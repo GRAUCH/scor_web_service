@@ -1,0 +1,149 @@
+package services
+
+import hwsol.webservices.CorreoUtil
+
+import java.text.SimpleDateFormat
+
+import javax.jws.WebMethod
+import javax.jws.WebParam
+import javax.jws.WebResult
+import javax.jws.WebService
+import javax.jws.soap.SOAPBinding
+
+import org.apache.cxf.annotations.SchemaValidation
+import org.grails.cxf.utils.EndpointType
+import org.grails.cxf.utils.GrailsCxfEndpoint
+import org.grails.cxf.utils.GrailsCxfEndpointProperty
+import org.springframework.web.context.request.RequestContextHolder
+
+import servicios.ClaveFiltro
+import servicios.Expediente
+import servicios.Filtro
+
+import com.scortelemed.Company
+import com.scortelemed.Recibido
+import com.ws.enumeration.StatusType
+import com.ws.lifesquare.beans.LifesquareUnderwrittingCaseManagementRequest
+import com.ws.lifesquare.beans.LifesquareUnderwrittingCaseManagementResponse
+import com.ws.servicios.EstadisticasService
+import com.ws.servicios.LogginService
+import com.ws.servicios.RequestService
+
+@WebService(targetNamespace = "http://www.scortelemed.com/schemas/lifesquare")
+@SchemaValidation
+@GrailsCxfEndpoint(address='/lifesquare/LifesquareUnderwrittingCaseManagement',
+expose = EndpointType.JAX_WS,properties = [@GrailsCxfEndpointProperty(name = "ws-security.enable.nonce.cache", value = "false"), @GrailsCxfEndpointProperty(name = "ws-security.enable.timestamp.cache", value = "false")])
+@SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
+class LifesquareUnderwrittingCaseManagementService {
+	
+	def protected estadisticasService = new EstadisticasService()
+	def protected requestService = new RequestService()
+	def protected logginService = new LogginService()
+	def crearExpedienteService
+	def tarificadorService
+	
+	@WebResult(name = "LifesquareUnderwrittingCaseManagementResponse")
+	@WebMethod
+	LifesquareUnderwrittingCaseManagementResponse LifesquareUnderwrittingCaseManagement(
+			@WebParam(partName = "LifesquareUnderwrittingCaseManagementRequest",name = "LifesquareUnderwrittingCaseManagementRequest")
+			LifesquareUnderwrittingCaseManagementRequest lifesquareUnderwrittingCaseManagementRequest) {
+
+		def opername = "LifesquareUnderwrittingCaseManagementRequest"
+		def correoUtil = new CorreoUtil()
+		def requestXML = ""
+		def requestBBDD
+		def company = Company.findByNombre('lifesquare')
+		def respuestaCrm
+		
+		Filtro filtro = new Filtro()
+		SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
+		LifesquareUnderwrittingCaseManagementResponse resultado = new LifesquareUnderwrittingCaseManagementResponse()
+
+		logginService.putInfoEndpoint("Endpoint-"+opername,"Peticion de Lifesqueare para solicitud: " + lifesquareUnderwrittingCaseManagementRequest.policy.policy_number)
+
+		try{
+
+			def operacion = estadisticasService.obtenerObjetoOperacion(opername)
+
+			if (lifesquareUnderwrittingCaseManagementRequest.getRequest_Data().getRecord().getNombre().equals("A")){
+
+				if (operacion && operacion.activo){
+
+					requestXML = requestService.marshall(lifesquareUnderwrittingCaseManagementRequest,LifesquareUnderwrittingCaseManagementRequest.class)
+					requestBBDD = requestService.crear(opername,requestXML)
+					requestBBDD.fecha_procesado = new Date()
+					requestBBDD.save(flush:true)
+					resultado.setStatusType(StatusType.ok)
+					resultado.setComments("ok mensaje")
+
+					if (Company.findByNombre("lifesquare").generationAutomatic) {
+
+						logginService.putInfoMessage("Se procede el alta automatica de Lifesquare con numero de solicitud " + lifesquareUnderwrittingCaseManagementRequest.policy.policy_number)
+						crearExpedienteService.crearExpediente(requestBBDD)
+
+
+						/**Metemos en recibidos
+						 *
+						 */
+						Recibido recibido = new Recibido()
+						recibido.setFecha(new Date())
+						recibido.setCia(company.id.toString())
+						recibido.setIdentificador(lifesquareUnderwrittingCaseManagementRequest.policy.policy_number)
+						recibido.setInfo(requestBBDD.request)
+						recibido.setOperacion("ALTA")
+						recibido.save(flush:true)
+						
+						
+						
+						/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
+						 *
+						 */
+						correoUtil.envioEmail(opername, null, 1)
+						tarificadorService.busquedaLifesquareCrm(lifesquareUnderwrittingCaseManagementRequest.policy.policy_number, company.ou, opername, company.codigoSt, company.id, requestBBDD)
+						
+					}
+					
+				} else {
+					resultado.setStatusType(StatusType.error)
+					resultado.setComments("La operacion esta desactivada temporalmente.")
+					logginService.putInfoMessage("Peticion " + opername + " no realizada para solicitud: " + lifesquareUnderwrittingCaseManagementRequest.policy.policy_number)
+					correoUtil.envioEmailErrores(opername,"Endpoint-"+ opername + ". La operacion esta desactivada temporalmente",null)
+				}
+			} else {
+
+				def msg = "Une annulation est requise pour le dossier " + lifesquareUnderwrittingCaseManagementRequest.policy.policy_number.toString()
+				correoUtil.envioEmailNoTratados("LifesquareUnderwrittingCaseManagementRequest",msg)
+			}
+			
+		}catch (Exception e){
+			
+			logginService.putInfoMessage("Peticion " + opername + " no realizada para solicitud: " + lifesquareUnderwrittingCaseManagementRequest.policy.policy_number.toString() + ". - Error: "+e.getMessage())
+			correoUtil.envioEmailErrores(opername,"Peticion no realizada para solicitud: " + lifesquareUnderwrittingCaseManagementRequest.policy.policy_number.toString(),e)
+			resultado.setStatusType(StatusType.error)
+			resultado.setComments("Error en "+opername+ ": "+e.getMessage())
+			
+			/**Metemos en errores
+			 *
+			 */
+			com.scortelemed.Error error = new com.scortelemed.Error()
+			error.setFecha(new Date())
+			error.setCia(company.id.toString())
+			error.setIdentificador(lifesquareUnderwrittingCaseManagementRequest.policy.policy_number.toString())
+			error.setInfo(requestBBDD.request)
+			error.setOperacion("ALTA")
+			error.setError("Peticion no realizada para solicitud: " + lifesquareUnderwrittingCaseManagementRequest.policy.policy_number.toString() + "- Error: "+e.getMessage())
+			error.save(flush:true)
+			
+		} finally {
+
+			def sesion=RequestContextHolder.currentRequestAttributes().getSession()
+			sesion.removeAttribute("userEndPoint")
+			sesion.removeAttribute("companyST")
+
+			resultado.setDate(lifesquareUnderwrittingCaseManagementRequest.request_Data.date)
+		}
+
+		return resultado
+	}
+
+}

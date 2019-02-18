@@ -1,0 +1,356 @@
+package services
+
+import grails.util.Environment
+import hwsol.webservices.CorreoUtil
+import hwsol.webservices.TransformacionUtil
+
+import java.text.SimpleDateFormat
+
+import javax.jws.WebParam
+import javax.jws.WebResult
+import javax.jws.WebService
+import javax.jws.soap.SOAPBinding
+
+import org.apache.cxf.annotations.SchemaValidation
+import org.grails.cxf.utils.EndpointType
+import org.grails.cxf.utils.GrailsCxfEndpoint
+import org.grails.cxf.utils.GrailsCxfEndpointProperty
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.web.context.request.RequestContextHolder
+
+import servicios.ClaveFiltro
+import servicios.Expediente
+import servicios.Filtro
+import servicios.RespuestaCRM
+import servicios.RespuestaCRMInforme
+
+import com.scortelemed.Company
+import com.scortelemed.Envio
+import com.scortelemed.Operacion
+import com.scortelemed.Recibido
+import com.scortelemed.schemas.caser.ConsultaExpedienteRequest;
+import com.scortelemed.schemas.caser.ConsultaExpedienteResponse;
+import com.scortelemed.schemas.netinsurance.NetinsuranteGetDossierRequest
+import com.scortelemed.schemas.netinsurance.NetinsuranteGetDossierResponse
+import com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCaseManagementRequest
+import com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCaseManagementResponse
+import com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCasesResultsRequest
+import com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCasesResultsResponse
+import com.scortelemed.schemas.netinsurance.ResultsBasicType
+import com.scortelemed.schemas.netinsurance.StatusType
+import com.ws.servicios.EstadisticasService
+import com.ws.servicios.LogginService
+import com.ws.servicios.NetinsuranceService
+import com.ws.servicios.RequestService
+import com.ws.servicios.TarificadorService
+
+@WebService(targetNamespace = "http://www.scortelemed.com/schemas/netinsurance")
+@SchemaValidation
+@GrailsCxfEndpoint(address='/netinsurance/NetinsuranceUnderwrittingCaseManagement',
+expose = EndpointType.JAX_WS,properties = [@GrailsCxfEndpointProperty(name = "ws-security.enable.nonce.cache", value = "false"), @GrailsCxfEndpointProperty(name = "ws-security.enable.timestamp.cache", value = "false")])
+@SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
+class NetinsuranceUnderwrittingCaseManagementService	 {
+
+	@Autowired
+	private NetinsuranceService netinsuranceService
+	@Autowired
+	private EstadisticasService estadisticasService
+	@Autowired
+	private RequestService requestService
+	@Autowired
+	private LogginService logginService
+	@Autowired
+	private TarificadorService tarificadorService
+
+	@WebResult(name = "CaseManagementResponse")
+	NetinsuranteUnderwrittingCaseManagementResponse netInsuranteUnderwrittingCaseManagement(
+			@WebParam(partName = "CaseManagementRequest",name = "CaseManagementRequest")
+			NetinsuranteUnderwrittingCaseManagementRequest netInsuranteUnderwrittingCaseManagement) {
+
+		def opername="NetinsuranceUnderwrittingCaseManagementRequest"
+		def correoUtil = new CorreoUtil()
+		def requestXML = ""
+		def crearExpedienteService
+		def requestBBDD
+		def respuestaCrm
+
+		Company company = Company.findByNombre("netinsurance")
+		Filtro filtro = new Filtro()
+		SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
+		TransformacionUtil util = new TransformacionUtil()
+		NetinsuranteUnderwrittingCaseManagementResponse resultado =new NetinsuranteUnderwrittingCaseManagementResponse()
+
+		String message = null
+		StatusType status = null
+
+		logginService.putInfoMessage("Realizando peticion de informacion de servicio GestionReconocimientoMedico para la cia " + company.nombre)
+
+		try{
+
+			def operacion = estadisticasService.obtenerObjetoOperacion(opername)
+
+			if (operacion && operacion.activo){
+
+				if (Company.findByNombre("netinsurance").generationAutomatic) {
+
+					requestXML=netinsuranceService.marshall("http://www.scortelemed.com/schemas/netinsurance",netInsuranteUnderwrittingCaseManagement)
+					requestBBDD = requestService.crear(opername,requestXML)
+					requestBBDD.fecha_procesado = new Date()
+					requestBBDD.save(flush:true)
+					netinsuranceService.crearExpediente(requestBBDD)
+
+					message = "Il caso è stato elaborato correttamente";
+					status = StatusType.OK
+
+					netinsuranceService.insertarRecibido(company, netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber, requestXML.toString(), "ALTA")
+
+					/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
+					 *
+					 */
+					netinsuranceService.busquedaCrm(netInsuranteUnderwrittingCaseManagement.candidateInformation.policyNumber, netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber, company.ou, opername, company.codigoSt, company.id, requestBBDD, company.nombre)
+				}
+			} else {
+
+				message = "L'operazione viene disattivata temporaneamente";
+				status = StatusType.OK
+
+				logginService.putInfoEndpoint("GestionReconocimientoMedico","Esta operacion para " + company.nombre + " esta desactivada temporalmente")
+				correoUtil.envioEmailErrores("GestionReconocimientoMedico","Peticion de " + company.nombre + " con numero de solicitud: " + netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber,"Esta operacion para " + company.nombre + " esta desactivada temporalmente")
+			}
+		} catch (Exception e){
+
+			message = "Error: " + e.printStackTrace();
+			status = StatusType.ERROR
+
+			netinsuranceService.insertarError(company, netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber, requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber + ". Error: " + e.getMessage())
+
+			logginService.putErrorEndpoint("GestionReconocimientoMedico","Peticion no realizada de " + company.nombre + " con numero de solicitud: " + netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber + ". Error: " + e.getMessage())
+			correoUtil.envioEmailErrores("GestionReconocimientoMedico","Peticion de " + company.nombre + " con numero de solicitud: " + netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber,e.getMessage())
+		}finally{
+
+			def sesion=RequestContextHolder.currentRequestAttributes().getSession()
+			sesion.removeAttribute("userEndPoint")
+			sesion.removeAttribute("companyST")
+		}
+
+		resultado.setMessage(message)
+		resultado.setDate(util.fromDateToXmlCalendar(new Date()))
+		resultado.setStatus(status)
+
+		return resultado
+	}
+
+	@WebResult(name = "CaseManagementResultsResponse")
+	NetinsuranteUnderwrittingCasesResultsResponse netInsuranteUnderwrittingCasesResults(
+			@WebParam(partName = "CaseManagementResultsRequest", name = "CaseManagementResultsRequest")
+			NetinsuranteUnderwrittingCasesResultsRequest netInsuranteUnderwrittingCasesResults) {
+
+		def opername="NetinsuranceUnderwrittingCaseManagementResponse"
+		def requestXML = ""
+		List<RespuestaCRMInforme> expedientes = new ArrayList<RespuestaCRMInforme>();
+		TransformacionUtil util = new TransformacionUtil()
+		CorreoUtil correoUtil = new CorreoUtil()
+
+		String notes = null
+		StatusType status = null
+
+		NetinsuranteUnderwrittingCasesResultsResponse resultado =new NetinsuranteUnderwrittingCasesResultsResponse()
+
+		Company company = Company.findByNombre("netinsurance")
+
+		try{
+
+			Operacion operacion = estadisticasService.obtenerObjetoOperacion(opername)
+
+			logginService.putInfoMessage("Realizando proceso envio de informacion para " + company.nombre + " con fecha " + netInsuranteUnderwrittingCasesResults.dateStart.toString() + "-" + netInsuranteUnderwrittingCasesResults.dateEnd.toString())
+
+			if(operacion && operacion.activo ) {
+
+				if (netInsuranteUnderwrittingCasesResults && netInsuranteUnderwrittingCasesResults.dateStart && netInsuranteUnderwrittingCasesResults.dateEnd){
+
+					requestXML=netinsuranceService.marshall("http://www.scortelemed.com/schemas/netinsurance",netInsuranteUnderwrittingCasesResults)
+
+					requestService.crear(opername,requestXML)
+
+					Date date = netInsuranteUnderwrittingCasesResults.dateStart.toGregorianCalendar().getTime()
+					SimpleDateFormat sdfr = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
+					String fechaIni = sdfr.format(date);
+					date = netInsuranteUnderwrittingCasesResults.dateEnd.toGregorianCalendar().getTime()
+					String fechaFin = sdfr.format(date);
+
+
+					for (int i = 1; i < 3; i++){
+						if (Environment.current.name.equals("production_wildfly")) {
+							expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1062",null,i,fechaIni,fechaFin,"IT"))
+						} else {
+							expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1060",null,i,fechaIni,fechaFin,"IT"))
+						}
+					}
+
+					netinsuranceService.insertarEnvio(company, netInsuranteUnderwrittingCasesResults.dateStart.toString().substring(0,10) + "-" + netInsuranteUnderwrittingCasesResults.dateEnd.toString().substring(0,10), requestXML.toString())
+
+					if(expedientes){
+
+						expedientes.each { expedientePoliza ->
+
+							resultado.getExpediente().add(netinsuranceService.rellenaDatosSalidaConsulta(expedientePoliza, netInsuranteUnderwrittingCasesResults.dateStart, logginService))
+						}
+
+						notes = "Risultati restituiti"
+						status = StatusType.OK
+
+						logginService.putInfoEndpoint("ResultadoReconocimientoMedico","Peticion realizada correctamente para " + company.nombre + " con fecha: " + netInsuranteUnderwrittingCasesResults.dateStart.toString() + "-" + netInsuranteUnderwrittingCasesResults.dateEnd.toString())
+					}else{
+
+						notes = "Nessun risultato per le date indicate"
+						status = StatusType.OK
+
+						logginService.putInfoEndpoint("ResultadoReconocimientoMedico","No hay resultados para " + company.nombre)
+					}
+				} else {
+
+					notes = "Nessuna data è stata inserita per la query"
+					status = StatusType.ERROR
+
+					logginService.putInfoEndpoint("ResultadoReconocimientoMedico","No se han introducido fechas para la consulta " + company.nombre)
+				}
+			} else {
+
+				notes = "L'operazione viene disabilitata temporaneamente"
+				status = StatusType.OK
+
+				logginService.putInfoEndpoint("ResultadoReconocimientoMedico","Esta operacion para " + company.nombre + " esta desactivada temporalmente")
+				correoUtil.envioEmailErrores("ResultadoReconocimientoMedico","Peticion de " + company.nombre + " con fecha: " + netInsuranteUnderwrittingCasesResults.dateStart.toString() + "-" + netInsuranteUnderwrittingCasesResults.dateEnd.toString(),"Esta operacion para " + company.nombre + " esta desactivada temporalmente")
+			}
+		}catch (Exception e){
+
+
+			notes = "Error: " + e.getMessage()
+			status = StatusType.ERROR
+
+			logginService.putErrorEndpoint("ResultadoReconocimientoMedico","Peticion realizada para " + company.nombre + " con fecha: " + netInsuranteUnderwrittingCasesResults.dateStart.toString() + "-" + netInsuranteUnderwrittingCasesResults.dateEnd.toString() + ". Error: " + e.getMessage())
+			correoUtil.envioEmailErrores("ResultadoReconocimientoMedico","Peticion realizada para " + company.nombre + " con fecha: " + netInsuranteUnderwrittingCasesResults.dateStart.toString() + "-" + netInsuranteUnderwrittingCasesResults.dateEnd.toString() + ". Error: " + e.getMessage())
+
+			netinsuranceService.insertarError(company, netInsuranteUnderwrittingCasesResults.dateStart.toString().substring(0,10) + "-" + netInsuranteUnderwrittingCasesResults.dateEnd.toString().substring(0,10), requestXML.toString(), "CONSULTA", "Peticion no realizada para solicitud: " + netInsuranteUnderwrittingCasesResults.dateStart.toString() + "-" + netInsuranteUnderwrittingCasesResults.dateEnd.toString() + ". Error: " + e.getMessage())
+		}finally{
+
+			def sesion=RequestContextHolder.currentRequestAttributes().getSession()
+			sesion.removeAttribute("userEndPoint")
+			sesion.removeAttribute("companyST")
+		}
+
+		resultado.setNotes(notes)
+		resultado.setDate(util.fromDateToXmlCalendar(new Date()))
+		resultado.setStatus(status)
+
+		return resultado
+	}
+
+	@WebResult(name = "NetinsuranteGetDossierResponse")
+	NetinsuranteGetDossierResponse netInsuranteGetDossier(
+			@WebParam(partName = "NetinsuranteGetDossierRequest", name = "NetinsuranteGetDossierRequest")
+			NetinsuranteGetDossierRequest consultaExpediente) {
+
+		NetinsuranteGetDossierResponse resultado = new NetinsuranteGetDossierResponse()
+
+		def opername="NetinsuranteGetDossier"
+		def requestXML = ""
+
+		String notes = null
+		StatusType status = null
+
+		RespuestaCRM respuestaCRM = new RespuestaCRM();
+		TransformacionUtil util = new TransformacionUtil()
+		CorreoUtil correoUtil = new CorreoUtil()
+
+		Company company = Company.findByNombre("netinsurance")
+
+		logginService.putInfoMessage("Realizando peticion de informacion de servicio ConsultaExpediente para la cia " + company.nombre)
+
+		try{
+
+			Operacion operacion = estadisticasService.obtenerObjetoOperacion(opername)
+
+			if(operacion && operacion.activo) {
+
+				if (consultaExpediente && consultaExpediente.requestNumber) {
+
+					requestXML=netinsuranceService.marshall("http://www.scortelemed.com/schemas/caser",consultaExpediente)
+
+					requestService.crear(opername,requestXML)
+
+					logginService.putInfoEndpoint("ConsultaExpediente","Realizando peticion para " + company.nombre + " con numero de expiente: " + consultaExpediente.requestNumber)
+
+					respuestaCRM = tarificadorService.consultaExpedienteNumSolicitud(consultaExpediente.requestNumber, company.ou.toString() ,company.codigoSt)
+
+					netinsuranceService.insertarEnvio (company, consultaExpediente.requestNumber, requestXML.toString())
+
+					if(respuestaCRM != null && respuestaCRM.getListaExpedientes() != null){
+
+						for (int i = 0; i < respuestaCRM.getListaExpedientes().size(); i++){
+
+							Expediente expediente = respuestaCRM.getListaExpedientes().get(i)
+
+							/**PARA EVITAR CONSULTAR DATOS DE OTRAS COMPAÑIAS
+							 *
+							 */
+
+							if (expediente.getCandidato().getCompanya().getCodigoST().equals(company.getCodigoSt())) {
+
+								resultado.getExpedienteConsulta().add(netinsuranceService.rellenaDatosSalidaExpediente(expediente, util.fromDateToXmlCalendar(new Date()), logginService))
+							}
+						}
+					}
+
+					if (resultado.getExpedienteConsulta() != null && resultado.getExpedienteConsulta().size() > 0) {
+
+						notes = "Risultati restituiti"
+						status = StatusType.OK
+
+						logginService.putInfoEndpoint("ConsultaExpediente","Peticion realizada correctamente para " + company.nombre + " con numero de expiente: " + consultaExpediente.requestNumber)
+					} else {
+
+						resultado.expedienteConsulta = null
+						notes = "Nessun risultato per le dossier indicate"
+						status = StatusType.OK
+
+						logginService.putInfoEndpoint("ConsultaExpediente","No hay resultados para " + company.nombre)
+					}
+				} else {
+
+					notes = "Nessun file è stato introdotto"
+					status = StatusType.ERROR
+
+					logginService.putInfoEndpoint("ConsultaExpediente","No se han introducido expediente para la consulta de " + company.nombre)
+				}
+			} else {
+
+				notes = "Questa operazione è temporaneamente disabilitata"
+				status = StatusType.OK
+
+				logginService.putInfoEndpoint("ConsultaExpediente","Esta operacion para " + company.nombre + " esta desactivada temporalmente")
+				correoUtil.envioEmail("ConsultaExpediente","Peticion de " + company.nombre + " con numero de expiente: " + consultaExpediente.requestNumber + ". Esta operacion para " + company.nombre + " esta desactivada temporalmente", 0)
+			}
+		}catch (Exception e){
+
+			logginService.putErrorEndpoint("ConsultaExpediente","Peticion realizada para " + company.nombre + " con con numero de expiente: " + consultaExpediente.requestNumber + ". Error: " + e.getMessage())
+			correoUtil.envioEmailErrores("ConsultaExpediente","Peticion realizada para " + company.nombre + " con numero de expiente: " + consultaExpediente.requestNumber, e)
+
+			notes = "Errore in ConsultaExpediente: " + e.getMessage()
+			status = StatusType.ERROR
+
+			netinsuranceService.insertarError(company, consultaExpediente.requestNumber, requestXML.toString(), "CONSULTA", "Peticion no realizada para solicitud: " + consultaExpediente.requestNumber + ". Error: " + e.getMessage())
+		}finally{
+			//BORRAMOS VARIABLES DE SESION
+			def sesion=RequestContextHolder.currentRequestAttributes().getSession()
+			sesion.removeAttribute("userEndPoint")
+			sesion.removeAttribute("companyST")
+		}
+
+		resultado.setNotes(notes)
+		resultado.setDate(util.fromDateToXmlCalendar(new Date()))
+		resultado.setStatus(status)
+
+		return resultado
+	}
+}

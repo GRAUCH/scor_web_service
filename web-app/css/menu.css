@@ -1,0 +1,188 @@
+#menu { /* es el bloque contenedor del menú */
+  padding-left: 10px;
+  height: 32px;
+  width: 100%;
+}
+#menu  ul { /* las listas */
+  display: block;
+  line-height: 1em;
+  list-style: none;
+  margin: 0 !important;
+  padding: 0 !important;
+  z-index: 90
+}
+#menu  ul li { /* los items de las listas */
+  float: left;
+  font-size: 10px;
+  line-height: 1, 5em;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  padding-left: 25px;
+}
+#menu ul li a { /* los enlaces de las listas */
+  background: transparent;
+  color: #333;
+  display: block;
+  font-weight: bold;
+  line-height: 32px;
+  text-decoration: none;
+  margin: 0;
+  padding: 0 1em;
+  width: auto;
+}
+#menu  ul li a:hover { /* efecto hover sobre los enlaces */
+  color: #000;
+  text-decoration: none;
+}
+#menu  ul.level2, #menu ul.level3 { /* las listas desplegables */
+  background: #fff;
+  border-top: 1px solid #ABC;
+  left: 0px;
+  position: absolute;
+  top: 0px;
+  visibility: hidden;
+}
+#menu  ul.level2 li, #menu ul.level3 li { /* cada item de las listas desplegables */
+  border-bottom: 1px solid #ABC;
+  float: none;
+  margin: 0;
+  padding: 0;
+  width: 150px;
+}
+#menu  ul.level2 li a, #menu ul.level3 li a { /* cada enlace de las listas desplegables */
+  padding: 0 1em;
+  margin-left: 5px;
+  padding-left: 25px;
+}
+#menu  ul.level2 li a:hover,#menu  ul.level3 li a:hover { /* efecto hover sobre esos enlaces */
+  background-color: #fff;
+}
+
+/*/////////////////////////////////////////////////////////////////*/
+
+#menu a.home, .button a.home {
+    background: url(../images/skin/house.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+#menu a.company, .button a.company {
+    background: url(../images/group.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+#menu a.conf, .button a.conf {
+    background: url(../images/wrench.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+#menu a.fichero, .button a.fichero {
+    background: url(../images/skin/database_save.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+#menu a.user, .button a.user {
+    background: url(../images/user_gray.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+#menu a.alert, .button a.alert {
+    background: url(../images/alerticon.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+#menu a.template, .button a.template {
+    background: url(../images/templateicon.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+#menu a.wservice, .button a.wservice {
+    background: url(../images/webservices.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+#menu a.stat, .button a.stat {
+    background: url(../images/statsicon.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+#menu a.roles, .button a.roles {
+    background: url(../images/roleicon.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+/*/////////////////////////////////////////////////////////////////*/
+
+.menuGrande {
+	background: #eaeaea url(../images/skin/shadow.jpg) repeat-x scroll 0 0;
+	width: 200px;
+	margin: 5px;
+	padding: 10 5 10 5;
+	float:left;
+	font-size: 12px;
+	text-align:center;
+	border: 1px solid #ccc;
+    border-style: solid none;
+}
+
+.menuGrande a.company {
+    background: url(../images/group.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+.menuGrande a.conf {
+    background: url(../images/wrench.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+.menuGrande a.user {
+    background: url(../images/user_gray.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+.menuGrande a.alert {
+    background: url(../images/alerticon.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+.menuGrande a.template {
+    background: url(../images/templateicon.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+.menuGrande a.wservice {
+    background: url(../images/webservices.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+.menuGrande a.stat {
+    background: url(../images/statsicon.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+.menuGrande a.roles {
+    background: url(../images/roleicon.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+
+
+

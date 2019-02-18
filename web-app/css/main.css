@@ -1,0 +1,611 @@
+/* GENERAL */
+
+.spinner {
+    padding: 5px;
+    position: absolute;
+    right: 0;
+}
+
+body {
+    background: #fff;
+    color: #333;
+    font: 11px verdana, arial, helvetica, sans-serif;
+    margin: 0px;
+}
+
+
+.body {
+	position: relative;
+	padding: 20px 0;
+ 	clear: both;
+	width: 915px;
+	overflow: auto;
+	z-index: 0;   
+}
+
+
+a:link, a:visited, a:hover {
+    color: #666;
+    font-weight: bold;
+    text-decoration: none;
+} 
+
+h1 {
+    color: #006A8D;
+    font-weight: bold;
+    font-size: 16px;
+    margin: 15px 0 10px 0;
+    background-color: #f5f5f5;
+    padding: 4px 10px 4px 10px;
+    border: 1px solid #efefef;
+}
+
+ul {
+    padding-left: 15px;	
+}
+
+input, select, textarea {
+    background-color: #fcfcfc;
+    border: 1px solid #ccc;
+    font: 11px verdana, arial, helvetica, sans-serif;
+    margin: 2px 0;
+    padding: 2px 4px;
+}
+select {
+   padding: 2px 2px 2px 0;
+}
+textarea {
+	width: 720px;
+	height: 150px;
+	vertical-align: top;
+}
+
+input:focus, select:focus, textarea:focus {
+    border: 1px solid #b2d1ff;
+}
+
+/* NAVIGATION MENU */
+
+.nav {
+    background: #eaeaea url(../images/skin/shadow.jpg) repeat-x scroll 0 0;
+    border: 1px solid #ccc;
+    border-style: solid none;	
+    margin:0 auto;
+    width: 900px;
+}
+
+.menuButton {
+    font-size: 10px;
+    padding: 0 5px;
+}
+
+.menuButton a {
+    color: #333;
+    padding: 4px 6px;
+    margin-right: 15px;
+}
+
+.menuButton a.home, .button a.home {
+    background: url(../images/skin/house.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+.menuButton a.company, .button a.company {
+    background: url(../images/group.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+.menuButton a.conf, .button a.conf {
+    background: url(../images/wrench.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+.menuButton a.user, .button a.user {
+    background: url(../images/user_gray.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+.menuButton a.ipres, .button a.ipresr {
+    background: url(../images/user.gif) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+.menuButton a.frontend, .button a.frontend {
+    background: url(../images/world_go.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+}
+
+
+
+/* MESSAGES AND ERRORS */
+
+.message {
+    background: #f3f8fc url(../images/skin/information.png) 8px 50% no-repeat;
+    border: 1px solid #b2d1ff;
+    color: #006dba;
+    margin: 10px 0 5px 0;
+    padding: 5px 5px 5px 30px;
+}
+
+div.errors {
+    background: #fff3f3;
+    border: 1px solid red;
+    color: #cc0000;
+    margin: 10px 0 5px 0;
+    padding: 5px 0 5px 0;
+}
+div.errors ul {
+    list-style: none;
+    padding: 0;	
+}
+div.errors li {
+	background: url(../images/skin/exclamation.png) 8px 0% no-repeat;
+    line-height: 16px;
+    padding-left: 30px;
+}
+
+td.errors select {
+    border: 1px solid red;
+}
+td.errors input {
+    border: 1px solid red;
+}
+
+/* TABLES */
+
+table {
+    border: 1px solid #ccc;
+    width: 100%;
+}
+tr {
+    border: 0;
+}
+td, th { 
+    font: 11px verdana, arial, helvetica, sans-serif;
+    line-height: 12px;
+    padding: 5px 6px;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background: #fff url(../images/skin/shadow.jpg);
+    color: #666;
+    font-size: 11px;
+    font-weight: bold;
+    line-height: 17px;
+    padding: 2px 6px;
+}
+th a:link, th a:visited, th a:hover {
+    color: #333;
+    display: block;
+    font-size: 10px;
+    text-decoration: none;
+    width: 100%;
+}
+th.asc a, th.desc a {
+    background-position: right;
+    background-repeat: no-repeat;
+}
+th.asc a {
+    background-image: url(../images/skin/sorted_asc.gif);
+}
+th.desc a {
+    background-image: url(../images/skin/sorted_desc.gif);
+}
+
+.odd {
+    background: #f7f7f7;
+}
+.even {
+    background: #fff;
+}
+
+/* LIST */
+
+.list {
+	clear: both;
+	margin: 0px auto;
+}
+
+.list table {
+    border-collapse: collapse;
+}
+.list th, .list td {
+    border-left: 1px solid #ddd;
+}
+.list th:hover, .list tr:hover {
+    background: #b2d1ff;
+}
+
+/* PAGINATION */
+
+.paginateButtons {
+    background: #fff url(../images/skin/shadow.jpg) bottom repeat-x;
+    border: 1px solid #ccc;
+    border-top: 0;
+    color: #666;
+    font-size: 10px;
+    overflow: hidden;
+    padding: 10px 3px;
+}
+.paginateButtons a {
+    background: #fff;
+    border: 1px solid #ccc;
+    border-color: #ccc #aaa #aaa #ccc;
+    color: #666;
+    margin: 0 3px;
+    padding: 2px 6px;
+}
+.paginateButtons span {
+    padding: 2px 3px;
+}
+
+/* DIALOG */
+
+.dialog table {
+    padding: 5px 0;
+}
+
+.prop {
+    padding: 5px;
+}
+
+.propVertical {
+	float: left;
+    padding-left: 10px;
+    width: 99%;
+}
+
+.propVertical .linea {
+	padding-top: 10px;
+    text-align: left;
+    white-space: nowrap;
+    width: 400px;
+    border-bottom: 1px dotted #ccc;
+}
+
+.propVertical .nombre {
+	width: 150px;
+	float: left;
+}
+
+.prop .name {
+    text-align: left;
+    width: 15%;
+    white-space: nowrap;
+}
+.prop .value {
+    text-align: left;
+    width: 85%;
+}
+// MIOS
+.prop .value ul {
+	padding-left: 0px;
+	margin: 0px;
+	list-style:none;
+}
+
+.prop .value li {
+	color: #000;
+	padding: 4px;
+	padding-left: 0px;
+	list-style:none;
+}
+
+.botonLupa {
+	background: transparent url(../images/search_icon.png) no-repeat;
+	padding-left: 18px;
+}
+
+
+/* ACTION BUTTONS */
+
+.buttons {
+    background: #fff url(../images/skin/shadow.jpg) bottom repeat-x;
+    border: 1px solid #ccc;
+    color: #666;
+    font-size: 10px;
+    margin-top: 5px;
+    overflow: hidden;
+    padding: 0;
+}
+
+.buttons input {
+    background: #fff;
+    border: 0;
+    color: #333;
+    cursor: pointer;
+    font-size: 10px;
+    font-weight: bold;
+    margin-left: 3px;
+    overflow: visible;
+    padding: 2px 6px;
+}
+.buttons input.find {
+    background: transparent url(../images/skin/icono_find.png) 5px 50% no-repeat;
+    padding-left: 28px;
+    margin-left: 10px;
+}
+.buttons input.delete {
+    background: transparent url(../images/skin/database_delete.png) 5px 50% no-repeat;
+    padding-left: 28px;
+}
+.buttons input.edit {
+    background: transparent url(../images/skin/database_edit.png) 5px 50% no-repeat;
+    padding-left: 28px;
+}
+.buttons input.save {
+    background: transparent url(../images/skin/database_save.png) 5px 50% no-repeat;
+    padding-left: 28px;
+}
+.buttons input.list {
+    background: transparent url(../images/skin/database_table.png) center left no-repeat;
+    padding-left: 25px;
+}
+
+.buttons input.create {
+    background: transparent url(../images/skin/database_add.png) center left no-repeat;
+    padding-left: 25px;
+}
+
+.buttons input.cancel {
+    background: transparent url("../images/cross.png") center left no-repeat;
+    padding-left: 25px;
+}
+
+.menuButton a.list, .button a.list {
+    background: transparent url(../images/skin/database_table.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+    overflow: auto;
+    margin-left: 5px;
+}
+.menuButton a.create, .button a.create {
+    background: url(../images/skin/database_add.png) center left no-repeat;
+    color: #333;
+    padding-left: 25px;
+    overflow: auto;
+    margin-left: 3px;
+    position: relative;
+    z-index: 10;
+}
+
+
+.delete {
+    background: transparent url(../images/skin/database_delete.png) 5px 50% no-repeat;
+    padding:2px 6px;
+    padding-left: 28px;
+    font-size:10px;
+	font-weight:bold;
+	margin-left:3px;
+}
+.edit {
+    background: transparent url(../images/skin/database_edit.png) 5px 50% no-repeat;
+    padding:2px 6px;
+    padding-left: 28px;
+    font-size:10px;
+	font-weight:bold;
+	margin-left:3px;
+}
+
+td.si {
+	background: url("../images/accept.png") no-repeat top left;
+	color: #fff;
+	padding-left: 30px;
+}
+
+td.no {
+	background: url("../images/cross.png") no-repeat top left;
+	color: #fff;
+	padding-left: 30px;
+}
+
+td.silist {
+	background: url("../images/accept.png") no-repeat center;
+}
+
+td.nolist {
+	background: url("../images/cross.png") no-repeat center;
+}
+
+/* ********* CUSTOMIZATION ********** */
+
+/* LAYOUT */
+
+#container {
+	position: relative;
+	margin: 0 auto;
+	width: 900px;
+}
+
+#pie {
+	border-top: 2px solid #84B823;
+	margin: 15px 0px;
+	padding-top: 5px;
+	font-size: 10px;
+	overflow: hidden;
+}
+
+#user-info {
+	clear:both;
+	float: right;
+	font-weight: bold;
+	color: #333;
+	overflow: hidden;
+}
+
+#login {
+	width: 50%;
+	margin-left: auto;
+	margin-right: auto;
+	overflow: hidden;
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+
+.login-message {
+  background: #fff3f3;
+  border: 1px solid red;
+  color: #cc0000;
+  margin: 10px 0 5px 0;
+  padding: 7px;
+}
+
+.login-form label {
+	font-weight: bold;
+	padding: 2px;
+	font-size: 12px;
+}
+
+.login-form .label {
+	vertical-align: middle;
+	text-align: right;
+}
+
+.login-form input {
+	padding: 5px;
+	font-size: 12px;
+}
+
+.login-button {
+	text-align: center;
+}
+
+.login-button input {
+	background: #fff url(../images/skin/shadow.jpg) bottom repeat-x;
+    border: 1px solid #ccc;
+    color: #666;
+    font-size: 10px;
+    margin-top: 5px;
+    overflow: hidden;
+    padding: 10px;
+    font-weight: bold;
+}
+/* -----------------------------------------------------------------------------------------------MENU  */
+#menubackend{
+	width: 900px;
+	margin: 0px auto;
+	font-family: sans-serif, Tahoma, Verdana, Geneva, Arial, Helvetica;
+	font-size: 11px;
+	clear: both;
+}
+
+.nMenu{
+ float: right;
+ margin: 10px auto 0px auto;
+ width: 300px;
+ height: 15px;
+ overflow: visible;
+ z-index: 10;
+}
+
+.usuarioMenu{
+	float: right;
+	font-family: sans-serif, Tahoma, Verdana, Geneva, Arial, Helvetica;
+	font-weight: bold;
+	font-size: 11px;
+	width: auto;
+} 
+
+#logo {
+	background:transparent url(../images/cabecera_logo.png) no-repeat scroll 0 0;
+	height:90px;
+	margin-bottom: 15px;
+	width:200px;
+}
+
+.opcionesMenu{
+	float: right;
+	font-family: sans-serif, Tahoma, Verdana, Geneva, Arial, Helvetica;
+	font-weight: bold;
+	font-size: 11px;
+	width: auto;
+	padding-right: 5px;
+	margin-bottom: 7px;
+	clear: both;
+}
+
+/* ---------------------------------------------------------------------- PIE */
+
+.maCopy, .autoPubli{
+	width: auto;
+	padding: 3px;
+}
+
+.maCopy{
+	float: left;
+}
+
+.autoPubli{	
+	float: right;
+}
+
+.autoPubli a:link, .autoPubli a:visited{
+	text-decoration: none;
+	color: #333;
+	font-size: 11px;
+	font-weight: normal;
+}
+
+.autoPubli a:hover{
+	text-decoration: none;
+	color: #025589;
+	font-size: 11px;
+}
+
+.autoPubli .azul_hello {
+	color: #00ABD1;
+}
+
+.pie{
+	width: 900px;
+	clear: both;
+	font-family: sans-serif, Tahoma, Verdana, Geneva, Arial, Helvetica;
+	font-size: 10px;
+	margin: 10px auto;
+	overflow: auto;
+	border-top: 1px solid #52a926;
+}
+
+.clear{
+	clear:both;
+}
+
+/*--------------------------------------------------------------------------------------*/
+
+.ayudanteCaja {
+	font-size: 12px; 
+	border: solid 1px #ccc;
+	width: 33%;
+}
+
+.ayudanteLink {
+	cursor: pointer;
+}
+
+.ayudanteAyuda {
+	background:transparent url(../images/helpicon.png) no-repeat;
+	padding-left: 18px;
+	font-size: 12px;
+}
+
+.correcto {
+	background: url("../images/accept.png") no-repeat top left;
+	padding-left: 30px;
+	margin: 30px;
+}
+
+.nocorrecto {
+	background: url("../images/cross.png") no-repeat top left;
+	padding-left: 30px;
+	margin: 30px;
+}
+.linkBloque { 
+	display: block;
+}

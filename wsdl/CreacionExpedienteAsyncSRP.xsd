@@ -1,0 +1,30 @@
+<schema attributeFormDefault="unqualified"
+	elementFormDefault="qualified"
+	targetNamespace="http://www.scor.com/CreacionExpedienteAsyncSRP"
+	xmlns="http://www.w3.org/2001/XMLSchema">
+	<element name="CreacionExpedienteAsyncSRPProcessRequest">
+		<complexType>
+			<sequence>
+				<element name="input" type="string"/>
+			</sequence>
+		</complexType>
+	</element>
+	<element name="CreacionExpedienteAsyncSRPProcessResponse">
+		<complexType>
+			<sequence>
+				<element name="result" type="string"/>
+			</sequence>
+		</complexType>
+	</element>
+	<element name="CreacionExpedienteAsyncSRPErrorResponse">
+		<complexType>
+			<sequence>
+				<element name="errorCode" type="string"/>
+                <element name="errorDesc" type="string"/>
+                <element name="systemId" type="string"/>
+                <element name="systemErrorCode" type="string"/>
+                <element name="details" type="string"/>
+			</sequence>
+		</complexType>
+	</element>
+</schema>

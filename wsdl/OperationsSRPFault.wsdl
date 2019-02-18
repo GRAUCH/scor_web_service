@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions name="OperationsSRPFault"
+    targetNamespace="http://www.scor.com/exceptionsSRP"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns="http://schemas.xmlsoap.org/wsdl/">
+
+    <message name="OperacionSRPFaultMessage">
+        <part name="errorCode" type="xsd:string"/>
+        <part name="errorDesc" type="xsd:string"/>
+        <part name="systemId" type="xsd:string"/>
+        <part name="systemErrorCode" type="xsd:string"/>
+        <part name="details" type="xsd:string"/>
+    </message>
+</definitions>

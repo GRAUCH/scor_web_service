@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://www.scor.com/SRPFileInbound"
+            xmlns:tns="http://www.scor.com/SRPFileInbound"
+            elementFormDefault="qualified" attributeFormDefault="unqualified">
+  <xsd:element name="Root-Element">
+    <xsd:complexType>
+      <xsd:choice minOccurs="1" maxOccurs="unbounded">
+        <xsd:element name="CABECERA">
+          <xsd:complexType>
+            <xsd:sequence>
+              <xsd:element name="contadorSecuencial" type="xsd:string"/>
+              <xsd:element name="fechaGeneracion" type="xsd:string"/>
+              <xsd:element name="tipoFichero" type="xsd:string"/>
+              <xsd:element name="codigoCia" type="xsd:string"/>
+              <xsd:element name="filler" type="xsd:string"/>
+            </xsd:sequence>
+          </xsd:complexType>
+        </xsd:element>
+        <xsd:element name="DATOS" type="tns:DATOS" minOccurs="1" maxOccurs="unbounded"></xsd:element>
+        <xsd:element name="PIE">
+          <xsd:complexType>
+            <xsd:sequence>
+              <xsd:element name="numRegistros" type="xsd:int"/>
+              <xsd:element name="numFilasFichero" type="xsd:int"/>
+              <xsd:element name="filler" type="xsd:string"/>
+            </xsd:sequence>
+          </xsd:complexType>
+        </xsd:element>
+      </xsd:choice>
+    </xsd:complexType>
+  </xsd:element>
+  
+  
+  <xsd:complexType name="DATOS">
+    <xsd:sequence>
+      <xsd:element name="registro" type="tns:REGISTRO_DATOS"/>
+      <xsd:element name="pregunta" minOccurs="0" maxOccurs="unbounded">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="tipoDatos" type="xsd:string"/>
+            <xsd:element name="codigoPregunta" type="xsd:string"/>
+            <xsd:element name="respuesta" type="xsd:string"/>
+            <xsd:element name="filler" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="servicio" minOccurs="0" maxOccurs="unbounded">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="tipoServicios" type="xsd:string"/>
+            <xsd:element name="codigoServicio" type="xsd:string"/>
+            <xsd:element name="descripcionServicio" type="xsd:string"/>
+            <xsd:element name="filler" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="coberturas" minOccurs="0" maxOccurs="unbounded">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="codigoCobertura" type="xsd:string"/>
+            <xsd:element name="nombreCobertura" type="xsd:string"/>
+            <xsd:element name="capital" type="xsd:float"/>
+            <xsd:element name="filler" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+  
+  
+  <xsd:complexType name="REGISTRO_DATOS">
+    <xsd:sequence>
+      <xsd:element name="modificarSolicitudesDuplicadas" type="xsd:string"></xsd:element>
+      <xsd:element name="numSecuencia" type="xsd:string"></xsd:element>
+      <xsd:element name="fechaGeneracion" type="tns:SRPdate"></xsd:element>
+      <xsd:element name="codigoCia" type="xsd:string"></xsd:element>
+      <xsd:element name="codigoProducto" type="xsd:string"/>
+      <xsd:element name="numSolicitud" type="xsd:string"/>
+      <xsd:element name="numPoliza" type="xsd:string"/>
+      <xsd:element name="numCertificado" type="xsd:string"/>
+      <xsd:element name="numMovimiento" type="xsd:string"/>
+      <xsd:element name="fechaEnvio" type="xsd:string"/>
+      <xsd:element name="tipoServicio" type="xsd:int"/>
+      <xsd:element name="claveValidacionCliente" type="xsd:string"/>
+      <xsd:element name="estadoExpediente" type="xsd:string"/>
+      <xsd:element name="nombreCliente" type="xsd:string"/>
+      <xsd:element name="apellidosCliente" type="xsd:string"/>
+      <xsd:element name="direccionCliente" type="xsd:string"/>
+      <xsd:element name="codigoPostal" type="xsd:string"/>
+      <xsd:element name="poblacion" type="xsd:string"/>
+      <xsd:element name="provincia" type="xsd:string"/>
+      <xsd:element name="pais" type="xsd:string"/>
+      <xsd:element name="telefono1" type="xsd:string"/>
+      <xsd:element name="telefono2" type="xsd:string"/>
+      <xsd:element name="telefono3" type="xsd:string"/>
+      <xsd:element name="email" type="xsd:string"/>
+      <xsd:element name="fechaNacimiento" type="xsd:string"/>
+      <xsd:element name="edadActuarial" type="xsd:int"/>
+      <xsd:element name="lugarNacimiento" type="xsd:string"/>
+      <xsd:element name="dni" type="xsd:string"/>
+      <xsd:element name="codigoAgencia" type="xsd:string"/>
+      <xsd:element name="nomApellAgente" type="xsd:string"/>
+      <xsd:element name="telefonoAgente" type="xsd:string"/>
+      <xsd:element name="emailAgente" type="xsd:string"/>
+      <xsd:element name="coberturaFallecimiento" type="xsd:string"/>
+      <xsd:element name="capitalFallecimiento" type="xsd:int"/>
+      <xsd:element name="coberturaInvalidez" type="xsd:string"/>
+      <xsd:element name="capitalInvalidez" type="xsd:int"/>
+      <xsd:element name="sexo" type="xsd:string"/>
+      <xsd:element name="estadoCivil" type="xsd:string"/>
+      <xsd:element name="tipoCliente" type="xsd:string"/>
+      <xsd:element name="franjaHoraria" type="xsd:string"/>
+      <xsd:element name="codigoCuestionario" type="xsd:string"/>
+      <xsd:element name="observaciones" type="xsd:string"/>
+      <xsd:element name="campo1" type="xsd:string"/> 
+      <xsd:element name="campo2" type="xsd:string"/>  
+      <xsd:element name="campo3" type="xsd:string"/>  
+      <xsd:element name="campo4" type="xsd:string"/>  
+      <xsd:element name="campo5" type="xsd:string"/>  
+      <xsd:element name="campo6" type="xsd:string"/>  
+      <xsd:element name="campo7" type="xsd:string"/>  
+      <xsd:element name="campo8" type="xsd:string"/>  
+      <xsd:element name="campo9" type="xsd:string"/> 
+      <xsd:element name="campo10" type="xsd:string"/>
+      <xsd:element name="campo11" type="xsd:string"/>  
+      <xsd:element name="campo12" type="xsd:string"/>  
+      <xsd:element name="campo13" type="xsd:string"/>
+      <xsd:element name="campo14" type="xsd:string"/>  
+      <xsd:element name="campo15" type="xsd:string"/> 
+      <xsd:element name="campo16" type="xsd:string"/>  
+      <xsd:element name="campo17" type="xsd:string"/>
+      <xsd:element name="campo18" type="xsd:string"/>  
+      <xsd:element name="campo19" type="xsd:string"/>
+      <xsd:element name="campo20" type="xsd:string"/>
+    </xsd:sequence>
+
+  </xsd:complexType>
+  <xsd:element name="RegistroDatos" type="tns:DATOS"/>
+    <xsd:simpleType name="SRPdate">
+    <xsd:restriction base="xsd:token">
+      <xsd:pattern value="((19|20)\d\d)(0[1-9]|1[012])(0[1-9]|1[0-9]|2[0-9]|3[01])"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+</xsd:schema>

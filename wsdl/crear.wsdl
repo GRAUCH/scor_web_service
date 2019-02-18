@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+     name="CreacionExpedienteAsyncSRP"
+     targetNamespace="http://www.scor.com/CreacionExpedienteAsyncSRP"
+     xmlns="http://schemas.xmlsoap.org/wsdl/"
+     xmlns:tns="http://www.scor.com/CreacionExpedienteAsyncSRP"
+     xmlns:wsa="http://schemas.xmlsoap.org/ws/2003/03/addressing"
+     xmlns:ns1="http://www.scor.com/SRPFileInbound"
+     xmlns:fault="http://www.scor.com/exceptionsSRP"
+     xmlns:plnk="http://schemas.xmlsoap.org/ws/2003/05/partner-link/"
+     xmlns:ns3="http://servicios/"
+     xmlns:ns2="http://schemas.oracle.com/bpel/extension"
+     xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+     xmlns:bpelx="http://schemas.oracle.com/bpel/extension"
+     xmlns:client="http://www.scor.com/CreacionExpedienteAsyncSRP"
+    >
+    <import namespace="http://schemas.oracle.com/bpel/extension" location="RuntimeFault.wsdl"/>
+    <import namespace="http://www.scor.com/exceptionsSRP" location="OperationsSRPFault.wsdl"/>
+    <types>
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:ns1="http://www.scor.com/SRPFileInbound"
+             xmlns:fault="http://www.scor.com/exceptionsSRP" xmlns:plnk="http://schemas.xmlsoap.org/ws/2003/05/partner-link/"
+             xmlns:client="http://www.scor.com/CreacionExpedienteAsyncSRP">
+            <import namespace="http://www.scor.com/CreacionExpedienteAsyncSRP" schemaLocation="CreacionExpedienteAsyncSRP.xsd"/>
+        </schema>
+        <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns1="http://www.scor.com/SRPFileInbound"
+             xmlns:fault="http://www.scor.com/exceptionsSRP" xmlns:plnk="http://schemas.xmlsoap.org/ws/2003/05/partner-link/"
+             xmlns:client="http://www.scor.com/CreacionExpedienteAsyncSRP">
+            <xsd:import namespace="http://www.scor.com/SRPFileInbound" schemaLocation="SRPFileInbound.xsd"/>
+        </xsd:schema>
+        <schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" attributeFormDefault="qualified" elementFormDefault="qualified">
+			<import namespace="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" 
+       		schemaLocation="oasis-200401-wss-wssecurity-secext-1.0.xsd" />
+		</schema>
+        <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+            <xsd:import namespace="http://servicios/" schemaLocation="FrontalService.xsd"/>
+        </xsd:schema>
+        <schema xmlns="http://www.w3.org/2001/XMLSchema">
+            <import namespace="http://schemas.xmlsoap.org/ws/2003/03/addressing" schemaLocation="http://172.26.0.2:8888/orabpel/xmllib/ws-addressing.xsd"/>
+        </schema>
+    </types>
+    <message name="CreacionExpedienteAsyncSRPRequestMessage">
+        <part name="payload" element="ns1:Root-Element"/>
+    </message>
+    <message name="CreacionExpedienteAsyncSRPResponseMessage">
+        <part name="payload" element="tns:CreacionExpedienteAsyncSRPProcessResponse"/>
+    </message>
+    <message name="WSARelatesToHeader">
+        <part name="RelatesTo" element="wsa:RelatesTo"/>
+    </message>
+    <message name="WSAReplyToHeader">
+        <part name="ReplyTo" element="wsa:ReplyTo"/>
+    </message>
+    <message name="WSAMessageIDHeader">
+        <part name="MessageID" element="wsa:MessageID"/>
+    </message>
+    <portType name="CreacionExpedienteAsyncSRP">
+        <operation name="initiate">
+            <input message="tns:CreacionExpedienteAsyncSRPRequestMessage"/>
+        </operation>
+    </portType>
+    <portType name="CreacionExpedienteAsyncSRPCallback">
+        <operation name="onResult">
+            <input message="tns:CreacionExpedienteAsyncSRPResponseMessage"/>
+        </operation>
+        <operation name="onException">
+            <input message="fault:OperacionSRPFaultMessage"/>
+        </operation>
+        <operation name="onSystemException">
+            <input message="ns2:RuntimeFaultMessage"/>
+        </operation>
+    </portType>
+    <binding name="CreacionExpedienteAsyncSRPBinding" type="tns:CreacionExpedienteAsyncSRP">
+        <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <operation name="initiate">
+            <soap:operation style="rpc" soapAction="initiate"/>
+            <input>
+                <soap:header message="tns:WSAReplyToHeader" part="ReplyTo" use="literal" encodingStyle=""/>
+                <soap:header message="tns:WSAMessageIDHeader" part="MessageID" use="literal" encodingStyle=""/>
+                <soap:body use="literal" namespace="http://www.scor.com/CreacionExpedienteAsyncSRP"/>
+            </input>
+        </operation>
+    </binding>
+    <binding name="CreacionExpedienteAsyncSRPCallbackBinding" type="tns:CreacionExpedienteAsyncSRPCallback">
+        <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <operation name="onResult">
+            <soap:operation style="rpc" soapAction="onResult"/>
+            <input>
+                <soap:header message="tns:WSARelatesToHeader" part="RelatesTo" use="literal" encodingStyle=""/>
+                <soap:body use="literal" namespace="http://www.scor.com/CreacionExpedienteAsyncSRP"/>
+            </input>
+        </operation>
+        <operation name="onException">
+            <soap:operation style="rpc" soapAction="onException"/>
+            <input>
+                <soap:header message="tns:WSARelatesToHeader" part="RelatesTo" use="literal" encodingStyle=""/>
+                <soap:body use="literal" namespace="http://www.scor.com/CreacionExpedienteAsyncSRP"/>
+            </input>
+        </operation>
+        <operation name="onSystemException">
+            <soap:operation style="rpc" soapAction="onSystemException"/>
+            <input>
+                <soap:header message="tns:WSARelatesToHeader" part="RelatesTo" use="literal" encodingStyle=""/>
+                <soap:body use="literal" namespace="http://www.scor.com/CreacionExpedienteAsyncSRP"/>
+            </input>
+        </operation>
+    </binding>
+    <service name="CreacionExpedienteAsyncSRP">
+        <port name="CreacionExpedienteAsyncSRPPort" binding="tns:CreacionExpedienteAsyncSRPBinding">
+            <soap:address location="http://172.26.0.2:8888/orabpel/default/CreacionExpedienteAsyncSRP/5.0"/>
+        </port>
+    </service>
+    <service name="CreacionExpedienteAsyncSRPCallbackService">
+        <port name="CreacionExpedienteAsyncSRPCallbackPort" binding="tns:CreacionExpedienteAsyncSRPCallbackBinding">
+            <soap:address location="http://set.by.caller"/>
+        </port>
+    </service>
+  <plnk:partnerLinkType name="CreacionExpedienteAsyncSRP">
+    <plnk:role name="CreacionExpedienteAsyncSRPProvider">
+      <plnk:portType name="tns:CreacionExpedienteAsyncSRP"/>
+    </plnk:role>
+    <plnk:role name="CreacionExpedienteAsyncSRPRequester">
+      <plnk:portType name="tns:CreacionExpedienteAsyncSRPCallback"/>
+    </plnk:role>
+  </plnk:partnerLinkType>
+</definitions>
