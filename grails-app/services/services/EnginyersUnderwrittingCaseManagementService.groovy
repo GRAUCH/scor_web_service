@@ -4,6 +4,7 @@ package services
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
 import hwsol.webservices.WsError
+import org.springframework.web.context.request.RequestContextHolder
 
 import java.text.SimpleDateFormat
 import java.util.List;
@@ -37,15 +38,14 @@ import com.ws.servicios.TarificadorService
 
 @WebService(targetNamespace = "http://www.scortelemed.com/schemas/enginyers")
 @SchemaValidation
-@GrailsCxfEndpoint(address='/enginyers/EnginyersUnderwrittingCaseManagement',
+@GrailsCxfEndpoint(address='/enginyers/EnginyersUnderwrittingCaseManagement', inInterceptors = ['interceptorEventos'],
 expose = EndpointType.JAX_WS,properties = [@GrailsCxfEndpointProperty(name = "ws-security.enable.nonce.cache", value = "false"), @GrailsCxfEndpointProperty(name = "ws-security.enable.timestamp.cache", value = "false")])
 @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
 
-class EnginyersUnderwrittingCaseManagementService	 {
-	
+class EnginyersUnderwrittingCaseManagementService {
 	
 	@Autowired
-	private EnginyersService psnService
+	private EnginyersService enginyersService
 	@Autowired
 	private EstadisticasService estadisticasService
 	@Autowired
@@ -60,85 +60,113 @@ class EnginyersUnderwrittingCaseManagementService	 {
 	AddExpResponse addExp(
 			@WebParam(partName = "addExp",name = "addExp")
 			AddExp addExp) {
-			
 
 			def opername="EnginyersResultadoReconocimientoMedicoRequest"
 			def correoUtil = new CorreoUtil()
 			List<WsError> wsErrors = new ArrayList<WsError>()
-			def requestXML = ""
-			def crearExpedienteService
+			def requestXML
 			def requestBBDD
-			def respuestaCrm
-	
-			String message = null
-			int code = 0
-	
+
 			Company company = Company.findByNombre("enginyers")
 			SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
 			TransformacionUtil util = new TransformacionUtil()
 			AddExpResponse resultado=new AddExpResponse()
-	
+
+			ArrayOfFaultElement array = new ArrayOfFaultElement()
+			FaultElement fault = new FaultElement();
+			Expedient expedient = new Expedient();
+			expedient.setIdExpedient(Integer.valueOf(addExp.getD().getPolicyNumber()))
+			List<FaultElement> faultList = new ArrayList<FaultElement>();
+			ErrorElement errorElement = new ErrorElement()
+
 			logginService.putInfoMessage("Realizando peticion de informacion de servicio GestionReconocimientoMedico para la cia " + company.nombre)
-			
-			
+
 			try{
 		
 				def operacion = estadisticasService.obtenerObjetoOperacion(opername)
 				
 					if (operacion && operacion.activo) {
 				
-						if (Company.findByNombre("psn").generationAutomatic) {
+						if (Company.findByNombre("enginyers").generationAutomatic) {
 							
 							logginService.putInfoMessage("Realizando peticion AddExp para " + company.nombre + " con numero de solicitud: " + addExp.d.getPolicyNumber())
-							
-							
-							requestXML = psnService.marshall("http://www.scortelemed.com/schemas/enginyers", gestionReconocimientoMedico)
+
+							requestXML = enginyersService.marshall("http://www.scortelemed.com/schemas/enginyers", addExp)
 							requestBBDD = requestService.crear(opername, requestXML)
 							requestBBDD.fecha_procesado = new Date()
 							requestBBDD.save(flush: true)
 		
-							wsErrors = psnService.validarDatosObligatorios(requestBBDD)
+							wsErrors = enginyersService.validarDatosObligatorios(requestBBDD)
 		
 							if (wsErrors != null && wsErrors.size() == 0) {
+
+								enginyersService.crearExpediente(requestBBDD)
+
+								expedient.setAddExpResultCode(0)
+								errorElement.setErrorMessage("")
+								errorElement.setErrorNumber(0)
+
+
+								enginyersService.insertarRecibido(company, addExp.d.getPolicyNumber(), requestXML.toString(), "ALTA")
+
+								/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
+								 *                                */
+								enginyersService.busquedaCrm(addExp.d.getPolicyNumber(), company.ou, opername, company.codigoSt, company.id, requestBBDD, company.nombre)
 							
-							
+							} else {
+
+								String error = util.detalleError(wsErrors)
+
+								expedient.setAddExpResultCode(-1)
+								errorElement.setErrorMessage("Error de validacion: " + error)
+								errorElement.setErrorNumber(8)
+
+								enginyersService.insertarError(company, addExp.d.getPolicyNumber(), requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + addExp.d.getPolicyNumber() + ". Error de validacion: " + error)
+								logginService.putErrorEndpoint("GestionReconocimientoMedico", "Peticion no realizada de " + company.nombre + " con numero de solicitud: " + addExp.d.getPolicyNumber() + ". Error de validacion: " + error)
+
 							}
-							
 						}
+					} else {
+
+						expedient.setAddExpResultCode(-1)
+						errorElement.setErrorMessage("La operacion " + opername + " esta desactivada temporalmente")
+						errorElement.setErrorNumber(1)
+
+						logginService.putInfoEndpoint("GestionReconocimientoMedico", "Esta operacion para " + company.nombre + " esta desactivada temporalmente")
+						correoUtil.envioEmail("GestionReconocimientoMedico", "Peticion de " + company.nombre + " con numero de solicitud: " + addExp.d.getPolicyNumber() + ". Esta operacion para " + company.nombre + " esta desactivada temporalmente", 0)
+
 					}
 			} catch (Exception e){
 
+				enginyersService.insertarError(company,addExp.d.getPolicyNumber(), requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + addExp.d.getPolicyNumber() + ". Error: " + e.getMessage())
+
+				logginService.putErrorEndpoint("GestionReconocimientoMedico","Peticion no realizada de " + company.nombre + " con numero de solicitud: " + addExp.d.getPolicyNumber() + ". Error: " + e.getMessage())
+				correoUtil.envioEmailErrores("GestionReconocimientoMedico","Peticion de " + company.nombre + " con numero de solicitud: " + addExp.d.getPolicyNumber(), e)
+
+				expedient.setAddExpResultCode(-1)
+				errorElement.setErrorMessage("Error: " + e.getMessage())
+				errorElement.setErrorNumber(2)
+
+			}finally {
+
+				def sesion = RequestContextHolder.currentRequestAttributes().getSession()
+				sesion.removeAttribute("userEndPoint")
+				sesion.removeAttribute("companyST")
+
 			}
 
+		logginService.putInfoMessage("Fin peticion de informacion de servicio GestionReconocimientoMedico para " + company.nombre)
 
-			ArrayOfFaultElement array = new ArrayOfFaultElement()
-			FaultElement fault = new FaultElement();
-			
-		Expedient expedient = new Expedient();
-		expedient.setAddExpResultCode(1)
-		expedient.setIdExpedient(1)
-		ErrorElement error = new ErrorElement()
-		error.setErrorMessage("")
-		error.setErrorNumber(0)
-		error.setErrorSource("")
-		
-		fault.setDetail(error)
+		errorElement.setErrorSource("")
+		fault.setDetail(errorElement)
 		fault.setFaultActor("")
 		fault.setFaultCode("")
 		fault.setFaultString("")
-		
-		List<FaultElement> faultList = new ArrayList<FaultElement>();
 		faultList.add(fault)
-		
 		array.getFaultElement().addAll(faultList)
-		
 		expedient.setFaultArray(array)
 		resultado.setAddExpResult(expedient)
-		
-		
 
-		logginService.putInfoMessage("Fin peticion de informacion de servicio GestionReconocimientoMedico para la cia mutua")
-		
 		return resultado
 	}
 				

@@ -44,7 +44,7 @@ public class MethislabUnderwrittingCaseManagementServiceImpl implements Methisla
             _return.setDate(javax.xml.datatype.DatatypeFactory.newInstance().newXMLGregorianCalendar("2018-08-07T14:17:46.949+02:00"));
             com.scortelemed.schemas.methislab.StatusType _returnStatus = com.scortelemed.schemas.methislab.StatusType.ERROR;
             _return.setStatus(_returnStatus);
-            _return.setNotes("Notes-1861618103");
+            _return.setMessages("Notes-1861618103");
             java.util.List<com.scortelemed.schemas.methislab.MethislabUnderwrittingCasesResultsResponse.Expediente> _returnExpediente = new java.util.ArrayList<com.scortelemed.schemas.methislab.MethislabUnderwrittingCasesResultsResponse.Expediente>();
             com.scortelemed.schemas.methislab.MethislabUnderwrittingCasesResultsResponse.Expediente _returnExpedienteVal1 = new com.scortelemed.schemas.methislab.MethislabUnderwrittingCasesResultsResponse.Expediente();
             _returnExpedienteVal1.setRequestDate(javax.xml.datatype.DatatypeFactory.newInstance().newXMLGregorianCalendar("2018-08-07T14:17:46.950+02:00"));

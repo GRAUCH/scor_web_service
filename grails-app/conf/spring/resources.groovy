@@ -1,5 +1,6 @@
 import com.scortelemed.Conf
 import hwsol.webservices.MyUserDetailsContextMapper
+import hwsol.webservices.EventIntrceptorListener
 
 
 beans = {
@@ -7,6 +8,8 @@ beans = {
 	ldapUserDetailsMapper(MyUserDetailsContextMapper){
 	
 	}
+
+	interceptorEventos(EventIntrceptorListener) {}
 	
 	autorizacionPRO(wslite.http.auth.HTTPBasicAuthorization) {
 		username = "alptis"

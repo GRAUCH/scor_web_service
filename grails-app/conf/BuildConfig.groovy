@@ -81,7 +81,6 @@ grails.project.dependency.resolution = {
 		compile ":cxf-client:1.6.2"		
 		compile ":wslite:0.7.2.0"
 		
-		
 		//compile 'org.grails:grails-datastore-gorm-plugin-support:3.1.0.RELEASE'
 
         // Uncomment these to enable additional asset-pipeline capabilities

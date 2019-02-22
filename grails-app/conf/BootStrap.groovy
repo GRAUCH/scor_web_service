@@ -35,7 +35,7 @@ class BootStrap {
 	ServerFactoryBean cbpitaUnderwrittingCaseManagementServiceFactory
 	ServerFactoryBean simplefrUnderwrittingCaseManagementServiceFactory
 	ServerFactoryBean societeGeneraleUnderwrittingCaseManagementServiceFactory
-	//ServerFactoryBean enginyersUnderwrittingCaseManagementServiceFactory
+
 	
 	def serverPasswordCallbackHandlerService
 //	
@@ -65,7 +65,7 @@ class BootStrap {
 		societeGeneraleUnderwrittingCaseManagementServiceFactory.getInInterceptors().add(new WSS4JInInterceptor(inPropsDigest))
 		cbpitaUnderwrittingCaseManagementServiceFactory.getInInterceptors().add(new WSS4JInInterceptor(inPropsDigest))
 		methislabUnderwrittingCaseManagementServiceFactory.getInInterceptors().add(new WSS4JInInterceptor(inPropsDigest))
-		//enginyersUnderwrittingCaseManagementServiceFactory.getInInterceptors().add(new WSS4JInInterceptor(inPropsDigest))
+
     }
 	
     def destroy = {

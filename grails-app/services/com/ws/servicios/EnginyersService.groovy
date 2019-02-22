@@ -6,7 +6,8 @@ import com.scortelemed.Recibido
 
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil;
-import hwsol.webservices.WsError;
+import hwsol.webservices.WsError
+import org.w3c.dom.NodeList;
 
 import javax.xml.bind.JAXBContext
 import javax.xml.bind.JAXBElement
@@ -105,8 +106,6 @@ class EnginyersService {
 	private def buildCabecera = { req ->
 		
 		def formato = new SimpleDateFormat("yyyyMMdd");
-		def pais
-		def codigoCia
 
 		RootElement.CABECERA cabecera = new RootElement.CABECERA()
 
@@ -116,7 +115,6 @@ class EnginyersService {
 			cabecera.setCodigoCia("1072")
 		}
 
-		cabecera.setCodigoCia(codigoCia)
 		cabecera.setContadorSecuencial("1")
 		cabecera.setFechaGeneracion(formato.format(new Date()))
 		cabecera.setFiller("")
@@ -142,8 +140,138 @@ class EnginyersService {
 	}
 
 	private def rellenaCoberturas (req) {
+
+		def listadoCoberturas = []
+		def capital
+
+		try {
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
+			DocumentBuilder builder = factory.newDocumentBuilder()
+
+			InputSource is = new InputSource(new StringReader(req.request))
+			is.setEncoding("UTF-8")
+			Document doc = builder.parse(is)
+
+			doc.getDocumentElement().normalize()
+
+			NodeList nList = doc.getElementsByTagName("riskTypeElement")
+
+			for (int temp = 0; temp < nList.getLength(); temp++) {
+
+				Node nNode = nList.item(temp)
+
+				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+
+					Element eElement = (Element) nNode;
+
+					DATOS.Coberturas cobertura = new DATOS.Coberturas()
+
+					cobertura.filler = ""
+					cobertura.codigoCobertura = "COB" + eElement.getElementsByTagName("idRisk").item(0).getTextContent()
+					cobertura.nombreCobertura = obtenerNombreCobertura(cobertura.codigoCobertura)
+					cobertura.capital = Float.parseFloat(eElement.getElementsByTagName("riskValue").item(0).getTextContent())
+
+					listadoCoberturas.add(cobertura)
+
+				}
+			}
+
+			return listadoCoberturas
+
+		} catch (Exception e) {
+			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+		}
 	}
 
+	String obtenerNombreCobertura(String codigo) {
+
+		String nombre
+
+		switch (codigo) {
+			case "COB1":
+				nombre = "Dependencia grave"
+				break
+			case "COB3":
+				nombre = "Enfermedades"
+				break
+			case "COB430":
+				nombre = "Baja Laboral <90 días"
+				break
+			case "COB431":
+				nombre = "Baja Laboral >90 días"
+				break
+			case "COB432":
+				nombre = "Vida"
+				break
+			case "COB433":
+				nombre = "Hospitalización"
+				break
+			case "COB434":
+				nombre = "Renta de Invalidez IPT"
+				break
+			case "COB435":
+				nombre = "Renta de Invalidez IPA"
+				break
+			case "COB436":
+				nombre = "IPT"
+				break
+			case "COB437":
+				nombre = "IPA(Invalidez Absoluta y Permanente)"
+				break
+			case "COB438":
+				nombre = "Gastos Quirúrgicos"
+				break
+			case "COB439":
+				nombre = "Accidentes Vida ASC"
+				break
+			case "COB440":
+				nombre = "Gastos Médicos"
+				break
+			case "COB441":
+				nombre = "Accidentes Invalidez ASC"
+				break
+			case "COB442":
+				nombre = "Circulación Vida"
+				break
+			case "COB443":
+				nombre = "Accidentes Muerte Q<30"
+				break
+			case "COB444":
+				nombre = "Circulación Invalidez"
+				break
+			case "COB445":
+				nombre = "Accidentes Invalidez Q<30"
+				break
+			case "COB446":
+				nombre = "Accidentes Vida ASC Circulación"
+				break
+			case "COB447":
+				nombre = "Accidentes Invalidez ASC Circulación"
+				break
+			case "COB448":
+				nombre = "IPA( Invalidez Absoluta por Accidente)"
+				break
+			case "COB449":
+				nombre = "Vida Accidental"
+				break
+			case "COB450":
+				nombre = "Protesis"
+				break
+			case "COB451":
+				nombre = "Renta Estudios Vida"
+				break
+			case "COB452":
+				nombre = "Renta Estudios IPA"
+				break
+			case "COB453":
+				nombre = "Dependencia servera"
+				break
+			case "COB454":
+				nombre = "Cancer de mama"
+				break
+		}
+
+	}
 
 	public def rellenaDatos (req, company) {
 		
@@ -188,11 +316,14 @@ class EnginyersService {
 
 					datosRegistro.codigoProducto = "SRP"
 
+					if (Environment.current.name.equals("production_wildfly")) {
 
-					if (eElement.getElementsByTagName("productCode").item(0) != null) {
-						datosRegistro.codigoProducto = eElement.getElementsByTagName("productCode").item(0).getTextContent()
+						datosRegistro.codigoProducto = "PENGINYERS"
+
+					} else {
+
+						datosRegistro.codigoProducto = "PENGINYERS"
 					}
-
 					/**NOMBRE DE CANDIDATO
 					 *
 					 */
@@ -273,11 +404,11 @@ class EnginyersService {
 					
 					if (Environment.current.name.equals("production_wildfly")) {
 						
-						datosRegistro.codigoCia = "1030"
+						datosRegistro.codigoCia = "1072"
 						
 					} else {
 					
-						datosRegistro.codigoCia = "1030"
+						datosRegistro.codigoCia = "1072"
 					
 					}
 
@@ -286,29 +417,9 @@ class EnginyersService {
 					 *
 					 */
 
-					if (eElement.getElementsByTagName("phoneNumber1").item(0) != null && eElement.getElementsByTagName("phoneNumber1").item(0).getTextContent() != null && !eElement.getElementsByTagName("phoneNumber1").item(0).getTextContent().isEmpty()) {
-						telefono1 = eElement.getElementsByTagName("phoneNumber1").item(0).getTextContent()
+					if (eElement.getElementsByTagName("phone").item(0) != null && eElement.getElementsByTagName("phone").item(0).getTextContent() != null && !eElement.getElementsByTagName("phone").item(0).getTextContent().isEmpty()) {
+						telefono1 = eElement.getElementsByTagName("phone").item(0).getTextContent()
 						datosRegistro.telefono1 = telefono1
-					}
-
-					if (eElement.getElementsByTagName("phoneNumber2").item(0) != null && eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent() != null && !eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent().isEmpty()) {
-						telefono2 = eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent()
-						datosRegistro.telefono2 = telefono2
-					}
-
-					if (eElement.getElementsByTagName("mobileNumber").item(0) != null && eElement.getElementsByTagName("mobileNumber").item(0).getTextContent() != null && !eElement.getElementsByTagName("mobileNumber").item(0).getTextContent().isEmpty()) {
-						telefonoMovil = eElement.getElementsByTagName("mobileNumber").item(0).getTextContent()
-						datosRegistro.telefono3 = telefonoMovil
-					}
-
-					if (datosRegistro.telefono1 == null || datosRegistro.telefono1.isEmpty()) {
-						if (datosRegistro.telefono3 != null && !datosRegistro.telefono3.isEmpty()) {
-							datosRegistro.telefono1 = datosRegistro.telefono3
-						} else if (datosRegistro.telefono2 != null && !datosRegistro.telefono2.isEmpty()) {
-							datosRegistro.telefono1 = datosRegistro.telefono2
-						} else {
-							datosRegistro.telefono1 = "999999999"
-						}
 					}
 
 					/**FECHA DE NACIMIENTO
@@ -410,7 +521,7 @@ class EnginyersService {
 				}
 			}
 
-			camposGenericos (datosRegistro, eUWReferenceCode, codigooficinanuevo, datosRegistro.pais)
+			camposGenericos (datosRegistro, eUWReferenceCode, codigooficinanuevo)
 
 
 			return datosRegistro
@@ -418,6 +529,35 @@ class EnginyersService {
 			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
 		}
 		
+	}
+
+	private void camposGenericos(REGISTRODATOS datos, eUWReferenceCode, codigoOficina) {
+
+		datos.lugarNacimiento = ""
+		datos.emailAgente = ""
+		datos.tipoCliente = "N"
+		datos.franjaHoraria = ""
+		datos.codigoCuestionario = ""
+		datos.campo1 = "es"
+		datos.campo2 = ""
+		datos.campo3 = "ES"
+		datos.campo4 = eUWReferenceCode
+		datos.campo5 = codigoOficina
+		datos.campo6 = ""
+		datos.campo7 = ""
+		datos.campo8 = ""
+		datos.campo9 = ""
+		datos.campo10 = ""
+		datos.campo11 = ""
+		datos.campo12 = ""
+		datos.campo13 = ""
+		datos.campo14 = ""
+		datos.campo15 = ""
+		datos.campo16 = ""
+		datos.campo17 = ""
+		datos.campo18 = ""
+		datos.campo19 = ""
+		datos.campo20 = ""
 	}
 
 	private def buildPie = {
@@ -591,16 +731,6 @@ class EnginyersService {
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
 					Element eElement = (Element) nNode;
-
-
-					/**CODIGO DE PRODUCTO
-					 *
-					 */
-
-					if (eElement.getElementsByTagName("productCode").item(0) == null || eElement.getElementsByTagName("productCode").item(0).getTextContent().isEmpty()) {
-						wsErrors.add(new WsError("productCode",null,"Elemento no puede ser nulo"))
-						break
-					}
 
 					/**NOMBRE DE CANDIDATO
 					 *
