@@ -183,6 +183,46 @@ class EnginyersService {
 		}
 	}
 
+	String obtenerObservaciones(req) {
+
+		String observaciones
+
+		try {
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
+			DocumentBuilder builder = factory.newDocumentBuilder()
+
+			InputSource is = new InputSource(new StringReader(req.request))
+			is.setEncoding("UTF-8")
+			Document doc = builder.parse(is)
+
+			doc.getDocumentElement().normalize()
+
+			NodeList nList = doc.getElementsByTagName("additionalField")
+
+			for (int temp = 0; temp < nList.getLength(); temp++) {
+
+				Node nNode = nList.item(temp)
+
+				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+
+					Element eElement = (Element) nNode;
+
+
+
+					if (eElement.getElementsByTagName("value").item(0) != null && !eElement.getElementsByTagName("value").item(0).getTextContent().isEmpty()) {
+						observaciones = eElement.getElementsByTagName("value").item(0).getTextContent()
+					}
+
+				}
+			}
+
+			return observaciones
+
+		} catch (Exception e) {
+			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+		}
+	}
+
 	String obtenerNombreCobertura(String codigo) {
 
 		String nombre
@@ -401,16 +441,10 @@ class EnginyersService {
 					
 					datosRegistro.pais = "ES"
 
-					
-					if (Environment.current.name.equals("production_wildfly")) {
-						
-						datosRegistro.codigoCia = "1072"
-						
-					} else {
-					
-						datosRegistro.codigoCia = "1072"
-					
-					}
+					/**CIA
+					 *
+					 */
+					datosRegistro.codigoCia = company.codigoSt
 
 		
 					/**TELEFONOS
@@ -436,7 +470,13 @@ class EnginyersService {
 					 *
 					 */
 					if (eElement.getElementsByTagName("actuarialAge").item(0) != null && !eElement.getElementsByTagName("actuarialAge").item(0).getTextContent().isEmpty()) {
+
 						datosRegistro.edadActuarial = Integer.parseInt(eElement.getElementsByTagName("actuarialAge").item(0).getTextContent())
+
+					} else {
+
+						datosRegistro.edadActuarial = util.calcularEdadActuarial(util.fromStringToXmlCalendar(eElement.getElementsByTagName("birthDate").item(0).getTextContent()).toGregorianCalendar())
+
 					}
 
 					/**ESTADO CIVIL
@@ -474,8 +514,8 @@ class EnginyersService {
 					 *
 					 */
 
-					if (eElement.getElementsByTagName("comments").item(0) != null) {
-						datosRegistro.observaciones = eElement.getElementsByTagName("comments").item(0).getTextContent()
+					if (obtenerObservaciones(req) != null) {
+						datosRegistro.observaciones = obtenerObservaciones(req)
 					}
 
 					/**FECHA DE SOLICITUD
@@ -491,8 +531,8 @@ class EnginyersService {
 					 *
 					 */
 
-					if (eElement.getElementsByTagName("requestNumber").item(0) != null) {
-						datosRegistro.numSolicitud = eElement.getElementsByTagName("requestNumber").item(0).getTextContent()
+					if (eElement.getElementsByTagName("policyNumber").item(0) != null) {
+						datosRegistro.numSolicitud = eElement.getElementsByTagName("policyNumber").item(0).getTextContent()
 					}
 
 					/**MOVIMIETO
@@ -585,7 +625,7 @@ class EnginyersService {
 			SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
 			CorreoUtil correoUtil = new CorreoUtil()
 
-			Thread.sleep(30000);
+			Thread.sleep(90000);
 
 			try {
 

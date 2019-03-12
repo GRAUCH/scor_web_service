@@ -611,7 +611,7 @@ class LagunaroService {
 			SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
 			CorreoUtil correoUtil = new CorreoUtil()
 
-			Thread.sleep(30000);
+			Thread.sleep(90000);
 
 			try {
 

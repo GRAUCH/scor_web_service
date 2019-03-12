@@ -668,7 +668,13 @@ class PsnService {
 					 *
 					 */
 					if (eElement.getElementsByTagName("actuarialAge").item(0) != null && !eElement.getElementsByTagName("actuarialAge").item(0).getTextContent().isEmpty()) {
+
 						datosRegistro.edadActuarial = Integer.parseInt(eElement.getElementsByTagName("actuarialAge").item(0).getTextContent())
+
+					} else {
+
+						datosRegistro.edadActuarial = util.calcularEdadActuarial(util.fromStringToXmlCalendar(eElement.getElementsByTagName("birthDate").item(0).getTextContent()).toGregorianCalendar())
+
 					}
 
 					/**ESTADO CIVIL
@@ -888,7 +894,7 @@ class PsnService {
 			SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
 			CorreoUtil correoUtil = new CorreoUtil()
 
-			Thread.sleep(30000);
+			Thread.sleep(90000);
 
 			try {
 

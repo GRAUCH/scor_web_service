@@ -582,7 +582,7 @@ class SimplefrService {
 			SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
 			CorreoUtil correoUtil = new CorreoUtil()
 
-			Thread.sleep(30000);
+			Thread.sleep(90000);
 
 			while( !encontrado && limite < 10) {
 
