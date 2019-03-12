@@ -5,13 +5,12 @@ import com.scortelemed.Company
 import com.scortelemed.Ipcontrol
 import grails.transaction.Transactional
 import org.springframework.web.context.request.RequestContextHolder
+import org.codehaus.groovy.grails.web.util.WebUtils
 
 @Transactional
 class InterceptorEventosService {
 
-    boolean validIp (String nombre) {
-
-        def ip = RequestContextHolder.getRequestAttributes().currentRequest.request.getRemoteAddr()
+    boolean validIp (String nombre, ip) {
 
         def company = Company.findByNombre(nombre)
 

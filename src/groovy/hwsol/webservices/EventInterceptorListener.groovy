@@ -8,6 +8,7 @@ import org.apache.cxf.interceptor.AbstractLoggingInterceptor
 import org.apache.cxf.interceptor.Fault
 import org.apache.cxf.message.Message
 import org.apache.cxf.phase.Phase
+import org.codehaus.groovy.grails.web.util.WebUtils
 import org.opensaml.ws.message.MessageException
 import org.springframework.web.context.request.RequestContextHolder
 
@@ -44,7 +45,12 @@ class EventIntrceptorListener extends AbstractLoggingInterceptor  {
         def sesion = RequestContextHolder.currentRequestAttributes().getSession()
         sesion.setAttribute("companyST",company?.codigoSt)
 
-        if (!service.validIp(company.getNombre())) {
+        def request = WebUtils.retrieveGrailsWebRequest().getCurrentRequest()
+        def ip = request.getRemoteAddr();
+
+        log LOG, "$name :: Calling from " + company.getNombre() + " con ip " + ip
+
+        if (!service.validIp(company.getNombre(), ip)) {
 
             log LOG, "$name :: Forbidden: IP address rejected"
             throw new WebServiceException("Forbidden: IP address rejected")
