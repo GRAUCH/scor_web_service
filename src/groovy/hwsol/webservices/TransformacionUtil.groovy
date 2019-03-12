@@ -1,5 +1,7 @@
 package hwsol.webservices
 
+import com.sun.xml.internal.ws.policy.privateutil.LocalizationMessages
+
 import java.text.DateFormat
 import java.text.DecimalFormat
 import java.text.Format
@@ -28,8 +30,16 @@ import com.ws.cajamar.beans.ElementoEntrada
 import com.ws.cajamar.beans.ElementoSalida
 import com.scortelemed.schemas.caser.BenefictNameType
 import com.scortelemed.schemas.caser.RequestStateType
+import com.scor.global.FechaUtils
 
 class TransformacionUtil {
+
+	public static final double DAYS_PER_YEAR = 365.25;
+	public static final short HOURS_PER_DAY = 24;
+	public static final short MINUTES_PER_HOUR = 60;
+	public static final short SECONDS_PER_MINUTE = 60;
+	public static final short MILLISECONDS_PER_SECOND = 1000;
+
 
 	public String[] transformarTipoCausaTerminacion (Object estadoSt, Object motivoAnulacionSt) {
 
@@ -1356,4 +1366,21 @@ class TransformacionUtil {
 		return detalle
 
 	}
+
+	public int calcularEdadActuarial(Calendar fechaNacimiento) {
+
+		double millisecsEnUnAnio = DAYS_PER_YEAR * HOURS_PER_DAY * MINUTES_PER_HOUR * SECONDS_PER_MINUTE * MILLISECONDS_PER_SECOND;
+
+		GregorianCalendar calendarNacimiento = new GregorianCalendar(FechaUtils.getYearAsInt(fechaNacimiento.getTime()), FechaUtils.getMonthAsInt(fechaNacimiento.getTime()) - 1, FechaUtils.getDayAsInt(fechaNacimiento.getTime()));
+
+		GregorianCalendar hoy = new GregorianCalendar();
+		double anios = (hoy.getTimeInMillis() - calendarNacimiento.getTimeInMillis()) / millisecsEnUnAnio;
+		String edadCandidato = (new Long(Math.round(anios))).toString();
+
+
+		return Integer.valueOf(edadCandidato)
+
+
+	}
+
 }
