@@ -103,9 +103,8 @@ class EnginyersUnderwrittingCaseManagementService {
 								enginyersService.crearExpediente(requestBBDD)
 
 								expedient.setAddExpResultCode(0)
-								errorElement.setErrorMessage("")
-								errorElement.setErrorNumber(0)
-
+								fault.setFaultCode("0")
+								fault.setFaultString("")
 
 								enginyersService.insertarRecibido(company, addExp.d.getPolicyNumber(), requestXML.toString(), "ALTA")
 
@@ -118,8 +117,8 @@ class EnginyersUnderwrittingCaseManagementService {
 								String error = util.detalleError(wsErrors)
 
 								expedient.setAddExpResultCode(-1)
-								errorElement.setErrorMessage("Error de validacion: " + error)
-								errorElement.setErrorNumber(8)
+								fault.setFaultCode("8")
+								fault.setFaultString("Error de validacion: " + error)
 
 								enginyersService.insertarError(company, addExp.d.getPolicyNumber(), requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + addExp.d.getPolicyNumber() + ". Error de validacion: " + error)
 								logginService.putErrorEndpoint("GestionReconocimientoMedico", "Peticion no realizada de " + company.nombre + " con numero de solicitud: " + addExp.d.getPolicyNumber() + ". Error de validacion: " + error)
@@ -129,8 +128,8 @@ class EnginyersUnderwrittingCaseManagementService {
 					} else {
 
 						expedient.setAddExpResultCode(-1)
-						errorElement.setErrorMessage("La operacion " + opername + " esta desactivada temporalmente")
-						errorElement.setErrorNumber(1)
+						fault.setFaultCode("1")
+						fault.setFaultString("La operacion " + opername + " esta desactivada temporalmente")
 
 						logginService.putInfoEndpoint("GestionReconocimientoMedico", "Esta operacion para " + company.nombre + " esta desactivada temporalmente")
 						correoUtil.envioEmail("GestionReconocimientoMedico", "Peticion de " + company.nombre + " con numero de solicitud: " + addExp.d.getPolicyNumber() + ". Esta operacion para " + company.nombre + " esta desactivada temporalmente", 0)
@@ -144,8 +143,8 @@ class EnginyersUnderwrittingCaseManagementService {
 				correoUtil.envioEmailErrores("GestionReconocimientoMedico","Peticion de " + company.nombre + " con numero de solicitud: " + addExp.d.getPolicyNumber(), e)
 
 				expedient.setAddExpResultCode(-1)
-				errorElement.setErrorMessage("Error: " + e.getMessage())
-				errorElement.setErrorNumber(2)
+				fault.setFaultCode("2")
+				fault.setFaultString("Error: " + e.getMessage())
 
 			}finally {
 
@@ -157,11 +156,11 @@ class EnginyersUnderwrittingCaseManagementService {
 
 		logginService.putInfoMessage("Fin peticion de informacion de servicio GestionReconocimientoMedico para " + company.nombre)
 
+		errorElement.setErrorMessage("")
+		errorElement.setErrorNumber(0)
 		errorElement.setErrorSource("")
 		fault.setDetail(errorElement)
 		fault.setFaultActor("")
-		fault.setFaultCode("")
-		fault.setFaultString("")
 		faultList.add(fault)
 		array.getFaultElement().addAll(faultList)
 		expedient.setFaultArray(array)
