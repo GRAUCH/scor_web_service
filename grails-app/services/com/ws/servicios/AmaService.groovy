@@ -1266,7 +1266,7 @@ class AmaService {
 		}
 
 		if (expediente.getSituacionPoliza() == null) {
-			codError += ". El expediente no tiene la situación de la póliza"
+			codError += ". El expediente no tiene la situaciï¿½n de la pï¿½liza"
 		}
 
 		if (expediente.getNumSuplemento() == null || expediente.getNumSuplemento().isEmpty()) {
@@ -1306,8 +1306,8 @@ class AmaService {
 			return true
 
 		} else {
-			logginService.putInfoMessage("Expediente: " + expediente.getCodigoST() + " tiene los siguientes erres: " + codError + ". Esto esta impidiendo a AMA ver la gestión del siniestro.")
-			correoUtil.envioEmail(opername, "Expediente: " + expediente.getCodigoST() + " tiene los siguientes erres: " + codError + ". Esto esta impidiendo a AMA ver la gestión del siniestro", 1)
+			logginService.putInfoMessage("Expediente: " + expediente.getCodigoST() + " tiene los siguientes erres: " + codError + ". Esto esta impidiendo a AMA ver la gestiï¿½n del siniestro.")
+			correoUtil.envioEmail(opername, "Expediente: " + expediente.getCodigoST() + " tiene los siguientes erres: " + codError + ". Esto esta impidiendo a AMA ver la gestiï¿½n del siniestro", 1)
 
 			return false
 		}
@@ -1315,10 +1315,10 @@ class AmaService {
 	}
 
 
-	/**METODO QUE VALIDA CONDICIONES DE AMA PARA SU VISUALIZACIÓN
+	/**METODO QUE VALIDA CONDICIONES DE AMA PARA SU VISUALIZACIï¿½N
 	 * 
-	 * El pago a Colaborador siempre deberá venir con tipo de impuesto.
-	 * En caso de pago al asegurado siempre se deberá proporcionar el número de cuenta/iban del mismo. 
+	 * El pago a Colaborador siempre deberï¿½ venir con tipo de impuesto.
+	 * En caso de pago al asegurado siempre se deberï¿½ proporcionar el nï¿½mero de cuenta/iban del mismo. 
 	 *
 	 * 
 	 * @param expediente
@@ -1336,8 +1336,8 @@ class AmaService {
 	public boolean tienePago(servicios.Expediente expediente, CorreoUtil correoUtil, String opername){
 
 		if (expediente.getListaSiniestros().get(0).getPagos() != null && expediente.getListaSiniestros().get(0).getPagos().size() > 0) {
-			logginService.putInfoMessage("Expediente: " + expediente.getCodigoST() + " no tiene pago. Esto esta impidiendo a AMA ver la gestión del siniestro.")
-			correoUtil.envioEmail(opername, "Expediente: " + expediente.getCodigoST() + " no tiene pago. Esto esta impidiendo a AMA ver la gestión del siniestro", 1)
+			logginService.putInfoMessage("Expediente: " + expediente.getCodigoST() + " no tiene pago. Esto esta impidiendo a AMA ver la gestiï¿½n del siniestro.")
+			correoUtil.envioEmail(opername, "Expediente: " + expediente.getCodigoST() + " no tiene pago. Esto esta impidiendo a AMA ver la gestiï¿½n del siniestro", 1)
 			return true
 		}
 
@@ -1350,8 +1350,8 @@ class AmaService {
 		if (pagos != null && pagos.size() > 0){
 			for (int i = 0; i < pagos.size(); i++){
 				if (pagos.get(i).getTipoPerceptor() == TipoPerceptor.COLABORADOR && pagos.get(i).getTipoIva() == null){
-					logginService.putInfoMessage("Expediente: " + expediente.getCodigoST() + " tiene pago a colaborador sin tipo de impuesto. Esto esta impidiendo a AMA ver la gestión del siniestro.")
-					correoUtil.envioEmail(opername, "Expediente: " + expediente.getCodigoST() + " tiene pago a colaborador sin tipo de impuesto. Esto esta impidiendo a AMA ver la gestión del siniestro", 1)
+					logginService.putInfoMessage("Expediente: " + expediente.getCodigoST() + " tiene pago a colaborador sin tipo de impuesto. Esto esta impidiendo a AMA ver la gestiï¿½n del siniestro.")
+					correoUtil.envioEmail(opername, "Expediente: " + expediente.getCodigoST() + " tiene pago a colaborador sin tipo de impuesto. Esto esta impidiendo a AMA ver la gestiï¿½n del siniestro", 1)
 					return true
 				}
 			}
@@ -1367,8 +1367,8 @@ class AmaService {
 		if (pagos != null && pagos.size() > 0){
 			for (int i = 0; i < pagos.size(); i++){
 				if (pagos.get(i).getTipoPerceptor() == TipoPerceptor.ASEGURADO && expediente.getCandidato().getNumCuenta() == null){
-					logginService.putInfoMessage("Expediente: " + expediente.getCodigoST() + " tiene pago a asegurado sin número de cuenta asociado. Esto esta impidiendo a AMA ver la gestión del siniestro.")
-					correoUtil.envioEmail(opername, "Expediente: " + expediente.getCodigoST() + " tiene pago a asegurado sin número de cuenta asociado. Esto esta impidiendo a AMA ver la gestión del siniestro", 1)
+					logginService.putInfoMessage("Expediente: " + expediente.getCodigoST() + " tiene pago a asegurado sin nï¿½mero de cuenta asociado. Esto esta impidiendo a AMA ver la gestiï¿½n del siniestro.")
+					correoUtil.envioEmail(opername, "Expediente: " + expediente.getCodigoST() + " tiene pago a asegurado sin nï¿½mero de cuenta asociado. Esto esta impidiendo a AMA ver la gestiï¿½n del siniestro", 1)
 					return true
 				}
 			}
@@ -1392,7 +1392,7 @@ class AmaService {
 			SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
 			CorreoUtil correoUtil = new CorreoUtil()
 
-			Thread.sleep(30000);
+			Thread.sleep(90000);
 
 			try {
 
@@ -1659,7 +1659,7 @@ class AmaService {
 
 		switch (code) {
 			case "1":
-				literal = "Estándar"
+				literal = "Estï¿½ndar"
 				break
 			case "2":
 				literal = "Rechazo"
@@ -1668,7 +1668,7 @@ class AmaService {
 				literal = "Combinado"
 				break
 			case "4":
-				literal = "Exclusión"
+				literal = "Exclusiï¿½n"
 				break
 			case "5":
 				literal = "Informe Medico"
@@ -1689,7 +1689,7 @@ class AmaService {
 				literal = "Acuerdo"
 				break
 			case "11":
-				literal = "Teleselección"
+				literal = "Teleselecciï¿½n"
 				break
 			case "12":
 				literal = "valor absoluto"
