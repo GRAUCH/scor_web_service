@@ -677,7 +677,7 @@ class WsController {
 				stub = new DossierDataStoreWSStub("https://pre-servicios.amaseguros.com/AMAPublish/ama/amascortelemed-ws/services/DossierDataStoreWS?wsdl",usuario,password)
 			}
 
-			long timeout = 2 * 60 * 1000; // Two minutes
+			long timeout = 3 * 60 * 1000; // Tres minuitos
 			stub._getServiceClient().getOptions().setTimeOutInMilliSeconds(timeout);
 
 			Dossier dossier = new Dossier();
