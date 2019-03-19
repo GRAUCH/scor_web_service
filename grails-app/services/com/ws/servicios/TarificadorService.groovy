@@ -229,7 +229,9 @@ class TarificadorService {
 	}
 
 	def obtenerZip(String nodo){
-		def response
+
+		def response = new byte[0]
+
 		try {
 			def parametrosEntrada = new ParametrosEntrada()
 			parametrosEntrada.usuario = Conf.findByName("orabpel.usuario")?.value
@@ -244,10 +246,12 @@ class TarificadorService {
 			def salida=grailsApplication.mainContext.soapClientComprimidoAlptis.process(parametrosEntrada)
 
 			return salida.datosRespuesta.content
+
 		} catch (Exception e) {
-			logginService.putErrorMessage("No se ha podido obtener el zip del expediente : "+e)
-			response = false
+			logginService.putErrorMessage("No se ha podido obtener el zip del nodo : " + nodo)
 		}
+
+		return response
 	}
 
 	def obtenerInformeExpedientes (String arg1,String arg2,int arg3,String arg4,String arg5, String arg6) {
