@@ -1,5 +1,7 @@
 package com.ws.servicios
 
+import com.scor.comprimirdocumentos.ParametrosEntrada
+
 import static grails.async.Promises.*
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.GenerarZip
@@ -39,6 +41,7 @@ import com.scortelemed.schemas.netinsurance.RequestStateType
 import com.scortelemed.schemas.netinsurance.NetinsuranteGetDossierResponse.ExpedienteConsulta
 import com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCasesResultsResponse.Expediente
 import com.scortelemed.servicios.TipoEstadoExpediente;
+import hwsol.webservices.ZipResponse;
 
 class NetinsuranceService {
 
@@ -115,9 +118,10 @@ class NetinsuranceService {
 		return expediente
 	}
 
-	public def rellenaDatosSalidaExpediente(servicios.Expediente expedientePoliza, requestDate, logginService) {
+	public def rellenaDatosSalidaExpediente(servicios.Expediente expedientePoliza, requestDate, logginService, String cia, Company company) {
 
 		ExpedienteConsulta expediente = new ExpedienteConsulta()
+		byte[] compressedData = null
 
 		expediente.setRequestDate(requestDate)
 		expediente.setRequestNumber(util.devolverDatos(expedientePoliza.getNumSolicitud()))
@@ -138,17 +142,27 @@ class NetinsuranceService {
 			expediente.setPhoneNumber2("")
 		}
 
-		byte[] compressedData=tarificadorService.obtenerZip(expedientePoliza.getNodoAlfresco())
+		ZipResponse zipResponse = obtenerZip(expedientePoliza.getCodigoST(), expedientePoliza.getNodoAlfresco(), cia);
+
+		if (!zipResponse.getError()) {
+
+			compressedData = zipResponse.getDatosRespuesta()
+
+
+		} else {
+
+			compressedData = zipResponse.getDatosRespuesta()
+			logginService.putErrorEndpoint("rellenaDatosSalidaExpediente","El método obtener zip ha generado el siguiente error: " + zipResponse.getCodigo() + "-" + zipResponse.getDescripcion())
+			insertarError(company, expedientePoliza.getNumSolicitud(), "Error en generado de zip" , "obtenerZip", zipResponse.getCodigo() + "-" + zipResponse.getDescripcion())
+		}
 
 		expediente.setZip(compressedData)
-
 		expediente.setNotes(util.devolverDatos(expedientePoliza.getTarificacion().getObservaciones()))
 
 		if (expedientePoliza.getCoberturasExpediente() != null && expedientePoliza.getCoberturasExpediente().size() > 0) {
 
 
-			expedientePoliza.getCoberturasExpediente().each {
-				coberturasPoliza ->
+			expedientePoliza.getCoberturasExpediente().each { coberturasPoliza ->
 
 				BenefitsType benefitsType = new BenefitsType()
 
@@ -178,8 +192,57 @@ class NetinsuranceService {
 			}
 		}
 
-		return expediente
+	return expediente
+
 	}
+
+	ZipResponse obtenerZip(String expediente, String nodo, String cia){
+
+		ZipResponse response = new ZipResponse()
+
+		try {
+			def parametrosEntrada = new ParametrosEntrada()
+			parametrosEntrada.usuario = Conf.findByName("orabpel.usuario")?.value
+			parametrosEntrada.clave = Conf.findByName("orabpel.clave")?.value
+			parametrosEntrada.refNodo = nodo
+
+			//SOBREESCRIBIMOS LA URL A LA QUE TIENE QUE LLAMAR EL WSDL
+			def ctx = grailsApplication.mainContext
+			def bean = ctx.getBean("soapClientComprimidoAlptis")
+			bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("orabpel.wsdl")?.value)
+
+			def salida=grailsApplication.mainContext.soapClientComprimidoAlptis.process(parametrosEntrada)
+
+			// salida.datosRespuesta.content
+
+			if (salida.codigo.equals("0")) {
+
+				response.setError(false);
+				response.setCodigo(salida.codigo)
+				response.setDescripcion(salida.descripcion)
+				response.setDatosRespuesta(salida.datosRespuesta.content)
+
+			} else {
+
+				response.setError(true);
+				response.setCodigo(salida.codigo)
+				response.setDescripcion(salida.descripcion)
+				response.setDatosRespuesta(salida.datosRespuesta.content)
+
+			}
+
+
+		} catch (Exception e) {
+
+			response.setError(true);
+			response.setCodigo("-1")
+			response.setDescripcion(e.getMessage().toString())
+			response.setDatosRespuesta(null)
+		}
+
+		return response
+	}
+
 
 	/**
 	 *

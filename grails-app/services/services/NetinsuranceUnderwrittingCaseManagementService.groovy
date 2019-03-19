@@ -1,5 +1,6 @@
 package services
 
+import com.scor.global.WSException
 import grails.util.Environment
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
@@ -99,7 +100,7 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 					requestBBDD.save(flush:true)
 					netinsuranceService.crearExpediente(requestBBDD)
 
-					message = "Il caso è stato elaborato correttamente";
+					message = "Il caso ï¿½ stato elaborato correttamente";
 					status = StatusType.OK
 
 					netinsuranceService.insertarRecibido(company, netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber, requestXML.toString(), "ALTA")
@@ -209,7 +210,7 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 					}
 				} else {
 
-					notes = "Nessuna data è stata inserita per la query"
+					notes = "Nessuna data ï¿½ stata inserita per la query"
 					status = StatusType.ERROR
 
 					logginService.putInfoEndpoint("ResultadoReconocimientoMedico","No se han introducido fechas para la consulta " + company.nombre)
@@ -291,13 +292,13 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 
 							Expediente expediente = respuestaCRM.getListaExpedientes().get(i)
 
-							/**PARA EVITAR CONSULTAR DATOS DE OTRAS COMPAÑIAS
+							/**PARA EVITAR CONSULTAR DATOS DE OTRAS COMPAï¿½IAS
 							 *
 							 */
 
 							if (expediente.getCandidato().getCompanya().getCodigoST().equals(company.getCodigoSt())) {
 
-								resultado.getExpedienteConsulta().add(netinsuranceService.rellenaDatosSalidaExpediente(expediente, util.fromDateToXmlCalendar(new Date()), logginService))
+								resultado.getExpedienteConsulta().add(netinsuranceService.rellenaDatosSalidaExpediente(expediente, util.fromDateToXmlCalendar(new Date()), logginService, company.nombre, company))
 							}
 						}
 					}
@@ -318,14 +319,14 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 					}
 				} else {
 
-					notes = "Nessun file è stato introdotto"
+					notes = "Nessun file ï¿½ stato introdotto"
 					status = StatusType.ERROR
 
 					logginService.putInfoEndpoint("ConsultaExpediente","No se han introducido expediente para la consulta de " + company.nombre)
 				}
 			} else {
 
-				notes = "Questa operazione è temporaneamente disabilitata"
+				notes = "Questa operazione ï¿½ temporaneamente disabilitata"
 				status = StatusType.OK
 
 				logginService.putInfoEndpoint("ConsultaExpediente","Esta operacion para " + company.nombre + " esta desactivada temporalmente")
