@@ -110,7 +110,7 @@ class EnginyersService {
 		RootElement.CABECERA cabecera = new RootElement.CABECERA()
 
 		if (Environment.current.name.equals("production_wildfly")) {
-			cabecera.setCodigoCia("1072")
+			cabecera.setCodigoCia("1071")
 		} else {
 			cabecera.setCodigoCia("1072")
 		}
@@ -131,6 +131,7 @@ class EnginyersService {
 			DATOS dato = new DATOS()
 
 			dato.registro = rellenaDatos(req, company)
+			dato.servicio = rellenaServicios(req, company.nombre)
 			dato.coberturas = rellenaCoberturas(req)
 
 			return dato
@@ -180,6 +181,26 @@ class EnginyersService {
 
 		} catch (Exception e) {
 			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+		}
+	}
+
+	private def rellenaServicios (req, nameCompany) {
+
+		def listadoServicios = []
+
+		try {
+
+			DATOS.Servicio servicio = new DATOS.Servicio()
+			servicio.tipoServicios = "S"
+			servicio.descripcionServicio = "Teleseleccion Mediana"
+			servicio.filler = ""
+			servicio.codigoServicio = "TM"
+
+			listadoServicios.add(servicio)
+
+			return listadoServicios
+		} catch (Exception e) {
+			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
 		}
 	}
 
