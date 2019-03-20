@@ -67,7 +67,7 @@ class EnginyersUnderwrittingCaseManagementService {
 			def requestXML
 			def requestBBDD
 
-			Company company = Company.findByNombre("enginyers")
+			Company company = null
 			SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
 			TransformacionUtil util = new TransformacionUtil()
 			AddExpResponse resultado=new AddExpResponse()
@@ -79,15 +79,17 @@ class EnginyersUnderwrittingCaseManagementService {
 			List<FaultElement> faultList = new ArrayList<FaultElement>();
 			ErrorElement errorElement = new ErrorElement()
 
-			logginService.putInfoMessage("Realizando peticion de informacion de servicio GestionReconocimientoMedico para la cia " + company.nombre)
-
 			try{
-		
+
+				company = Company.findByNombre('enginyers')
+
 				def operacion = estadisticasService.obtenerObjetoOperacion(opername)
-				
+
+				logginService.putInfoEndpoint("Endpoint-"+opername," Peticion de " + company.nombre + " para solicitud: " + addExp.d.getPolicyNumber())
+
 					if (operacion && operacion.activo) {
-				
-						if (Company.findByNombre("enginyers").generationAutomatic) {
+
+						if (company.generationAutomatic) {
 							
 							logginService.putInfoMessage("Realizando peticion AddExp para " + company.nombre + " con numero de solicitud: " + addExp.d.getPolicyNumber())
 
