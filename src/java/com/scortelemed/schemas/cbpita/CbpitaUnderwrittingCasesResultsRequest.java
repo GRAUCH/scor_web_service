@@ -10,12 +10,12 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 
 /**
- * <p>Java class for CbpitaUnderwrittingCasesResultsRequest complex type.
+ * <p>Java class for cbpitaUnderwrittingCasesResultsRequest complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="CbpitaUnderwrittingCasesResultsRequest">
+ * &lt;complexType name="cbpitaUnderwrittingCasesResultsRequest">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
@@ -30,7 +30,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "CbpitaUnderwrittingCasesResultsRequest", propOrder = {
+@XmlType(name = "cbpitaUnderwrittingCasesResultsRequest", propOrder = {
     "dateStart",
     "dateEnd"
 })

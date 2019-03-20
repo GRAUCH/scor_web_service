@@ -12,18 +12,19 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 
 /**
- * <p>Java class for CbpitaUnderwrittingCasesResultsResponse complex type.
+ * <p>Java class for cbpitaUnderwrittingCasesResultsResponse complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="CbpitaUnderwrittingCasesResultsResponse">
+ * &lt;complexType name="cbpitaUnderwrittingCasesResultsResponse">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
  *         &lt;element name="date" type="{http://www.w3.org/2001/XMLSchema}dateTime"/>
  *         &lt;element name="status" type="{http://www.scortelemed.com/schemas/cbpita}StatusType"/>
- *         &lt;element name="notes" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="message" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="code" type="{http://www.w3.org/2001/XMLSchema}int"/>
  *         &lt;element name="Expediente" maxOccurs="unbounded" minOccurs="0">
  *           &lt;complexType>
  *             &lt;complexContent>
@@ -56,10 +57,11 @@ import javax.xml.datatype.XMLGregorianCalendar;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "CbpitaUnderwrittingCasesResultsResponse", propOrder = {
+@XmlType(name = "cbpitaUnderwrittingCasesResultsResponse", propOrder = {
     "date",
     "status",
-    "notes",
+    "message",
+    "code",
     "expediente"
 })
 public class CbpitaUnderwrittingCasesResultsResponse {
@@ -70,9 +72,10 @@ public class CbpitaUnderwrittingCasesResultsResponse {
     @XmlElement(required = true)
     protected StatusType status;
     @XmlElement(required = true)
-    protected String notes;
+    protected String message;
+    protected int code;
     @XmlElement(name = "Expediente", nillable = true)
-    protected List<CbpitaUnderwrittingCasesResultsResponse.Expediente> expediente;
+    protected List<Expediente> expediente;
 
     /**
      * Gets the value of the date property.
@@ -123,27 +126,43 @@ public class CbpitaUnderwrittingCasesResultsResponse {
     }
 
     /**
-     * Gets the value of the notes property.
+     * Gets the value of the message property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getNotes() {
-        return notes;
+    public String getMessage() {
+        return message;
     }
 
     /**
-     * Sets the value of the notes property.
+     * Sets the value of the message property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setNotes(String value) {
-        this.notes = value;
+    public void setMessage(String value) {
+        this.message = value;
+    }
+
+    /**
+     * Gets the value of the code property.
+     * 
+     */
+    public int getCode() {
+        return code;
+    }
+
+    /**
+     * Sets the value of the code property.
+     * 
+     */
+    public void setCode(int value) {
+        this.code = value;
     }
 
     /**
@@ -164,13 +183,13 @@ public class CbpitaUnderwrittingCasesResultsResponse {
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link CbpitaUnderwrittingCasesResultsResponse.Expediente }
+     * {@link Expediente }
      * 
      * 
      */
-    public List<CbpitaUnderwrittingCasesResultsResponse.Expediente> getExpediente() {
+    public List<Expediente> getExpediente() {
         if (expediente == null) {
-            expediente = new ArrayList<CbpitaUnderwrittingCasesResultsResponse.Expediente>();
+            expediente = new ArrayList<Expediente>();
         }
         return this.expediente;
     }

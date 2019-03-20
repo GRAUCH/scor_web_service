@@ -21,7 +21,6 @@ import javax.xml.datatype.XMLGregorianCalendar;
  *         &lt;element name="status" type="{http://www.scortelemed.com/schemas/cbpita}StatusType" minOccurs="0"/>
  *         &lt;element name="date" type="{http://www.w3.org/2001/XMLSchema}date" minOccurs="0"/>
  *         &lt;element name="message" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
- *         &lt;element name="code" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -34,8 +33,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 @XmlType(name = "CbpitaUnderwrittingCaseManagementResponse", propOrder = {
     "status",
     "date",
-    "message",
-    "code"
+    "message"
 })
 public class CbpitaUnderwrittingCaseManagementResponse {
 
@@ -43,7 +41,6 @@ public class CbpitaUnderwrittingCaseManagementResponse {
     @XmlSchemaType(name = "date")
     protected XMLGregorianCalendar date;
     protected String message;
-    protected String code;
 
     /**
      * Gets the value of the status property.
@@ -115,30 +112,6 @@ public class CbpitaUnderwrittingCaseManagementResponse {
      */
     public void setMessage(String value) {
         this.message = value;
-    }
-
-    /**
-     * Gets the value of the code property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getCode() {
-        return code;
-    }
-
-    /**
-     * Sets the value of the code property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setCode(String value) {
-        this.code = value;
     }
 
 }
