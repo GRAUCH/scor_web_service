@@ -1,30 +1,33 @@
 package services
 
+import com.scortelemed.Company
 
+import com.ws.servicios.*
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
 import hwsol.webservices.WsError
-import javax.jws.WebParam
-import javax.jws.WebResult
-import javax.jws.WebService
-import javax.jws.soap.SOAPBinding
-
 import org.apache.cxf.annotations.SchemaValidation
 import org.grails.cxf.utils.EndpointType
 import org.grails.cxf.utils.GrailsCxfEndpoint
 import org.grails.cxf.utils.GrailsCxfEndpointProperty
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.context.request.RequestContextHolder
-import com.scortelemed.Company
-import com.scortelemed.Recibido
-import com.ws.servicios.EstadisticasService
-import com.ws.servicios.LogginService
-import com.ws.servicios.CbpitaService
-import com.ws.servicios.RequestService
-import com.ws.servicios.TarificadorService
+import servicios.RespuestaCRMInforme
+import com.scortelemed.Operacion
+import java.text.SimpleDateFormat
+import javax.jws.WebParam
+import javax.jws.WebResult
+import javax.jws.WebService
+import javax.jws.soap.SOAPBinding
+import grails.util.Environment
+import com.scortelemed.schemas.netinsurance.StatusType
+import com.scortelemed.schemas.netinsurance.StatusType
 import com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCaseManagementRequest
 import com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCaseManagementResponse
-import com.scortelemed.schemas.cbpita.StatusType;
+import com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCasesResultsRequest
+import com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCasesResultsResponse
+
+
 
 @WebService(targetNamespace = "http://www.scortelemed.com/schemas/cbpita")
 @SchemaValidation
@@ -56,18 +59,18 @@ class CbpitaUnderwrittingCaseManagementService	 {
 		def requestXML = ""
 		def requestBBDD
 		def tarificadorService
-
+		Company company = null
 		String message = null
 		StatusType status = null
 		String code = 0
 
-		def company = Company.findByNombre('cbp-italia')
-
-		logginService.putInfoEndpoint("Endpoint-"+opername," Peticion de " + company.nombre + " para solicitud: " + cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber)
-
 		try{
 
+			company = Company.findByNombre('cbp-italia')
+
 			def operacion = estadisticasService.obtenerObjetoOperacion(opername)
+
+			logginService.putInfoEndpoint("Endpoint-"+opername," Peticion de " + company.nombre + " para solicitud: " + cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber)
 
 			if (operacion && operacion.activo){
 
@@ -139,6 +142,123 @@ class CbpitaUnderwrittingCaseManagementService	 {
 		}
 
 		resultado.setMessage(message)
+		resultado.setDate(util.fromDateToXmlCalendar(new Date()))
+		resultado.setStatus(status)
+		resultado.setCode(code)
+
+		return resultado
+	}
+
+	@WebResult(name = "CaseManagementResultsResponse")
+	CbpitaUnderwrittingCasesResultsResponse cbpitaUnderwrittingCasesResultsResponse(
+			@WebParam(partName = "CaseManagementResultsRequest", name = "CaseManagementResultsRequest")
+					CbpitaUnderwrittingCasesResultsRequest cbpitaUnderwrittingCasesResultsRequest) {
+
+		def opername="cbpitaUnderwrittingCaseManagementResponse"
+		def requestXML = ""
+		List<RespuestaCRMInforme> expedientes = new ArrayList<RespuestaCRMInforme>();
+		TransformacionUtil util = new TransformacionUtil()
+		CorreoUtil correoUtil = new CorreoUtil()
+		Company company = null
+		String message = null
+		StatusType status = null
+		int code = 0
+
+		CbpitaUnderwrittingCasesResultsResponse resultado = new CbpitaUnderwrittingCasesResultsResponse()
+
+		try{
+
+			company = Company.findByNombre("cbp-italia")
+
+			Operacion operacion = estadisticasService.obtenerObjetoOperacion(opername)
+
+			logginService.putInfoMessage("Realizando proceso envio de informacion para " + company.nombre + " con fecha " + netInsuranteUnderwrittingCasesResults.dateStart.toString() + "-" + netInsuranteUnderwrittingCasesResults.dateEnd.toString())
+
+			if(operacion && operacion.activo ) {
+
+				if (Company.findByNombre("cbp-italia").generationAutomatic) {
+
+					if (cbpitaUnderwrittingCasesResultsRequest && cbpitaUnderwrittingCasesResultsRequest.dateStart && cbpitaUnderwrittingCasesResultsRequest.dateEnd) {
+
+						requestXML = cbpitaService.marshall("http://www.scortelemed.com/schemas/cbpita", cbpitaUnderwrittingCasesResultsRequest)
+
+						requestService.crear(opername, requestXML)
+
+						Date date = cbpitaUnderwrittingCasesResultsRequest.dateStart.toGregorianCalendar().getTime()
+						SimpleDateFormat sdfr = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
+						String fechaIni = sdfr.format(date);
+						date = cbpitaUnderwrittingCasesResultsRequest.dateEnd.toGregorianCalendar().getTime()
+						String fechaFin = sdfr.format(date);
+
+
+						for (int i = 1; i < 3; i++) {
+							if (Environment.current.name.equals("production_wildfly")) {
+								expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1071", null, i, fechaIni, fechaFin, "IT"))
+							} else {
+								expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1071", null, i, fechaIni, fechaFin, "IT"))
+							}
+						}
+
+						cbpitaService.insertarEnvio(company, cbpitaUnderwrittingCasesResultsRequest.dateStart.toString().substring(0, 10) + "-" + cbpitaUnderwrittingCasesResultsRequest.dateEnd.toString().substring(0, 10), requestXML.toString())
+
+						if (expedientes) {
+
+							expedientes.each { expedientePoliza ->
+
+								resultado.getExpediente().add(cbpitaService.rellenaDatosSalidaConsulta(expedientePoliza, cbpitaUnderwrittingCasesResultsRequest.dateStart, logginService))
+							}
+
+							message = "Risultati restituiti"
+							status = StatusType.OK
+							code = 0
+
+							logginService.putInfoEndpoint("ResultadoReconocimientoMedico", "Peticion realizada correctamente para " + company.nombre + " con fecha: " + cbpitaUnderwrittingCasesResultsRequest.dateStart.toString() + "-" + cbpitaUnderwrittingCasesResultsRequest.dateEnd.toString())
+						} else {
+
+							message = "Nessun risultato per le date indicate"
+							status = StatusType.OK
+							code = 6
+
+							logginService.putInfoEndpoint("ResultadoReconocimientoMedico", "No hay resultados para " + company.nombre)
+						}
+					} else {
+
+						message = "Nessuna data � stata inserita per la query"
+						status = StatusType.ERROR
+						code = 7
+						logginService.putInfoEndpoint("ResultadoReconocimientoMedico", "No se han introducido fechas para la consulta " + company.nombre)
+					}
+				}
+				} else {
+
+					message = "L'operazione viene disabilitata temporaneamente"
+					status = StatusType.OK
+					code = 1
+
+					logginService.putInfoEndpoint("ResultadoReconocimientoMedico", "Esta operacion para " + company.nombre + " esta desactivada temporalmente")
+					correoUtil.envioEmailErrores("ResultadoReconocimientoMedico", "Peticion de " + company.nombre + " con fecha: " + cbpitaUnderwrittingCasesResultsRequest.dateStart.toString() + "-" + cbpitaUnderwrittingCasesResultsRequest.dateEnd.toString(), "Esta operacion para " + company.nombre + " esta desactivada temporalmente")
+				}
+
+		}catch (Exception e){
+
+
+			message = "Error: " + e.getMessage()
+			status = StatusType.ERROR
+			code = 2
+
+			logginService.putErrorEndpoint("ResultadoReconocimientoMedico","Peticion realizada para " + company.nombre + " con fecha: " + cbpitaUnderwrittingCasesResultsRequest.dateStart.toString() + "-" + cbpitaUnderwrittingCasesResultsRequest.dateEnd.toString() + ". Error: " + e.getMessage())
+			correoUtil.envioEmailErrores("ResultadoReconocimientoMedico","Peticion realizada para " + company.nombre + " con fecha: " + cbpitaUnderwrittingCasesResultsRequest.dateStart.toString() + "-" + cbpitaUnderwrittingCasesResultsRequest.dateEnd.toString() + ". Error: " + e.getMessage())
+
+			cbpitaService.insertarError(company, cbpitaUnderwrittingCasesResultsRequest.dateStart.toString().substring(0,10) + "-" + cbpitaUnderwrittingCasesResultsRequest.dateEnd.toString().substring(0,10), requestXML.toString(), "CONSULTA", "Peticion no realizada para solicitud: " + cbpitaUnderwrittingCasesResultsRequest.dateStart.toString() + "-" + cbpitaUnderwrittingCasesResultsRequest.dateEnd.toString() + ". Error: " + e.getMessage())
+
+		}finally{
+
+			def sesion=RequestContextHolder.currentRequestAttributes().getSession()
+			sesion.removeAttribute("userEndPoint")
+			sesion.removeAttribute("companyST")
+		}
+
+		resultado.setMessage(notes)
 		resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 		resultado.setStatus(status)
 		resultado.setCode(code)
