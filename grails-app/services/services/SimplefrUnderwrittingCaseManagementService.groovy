@@ -111,13 +111,13 @@ class SimplefrUnderwrittingCaseManagementService	 {
 				resultado.setMessage("The operation is temporarily disabled")
 				resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 				logginService.putInfoMessage("Peticion " + opername + " no realizada para solicitud: " + simplefrUnderwrittingCaseManagement.candidateInformation.requestNumber)
-				correoUtil.envioEmailErrores("ERROR en alta de Simplefr","Endpoint-"+ opername + ". La operacion esta desactivada temporalmente",null)
+				correoUtil.envioEmailErrores(opername,"Endpoint-"+ opername + ". La operacion esta desactivada temporalmente",null)
 				
 			}
 		} catch (Exception e){
 		
 			logginService.putErrorEndpoint("Endpoint-"+opername,"Peticion no realizada para solicitud: " + simplefrUnderwrittingCaseManagement.candidateInformation.requestNumber + "- Error: "+e.getMessage())
-			correoUtil.envioEmailErrores("ERROR en alta de Simplefr","Peticion no realizada para solicitud: " + simplefrUnderwrittingCaseManagement.candidateInformation.requestNumber,e)
+			correoUtil.envioEmailErrores(opername,"Peticion no realizada para solicitud: " + simplefrUnderwrittingCaseManagement.candidateInformation.requestNumber,e)
 			resultado.setMessage("Error: " + e.printStackTrace())
 			resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 			resultado.setStatus(StatusType.ERROR)
@@ -225,13 +225,14 @@ class SimplefrUnderwrittingCaseManagementService	 {
 				resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 				resultado.setStatus(StatusType.ERROR)
 				logginService.putInfoEndpoint("La operacion " + opername + " esta desactivada temporalmente")
-
+				correoUtil.envioEmailErrores(opername,"Endpoint-"+ opername + ". La operacion esta desactivada temporalmente","")
 				
 			}
 			
 		}catch (Exception e){
 		
 			logginService.putErrorEndpoint("Endpoint-"+opername,"Peticion realizada para Simplefr con fecha: " + simpleUnderwrittingCasesResults.dateStart.toString() + "-" + simpleUnderwrittingCasesResults.dateEnd.toString() + "- Error: " + e.getMessage())
+			correoUtil.envioEmailErrores(opername,"Peticion realizada para caser con fecha: " + simpleUnderwrittingCasesResults.dateStart.toString() + "-" + simpleUnderwrittingCasesResults.dateEnd.toString(),e)
 			resultado.setNotes("Errore nel " + opername + ": " + e.getMessage())
 			resultado.setDate(simpleUnderwrittingCasesResults.dateStart)
 			resultado.setStatus(StatusType.ERROR)

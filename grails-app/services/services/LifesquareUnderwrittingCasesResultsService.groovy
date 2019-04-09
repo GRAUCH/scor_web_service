@@ -121,13 +121,16 @@ class LifesquareUnderwrittingCasesResultsService {
 				}
 				 				 
 				logginService.putInfoEndpoint("Endpoint-"+opername,"Peticion realizada correctamente para fecha: " + LifesquareUnderwrittingCasesResultsRequest.date)
-
+				
+				//ENVIAMOS UN CORREO PARA INFORMAR
+				correoUtil.envioEmail(opername, null, 1)
 			} else {
 				result.setComments("La operacion esta desactivada temporalmente.")
 				logginService.putInfoEndpoint("Endpoint-"+opername,"Peticion no realizada para fecha: " + LifesquareUnderwrittingCasesResultsRequest.date)
 			}		
 		}catch (Exception e){
 			logginService.putErrorEndpoint("Endpoint-"+opername,"Peticion no realizada para fecha: " + LifesquareUnderwrittingCasesResultsRequest.date + "- Error: "+e.getMessage())
+			correoUtil.envioEmailErrores(opername,"Peticion no realizada para fecha: " + LifesquareUnderwrittingCasesResultsRequest.date,e)
 			result.setComments("Error en LifesquareUnderwrittingCasesResultsRequest: "+e.getMessage())
 				
 		}finally{

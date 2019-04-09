@@ -670,7 +670,7 @@ class LagunaroService {
 				if (limite == 10) {
 
 					logginService.putInfoMessage("Nueva alta de Lagunaro con numero de solicitud: " + policyNumber.toString() + " y referencia: " + certificado.toString() + " se ha procesado pero no se ha dado de alta en CRM")
-					correoUtil.envioEmailErrores("ERROR en alta de Gestion reconocimiento medico","Nueva alta de Lagunaro con numero de solicitud: " + policyNumber.toString() + " y referencia: " + certificado.toString() + " se ha procesado pero no se ha dado de alta en CRM",null)
+					correoUtil.envioEmailErrores(opername,"Nueva alta de Lagunaro con numero de solicitud: " + policyNumber.toString() + " y referencia: " + certificado.toString() + " se ha procesado pero no se ha dado de alta en CRM",null)
 
 
 					/**Metemos en errores
@@ -688,7 +688,7 @@ class LagunaroService {
 			} catch (Exception e) {
 
 				logginService.putErrorMessage("Nueva alta de Lagunaro con numero de solicitud: " + policyNumber.toString() + " no se ha procesado: Motivo: " + e.getMessage())
-				correoUtil.envioEmailErrores("ERROR en alta de Gestion reconocimiento medico","Nueva alta de Lagunaro con numero de solicitud: " + policyNumber.toString() + " no se ha procesado: Motivo: " + e.getMessage(),null)
+				correoUtil.envioEmailErrores(opername,"Nueva alta de Lagunaro con numero de solicitud: " + policyNumber.toString() + " no se ha procesado: Motivo: " + e.getMessage(),null)
 			}
 		}
 	}
