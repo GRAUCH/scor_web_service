@@ -758,7 +758,7 @@ class MethislabService {
 				if (limite == 10) {
 
 					logginService.putInfoMessage("BusquedaExpedienteCrm - Nueva alta de " + companyName + " con numero de solicitud: " + requestNumber.toString() + " y num. certificado: " + certificateNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM")
-					correoUtil.envioEmailErrores("ERROR en alta de Methislab","Nueva alta de " + companyName + " con numero de solicitud: " + requestNumber.toString() + " y num. certificado: " + certificateNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM",null)
+					correoUtil.envioEmailErrores("BusquedaExpedienteCrm","Nueva alta de " + companyName + " con numero de solicitud: " + requestNumber.toString() + " y num. certificado: " + certificateNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM",null)
 
 					/**Metemos en errores
 					 *
@@ -775,7 +775,7 @@ class MethislabService {
 			} catch (Exception e) {
 
 				logginService.putInfoMessage("BusquedaExpedienteCrm - Nueva alta de " + companyName + " con numero de solicitud: " + requestNumber.toString() + " y num. certificado: " + certificateNumber.toString() + ". Error: " + e.getMessage())
-				correoUtil.envioEmailErrores("ERROR en alta de Methislab","Nueva alta de " + companyName + " con numero de solicitud: " + requestNumber.toString() + " y num. certificado: " + certificateNumber.toString(), e)
+				correoUtil.envioEmailErrores("BusquedaExpedienteCrm","Nueva alta de " + companyName + " con numero de solicitud: " + requestNumber.toString() + " y num. certificado: " + certificateNumber.toString(), e)
 			}
 		}
 	}

@@ -109,13 +109,13 @@ class SocieteGeneraleUnderwrittingCaseManagementService	 {
 				resultado.setMessage("The operation is temporarily disabled")
 				resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 				logginService.putInfoMessage("Peticion " + opername + " no realizada para solicitud: " + societeGeneraleUnderwrittingCaseManagement.candidateInformation.requestNumber)
-				correoUtil.envioEmailErrores("ERROR en alta de SocieteGenerale","Endpoint-"+ opername + ". La operacion esta desactivada temporalmente",null)
+				correoUtil.envioEmailErrores(opername,"Endpoint-"+ opername + ". La operacion esta desactivada temporalmente",null)
 				
 			}
 		} catch (Exception e){
 		
 			logginService.putErrorEndpoint("Endpoint-"+opername,"Peticion no realizada para solicitud: " + societeGeneraleUnderwrittingCaseManagement.candidateInformation.requestNumber + "- Error: "+e.getMessage())
-			correoUtil.envioEmailErrores("ERROR en alta de SocieteGenerale","Peticion no realizada para solicitud: " + societeGeneraleUnderwrittingCaseManagement.candidateInformation.requestNumber,e)
+			correoUtil.envioEmailErrores(opername,"Peticion no realizada para solicitud: " + societeGeneraleUnderwrittingCaseManagement.candidateInformation.requestNumber,e)
 			resultado.setMessage("Error: " + e.printStackTrace())
 			resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 			resultado.setStatus(StatusType.ERROR)
@@ -223,12 +223,14 @@ class SocieteGeneraleUnderwrittingCaseManagementService	 {
 				resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 				resultado.setStatus(StatusType.ERROR)
 				logginService.putInfoEndpoint("La operacion " + opername + " esta desactivada temporalmente")
+				correoUtil.envioEmailErrores(opername,"Endpoint-"+ opername + ". La operacion esta desactivada temporalmente","")
 				
 			}
 			
 		}catch (Exception e){
 		
 			logginService.putErrorEndpoint("Endpoint-"+opername,"Peticion realizada para Simplefr con fecha: " + societeGeneraleUnderwrittingCasesResults.dateStart.toString() + "-" + societeGeneraleUnderwrittingCasesResults.dateEnd.toString() + "- Error: " + e.getMessage())
+			correoUtil.envioEmailErrores(opername,"Peticion realizada para caser con fecha: " + societeGeneraleUnderwrittingCasesResults.dateStart.toString() + "-" + societeGeneraleUnderwrittingCasesResults.dateEnd.toString(),e)
 			resultado.setNotes("Errore nel " + opername + ": " + e.getMessage())
 			resultado.setDate(societeGeneraleUnderwrittingCasesResults.dateStart)
 			resultado.setStatus(StatusType.ERROR)

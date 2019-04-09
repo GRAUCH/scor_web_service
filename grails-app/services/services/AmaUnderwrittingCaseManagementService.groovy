@@ -153,7 +153,7 @@ class AmaUnderwrittingCaseManagementService	 {
 				status = StatusType.OK
 
 				logginService.putInfoEndpoint("GestionReconocimientoMedico","Esta operacion para " + company.nombre + " esta desactivada temporalmente")
-				correoUtil.envioEmailErrores("ERROR en alta de Ama","Endpoint-"+ opername + ". La operacion esta desactivada temporalmente",null)
+				correoUtil.envioEmail("GestionReconocimientoMedico","Peticion de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber + ". Esta operacion para " + company.nombre + " esta desactivada temporalmente", 0)
 			}
 		} catch (Exception e){
 
@@ -163,7 +163,7 @@ class AmaUnderwrittingCaseManagementService	 {
 			amaService.insertarError(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber + ". Error: " + e.getMessage())
 
 			logginService.putErrorEndpoint("GestionReconocimientoMedico","Peticion no realizada de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber + ". Error: " + e.getMessage())
-			correoUtil.envioEmailErrores("ERROR en alta de Ama","Peticion de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber,e.getMessage().toString())
+			correoUtil.envioEmailErrores("GestionReconocimientoMedico","Peticion de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber,e)
 		}finally{
 
 			def sesion=RequestContextHolder.currentRequestAttributes().getSession()
@@ -278,10 +278,12 @@ class AmaUnderwrittingCaseManagementService	 {
 				status = StatusType.OK
 
 				logginService.putInfoEndpoint("ResultadoSiniestro","Esta operacion para " + company.nombre + " esta desactivada temporalmente")
+				correoUtil.envioEmail("ResultadoSiniestro","Peticion de " + company.nombre + " con fecha: " + resultadoSiniestro.dateStart.toString().substring(0,10) +"-"+resultadoSiniestro.dateEnd.toString().substring(0,10) + ". Esta operacion para " + company.nombre + " esta desactivada temporalmente",0)
 			}
 		}catch (Exception e){
 
 			logginService.putErrorEndpoint("ResultadoSiniestro","Peticion realizada para " + company.nombre + " con fecha: " + resultadoSiniestro.dateStart.toString().substring(0,10) +"-"+resultadoSiniestro.dateEnd.toString().substring(0,10) + ". Error: " + e.getMessage())
+			correoUtil.envioEmailErrores("ResultadoSiniestro","Peticion realizada para " + company.nombre + " con fecha: " + resultadoSiniestro.dateStart.toString().substring(0,10) +"-"+resultadoSiniestro.dateEnd.toString().substring(0,10), e)
 
 			notes = "Error: " + e.getMessage()
 			status = StatusType.ERROR
@@ -581,10 +583,12 @@ class AmaUnderwrittingCaseManagementService	 {
 				resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 				resultado.setStatus(StatusType.ERROR)
 				logginService.putInfoEndpoint("Endpoint-"+opername,"La operacion " + opername + " esta desactivada temporalmente")
+				correoUtil.envioEmailErrores(opername,"Endpoint-"+ opername + ". La operacion esta desactivada temporalmente",null)
 			}
 		}catch (Exception e){
 
 			logginService.putErrorEndpoint("Endpoint-"+opername,"Peticion realizada de " + company.nombre + " para la solicitud: " + identificador + "- Error: " + e.getMessage())
+			correoUtil.envioEmailErrores(opername,"Peticion realizada de " + company.nombre + " para la solicitud: " + identificador,e)
 			resultado.setNotes("Error en consultaExpediente: " + e.getMessage())
 			resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 			resultado.setStatus(StatusType.ERROR)
@@ -749,10 +753,12 @@ class AmaUnderwrittingCaseManagementService	 {
 				resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 				resultado.setStatus(StatusType.ERROR)
 				logginService.putInfoEndpoint("Endpoint-"+opername, "La operacion " + opername + " esta desactivada temporalmente")
+				correoUtil.envioEmailErrores(opername,"Endpoint-"+ opername + ". La operacion esta desactivada temporalmente",null)
 			}
 		}catch (Exception e){
 
 			logginService.putErrorEndpoint("Endpoint-"+opername,"Peticion realizada de " + company.nombre + " para la solicitud: " + consultaDocumento.nodoAlfresco + "- Error: " + e.getMessage())
+			correoUtil.envioEmailErrores(opername,"Peticion realizada de " + company.nombre + " para la solicitud: " + consultaDocumento.nodoAlfresco,e)
 			resultado.setMessage("Error en consultaExpediente: " + e.getMessage())
 			resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 			resultado.setStatus(StatusType.ERROR)

@@ -186,7 +186,7 @@ class PsnUnderwrittingCaseManagementService	 {
 				code = 1
 
 				logginService.putInfoEndpoint("GestionReconocimientoMedico", "Esta operacion para " + company.nombre + " esta desactivada temporalmente")
-				correoUtil.envioEmailErrores("ERROR en alta de Psn","Peticion de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber, "Esta operacion para " + company.nombre + " esta desactivada temporalmente")
+				correoUtil.envioEmail("GestionReconocimientoMedico", "Peticion de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber + ". Esta operacion para " + company.nombre + " esta desactivada temporalmente", 0)
 			}
 		} catch (Exception e){
 
@@ -197,7 +197,7 @@ class PsnUnderwrittingCaseManagementService	 {
 			psnService.insertarError(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber + ". Error: " + e.getMessage())
 
 			logginService.putErrorEndpoint("GestionReconocimientoMedico","Peticion no realizada de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber + ". Error: " + e.getMessage())
-			correoUtil.envioEmailErrores("ERROR en alta de Psn","Peticion de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber, e)
+			correoUtil.envioEmailErrores("GestionReconocimientoMedico","Peticion de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber, e)
 
 		}finally{
 
@@ -334,10 +334,12 @@ class PsnUnderwrittingCaseManagementService	 {
 				code = 1
 
 				logginService.putInfoEndpoint("ResultadoReconocimientoMedico","Esta operacion para " + company.nombre + " esta desactivada temporalmente")
+				correoUtil.envioEmail("ResultadoReconocimientoMedico","Peticion de " + company.nombre + " con numero de expiente: " + resultadoReconocimientoMedico.numSolicitud.toString() + ". Esta operacion para " + company.nombre + " esta desactivada temporalmente", 0)
 			}
 		}catch (Exception e){
 
 			logginService.putErrorEndpoint("ResultadoReconocimientoMedico","Peticion realizada para " + company.nombre + " con con numero de expiente: " + resultadoReconocimientoMedico.numSolicitud.toString() + ". Error: " + e.getMessage())
+			correoUtil.envioEmailErrores("ResultadoReconocimientoMedico","Peticion realizada para " + company.nombre + " con numero de expiente: " + resultadoReconocimientoMedico.numSolicitud.toString(), e)
 
 			message = "Error: " + e.getMessage()
 			status = StatusType.ERROR
@@ -642,6 +644,7 @@ class PsnUnderwrittingCaseManagementService	 {
 		}catch (Exception e){
 
 			logginService.putErrorEndpoint("ConsultaExpediente","Peticion realizada para " + company.nombre + " con " + identificador + ". Error: " + e.getMessage())
+			correoUtil.envioEmailErrores("ConsultaExpediente","Peticion realizada para " + company.nombre + " con " + identificador, e)
 
 			message = "Error: " + e.getMessage()
 			status = StatusType.ERROR
@@ -792,10 +795,12 @@ class PsnUnderwrittingCaseManagementService	 {
 				status = StatusType.OK
 
 				logginService.putInfoEndpoint("ConsultaExpediente","Esta operacion para " + company.nombre + " esta desactivada temporalmente")
+				correoUtil.envioEmailErrores("ConsultaExpediente","Peticion de " + company.nombre + " con identificador " + identificador + ". Esta operacion para " + company.nombre + " esta desactivada temporalmente", 0)
 			}
 		}catch (Exception e){
 
 			logginService.putErrorEndpoint("ConsultaExpediente","Peticion realizada para " + company.nombre + " con " + identificador + ". Error: " + e.getMessage())
+			correoUtil.envioEmailErrores("ConsultaExpediente","Peticion realizada para " + company.nombre + " con " + identificador, e )
 
 			messages = "Error en ConsultaExpediente: " + e.getMessage()
 			status = StatusType.ERROR

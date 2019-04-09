@@ -944,7 +944,7 @@ class PsnService {
 				if (limite == 10) {
 
 					logginService.putInfoMessage("BusquedaExpedienteCrm - Nueva alta de " + companyName + " con numero de solicitud: " + policyNumber.toString() + " y referencia: " + certificado.toString() + " se ha procesado pero no se ha dado de alta en CRM")
-					correoUtil.envioEmailErrores("ERROR en alta de Psn","Nueva alta de " + companyName + " con numero de solicitud: " + policyNumber.toString() + " y referencia: " + certificado.toString() + " se ha procesado pero no se ha dado de alta en CRM",null)
+					correoUtil.envioEmailErrores("BusquedaExpedienteCrm","Nueva alta de " + companyName + " con numero de solicitud: " + policyNumber.toString() + " y referencia: " + certificado.toString() + " se ha procesado pero no se ha dado de alta en CRM",null)
 
 					/**Metemos en errores
 					 *
@@ -961,7 +961,7 @@ class PsnService {
 			} catch (Exception e) {
 
 				logginService.putInfoMessage("BusquedaExpedienteCrm - Nueva alta de " + companyName + " con numero de solicitud: " + policyNumber.toString() + " y referencia: " + certificado.toString() + ". Error: " + e.getMessage())
-				correoUtil.envioEmailErrores("ERROR en alta de Psn","Nueva alta de " + companyName + " con numero de solicitud: " + policyNumber.toString() + " y referencia: " + certificado.toString(), e)
+				correoUtil.envioEmailErrores("BusquedaExpedienteCrm","Nueva alta de " + companyName + " con numero de solicitud: " + policyNumber.toString() + " y referencia: " + certificado.toString(), e)
 			}
 		}
 	}
