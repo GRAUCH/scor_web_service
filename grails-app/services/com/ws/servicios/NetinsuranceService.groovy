@@ -142,21 +142,28 @@ class NetinsuranceService {
 			expediente.setPhoneNumber2("")
 		}
 
-		ZipResponse zipResponse = obtenerZip(expedientePoliza.getCodigoST(), expedientePoliza.getNodoAlfresco(), cia);
+		/*if (expedientePoliza.getCodigoEstado() == servicios.TipoEstadoExpediente.CERRADO) {
 
-		if (!zipResponse.getError()) {
+			ZipResponse zipResponse = obtenerZip(expedientePoliza.getCodigoST(), expedientePoliza.getNodoAlfresco(), cia);
 
-			compressedData = zipResponse.getDatosRespuesta()
+			if (!zipResponse.getError()) {
+
+				compressedData = zipResponse.getDatosRespuesta()
 
 
+			} else {
+
+				compressedData = zipResponse.getDatosRespuesta()
+				logginService.putErrorEndpoint("rellenaDatosSalidaExpediente", "El método obtener zip ha generado el siguiente error: " + zipResponse.getCodigo() + "-" + zipResponse.getDescripcion())
+				insertarError(company, expedientePoliza.getNumSolicitud(), "Error en generado de zip", "obtenerZip", zipResponse.getCodigo() + "-" + zipResponse.getDescripcion())
+			}
+
+			expediente.setZip(compressedData)
 		} else {
+			expediente.setZip(new byte[0])
+		}*/
 
-			compressedData = zipResponse.getDatosRespuesta()
-			logginService.putErrorEndpoint("rellenaDatosSalidaExpediente","El método obtener zip ha generado el siguiente error: " + zipResponse.getCodigo() + "-" + zipResponse.getDescripcion())
-			insertarError(company, expedientePoliza.getNumSolicitud(), "Error en generado de zip" , "obtenerZip", zipResponse.getCodigo() + "-" + zipResponse.getDescripcion())
-		}
-
-		expediente.setZip(compressedData)
+		expediente.setZip(new byte[0])
 		expediente.setNotes(util.devolverDatos(expedientePoliza.getTarificacion().getObservaciones()))
 
 		if (expedientePoliza.getCoberturasExpediente() != null && expedientePoliza.getCoberturasExpediente().size() > 0) {
@@ -834,7 +841,7 @@ class NetinsuranceService {
 				if (limite == 10) {
 
 					logginService.putInfoMessage("BusquedaExpedienteCrm - Nueva alta de " + companyName + " con numero de solicitud: " + certificado.toString() + " se ha procesado pero no se ha dado de alta en CRM")
-					correoUtil.envioEmailErrores("BusquedaExpedienteCrm","Nueva alta de " + companyName + " con numero de solicitud: " + certificado.toString() + " se ha procesado pero no se ha dado de alta en CRM",null)
+					correoUtil.envioEmailErrores("ERROR en alta de Netinsurance","Nueva alta de " + companyName + " con numero de solicitud: " + certificado.toString() + " se ha procesado pero no se ha dado de alta en CRM",null)
 
 
 					/**Metemos en errores
@@ -852,7 +859,7 @@ class NetinsuranceService {
 			} catch (Exception e) {
 
 				logginService.putInfoMessage("BusquedaExpedienteCrm - Nueva alta de " + companyName + " con numero de solicitud: " + certificado.toString() + ". Error: " + e.getMessage())
-				correoUtil.envioEmailErrores("BusquedaExpedienteCrm","Nueva alta de " + companyName + " con numero de solicitud: " + certificado.toString(), e)
+				correoUtil.envioEmailErrores("ERROR en alta de Netinsurance","Nueva alta de " + companyName + " con numero de solicitud: " + certificado.toString(), e)
 			}
 		}
 	}
@@ -921,7 +928,7 @@ class NetinsuranceService {
 			case "CITA_CONCERTADA": return "APPUNTAMENTO ACCORDATO";
 			case "NO_ACUDE_CITA": return "NON SI PRESENTA ALL'APPUNTAMENTO";
 			case "RECHAZA_PRUEBAS": return "RIFIUTA PROVE";
-			case "NO_LOCALIZADO": return "IRREPERIBILE ";
+			case "NO_LOCALIZADO": return "NON_LOCALIZZATO";
 			case "CARTA_ILOCALIZABLE_ENVIADA": return "LETTERA IRREPERIBILE INVIATA";
 			case "SOLICITADO_MENSAJERO": return "RICHIESTO CORRIERE";
 			case "PENDIENTE_LABORATORIO": return "IN ATTESA DI LABORTAORIO";

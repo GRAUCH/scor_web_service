@@ -707,7 +707,7 @@ class CajamarService {
 				if (limite == 10) {
 
 					logginService.putInfoMessage("Nueva alta de Cajamar con numero de solicitud: " + numref.toString() + " se ha procesado pero no se ha dado de alta en CRM")
-					correoUtil.envioEmailErrores("BusquedaExpedienteCrm","Nueva alta de Cajamar con numero de solicitud: " + numref.toString() + " se ha procesado pero no se ha dado de alta en CRM",null)
+					correoUtil.envioEmailErrores("ERROR en alta de Cajamar","Nueva alta de Cajamar con numero de solicitud: " + numref.toString() + " se ha procesado pero no se ha dado de alta en CRM",null)
 
 
 					/**Metemos en errores
@@ -725,7 +725,17 @@ class CajamarService {
 			} catch (Exception e) {
 
 				logginService.putErrorMessage("Nueva alta de Cajamar con numero de solicitud: " + numref.toString() + " no se ha procesado: Motivo: " + e.getMessage())
-				correoUtil.envioEmailErrores(opername,"Nueva alta de Cajamar con numero de solicitud: " + numref.toString() + " no se ha procesado: Motivo: " + e.getMessage(),null)
+				correoUtil.envioEmailErrores("ERROR en alta de Cajamar","Nueva alta de Cajamar con numero de solicitud: " + numref.toString() + " no se ha procesado: Motivo: " + e.getMessage(),null)
+
+				com.scortelemed.Error error = new com.scortelemed.Error()
+				error.setFecha(new Date())
+				error.setCia(companyId.toString())
+				error.setIdentificador(numref.toString())
+				error.setInfo(requestBBDD.request)
+				error.setOperacion("ALTA")
+				error.setError("Nueva alta de Cajamar con numero de solicitud: " + numref.toString() + " no se ha procesado: Motivo: " + e.getMessage())
+				error.save(flush:true)
+
 			}
 		}
 	}

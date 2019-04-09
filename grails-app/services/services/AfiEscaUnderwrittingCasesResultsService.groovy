@@ -137,12 +137,10 @@ class AfiEscaUnderwrittingCasesResultsService {
 			
 				result.setComments("La operacion esta desactivada temporalmente.")
 				logginService.putInfoEndpoint("La operacion " + opername + " esta desactivada temporalmente")
-				correoUtil.envioEmailErrores(opername,"Endpoint-"+ opername + ". La operacion esta desactivada temporalmente",null)
 			}		
 		}catch (Exception e){
 		
 			logginService.putErrorEndpoint("Endpoint-"+opername,"Peticion no realizada para fecha: " + afiEscaUnderwrittingCasesResultsRequest.date + ". Error: "+e.getMessage())
-			correoUtil.envioEmailErrores(opername,"Peticion no realizada para fecha: " + afiEscaUnderwrittingCasesResultsRequest.date,e)
 			result.setComments("Error en AfiEscaUnderwrittingCasesResultsRequest: "+e.getMessage())
 			
 			

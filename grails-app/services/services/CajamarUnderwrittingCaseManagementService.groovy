@@ -126,7 +126,7 @@ class CajamarUnderwrittingCaseManagementService {
 				 */
 				if (cajamarUnderwrittingCaseManagementRequest.getRegScor().getYtipo().toString().equals("3")){
 
-					def msg = "Ha llegado una anulación de " + company.nombre + " con número de referencia: " + cajamarUnderwrittingCaseManagementRequest.getRegScor().getNumref()
+					def msg = "Ha llegado una anulaciï¿½n de " + company.nombre + " con nï¿½mero de referencia: " + cajamarUnderwrittingCaseManagementRequest.getRegScor().getNumref()
 
 					requestXML=cajamarService.marshall("http://www.scortelemed.com/schemas/cajamar",cajamarUnderwrittingCaseManagementRequest)
 					requestBBDD = requestService.crear(opername,requestXML)
@@ -144,7 +144,7 @@ class CajamarUnderwrittingCaseManagementService {
 					resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 
 
-					logginService.putInfoMessage("Ha llegado una anulación de " + company.nombre + " con número de referencia: " + cajamarUnderwrittingCaseManagementRequest.getRegScor().getNumref())
+					logginService.putInfoMessage("Ha llegado una anulaciï¿½n de " + company.nombre + " con nï¿½mero de referencia: " + cajamarUnderwrittingCaseManagementRequest.getRegScor().getNumref())
 
 					correoUtil.envioEmailNoTratados("CajamarUnderwrittingCaseManagementRequest",msg)
 
@@ -155,7 +155,7 @@ class CajamarUnderwrittingCaseManagementService {
 				 */
 				if (cajamarUnderwrittingCaseManagementRequest.getRegScor().getYtipo().toString().equals("2")){
 
-					def msg = "Ha llegado una modificación de " + company.nombre + " con número de referencia: " + cajamarUnderwrittingCaseManagementRequest.getRegScor().getNumref()
+					def msg = "Ha llegado una modificaciï¿½n de " + company.nombre + " con nï¿½mero de referencia: " + cajamarUnderwrittingCaseManagementRequest.getRegScor().getNumref()
 
 					requestXML=cajamarService.marshall("http://www.scortelemed.com/schemas/cajamar",cajamarUnderwrittingCaseManagementRequest)
 					requestBBDD = requestService.crear(opername,requestXML)
@@ -173,7 +173,7 @@ class CajamarUnderwrittingCaseManagementService {
 					resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 
 
-					logginService.putInfoMessage("Ha llegado una modificación " + company.nombre + " con número de referencia: " + cajamarUnderwrittingCaseManagementRequest.getRegScor().getNumref())
+					logginService.putInfoMessage("Ha llegado una modificaciï¿½n " + company.nombre + " con nï¿½mero de referencia: " + cajamarUnderwrittingCaseManagementRequest.getRegScor().getNumref())
 
 					correoUtil.envioEmailNoTratados("CajamarUnderwrittingCaseManagementRequest",msg)
 				}
@@ -185,14 +185,14 @@ class CajamarUnderwrittingCaseManagementService {
 				resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 				resultado.setStatus(StatusType.ERROR)
 				logginService.putInfoEndpoint("La operacion " + opername + " esta desactivada temporalmente")
-				correoUtil.envioEmailErrores(opername,"Endpoint-"+ opername + ". La operacion esta desactivada temporalmente",null)
+				correoUtil.envioEmailErrores("ERROR en alta de Cajamar","Endpoint-"+ opername + ". La operacion esta desactivada temporalmente",null)
 
 			}
 
 		} catch (Exception e){
 
 			logginService.putErrorEndpoint("Endpoint-"+opername,"Peticion no realizada para numero de solicitud: " +cajamarUnderwrittingCaseManagementRequest.regScor.numref + "- Error: "+e.getMessage())
-			correoUtil.envioEmailErrores(opername,"Peticion no realizada para numero de solicitud: " +cajamarUnderwrittingCaseManagementRequest.regScor.numref,e)
+			correoUtil.envioEmailErrores("ERROR en alta de Cajamar","Peticion no realizada para numero de solicitud: " +cajamarUnderwrittingCaseManagementRequest.regScor.numref,e)
 			resultado.setComments("Error: " + e.printStackTrace())
 			resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 			resultado.setStatus(StatusType.ERROR)

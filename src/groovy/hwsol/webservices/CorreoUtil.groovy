@@ -177,6 +177,9 @@ class CorreoUtil {
 				msg.setRecipients(Message.RecipientType.TO, addressTo);
 				msg.setSubject(subject);
 				msg.setContent(message, "text/plain");
+				// Prioridad al envío
+				// 1 La más alta - 3 Normal - 5 la más baja
+				msg.addHeader("X-Priority", "1");
 				Transport t = sessionMail.getTransport("smtp");
 				t.connect(usuarioConexion,passConexion);
 				t.sendMessage(msg,msg.getAllRecipients());

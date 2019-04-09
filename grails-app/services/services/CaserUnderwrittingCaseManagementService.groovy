@@ -114,7 +114,7 @@ class CaserUnderwrittingCaseManagementService	 {
 				status = StatusType.OK
 
 				logginService.putInfoEndpoint("GestionReconocimientoMedico","Esta operacion para " + company.nombre + " esta desactivada temporalmente")
-				correoUtil.envioEmail("GestionReconocimientoMedico","Peticion de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.policyHolderInformation.requestNumber + ". Esta operacion para " + company.nombre + " esta desactivada temporalmente",0)
+				correoUtil.envioEmail("ERROR en alta de Caser","Peticion de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.policyHolderInformation.requestNumber + ". Esta operacion para " + company.nombre + " esta desactivada temporalmente",0)
 			}
 		} catch (Exception e){
 
@@ -124,7 +124,7 @@ class CaserUnderwrittingCaseManagementService	 {
 			caserService.insertarError(company, gestionReconocimientoMedico.policyHolderInformation.requestNumber, requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + gestionReconocimientoMedico.policyHolderInformation.requestNumber + ". Error: " + e.getMessage())
 
 			logginService.putErrorEndpoint("GestionReconocimientoMedico","Peticion no realizada de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.policyHolderInformation.requestNumber + ". Error: " + e.getMessage())
-			correoUtil.envioEmailErrores("GestionReconocimientoMedico","Peticion de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.policyHolderInformation.requestNumber, e)
+			correoUtil.envioEmailErrores("ERROR en alta de Caser","Peticion de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.policyHolderInformation.requestNumber, e)
 		}finally{
 
 			def sesion=RequestContextHolder.currentRequestAttributes().getSession()
@@ -222,12 +222,10 @@ class CaserUnderwrittingCaseManagementService	 {
 				status = StatusType.OK
 
 				logginService.putInfoEndpoint("ResultadoReconocimientoMedico","Esta operacion para " + company.nombre + " esta desactivada temporalmente")
-				correoUtil.envioEmail("ResultadoReconocimientoMedico","Peticion de " + company.nombre + " con fecha: " + resultadoReconocimientoMedico.dateStart.toString() + "-" + resultadoReconocimientoMedico.dateEnd.toString() + ". Esta operacion para " + company.nombre + " esta desactivada temporalmente",0)
 			}
 		}catch (Exception e){
 
 			logginService.putErrorEndpoint("ResultadoReconocimientoMedico","Peticion realizada para " + company.nombre + " con fecha: " + resultadoReconocimientoMedico.dateStart.toString() + "-" + resultadoReconocimientoMedico.dateEnd.toString() + ". Error: " + e.getMessage())
-			correoUtil.envioEmailErrores("ResultadoReconocimientoMedico","Peticion realizada para " + company.nombre + " con fecha: " + resultadoReconocimientoMedico.dateStart.toString(), e)
 
 			notes = "Error en resultadoReconocimientoMedico: " + e.getMessage()
 			status = StatusType.ERROR
@@ -292,7 +290,7 @@ class CaserUnderwrittingCaseManagementService	 {
 
 							Expediente expediente = respuestaCRM.getListaExpedientes().get(i)
 
-							/**PARA EVITAR CONSULTAR DATOS DE OTRAS COMPAÑIAS
+							/**PARA EVITAR CONSULTAR DATOS DE OTRAS COMPAï¿½IAS
 							 *
 							 */
 
@@ -330,12 +328,10 @@ class CaserUnderwrittingCaseManagementService	 {
 				status = StatusType.OK
 
 				logginService.putInfoEndpoint("ConsultaExpediente","Esta operacion para " + company.nombre + " esta desactivada temporalmente")
-				correoUtil.envioEmail("ConsultaExpediente","Peticion de " + company.nombre + " con numero de expiente: " + consultaExpediente.codExpediente + ". Esta operacion para " + company.nombre + " esta desactivada temporalmente", 0)
 			}
 		}catch (Exception e){
 
 			logginService.putErrorEndpoint("ConsultaExpediente","Peticion realizada para " + company.nombre + " con con numero de expiente: " + consultaExpediente.codExpediente + ". Error: " + e.getMessage())
-			correoUtil.envioEmailErrores("ConsultaExpediente","Peticion realizada para " + company.nombre + " con numero de expiente: " + consultaExpediente.codExpediente, e)
 
 			notes = "Error en ConsultaExpediente: " + e.getMessage()
 			status = StatusType.ERROR

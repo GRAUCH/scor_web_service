@@ -121,7 +121,7 @@ class CbpitaUnderwrittingCaseManagementService	 {
 				code = 1
 
 				logginService.putInfoEndpoint("GestionReconocimientoMedico","Esta operacion para " + company.nombre + " esta desactivada temporalmente")
-				correoUtil.envioEmailErrores("GestionReconocimientoMedico","Peticion de " + company.nombre + " con numero de solicitud: " + cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber,"Esta operacion para " + company.nombre + " esta desactivada temporalmente")
+				correoUtil.envioEmailErrores("ERROR en alta de HMI-CBP","Peticion de " + company.nombre + " con numero de solicitud: " + cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber,"Esta operacion para " + company.nombre + " esta desactivada temporalmente")
 			}
 		} catch (Exception e){
 
@@ -132,7 +132,7 @@ class CbpitaUnderwrittingCaseManagementService	 {
 			cbpitaService.insertarError(company, cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber + ". Error: " + e.getMessage())
 
 			logginService.putErrorEndpoint("GestionReconocimientoMedico","Peticion no realizada de " + company.nombre + " con numero de solicitud: " + cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber + ". Error: " + e.getMessage())
-			correoUtil.envioEmailErrores("GestionReconocimientoMedico","Peticion de " + company.nombre + " con numero de solicitud: " + cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, e)
+			correoUtil.envioEmailErrores("ERROR en alta de HMI-CBP","Peticion de " + company.nombre + " con numero de solicitud: " + cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, e)
 
 		}finally{
 
@@ -205,7 +205,7 @@ class CbpitaUnderwrittingCaseManagementService	 {
 
 							expedientes.each { expedientePoliza ->
 
-								resultado.getExpediente().add(cbpitaService.rellenaDatosSalidaConsulta(expedientePoliza, cbpitaUnderwrittingCasesResultsRequest.dateStart, logginService))
+								resultado.getExpediente().add(cbpitaService.rellenaDatosSalidaConsulta(expedientePoliza, cbpitaUnderwrittingCasesResultsRequest.dateStart))
 							}
 
 							message = "Risultati restituiti"
@@ -236,7 +236,6 @@ class CbpitaUnderwrittingCaseManagementService	 {
 					code = 1
 
 					logginService.putInfoEndpoint("ResultadoReconocimientoMedico", "Esta operacion para " + company.nombre + " esta desactivada temporalmente")
-					correoUtil.envioEmailErrores("ResultadoReconocimientoMedico", "Peticion de " + company.nombre + " con fecha: " + cbpitaUnderwrittingCasesResultsRequest.dateStart.toString() + "-" + cbpitaUnderwrittingCasesResultsRequest.dateEnd.toString(), "Esta operacion para " + company.nombre + " esta desactivada temporalmente")
 				}
 
 		}catch (Exception e){
@@ -247,7 +246,6 @@ class CbpitaUnderwrittingCaseManagementService	 {
 			code = 2
 
 			logginService.putErrorEndpoint("ResultadoReconocimientoMedico","Peticion realizada para " + company.nombre + " con fecha: " + cbpitaUnderwrittingCasesResultsRequest.dateStart.toString() + "-" + cbpitaUnderwrittingCasesResultsRequest.dateEnd.toString() + ". Error: " + e.getMessage())
-			correoUtil.envioEmailErrores("ResultadoReconocimientoMedico","Peticion realizada para " + company.nombre + " con fecha: " + cbpitaUnderwrittingCasesResultsRequest.dateStart.toString() + "-" + cbpitaUnderwrittingCasesResultsRequest.dateEnd.toString() + ". Error: " + e.getMessage())
 
 			cbpitaService.insertarError(company, cbpitaUnderwrittingCasesResultsRequest.dateStart.toString().substring(0,10) + "-" + cbpitaUnderwrittingCasesResultsRequest.dateEnd.toString().substring(0,10), requestXML.toString(), "CONSULTA", "Peticion no realizada para solicitud: " + cbpitaUnderwrittingCasesResultsRequest.dateStart.toString() + "-" + cbpitaUnderwrittingCasesResultsRequest.dateEnd.toString() + ". Error: " + e.getMessage())
 
