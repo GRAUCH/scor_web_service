@@ -107,7 +107,7 @@ class LifesquareUnderwrittingCaseManagementService {
 					resultado.setStatusType(StatusType.error)
 					resultado.setComments("La operacion esta desactivada temporalmente.")
 					logginService.putInfoMessage("Peticion " + opername + " no realizada para solicitud: " + lifesquareUnderwrittingCaseManagementRequest.policy.policy_number)
-					correoUtil.envioEmailErrores(opername,"Endpoint-"+ opername + ". La operacion esta desactivada temporalmente",null)
+					correoUtil.envioEmailErrores("ERROR en alta de Lifesquare","Endpoint-"+ opername + ". La operacion esta desactivada temporalmente",null)
 				}
 			} else {
 
@@ -118,7 +118,7 @@ class LifesquareUnderwrittingCaseManagementService {
 		}catch (Exception e){
 			
 			logginService.putInfoMessage("Peticion " + opername + " no realizada para solicitud: " + lifesquareUnderwrittingCaseManagementRequest.policy.policy_number.toString() + ". - Error: "+e.getMessage())
-			correoUtil.envioEmailErrores(opername,"Peticion no realizada para solicitud: " + lifesquareUnderwrittingCaseManagementRequest.policy.policy_number.toString(),e)
+			correoUtil.envioEmailErrores("ERROR en alta de Lifesquare","Peticion no realizada para solicitud: " + lifesquareUnderwrittingCaseManagementRequest.policy.policy_number.toString(),e)
 			resultado.setStatusType(StatusType.error)
 			resultado.setComments("Error en "+opername+ ": "+e.getMessage())
 			

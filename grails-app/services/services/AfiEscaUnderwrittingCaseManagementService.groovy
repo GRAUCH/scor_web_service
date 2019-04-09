@@ -93,14 +93,14 @@ class AfiEscaUnderwrittingCaseManagementService {
 			} else {
 
 				resultado.setStatusType(StatusType.error)
-				resultado.setComments("L'opération est temporairement désactivée")
+				resultado.setComments("L'opï¿½ration est temporairement dï¿½sactivï¿½e")
 				logginService.putInfoMessage("Peticion " + opername + " no realizada para solicitud: " + afiEscaUnderwrittingCaseManagementRequest.policy.policy_number)
-				correoUtil.envioEmailErrores(opername,"Endpoint-"+ opername + ". La operacion esta desactivada temporalmente",null)
+				correoUtil.envioEmailErrores("ERROR en alta de AfiEsca","Endpoint-"+ opername + ". La operacion esta desactivada temporalmente",null)
 			}
 		} catch (Exception e) {
 
 			logginService.putInfoMessage("Peticion " + opername + " no realizada para solicitud: " + afiEscaUnderwrittingCaseManagementRequest.policy.policy_number + ". - Error: "+e)
-			correoUtil.envioEmailErrores(opername,"Peticion no realizada para solicitud: " + afiEscaUnderwrittingCaseManagementRequest.policy.policy_number,e)
+			correoUtil.envioEmailErrores("ERROR en alta de AfiEsca","Peticion no realizada para solicitud: " + afiEscaUnderwrittingCaseManagementRequest.policy.policy_number,e)
 			resultado.setStatusType(StatusType.error)
 			resultado.setComments(opername+": "+e)
 

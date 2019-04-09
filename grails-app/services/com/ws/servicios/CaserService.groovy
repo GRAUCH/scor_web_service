@@ -862,7 +862,7 @@ class CaserService {
 				if (limite == 10) {
 
 					logginService.putInfoMessage("BusquedaExpedienteCrm - Nueva alta de " + companyName + " con numero de solicitud: " + policyNumber.toString() + " y referencia: " + certificateNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM")
-					correoUtil.envioEmailErrores("BusquedaExpedienteCrm","Nueva alta de " + companyName + " con numero de solicitud: " + policyNumber.toString() + " y referencia: " + certificateNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM",null)
+					correoUtil.envioEmailErrores("ERROR en alta de Caser","Nueva alta de " + companyName + " con numero de solicitud: " + policyNumber.toString() + " y referencia: " + certificateNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM",null)
 
 
 					/**Metemos en errores
@@ -880,7 +880,7 @@ class CaserService {
 			} catch (Exception e) {
 
 				logginService.putInfoMessage("BusquedaExpedienteCrm - Nueva alta de " + companyName + " con numero de solicitud: " + policyNumber.toString() + " y referencia: " + certificateNumber.toString() + ". Error: " + e.getMessage())
-				correoUtil.envioEmailErrores("BusquedaExpedienteCrm","Nueva alta de " + companyName + " con numero de solicitud: " + policyNumber.toString() + " y referencia: " + certificateNumber.toString(),e)
+				correoUtil.envioEmailErrores("ERROR en alta de Caser","Nueva alta de " + companyName + " con numero de solicitud: " + policyNumber.toString() + " y referencia: " + certificateNumber.toString(),e)
 			
 			}
 		}

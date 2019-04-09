@@ -116,7 +116,7 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 				status = StatusType.OK
 
 				logginService.putInfoEndpoint("GestionReconocimientoMedico","Esta operacion para " + company.nombre + " esta desactivada temporalmente")
-				correoUtil.envioEmailErrores("GestionReconocimientoMedico","Peticion de " + company.nombre + " con numero de solicitud: " + netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber,"Esta operacion para " + company.nombre + " esta desactivada temporalmente")
+				correoUtil.envioEmailErrores("ERROR en alta de Netinsurance","Peticion de " + company.nombre + " con numero de solicitud: " + netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber,"Esta operacion para " + company.nombre + " esta desactivada temporalmente")
 			}
 		} catch (Exception e){
 
@@ -126,7 +126,7 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 			netinsuranceService.insertarError(company, netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber, requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber + ". Error: " + e.getMessage())
 
 			logginService.putErrorEndpoint("GestionReconocimientoMedico","Peticion no realizada de " + company.nombre + " con numero de solicitud: " + netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber + ". Error: " + e.getMessage())
-			correoUtil.envioEmailErrores("GestionReconocimientoMedico","Peticion de " + company.nombre + " con numero de solicitud: " + netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber,e.getMessage())
+			correoUtil.envioEmailErrores("ERROR en alta de Netinsurance","Peticion de " + company.nombre + " con numero de solicitud: " + netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber,e.getMessage())
 		}finally{
 
 			def sesion=RequestContextHolder.currentRequestAttributes().getSession()
@@ -221,7 +221,6 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 				status = StatusType.OK
 
 				logginService.putInfoEndpoint("ResultadoReconocimientoMedico","Esta operacion para " + company.nombre + " esta desactivada temporalmente")
-				correoUtil.envioEmailErrores("ResultadoReconocimientoMedico","Peticion de " + company.nombre + " con fecha: " + netInsuranteUnderwrittingCasesResults.dateStart.toString() + "-" + netInsuranteUnderwrittingCasesResults.dateEnd.toString(),"Esta operacion para " + company.nombre + " esta desactivada temporalmente")
 			}
 		}catch (Exception e){
 
@@ -230,7 +229,6 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 			status = StatusType.ERROR
 
 			logginService.putErrorEndpoint("ResultadoReconocimientoMedico","Peticion realizada para " + company.nombre + " con fecha: " + netInsuranteUnderwrittingCasesResults.dateStart.toString() + "-" + netInsuranteUnderwrittingCasesResults.dateEnd.toString() + ". Error: " + e.getMessage())
-			correoUtil.envioEmailErrores("ResultadoReconocimientoMedico","Peticion realizada para " + company.nombre + " con fecha: " + netInsuranteUnderwrittingCasesResults.dateStart.toString() + "-" + netInsuranteUnderwrittingCasesResults.dateEnd.toString() + ". Error: " + e.getMessage())
 
 			netinsuranceService.insertarError(company, netInsuranteUnderwrittingCasesResults.dateStart.toString().substring(0,10) + "-" + netInsuranteUnderwrittingCasesResults.dateEnd.toString().substring(0,10), requestXML.toString(), "CONSULTA", "Peticion no realizada para solicitud: " + netInsuranteUnderwrittingCasesResults.dateStart.toString() + "-" + netInsuranteUnderwrittingCasesResults.dateEnd.toString() + ". Error: " + e.getMessage())
 		}finally{
@@ -330,12 +328,10 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 				status = StatusType.OK
 
 				logginService.putInfoEndpoint("ConsultaExpediente","Esta operacion para " + company.nombre + " esta desactivada temporalmente")
-				correoUtil.envioEmail("ConsultaExpediente","Peticion de " + company.nombre + " con numero de expiente: " + consultaExpediente.requestNumber + ". Esta operacion para " + company.nombre + " esta desactivada temporalmente", 0)
 			}
 		}catch (Exception e){
 
 			logginService.putErrorEndpoint("ConsultaExpediente","Peticion realizada para " + company.nombre + " con con numero de expiente: " + consultaExpediente.requestNumber + ". Error: " + e.getMessage())
-			correoUtil.envioEmailErrores("ConsultaExpediente","Peticion realizada para " + company.nombre + " con numero de expiente: " + consultaExpediente.requestNumber, e)
 
 			notes = "Errore in ConsultaExpediente: " + e.getMessage()
 			status = StatusType.ERROR

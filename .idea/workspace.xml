@@ -1,20 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="50157f8b-df9a-4cef-a719-b7855b06b67f" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/grails-app/services/com/ws/servicios/InterceptorEventosService.groovy" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/groovy/hwsol/webservices/EventInterceptorListener.groovy" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/java/com/scor/global/Uri.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+    <list default="true" id="50157f8b-df9a-4cef-a719-b7855b06b67f" name="Default Changelist" comment="Se sube el tiempo de espera en buscar expediente entre intento e intento">
       <change beforePath="$PROJECT_DIR$/.idea/scorWebservice.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/scorWebservice.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/grails-app/conf/BootStrap.groovy" beforeDir="false" afterPath="$PROJECT_DIR$/grails-app/conf/BootStrap.groovy" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/grails-app/conf/BuildConfig.groovy" beforeDir="false" afterPath="$PROJECT_DIR$/grails-app/conf/BuildConfig.groovy" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/grails-app/conf/spring/resources.groovy" beforeDir="false" afterPath="$PROJECT_DIR$/grails-app/conf/spring/resources.groovy" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/grails-app/controllers/com/scortelemed/RequestController.groovy" beforeDir="false" afterPath="$PROJECT_DIR$/grails-app/controllers/com/scortelemed/RequestController.groovy" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/grails-app/services/com/ws/servicios/AmaService.groovy" beforeDir="false" afterPath="$PROJECT_DIR$/grails-app/services/com/ws/servicios/AmaService.groovy" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/grails-app/services/com/ws/servicios/CajamarService.groovy" beforeDir="false" afterPath="$PROJECT_DIR$/grails-app/services/com/ws/servicios/CajamarService.groovy" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/grails-app/services/com/ws/servicios/CaserService.groovy" beforeDir="false" afterPath="$PROJECT_DIR$/grails-app/services/com/ws/servicios/CaserService.groovy" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/grails-app/services/com/ws/servicios/CbpitaService.groovy" beforeDir="false" afterPath="$PROJECT_DIR$/grails-app/services/com/ws/servicios/CbpitaService.groovy" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/grails-app/services/com/ws/servicios/EnginyersService.groovy" beforeDir="false" afterPath="$PROJECT_DIR$/grails-app/services/com/ws/servicios/EnginyersService.groovy" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/grails-app/services/com/ws/servicios/LagunaroService.groovy" beforeDir="false" afterPath="$PROJECT_DIR$/grails-app/services/com/ws/servicios/LagunaroService.groovy" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/grails-app/services/com/ws/servicios/MethislabService.groovy" beforeDir="false" afterPath="$PROJECT_DIR$/grails-app/services/com/ws/servicios/MethislabService.groovy" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/grails-app/services/com/ws/servicios/NetinsuranceService.groovy" beforeDir="false" afterPath="$PROJECT_DIR$/grails-app/services/com/ws/servicios/NetinsuranceService.groovy" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/grails-app/services/com/ws/servicios/PsnService.groovy" beforeDir="false" afterPath="$PROJECT_DIR$/grails-app/services/com/ws/servicios/PsnService.groovy" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/grails-app/services/com/ws/servicios/SimplefrService.groovy" beforeDir="false" afterPath="$PROJECT_DIR$/grails-app/services/com/ws/servicios/SimplefrService.groovy" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/grails-app/services/com/ws/servicios/SocieteGeneraleService.groovy" beforeDir="false" afterPath="$PROJECT_DIR$/grails-app/services/com/ws/servicios/SocieteGeneraleService.groovy" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/grails-app/services/com/ws/servicios/TarificadorService.groovy" beforeDir="false" afterPath="$PROJECT_DIR$/grails-app/services/com/ws/servicios/TarificadorService.groovy" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/grails-app/services/services/AfiEscaUnderwrittingCaseManagementService.groovy" beforeDir="false" afterPath="$PROJECT_DIR$/grails-app/services/services/AfiEscaUnderwrittingCaseManagementService.groovy" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/grails-app/services/services/AfiEscaUnderwrittingCasesResultsService.groovy" beforeDir="false" afterPath="$PROJECT_DIR$/grails-app/services/services/AfiEscaUnderwrittingCasesResultsService.groovy" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/grails-app/services/services/AlptisUnderwrittingCaseManagementService.groovy" beforeDir="false" afterPath="$PROJECT_DIR$/grails-app/services/services/AlptisUnderwrittingCaseManagementService.groovy" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/grails-app/services/services/AmaUnderwrittingCaseManagementService.groovy" beforeDir="false" afterPath="$PROJECT_DIR$/grails-app/services/services/AmaUnderwrittingCaseManagementService.groovy" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/grails-app/services/services/CajamarUnderwrittingCaseManagementService.groovy" beforeDir="false" afterPath="$PROJECT_DIR$/grails-app/services/services/CajamarUnderwrittingCaseManagementService.groovy" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/grails-app/services/services/CaserUnderwrittingCaseManagementService.groovy" beforeDir="false" afterPath="$PROJECT_DIR$/grails-app/services/services/CaserUnderwrittingCaseManagementService.groovy" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/grails-app/services/services/CbpitaUnderwrittingCaseManagementService.groovy" beforeDir="false" afterPath="$PROJECT_DIR$/grails-app/services/services/CbpitaUnderwrittingCaseManagementService.groovy" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/grails-app/services/services/EnginyersUnderwrittingCaseManagementService.groovy" beforeDir="false" afterPath="$PROJECT_DIR$/grails-app/services/services/EnginyersUnderwrittingCaseManagementService.groovy" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/java/com/scortelemed/schemas/methislab/MethislabUnderwrittingCaseManagementServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/java/com/scortelemed/schemas/methislab/MethislabUnderwrittingCaseManagementServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/grails-app/services/services/GestionReconocimientosMedicosService.groovy" beforeDir="false" afterPath="$PROJECT_DIR$/grails-app/services/services/GestionReconocimientosMedicosService.groovy" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/grails-app/services/services/LifesquareUnderwrittingCaseManagementService.groovy" beforeDir="false" afterPath="$PROJECT_DIR$/grails-app/services/services/LifesquareUnderwrittingCaseManagementService.groovy" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/grails-app/services/services/LifesquareUnderwrittingCasesResultsService.groovy" beforeDir="false" afterPath="$PROJECT_DIR$/grails-app/services/services/LifesquareUnderwrittingCasesResultsService.groovy" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/grails-app/services/services/MethislabUnderwrittingCaseManagementService.groovy" beforeDir="false" afterPath="$PROJECT_DIR$/grails-app/services/services/MethislabUnderwrittingCaseManagementService.groovy" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/grails-app/services/services/NetinsuranceUnderwrittingCaseManagementService.groovy" beforeDir="false" afterPath="$PROJECT_DIR$/grails-app/services/services/NetinsuranceUnderwrittingCaseManagementService.groovy" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/grails-app/services/services/PsnUnderwrittingCaseManagementService.groovy" beforeDir="false" afterPath="$PROJECT_DIR$/grails-app/services/services/PsnUnderwrittingCaseManagementService.groovy" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/grails-app/services/services/SimplefrUnderwrittingCaseManagementService.groovy" beforeDir="false" afterPath="$PROJECT_DIR$/grails-app/services/services/SimplefrUnderwrittingCaseManagementService.groovy" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/grails-app/services/services/SocieteGeneraleUnderwrittingCaseManagementService.groovy" beforeDir="false" afterPath="$PROJECT_DIR$/grails-app/services/services/SocieteGeneraleUnderwrittingCaseManagementService.groovy" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/grails-app/views/request/show.gsp" beforeDir="false" afterPath="$PROJECT_DIR$/grails-app/views/request/show.gsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/groovy/hwsol/webservices/CorreoUtil.groovy" beforeDir="false" afterPath="$PROJECT_DIR$/src/groovy/hwsol/webservices/CorreoUtil.groovy" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/java/com/scortelemed/schemas/cbpita/CbpitaUnderwrittingCaseManagementService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/java/com/scortelemed/schemas/cbpita/CbpitaUnderwrittingCaseManagementService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/java/com/scortelemed/schemas/cbpita/CbpitaUnderwrittingCaseManagementServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/java/com/scortelemed/schemas/cbpita/CbpitaUnderwrittingCaseManagementServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/java/com/scortelemed/schemas/cbpita/CbpitaUnderwrittingCaseManagementServiceService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/java/com/scortelemed/schemas/cbpita/CbpitaUnderwrittingCaseManagementServiceService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/java/com/scortelemed/schemas/cbpita/CbpitaUnderwrittingCaseManagementService_CbpitaUnderwrittingCaseManagementServicePort_Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/java/com/scortelemed/schemas/cbpita/CbpitaUnderwrittingCaseManagementService_CbpitaUnderwrittingCaseManagementServicePort_Client.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/java/com/scortelemed/schemas/cbpita/CbpitaUnderwrittingCasesResultsResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/java/com/scortelemed/schemas/cbpita/CbpitaUnderwrittingCasesResultsResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/java/com/scortelemed/schemas/cbpita/ContactTimeType.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/java/com/scortelemed/schemas/cbpita/ContactTimeType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/java/com/scortelemed/schemas/cbpita/ObjectFactory.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/java/com/scortelemed/schemas/cbpita/ObjectFactory.java" afterDir="false" />
     </list>
     <ignored path="$USER_HOME$/.grails/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -23,138 +50,136 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="CoverageDataManager">
+    <SUITE FILE_PATH="coverage/scorWebservice$Unnamed.ic" NAME="Unnamed Coverage Results" MODIFIED="1552571245803" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
+  </component>
+  <component name="DatabaseView">
+    <option name="SHOW_INTERMEDIATE" value="true" />
+    <option name="GROUP_DATA_SOURCES" value="true" />
+    <option name="GROUP_SCHEMA" value="true" />
+    <option name="GROUP_CONTENTS" value="false" />
+    <option name="SORT_POSITIONED" value="false" />
+    <option name="SHOW_EMPTY_GROUPS" value="false" />
+    <option name="AUTO_SCROLL_FROM_SOURCE" value="false" />
+    <option name="HIDDEN_KINDS">
+      <set />
+    </option>
+    <expand />
+    <select />
+  </component>
   <component name="FUSProjectUsageTrigger">
     <session id="1776089369">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="8" />
-          <entry key="project.open.time.0" value="6" />
-          <entry key="project.open.time.1" value="1" />
-          <entry key="project.open.time.2" value="1" />
+          <entry key="project.closed" value="45" />
+          <entry key="project.open.time.0" value="7" />
+          <entry key="project.open.time.1" value="7" />
+          <entry key="project.open.time.10" value="2" />
+          <entry key="project.open.time.11" value="1" />
+          <entry key="project.open.time.13" value="1" />
+          <entry key="project.open.time.2" value="4" />
+          <entry key="project.open.time.202" value="1" />
+          <entry key="project.open.time.204" value="1" />
+          <entry key="project.open.time.3" value="1" />
+          <entry key="project.open.time.35" value="1" />
           <entry key="project.open.time.37" value="1" />
-          <entry key="project.opened" value="9" />
+          <entry key="project.open.time.39" value="2" />
+          <entry key="project.open.time.4" value="1" />
+          <entry key="project.open.time.40" value="2" />
+          <entry key="project.open.time.41" value="1" />
+          <entry key="project.open.time.43" value="3" />
+          <entry key="project.open.time.44" value="1" />
+          <entry key="project.open.time.45" value="1" />
+          <entry key="project.open.time.5" value="1" />
+          <entry key="project.open.time.55" value="1" />
+          <entry key="project.open.time.56" value="1" />
+          <entry key="project.open.time.60" value="1" />
+          <entry key="project.open.time.78" value="1" />
+          <entry key="project.open.time.8" value="5" />
+          <entry key="project.open.time.9" value="1" />
+          <entry key="project.opened" value="49" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="class" value="6" />
-          <entry key="groovy" value="48" />
-          <entry key="java" value="10" />
+          <entry key="class" value="25" />
+          <entry key="groovy" value="272" />
+          <entry key="gsp" value="1" />
+          <entry key="iml" value="2" />
+          <entry key="java" value="69" />
           <entry key="properties" value="1" />
+          <entry key="xml" value="2" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="CLASS" value="6" />
-          <entry key="Groovy" value="48" />
-          <entry key="JAVA" value="10" />
+          <entry key="CLASS" value="25" />
+          <entry key="GSP" value="1" />
+          <entry key="Groovy" value="272" />
+          <entry key="IDEA_MODULE" value="2" />
+          <entry key="JAVA" value="69" />
           <entry key="Properties" value="1" />
+          <entry key="XML" value="2" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="groovy" value="1856" />
-          <entry key="java" value="140" />
-          <entry key="txt" value="128" />
+          <entry key="groovy" value="6086" />
+          <entry key="gsp" value="4" />
+          <entry key="java" value="236" />
+          <entry key="txt" value="1154" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="Groovy" value="1856" />
-          <entry key="JAVA" value="140" />
-          <entry key="PLAIN_TEXT" value="128" />
+          <entry key="GSP" value="4" />
+          <entry key="Groovy" value="6086" />
+          <entry key="JAVA" value="236" />
+          <entry key="PLAIN_TEXT" value="1154" />
         </counts>
       </usages-collector>
     </session>
   </component>
+  <component name="FavoritesManager">
+    <favorites_list name="scorWebservice" />
+  </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/webservices/EventInterceptorListener.groovy">
+        <entry file="file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/NetinsuranceService.groovy">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="137">
-              <caret line="43" selection-start-line="43" selection-end-line="43" />
+            <state relative-caret-position="13634">
+              <caret line="843" column="49" selection-start-line="843" selection-start-column="49" selection-end-line="843" selection-end-column="80" />
               <folding>
-                <element signature="e#27#53#0" expanded="true" />
+                <element signature="e#26#79#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="jar://$MAVEN_REPOSITORY$/org/apache/cxf/cxf-api/2.6.6/cxf-api-2.6.6.jar!/org/apache/cxf/phase/PhaseInterceptorChain.class">
+        <entry file="file://$PROJECT_DIR$/grails-app/services/services/SimplefrUnderwrittingCaseManagementService.groovy">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="178">
-              <caret line="181" column="32" selection-start-line="181" selection-start-column="32" selection-end-line="181" selection-end-column="32" />
+            <state relative-caret-position="1190">
+              <caret line="105" column="33" selection-start-line="105" selection-start-column="33" selection-end-line="105" selection-end-column="33" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/ServerPasswordCallbackHandlerService.groovy">
+        <entry file="file://$PROJECT_DIR$/grails-app/services/services/SocieteGeneraleUnderwrittingCaseManagementService.groovy">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="346">
-              <caret line="36" column="78" selection-start-line="34" selection-start-column="20" selection-end-line="36" selection-end-column="78" />
+            <state relative-caret-position="1190">
+              <caret line="103" column="47" selection-start-line="103" selection-start-column="47" selection-end-line="103" selection-end-column="47" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/InterceptorEventosService.groovy">
+        <entry file="file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/SocieteGeneraleService.groovy">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="187">
-              <caret line="11" column="37" selection-start-line="11" selection-start-column="37" selection-end-line="11" selection-end-column="37" />
-              <folding>
-                <element signature="e#26#52#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/PsnService.groovy">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="492">
-              <caret line="858" column="21" selection-start-line="836" selection-start-column="16" selection-end-line="858" selection-end-column="21" />
-              <folding>
-                <element signature="e#26#58#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/grails-app/services/services/PsnUnderwrittingCaseManagementService.groovy">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="102">
-              <caret line="83" column="29" selection-start-line="83" selection-start-column="29" selection-end-line="83" selection-end-column="29" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/RequestService.groovy">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="193">
-              <caret line="32" selection-start-line="32" selection-end-line="32" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/EnginyersService.groovy">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="338">
-              <caret line="171" selection-start-line="171" selection-end-line="171" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/java/com/scortelemed/schemas/methislab/MethislabUnderwrittingCaseManagementServiceImpl.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="336">
-              <caret line="46" column="32" selection-start-line="46" selection-start-column="32" selection-end-line="46" selection-end-column="32" />
+            <state relative-caret-position="10251">
+              <caret line="629" column="41" selection-start-line="629" selection-start-column="41" selection-end-line="629" selection-end-column="41" />
             </state>
           </provider>
         </entry>
@@ -162,11 +187,59 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/grails-app/services/services/EnginyersUnderwrittingCaseManagementService.groovy">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="193">
-              <caret line="109" column="63" selection-start-line="109" selection-start-column="63" selection-end-line="109" selection-end-column="63" />
+            <state relative-caret-position="1768">
+              <caret line="136" column="45" selection-start-line="136" selection-start-column="45" selection-end-line="136" selection-end-column="45" />
               <folding>
                 <element signature="e#19#54#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/webservices/CorreoUtil.groovy">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="2414">
+              <caret line="156" column="23" selection-start-line="156" selection-start-column="16" selection-end-line="156" selection-end-column="23" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/grails-app/services/services/AmaUnderwrittingCaseManagementService.groovy">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="3383">
+              <caret line="242" column="60" selection-start-line="242" selection-start-column="60" selection-end-line="242" selection-end-column="60" />
+              <folding>
+                <element signature="e#18#48#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/AmaService.groovy">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="20128">
+              <caret line="1251" column="19" selection-start-line="1251" selection-start-column="19" selection-end-line="1251" selection-end-column="19" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/java/com/scortelemed/schemas/cbpita/CbpitaUnderwrittingCaseManagementService.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="80">
+              <caret line="22" selection-start-line="22" selection-end-line="39" selection-end-column="1" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/EnginyersService.groovy">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="11577">
+              <caret line="715" column="39" selection-start-line="715" selection-start-column="39" selection-end-line="715" selection-end-column="39" />
             </state>
           </provider>
         </entry>
@@ -182,21 +255,36 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>autorizacionPRO</find>
-      <find>serverPasswordCallbackHandlerService</find>
-      <find>customLoggingInInterceptor</find>
-      <find>ctx</find>
-      <find>soapClientComprimidoAlptis</find>
-      <find>grailsApplication</find>
-      <find>gestionReconocimientoMedico</find>
-      <find>camposGenericos</find>
-      <find>phone</find>
-      <find>cobert</find>
-      <find>capital</find>
-      <find>psn</find>
-      <find>sesion.set</find>
+      <find>consultaEx</find>
+      <find>http://172.17.0.33:8003/</find>
+      <find>el zip</find>
+      <find>asignarZipExpediente</find>
+      <find>obtenerZip</find>
+      <find>sta</find>
+      <find>caser</find>
+      <find>interceptorEventos</find>
+      <find>handleMessage</find>
+      <find>rellenaServicios</find>
+      <find>rellena</find>
+      <find>getDo</find>
+      <find>getdo</find>
+      <find>Ama</find>
       <find>producto</find>
-      <find>1030</find>
+      <find>procesarRequest</find>
+      <find>enginyersService.marshall</find>
+      <find>enginyersService</find>
+      <find>NO_LOCALIZADO</find>
+      <find>rellenaDatosSalidaConsulta</find>
+      <find>rellenar</find>
+      <find>expedie</find>
+      <find>ExpedienteExpediente</find>
+      <find>motivoAnulacion</find>
+      <find>response</find>
+      <find>contacto</find>
+      <find>observa</find>
+      <find>ContactTimeType</find>
+      <find>remitente</find>
+      <find>Esto esta impidiendo</find>
     </findStrings>
     <dirStrings>
       <dir>D:\Proyectos InteIj\scorWebservice</dir>
@@ -231,18 +319,68 @@
         <option value="$PROJECT_DIR$/grails-app/domain/com/scortelemed/IpRestriction.groovy" />
         <option value="$PROJECT_DIR$/src/java/com/scor/global/Uri.java" />
         <option value="$PROJECT_DIR$/grails-app/services/com/ws/servicios/InterceptorEventosService.groovy" />
-        <option value="$PROJECT_DIR$/grails-app/services/services/PsnUnderwrittingCaseManagementService.groovy" />
-        <option value="$PROJECT_DIR$/grails-app/services/services/EnginyersUnderwrittingCaseManagementService.groovy" />
         <option value="$PROJECT_DIR$/src/groovy/hwsol/webservices/EventInterceptorListener.groovy" />
+        <option value="$PROJECT_DIR$/src/java/com/scor/global/DateUtils.java" />
+        <option value="$PROJECT_DIR$/src/java/com/scor/global/FechaUtils.java" />
+        <option value="$PROJECT_DIR$/src/groovy/hwsol/webservices/TransformacionUtil.groovy" />
+        <option value="$PROJECT_DIR$/src/groovy/hwsol/webservices/ZipError.groovy" />
+        <option value="$PROJECT_DIR$/src/groovy/hwsol/webservices/ZipResponse.groovy" />
+        <option value="$PROJECT_DIR$/grails-app/controllers/com/scortelemed/WsController.groovy" />
+        <option value="$PROJECT_DIR$/src/java/com/scortelemed/schemas/cbpita/CbpitaUnderwrittingCasesResultsResponse.java" />
+        <option value="$PROJECT_DIR$/src/java/com/scortelemed/schemas/cbpita/CbpitaUnderwrittingCaseManagementResponse.java" />
+        <option value="$PROJECT_DIR$/grails-app/views/request/show.gsp" />
+        <option value="$PROJECT_DIR$/grails-app/controllers/com/scortelemed/RequestController.groovy" />
+        <option value="$PROJECT_DIR$/src/java/com/scortelemed/schemas/netinsurance/ContactTimeType.java" />
+        <option value="$PROJECT_DIR$/src/java/com/scortelemed/schemas/cbpita/ContactTimeType.java" />
+        <option value="$PROJECT_DIR$/grails-app/services/services/AfiEscaUnderwrittingCasesResultsService.groovy" />
+        <option value="$PROJECT_DIR$/grails-app/services/services/LifesquareUnderwrittingCasesResultsService.groovy" />
+        <option value="$PROJECT_DIR$/grails-app/services/services/AfiEscaUnderwrittingCaseManagementService.groovy" />
+        <option value="$PROJECT_DIR$/grails-app/services/services/AlptisUnderwrittingCaseManagementService.groovy" />
+        <option value="$PROJECT_DIR$/grails-app/services/com/ws/servicios/AmaService.groovy" />
+        <option value="$PROJECT_DIR$/grails-app/services/services/AmaUnderwrittingCaseManagementService.groovy" />
+        <option value="$PROJECT_DIR$/grails-app/services/services/CajamarUnderwrittingCaseManagementService.groovy" />
+        <option value="$PROJECT_DIR$/grails-app/services/com/ws/servicios/CajamarService.groovy" />
+        <option value="$PROJECT_DIR$/grails-app/services/services/CaserUnderwrittingCaseManagementService.groovy" />
+        <option value="$PROJECT_DIR$/grails-app/services/com/ws/servicios/CaserService.groovy" />
+        <option value="$PROJECT_DIR$/grails-app/services/services/CbpitaUnderwrittingCaseManagementService.groovy" />
+        <option value="$PROJECT_DIR$/grails-app/services/com/ws/servicios/CbpitaService.groovy" />
+        <option value="$PROJECT_DIR$/grails-app/services/services/EnginyersUnderwrittingCaseManagementService.groovy" />
         <option value="$PROJECT_DIR$/grails-app/services/com/ws/servicios/EnginyersService.groovy" />
+        <option value="$PROJECT_DIR$/grails-app/services/services/GestionReconocimientosMedicosService.groovy" />
+        <option value="$PROJECT_DIR$/grails-app/services/com/ws/servicios/LagunaroService.groovy" />
+        <option value="$PROJECT_DIR$/grails-app/services/services/LifesquareUnderwrittingCaseManagementService.groovy" />
+        <option value="$PROJECT_DIR$/grails-app/services/com/ws/servicios/TarificadorService.groovy" />
+        <option value="$PROJECT_DIR$/grails-app/services/services/MethislabUnderwrittingCaseManagementService.groovy" />
+        <option value="$PROJECT_DIR$/grails-app/services/com/ws/servicios/MethislabService.groovy" />
+        <option value="$PROJECT_DIR$/grails-app/services/services/NetinsuranceUnderwrittingCaseManagementService.groovy" />
+        <option value="$PROJECT_DIR$/grails-app/services/com/ws/servicios/NetinsuranceService.groovy" />
+        <option value="$PROJECT_DIR$/grails-app/services/services/PsnUnderwrittingCaseManagementService.groovy" />
+        <option value="$PROJECT_DIR$/grails-app/services/com/ws/servicios/PsnService.groovy" />
+        <option value="$PROJECT_DIR$/grails-app/services/services/SimplefrUnderwrittingCaseManagementService.groovy" />
+        <option value="$PROJECT_DIR$/grails-app/services/com/ws/servicios/SimplefrService.groovy" />
+        <option value="$PROJECT_DIR$/grails-app/services/services/SocieteGeneraleUnderwrittingCaseManagementService.groovy" />
+        <option value="$PROJECT_DIR$/grails-app/services/com/ws/servicios/SocieteGeneraleService.groovy" />
+        <option value="$PROJECT_DIR$/src/groovy/hwsol/webservices/CorreoUtil.groovy" />
       </list>
     </option>
   </component>
   <component name="JsBuildToolGruntFileManager" detection-done="true" sorting="DEFINITION_ORDER" />
   <component name="JsBuildToolPackageJson" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsFlowSettings">
+    <service-enabled>true</service-enabled>
+    <exe-path />
+    <other-services-enabled>true</other-services-enabled>
+    <auto-save>true</auto-save>
+  </component>
   <component name="JsGulpfileManager">
     <detection-done>true</detection-done>
     <sorting>DEFINITION_ORDER</sorting>
+  </component>
+  <component name="MavenProjectNavigator">
+    <treeState>
+      <expand />
+      <select />
+    </treeState>
   </component>
   <component name="NodePackageJsonFileManager">
     <packageJsonPaths>
@@ -250,10 +388,10 @@
     </packageJsonPaths>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="2328" />
-    <option name="y" value="316" />
-    <option name="width" value="1598" />
-    <option name="height" value="898" />
+    <option name="x" value="1818" />
+    <option name="y" value="226" />
+    <option name="width" value="2060" />
+    <option name="height" value="1164" />
   </component>
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="1" id="Add" />
@@ -263,9 +401,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="PackagesPane" />
-      <pane id="AndroidView" />
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -282,74 +417,15 @@
           <select />
         </subPane>
       </pane>
+      <pane id="PackagesPane" />
+      <pane id="AndroidView" />
+      <pane id="Scope" />
       <pane id="Grails">
         <subPane>
           <expand>
             <path>
               <item name="" type="f1a0d8d8:GrailsRootNode" />
               <item name="" type="3c7b8529:GrailsApplicationNode" />
-            </path>
-            <path>
-              <item name="" type="f1a0d8d8:GrailsRootNode" />
-              <item name="" type="3c7b8529:GrailsApplicationNode" />
-              <item name="conf" type="a8c2cad5:GrailsPsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="" type="f1a0d8d8:GrailsRootNode" />
-              <item name="" type="3c7b8529:GrailsApplicationNode" />
-              <item name="grails-app" type="51fcbf36:OtherGrailsAppSourcesNode" />
-            </path>
-            <path>
-              <item name="" type="f1a0d8d8:GrailsRootNode" />
-              <item name="" type="3c7b8529:GrailsApplicationNode" />
-              <item name="grails-app" type="51fcbf36:OtherGrailsAppSourcesNode" />
-              <item name="domain" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="" type="f1a0d8d8:GrailsRootNode" />
-              <item name="" type="3c7b8529:GrailsApplicationNode" />
-              <item name="grails-app" type="51fcbf36:OtherGrailsAppSourcesNode" />
-              <item name="i18n" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="" type="f1a0d8d8:GrailsRootNode" />
-              <item name="" type="3c7b8529:GrailsApplicationNode" />
-              <item name="groovy" type="a8c2cad5:GrailsPsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="" type="f1a0d8d8:GrailsRootNode" />
-              <item name="" type="3c7b8529:GrailsApplicationNode" />
-              <item name="groovy" type="a8c2cad5:GrailsPsiDirectoryNode" />
-              <item name="webservices" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="" type="f1a0d8d8:GrailsRootNode" />
-              <item name="" type="3c7b8529:GrailsApplicationNode" />
-              <item name="groovy" type="a8c2cad5:GrailsPsiDirectoryNode" />
-              <item name="webservices" type="462c0819:PsiDirectoryNode" />
-              <item name="EventInterceptorListener.groovy" type="529ef68f:ClassesTreeStructureProvider$PsiClassOwnerTreeNode" />
-            </path>
-            <path>
-              <item name="" type="f1a0d8d8:GrailsRootNode" />
-              <item name="" type="3c7b8529:GrailsApplicationNode" />
-              <item name="java" type="a8c2cad5:GrailsPsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="" type="f1a0d8d8:GrailsRootNode" />
-              <item name="" type="3c7b8529:GrailsApplicationNode" />
-              <item name="java" type="a8c2cad5:GrailsPsiDirectoryNode" />
-              <item name="com" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="" type="f1a0d8d8:GrailsRootNode" />
-              <item name="" type="3c7b8529:GrailsApplicationNode" />
-              <item name="Services" type="75e8b6a9:GrailsArtefactHandlerNode" />
-            </path>
-            <path>
-              <item name="" type="f1a0d8d8:GrailsRootNode" />
-              <item name="" type="3c7b8529:GrailsApplicationNode" />
-              <item name="Services" type="75e8b6a9:GrailsArtefactHandlerNode" />
-              <item name="com.ws.servicios" type="f5631256:GrailsArtefactPackageNode" />
             </path>
           </expand>
           <select />
@@ -360,18 +436,20 @@
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1550834179582" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1554389582570" />
     <property name="grails.last.selected.app.url" value="file://$PROJECT_DIR$" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../MovimientosNN" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
-    <property name="project.structure.last.edited" value="Global Libraries" />
+    <property name="project.structure.last.edited" value="Project" />
     <property name="project.structure.proportion" value="0.15" />
-    <property name="project.structure.side.proportion" value="0.2" />
-    <property name="settings.editor.selected.configurable" value="preferences.keymap" />
+    <property name="project.structure.side.proportion" value="0.13295211" />
+    <property name="settings.editor.selected.configurable" value="debugger.stepping" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\Proyectos InteIj\scorWebservice\src\java\com\scortelemed\schemas\cbpita" />
+      <recent name="D:\Proyectos InteIj\scorWebservice\lib" />
       <recent name="D:\Proyectos InteIj\scorWebservice\src\groovy\hwsol\webservices" />
     </key>
   </component>
@@ -437,88 +515,201 @@
       <workItem from="1550584597844" duration="6000" />
       <workItem from="1550654405228" duration="1503000" />
       <workItem from="1550656092294" duration="13161000" />
-      <workItem from="1550674196603" duration="27641000" />
+      <workItem from="1550674196603" duration="49610000" />
+      <workItem from="1551165427952" duration="466000" />
+      <workItem from="1551166008679" duration="7573000" />
+      <workItem from="1551252731125" duration="660000" />
+      <workItem from="1551275311373" duration="629000" />
+      <workItem from="1551959278811" duration="724000" />
+      <workItem from="1552302060001" duration="8331000" />
+      <workItem from="1552332167488" duration="553000" />
+      <workItem from="1552374447040" duration="3761000" />
+      <workItem from="1552482700746" duration="791000" />
+      <workItem from="1552547380526" duration="781000" />
+      <workItem from="1552548258776" duration="3673000" />
+      <workItem from="1552553812449" duration="19162000" />
+      <workItem from="1552640193737" duration="8102000" />
+      <workItem from="1552992751426" duration="9780000" />
+      <workItem from="1553064878301" duration="14671000" />
+      <workItem from="1553154165252" duration="4040000" />
+      <workItem from="1553168421450" duration="128000" />
+      <workItem from="1553168816697" duration="58000" />
+      <workItem from="1553175322127" duration="150000" />
+      <workItem from="1553182347134" duration="725000" />
+      <workItem from="1553236766015" duration="5475000" />
+      <workItem from="1553504574885" duration="623000" />
+      <workItem from="1553587514966" duration="6539000" />
+      <workItem from="1553607589530" duration="138000" />
+      <workItem from="1553608496772" duration="1478000" />
+      <workItem from="1553612348993" duration="17000" />
+      <workItem from="1553683401470" duration="1046000" />
+      <workItem from="1553686445824" duration="665000" />
+      <workItem from="1553694357655" duration="146000" />
+      <workItem from="1553773945560" duration="4920000" />
+      <workItem from="1553848766686" duration="42000" />
+      <workItem from="1554099901072" duration="7529000" />
+      <workItem from="1554114814131" duration="593000" />
+      <workItem from="1554126741326" duration="712000" />
+      <workItem from="1554185988375" duration="838000" />
+      <workItem from="1554190494811" duration="5944000" />
+      <workItem from="1554200210860" duration="8000" />
+      <workItem from="1554388974863" duration="930000" />
+      <workItem from="1554449649939" duration="2214000" />
+      <workItem from="1554789011984" duration="2012000" />
     </task>
+    <task id="LOCAL-00001" summary="Se sube el tiempo de espera en buscar expediente entre intento e intento">
+      <created>1552383683057</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1552383683057</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Se sube el tiempo de espera en buscar expediente entre intento e intento">
+      <created>1552384577206</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1552384577206</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Se añade funcion que calcula la edad actuarial">
+      <created>1552384659518</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1552384659518</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Se sube el tiempo de espera en buscar expediente entre intento e intento">
+      <created>1552384669168</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1552384669168</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Se añade un interceptor listener a nivel de webservice para capturar las llamadas al servicio y actuar en consecuencia, ahora mismo se ha añadido funcionalidad para filtrar acceso por ip.">
+      <created>1552384742521</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1552384742521</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Se modifica la forma de devolver los errores a netinsurance en la response">
+      <created>1552384788688</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1552384788688</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Librerias regeneradas del frontal">
+      <created>1552999809675</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1552999809676</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Se sube a tres mitunos el timeout de ama">
+      <created>1552999907035</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1552999907035</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Obtener devuelve ahora new Byte[0] si no hay documentos evitando el error anterior.">
+      <created>1552999970841</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1552999970841</updated>
+    </task>
+    <task id="LOCAL-00010" summary="Nuevo metodo obtenerZip que captura errores en la generacion de zips">
+      <created>1553000013371</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1553000013371</updated>
+    </task>
+    <task id="LOCAL-00011" summary="Nueva especificacion CBP">
+      <created>1553075025119</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1553075025120</updated>
+    </task>
+    <task id="LOCAL-00012" summary="Nuevo servicio de respuesta para CBP">
+      <created>1553075187393</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1553075187393</updated>
+    </task>
+    <task id="LOCAL-00013" summary="Se envia el serivicio TM a la carga direcamente.">
+      <created>1553075228958</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1553075228958</updated>
+    </task>
+    <task id="LOCAL-00014" summary="Se meten todas las operaciones que pueden lanzar excepciones dentro del try">
+      <created>1553075271118</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1553075271118</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="45898000" />
+    <option name="totallyTimeSpent" value="194494000" />
+  </component>
+  <component name="TodoView">
+    <todo-panel id="selected-file">
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
   </component>
   <component name="ToolWindowManager">
     <frame x="2040" y="64" width="1936" height="1096" extended-state="6" />
-    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.8237548" visible="true" weight="0.18636848" />
-      <window_info id="Structure" order="1" sideWeight="0.17624521" side_tool="true" weight="0.26783812" />
-      <window_info id="Persistence" order="2" side_tool="true" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.6281645" visible="true" weight="0.26677316" />
+      <window_info id="Structure" order="1" sideWeight="0.37183544" side_tool="true" weight="0.25612354" />
+      <window_info id="Persistence" order="2" sideWeight="0.37183544" side_tool="true" weight="0.25612354" />
       <window_info id="Designer" order="3" />
       <window_info id="Image Layers" order="4" />
       <window_info id="UI Designer" order="5" />
-      <window_info id="Favorites" order="6" side_tool="true" />
+      <window_info id="Favorites" order="6" sideWeight="0.37183544" side_tool="true" weight="0.25612354" />
       <window_info id="Capture Tool" order="7" />
-      <window_info id="Web" order="8" side_tool="true" />
+      <window_info id="Web" order="8" sideWeight="0.37183544" side_tool="true" weight="0.25612354" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.40827146" />
+      <window_info active="true" anchor="bottom" id="Find" order="1" sideWeight="0.49946752" visible="true" weight="0.25026512" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.32979852" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.44008484" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Spring" order="7" />
-      <window_info anchor="bottom" id="Terminal" order="8" />
-      <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
-      <window_info anchor="bottom" id="Java Enterprise" order="10" />
+      <window_info anchor="bottom" id="Spring" order="7" sideWeight="0.49946752" weight="0.21483096" />
+      <window_info anchor="bottom" id="Terminal" order="8" weight="0.32979852" />
+      <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.50159746" side_tool="true" visible="true" weight="0.5514316" />
+      <window_info anchor="bottom" id="Java Enterprise" order="10" weight="0.32979852" />
       <window_info anchor="bottom" id="Database Changes" order="11" show_stripe_button="false" />
-      <window_info active="true" anchor="bottom" id="Version Control" order="12" visible="true" weight="0.58006364" />
-      <window_info anchor="bottom" id="Grails Console" order="13" weight="0.32979852" />
+      <window_info active="true" anchor="bottom" id="Version Control" order="12" sideWeight="0.49840257" visible="true" weight="0.5514316" />
+      <window_info anchor="bottom" id="Grails Console" order="13" sideWeight="0.6118211" weight="0.640509" />
+      <window_info anchor="bottom" id="Messages" order="14" weight="0.54825026" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="right" id="Palette" order="3" />
       <window_info anchor="right" id="Capture Analysis" order="4" />
       <window_info anchor="right" id="CDI" order="5" />
-      <window_info anchor="right" id="Maven Projects" order="6" />
-      <window_info anchor="right" id="Database" order="7" />
+      <window_info anchor="right" id="Maven Projects" order="6" weight="0.32991013" />
+      <window_info anchor="right" id="Database" order="7" weight="0.05804047" />
       <window_info anchor="right" id="Palette&#9;" order="8" />
       <window_info anchor="right" id="Theme Preview" order="9" />
       <window_info anchor="right" id="Bean Validation" order="10" />
+      <window_info anchor="right" id="Coverage" order="11" side_tool="true" />
     </layout>
-    <layout-to-restore>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.8237548" weight="0.18636848" />
-      <window_info id="Structure" order="1" sideWeight="0.17624521" side_tool="true" weight="0.26783812" />
-      <window_info id="Persistence" order="2" side_tool="true" />
-      <window_info id="Designer" order="3" />
-      <window_info id="Image Layers" order="4" />
-      <window_info id="UI Designer" order="5" />
-      <window_info id="Favorites" order="6" side_tool="true" />
-      <window_info id="Capture Tool" order="7" />
-      <window_info id="Web" order="8" side_tool="true" />
-      <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" />
-      <window_info active="true" anchor="bottom" id="Debug" order="3" visible="true" weight="0.40827146" />
-      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
-      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Spring" order="7" />
-      <window_info anchor="bottom" id="Terminal" order="8" />
-      <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
-      <window_info anchor="bottom" id="Java Enterprise" order="10" />
-      <window_info anchor="bottom" id="Database Changes" order="11" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Version Control" order="12" weight="0.16542949" />
-      <window_info anchor="bottom" id="Grails Console" order="13" weight="0.32979852" />
-      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
-      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
-      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" id="Palette" order="3" />
-      <window_info anchor="right" id="Capture Analysis" order="4" />
-      <window_info anchor="right" id="CDI" order="5" />
-      <window_info anchor="right" id="Maven Projects" order="6" />
-      <window_info anchor="right" id="Database" order="7" />
-      <window_info anchor="right" id="Palette&#9;" order="8" />
-      <window_info anchor="right" id="Theme Preview" order="9" />
-      <window_info anchor="right" id="Bean Validation" order="10" />
-    </layout-to-restore>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
@@ -562,6 +753,21 @@
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
   </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Se añade funcion que calcula la edad actuarial" />
+    <MESSAGE value="Se sube el tiempo de espera en buscar expediente entre intento e intento" />
+    <MESSAGE value="Se añade un interceptor listener a nivel de webservice para capturar las llamadas al servicio y actuar en consecuencia, ahora mismo se ha añadido funcionalidad para filtrar acceso por ip." />
+    <MESSAGE value="Se modifica la forma de devolver los errores a netinsurance en la response" />
+    <MESSAGE value="Librerias regeneradas del frontal" />
+    <MESSAGE value="Se sube a tres mitunos el timeout de ama" />
+    <MESSAGE value="Obtener devuelve ahora new Byte[0] si no hay documentos evitando el error anterior." />
+    <MESSAGE value="Nuevo metodo obtenerZip que captura errores en la generacion de zips" />
+    <MESSAGE value="Nueva especificacion CBP" />
+    <MESSAGE value="Nuevo servicio de respuesta para CBP" />
+    <MESSAGE value="Se envia el serivicio TM a la carga direcamente." />
+    <MESSAGE value="Se meten todas las operaciones que pueden lanzar excepciones dentro del try" />
+    <option name="LAST_COMMIT_MESSAGE" value="Se meten todas las operaciones que pueden lanzar excepciones dentro del try" />
+  </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
@@ -578,345 +784,710 @@
           <option name="timeStamp" value="46" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/grails-app/services/services/EnginyersUnderwrittingCaseManagementService.groovy</url>
-          <line>99</line>
+          <url>file://$PROJECT_DIR$/src/groovy/hwsol/webservices/TransformacionUtil.groovy</url>
+          <line>746</line>
           <properties />
-          <option name="timeStamp" value="122" />
+          <option name="timeStamp" value="189" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/controllers/com/scortelemed/WsController.groovy</url>
+          <line>703</line>
+          <properties />
+          <option name="timeStamp" value="230" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/controllers/com/scortelemed/WsController.groovy</url>
+          <line>924</line>
+          <properties />
+          <option name="timeStamp" value="232" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/controllers/com/scortelemed/WsController.groovy</url>
+          <line>937</line>
+          <properties />
+          <option name="timeStamp" value="233" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/controllers/com/scortelemed/WsController.groovy</url>
+          <line>985</line>
+          <properties />
+          <option name="timeStamp" value="234" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/controllers/com/scortelemed/WsController.groovy</url>
+          <line>1011</line>
+          <properties />
+          <option name="timeStamp" value="235" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/controllers/com/scortelemed/WsController.groovy</url>
+          <line>1020</line>
+          <properties />
+          <option name="timeStamp" value="236" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/controllers/com/scortelemed/WsController.groovy</url>
+          <line>1024</line>
+          <properties />
+          <option name="timeStamp" value="237" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/controllers/com/scortelemed/WsController.groovy</url>
+          <line>950</line>
+          <properties />
+          <option name="timeStamp" value="238" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/controllers/com/scortelemed/WsController.groovy</url>
+          <line>695</line>
+          <properties />
+          <option name="timeStamp" value="240" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/controllers/com/scortelemed/WsController.groovy</url>
+          <line>697</line>
+          <properties />
+          <option name="timeStamp" value="242" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/controllers/com/scortelemed/WsController.groovy</url>
+          <line>934</line>
+          <properties />
+          <option name="timeStamp" value="244" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/TarificadorService.groovy</url>
+          <line>253</line>
+          <properties />
+          <option name="timeStamp" value="296" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/services/services/NetinsuranceUnderwrittingCaseManagementService.groovy</url>
+          <line>282</line>
+          <properties />
+          <option name="timeStamp" value="344" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/services/services/AmaUnderwrittingCaseManagementService.groovy</url>
+          <line>530</line>
+          <properties />
+          <option name="timeStamp" value="351" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/services/services/AmaUnderwrittingCaseManagementService.groovy</url>
+          <line>519</line>
+          <properties />
+          <option name="timeStamp" value="352" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/services/services/AmaUnderwrittingCaseManagementService.groovy</url>
+          <line>501</line>
+          <properties />
+          <option name="timeStamp" value="353" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/services/services/AmaUnderwrittingCaseManagementService.groovy</url>
+          <line>486</line>
+          <properties />
+          <option name="timeStamp" value="354" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/services/services/AmaUnderwrittingCaseManagementService.groovy</url>
+          <line>476</line>
+          <properties />
+          <option name="timeStamp" value="355" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/services/services/AmaUnderwrittingCaseManagementService.groovy</url>
+          <line>456</line>
+          <properties />
+          <option name="timeStamp" value="356" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/services/services/AmaUnderwrittingCaseManagementService.groovy</url>
+          <line>538</line>
+          <properties />
+          <option name="timeStamp" value="357" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/AmaService.groovy</url>
+          <line>1472</line>
+          <properties />
+          <option name="timeStamp" value="358" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/AmaService.groovy</url>
+          <line>1479</line>
+          <properties />
+          <option name="timeStamp" value="359" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/AmaService.groovy</url>
+          <line>1474</line>
+          <properties />
+          <option name="timeStamp" value="360" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/services/services/EnginyersUnderwrittingCaseManagementService.groovy</url>
+          <line>63</line>
+          <properties />
+          <option name="timeStamp" value="363" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/EnginyersService.groovy</url>
-          <line>148</line>
+          <line>96</line>
           <properties />
-          <option name="timeStamp" value="134" />
+          <option name="timeStamp" value="367" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/EnginyersService.groovy</url>
+          <line>83</line>
+          <properties />
+          <option name="timeStamp" value="371" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/EnginyersService.groovy</url>
+          <line>84</line>
+          <properties />
+          <option name="timeStamp" value="372" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/EnginyersService.groovy</url>
+          <line>93</line>
+          <properties />
+          <option name="timeStamp" value="373" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/EnginyersService.groovy</url>
+          <line>688</line>
+          <properties />
+          <option name="timeStamp" value="382" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/EnginyersService.groovy</url>
+          <line>697</line>
+          <properties />
+          <option name="timeStamp" value="383" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/EnginyersService.groovy</url>
+          <line>706</line>
+          <properties />
+          <option name="timeStamp" value="384" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/EnginyersService.groovy</url>
+          <line>709</line>
+          <properties />
+          <option name="timeStamp" value="385" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/EnginyersService.groovy</url>
+          <line>682</line>
+          <properties />
+          <option name="timeStamp" value="392" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/EnginyersService.groovy</url>
+          <line>683</line>
+          <properties />
+          <option name="timeStamp" value="393" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/NetinsuranceService.groovy</url>
+          <line>162</line>
+          <properties />
+          <option name="timeStamp" value="397" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/NetinsuranceService.groovy</url>
+          <line>160</line>
+          <properties />
+          <option name="timeStamp" value="400" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/NetinsuranceService.groovy</url>
+          <line>144</line>
+          <properties />
+          <option name="timeStamp" value="403" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/NetinsuranceService.groovy</url>
+          <line>146</line>
+          <properties />
+          <option name="timeStamp" value="405" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/NetinsuranceService.groovy</url>
+          <line>459</line>
+          <properties />
+          <option name="timeStamp" value="407" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/NetinsuranceService.groovy</url>
+          <line>461</line>
+          <properties />
+          <option name="timeStamp" value="408" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/NetinsuranceService.groovy</url>
+          <line>462</line>
+          <properties />
+          <option name="timeStamp" value="409" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/NetinsuranceService.groovy</url>
+          <line>460</line>
+          <properties />
+          <option name="timeStamp" value="410" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/EnginyersService.groovy</url>
+          <line>415</line>
+          <properties />
+          <option name="timeStamp" value="411" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/EnginyersService.groovy</url>
+          <line>416</line>
+          <properties />
+          <option name="timeStamp" value="412" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/EnginyersService.groovy</url>
+          <line>418</line>
+          <properties />
+          <option name="timeStamp" value="413" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/EnginyersService.groovy</url>
+          <line>423</line>
+          <properties />
+          <option name="timeStamp" value="414" />
         </line-breakpoint>
       </breakpoints>
+      <breakpoints-dialog>
+        <breakpoints-dialog />
+      </breakpoints-dialog>
     </breakpoint-manager>
   </component>
   <component name="debuggerHistoryManager">
     <expressions id="evaluateCodeFragment">
       <expression>
-        <expression-string>nList</expression-string>
+        <expression-string>datosRegistro</expression-string>
         <language-id>Groovy</language-id>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>eElement.getElementsByTagName(&quot;idRisk&quot;).item(0).getTextContent()</expression-string>
+        <expression-string>expedientePoliza.getCodigoEstado()</expression-string>
         <language-id>Groovy</language-id>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>eElement</expression-string>
+        <expression-string>expedientePoliza.getCodigoEstado().toString()</expression-string>
         <language-id>Groovy</language-id>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>operacion</expression-string>
+        <expression-string>exp.getFechaApertura()</expression-string>
         <language-id>Groovy</language-id>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>uri.getCompany()</expression-string>
+        <expression-string>policyNumber.toString()</expression-string>
         <language-id>Groovy</language-id>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>req</expression-string>
+        <expression-string>companyCodigoSt.toString()</expression-string>
         <language-id>Groovy</language-id>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>service.restrictedIp(companyName)</expression-string>
+        <expression-string>salida.codigo.equals(&quot;0&quot;)</expression-string>
         <language-id>Groovy</language-id>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>it</expression-string>
+        <expression-string>zipResponse.getError()</expression-string>
         <language-id>Groovy</language-id>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
       <expression>
-        <expression-string>it.ipAddress</expression-string>
+        <expression-string>e.getMessage().toString()</expression-string>
         <language-id>Groovy</language-id>
         <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
       </expression>
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/application.properties">
+    <entry file="file://$PROJECT_DIR$/.idea/scorWebservice.iml">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/webservices/EventInterceptorListener.groovy">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="68">
-          <caret line="4" column="15" selection-start-line="4" selection-start-column="15" selection-end-line="4" selection-end-column="15" />
+        <state relative-caret-position="272">
+          <caret line="32" column="24" selection-start-line="32" selection-start-column="24" selection-end-line="32" selection-end-column="24" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/grails-app/controllers/com/scortelemed/WsController.groovy">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="51" column="27" selection-start-line="51" selection-start-column="27" selection-end-line="51" selection-end-column="27" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/webservices/InterceptorEventos.groovy" />
-    <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/webservices/EventInterceptor.groovy" />
-    <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/webservices/MyUserDetailsContextMapper.groovy">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="68">
-          <caret line="11" column="32" selection-start-line="11" selection-start-column="6" selection-end-line="11" selection-end-column="32" />
+        <state relative-caret-position="14824">
+          <caret line="916" selection-start-line="916" selection-end-line="916" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/grails-app/conf/Config.groovy">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="146">
-          <caret line="93" column="16" selection-start-line="93" selection-start-column="16" selection-end-line="93" selection-end-column="16" />
+        <state relative-caret-position="2720">
+          <caret line="160" column="89" selection-start-line="160" selection-start-column="26" selection-end-line="160" selection-end-column="89" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/TarificadorService.groovy">
+    <entry file="jar://$PROJECT_DIR$/lib/creacionBPEL.jar!/com/scor/srpfileinbound/REGISTRODATOS.class">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="161">
-          <caret line="240" column="62" selection-start-line="240" selection-start-column="36" selection-end-line="240" selection-end-column="62" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/grails-app/conf/BootStrap.groovy">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="833">
-          <caret line="49" column="101" selection-start-line="49" selection-start-column="101" selection-end-line="49" selection-end-column="101" />
-          <folding>
-            <element signature="e#0#48#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/grails-app/conf/BuildConfig.groovy">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1377">
-          <caret line="81" column="33" selection-start-line="81" selection-start-column="33" selection-end-line="81" selection-end-column="33" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/grails-app/conf/spring/resources.groovy">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="11" column="46" selection-start-line="11" selection-start-column="23" selection-end-line="11" selection-end-column="46" />
-          <folding>
-            <element signature="e#0#27#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/grails-app/conf/DataSource.groovy">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="51">
-          <caret line="3" column="16" selection-start-line="3" selection-start-column="16" selection-end-line="3" selection-end-column="16" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/grails-app/domain/com/scortelemed/IpRestriction.groovy">
-      <provider editor-type-id="org.jetbrains.plugins.grails.perspectives.DomainClassesRelationsEditorProvider" />
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="13" selection-start-line="13" selection-end-line="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/grails-app/domain/com/scortelemed/Company.groovy">
-      <provider editor-type-id="org.jetbrains.plugins.grails.perspectives.DomainClassesRelationsEditorProvider" />
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="510">
-          <caret line="30" column="1" selection-start-line="30" selection-start-column="1" selection-end-line="30" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/grails-app/domain/com/scortelemed/Ipcontrol.groovy">
-      <provider editor-type-id="org.jetbrains.plugins.grails.perspectives.DomainClassesRelationsEditorProvider" />
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="7" column="11" selection-start-line="7" selection-start-column="4" selection-end-line="7" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/java/com/scor/global/Compania.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="200">
-          <caret line="31" column="13" selection-start-line="31" selection-start-column="13" selection-end-line="31" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/java/com/scor/global/Uri.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="11" column="86" selection-start-line="11" selection-start-column="86" selection-end-line="11" selection-end-column="86" />
-          <folding>
-            <element signature="e#246#247#0" expanded="true" />
-            <element signature="e#280#281#0" expanded="true" />
-            <element signature="e#334#335#0" expanded="true" />
-            <element signature="e#380#381#0" expanded="true" />
-            <element signature="e#415#416#0" expanded="true" />
-            <element signature="e#446#447#0" expanded="true" />
-            <element signature="e#494#495#0" expanded="true" />
-            <element signature="e#534#535#0" expanded="true" />
-            <element signature="e#568#569#0" expanded="true" />
-            <element signature="e#598#599#0" expanded="true" />
-            <element signature="e#644#645#0" expanded="true" />
-            <element signature="e#682#683#0" expanded="true" />
-            <element signature="e#717#718#0" expanded="true" />
-            <element signature="e#748#749#0" expanded="true" />
-            <element signature="e#796#797#0" expanded="true" />
-            <element signature="e#836#837#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/grails-app/services/services/AmaUnderwrittingCaseManagementService.groovy">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="595">
-          <caret line="128" column="233" selection-start-line="127" selection-start-column="28" selection-end-line="128" selection-end-column="233" />
-          <folding>
-            <element signature="e#18#48#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://D:/Entornos/GGTS/groovy-grails-tool-suite/ggts-bundle/grails-2.5.0/lib/org.springframework/spring-tx/jars/spring-tx-4.1.5.RELEASE-sources.jar!/org/springframework/transaction/support/TransactionTemplate.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="193">
-          <caret line="132" selection-start-line="132" selection-end-line="132" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://D:/Entornos/GGTS/groovy-grails-tool-suite/ggts-bundle/grails-2.5.0/lib/org.springframework/spring-tx/jars/spring-tx-4.1.5.RELEASE-sources.jar!/org/springframework/transaction/interceptor/TransactionAspectSupport.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="295">
-          <caret line="288" selection-start-line="288" selection-end-line="288" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://D:/Entornos/GGTS/groovy-grails-tool-suite/ggts-bundle/grails-2.5.0/lib/org.springframework/spring-aop/jars/spring-aop-4.1.5.RELEASE-sources.jar!/org/springframework/aop/framework/CglibAopProxy.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="193">
-          <caret line="658" selection-start-line="658" selection-end-line="658" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/java/com/scortelemed/schemas/enginyers/Expedient.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="252">
-          <caret line="77" column="16" selection-start-line="77" selection-start-column="16" selection-end-line="77" selection-end-column="16" />
-          <folding>
-            <element signature="e#1526#1527#0" expanded="true" />
-            <element signature="e#1571#1572#0" expanded="true" />
-            <element signature="e#2017#2018#0" expanded="true" />
-            <element signature="e#2057#2058#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/java/com/scortelemed/schemas/enginyers/SurveyData.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="193">
-          <caret line="430" column="18" selection-start-line="430" selection-start-column="18" selection-end-line="430" selection-end-column="18" />
-          <folding>
-            <element signature="e#10022#10023#0" expanded="true" />
-            <element signature="e#10057#10058#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://D:/Entornos/GGTS/groovy-grails-tool-suite/ggts-bundle/grails-2.5.0/lib/org.springframework/spring-core/jars/spring-core-4.1.5.RELEASE.jar!/org/springframework/cglib/proxy/MethodProxy.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="106" selection-start-line="106" selection-end-line="106" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/grails-app/services/services/PsnUnderwrittingCaseManagementService.groovy">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="102">
-          <caret line="83" column="29" selection-start-line="83" selection-start-column="29" selection-end-line="83" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/InterceptorEventosService.groovy">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="11" column="37" selection-start-line="11" selection-start-column="37" selection-end-line="11" selection-end-column="37" />
-          <folding>
-            <element signature="e#26#52#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/ServerPasswordCallbackHandlerService.groovy">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="346">
-          <caret line="36" column="78" selection-start-line="34" selection-start-column="20" selection-end-line="36" selection-end-column="78" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/org/apache/cxf/cxf-api/2.6.6/cxf-api-2.6.6.jar!/org/apache/cxf/phase/PhaseInterceptorChain.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="178">
-          <caret line="181" column="32" selection-start-line="181" selection-start-column="32" selection-end-line="181" selection-end-column="32" />
+        <state relative-caret-position="6817">
+          <caret line="555" selection-start-line="555" selection-end-line="555" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/RequestService.groovy">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="193">
-          <caret line="32" selection-start-line="32" selection-end-line="32" />
+        <state relative-caret-position="170">
+          <caret line="30" column="8" selection-start-line="30" selection-start-column="8" selection-end-line="30" selection-end-column="8" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/grails-app/services/services/EnginyersUnderwrittingCaseManagementService.groovy">
+    <entry file="file://$PROJECT_DIR$/grails-app/views/request/show.gsp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="193">
-          <caret line="109" column="63" selection-start-line="109" selection-start-column="63" selection-end-line="109" selection-end-column="63" />
+        <state relative-caret-position="1530">
+          <caret line="90" column="88" selection-start-line="90" selection-start-column="73" selection-end-line="90" selection-end-column="88" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/java/com/scortelemed/schemas/cbpita/CbpitaUnderwrittingCaseManagementResponse.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="9" lean-forward="true" selection-start-line="9" selection-end-line="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grails-app/controllers/com/scortelemed/RequestController.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="219">
+          <caret line="604" selection-start-line="604" selection-end-line="604" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/java/com/scortelemed/schemas/cbpita/CbpitaUnderwrittingCasesResultsResponse.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-240">
+          <caret line="246" column="6" lean-forward="true" selection-start-line="246" selection-start-column="6" selection-end-line="246" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$PROJECT_DIR$/lib/FrontalCRMDynamics.jar!/servicios/TipoMotivoAnulacion.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="170">
+          <caret line="14" column="12" selection-start-line="14" selection-start-column="12" selection-end-line="14" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/webservices/TransformacionUtil.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3024">
+          <caret line="671" column="21" lean-forward="true" selection-start-line="671" selection-start-column="21" selection-end-line="671" selection-end-column="21" />
           <folding>
-            <element signature="e#19#54#0" expanded="true" />
+            <element signature="e#27#97#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$PROJECT_DIR$/lib/FrontalCRMDynamics.jar!/servicios/TipoEstadoExpediente.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="89">
+          <caret line="29" column="11" selection-start-line="29" selection-start-column="4" selection-end-line="29" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$PROJECT_DIR$/lib/FrontalCRMDynamics.jar!/servicios/Expediente.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="219">
+          <caret line="472" column="30" selection-start-line="472" selection-start-column="11" selection-end-line="472" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/AvisosService.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="51">
+          <caret line="16" column="6" selection-start-line="16" selection-start-column="6" selection-end-line="16" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/java/com/scortelemed/schemas/netinsurance/NetinsuranteUnderwrittingCaseManagementRequest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="229">
+          <caret line="352" column="30" lean-forward="true" selection-start-line="352" selection-start-column="30" selection-end-line="352" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/java/com/scortelemed/schemas/netinsurance/ContactTimeType.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="238">
+          <caret line="15" column="26" lean-forward="true" selection-start-line="15" selection-start-column="26" selection-end-line="15" selection-end-column="26" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/java/com/scortelemed/schemas/cbpita/CbpitaUnderwrittingCasesResultsRequest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="527">
+          <caret line="36" column="13" selection-start-line="36" selection-start-column="13" selection-end-line="36" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/java/com/scortelemed/schemas/cbpita/ContactTimeType.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="16" column="10" selection-start-line="16" selection-start-column="10" selection-end-line="16" selection-end-column="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grails-app/services/services/LifesquareUnderwrittingCasesResultsService.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1785">
+          <caret line="129" column="180" selection-start-line="129" selection-start-column="180" selection-end-line="129" selection-end-column="180" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grails-app/services/services/NationaleNederlandenUnderwrittingCaseManagementService.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="153">
+          <caret line="29" column="6" selection-start-line="29" selection-start-column="6" selection-end-line="29" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grails-app/services/services/AfiEscaUnderwrittingCasesResultsService.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1904">
+          <caret line="139" column="20" selection-start-line="139" selection-start-column="20" selection-end-line="139" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grails-app/services/services/AlptisUnderwrittingCaseManagementService.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="360">
+          <caret line="102" column="48" selection-start-line="102" selection-start-column="31" selection-end-line="102" selection-end-column="48" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grails-app/services/services/AfiEscaUnderwrittingCaseManagementService.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="224">
+          <caret line="97" column="71" lean-forward="true" selection-start-line="97" selection-start-column="45" selection-end-line="97" selection-end-column="71" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/CaserService.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="340">
+          <caret line="869" column="23" lean-forward="true" selection-start-line="869" selection-start-column="23" selection-end-line="869" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grails-app/services/services/CaserUnderwrittingCaseManagementService.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="108" column="40" selection-start-line="108" selection-start-column="40" selection-end-line="108" selection-end-column="40" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/CajamarService.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="442">
+          <caret line="722" column="42" lean-forward="true" selection-start-line="722" selection-start-column="42" selection-end-line="722" selection-end-column="42" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grails-app/services/services/CajamarUnderwrittingCaseManagementService.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="493">
+          <caret line="119" column="43" selection-start-line="119" selection-start-column="43" selection-end-line="119" selection-end-column="43" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grails-app/services/services/CbpitaUnderwrittingCaseManagementService.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="306">
+          <caret line="100" column="44" lean-forward="true" selection-start-line="100" selection-start-column="44" selection-end-line="100" selection-end-column="44" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/CbpitaService.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="256">
+          <caret line="690" column="68" lean-forward="true" selection-start-line="690" selection-start-column="68" selection-end-line="690" selection-end-column="68" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grails-app/services/services/GestionReconocimientosMedicosService.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="170">
+          <caret line="127" column="42" lean-forward="true" selection-start-line="127" selection-start-column="42" selection-end-line="127" selection-end-column="42" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/LagunaroService.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="496">
+          <caret line="684" column="71" selection-start-line="684" selection-start-column="71" selection-end-line="684" selection-end-column="71" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/TarificadorService.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="714">
+          <caret line="760" column="74" selection-start-line="760" selection-start-column="74" selection-end-line="760" selection-end-column="74" />
+          <folding>
+            <element signature="e#25#60#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grails-app/services/services/LifesquareUnderwrittingCaseManagementService.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="442">
+          <caret line="101" column="57" selection-start-line="101" selection-start-column="57" selection-end-line="101" selection-end-column="57" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grails-app/services/services/NetinsuranceUnderwrittingCaseManagementService.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="425">
+          <caret line="118" column="76" selection-start-line="118" selection-start-column="45" selection-end-line="118" selection-end-column="76" />
+          <folding>
+            <element signature="e#18#52#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/MethislabService.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="883">
+          <caret line="757" column="35" lean-forward="true" selection-start-line="757" selection-start-column="35" selection-end-line="757" selection-end-column="35" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/SimplefrService.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="458">
+          <caret line="629" column="72" selection-start-line="629" selection-start-column="72" selection-end-line="629" selection-end-column="72" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grails-app/services/services/MethislabUnderwrittingCaseManagementService.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1275">
+          <caret line="113" column="50" selection-start-line="113" selection-start-column="50" selection-end-line="113" selection-end-column="50" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grails-app/services/services/PsnUnderwrittingCaseManagementService.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1326">
+          <caret line="119" column="48" selection-start-line="119" selection-start-column="48" selection-end-line="119" selection-end-column="48" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/PsnService.groovy">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="492">
-          <caret line="858" column="21" selection-start-line="836" selection-start-column="16" selection-end-line="858" selection-end-column="21" />
+        <state relative-caret-position="15045">
+          <caret line="946" column="71" selection-start-line="946" selection-start-column="71" selection-end-line="946" selection-end-column="71" />
           <folding>
             <element signature="e#26#58#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/NetinsuranceService.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="13634">
+          <caret line="843" column="49" selection-start-line="843" selection-start-column="49" selection-end-line="843" selection-end-column="80" />
+          <folding>
+            <element signature="e#26#79#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grails-app/services/services/SimplefrUnderwrittingCaseManagementService.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1190">
+          <caret line="105" column="33" selection-start-line="105" selection-start-column="33" selection-end-line="105" selection-end-column="33" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grails-app/services/services/SocieteGeneraleUnderwrittingCaseManagementService.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1190">
+          <caret line="103" column="47" selection-start-line="103" selection-start-column="47" selection-end-line="103" selection-end-column="47" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/SocieteGeneraleService.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="10251">
+          <caret line="629" column="41" selection-start-line="629" selection-start-column="41" selection-end-line="629" selection-end-column="41" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grails-app/services/services/EnginyersUnderwrittingCaseManagementService.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1768">
+          <caret line="136" column="45" selection-start-line="136" selection-start-column="45" selection-end-line="136" selection-end-column="45" />
+          <folding>
+            <element signature="e#19#54#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/webservices/CorreoUtil.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2414">
+          <caret line="156" column="23" selection-start-line="156" selection-start-column="16" selection-end-line="156" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grails-app/services/services/AmaUnderwrittingCaseManagementService.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3383">
+          <caret line="242" column="60" selection-start-line="242" selection-start-column="60" selection-end-line="242" selection-end-column="60" />
+          <folding>
+            <element signature="e#18#48#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/AmaService.groovy">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="209">
-          <caret line="772" column="55" selection-start-line="772" selection-start-column="52" selection-end-line="772" selection-end-column="55" />
+        <state relative-caret-position="20128">
+          <caret line="1251" column="19" selection-start-line="1251" selection-start-column="19" selection-end-line="1251" selection-end-column="19" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/EnginyersService.groovy">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="338">
-          <caret line="171" selection-start-line="171" selection-end-line="171" />
+        <state relative-caret-position="11577">
+          <caret line="715" column="39" selection-start-line="715" selection-start-column="39" selection-end-line="715" selection-end-column="39" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/webservices/EventInterceptorListener.groovy">
+    <entry file="file://$PROJECT_DIR$/src/java/com/scortelemed/schemas/cbpita/CbpitaUnderwrittingCaseManagementService.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="137">
-          <caret line="43" selection-start-line="43" selection-end-line="43" />
-          <folding>
-            <element signature="e#27#53#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/java/com/scortelemed/schemas/methislab/MethislabUnderwrittingCaseManagementServiceImpl.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="336">
-          <caret line="46" column="32" selection-start-line="46" selection-start-column="32" selection-end-line="46" selection-end-column="32" />
+        <state relative-caret-position="80">
+          <caret line="22" selection-start-line="22" selection-end-line="39" selection-end-column="1" />
         </state>
       </provider>
     </entry>
@@ -958,7 +1529,7 @@
           <splitter-proportions>
             <option name="proportions">
               <list>
-                <option value="0.2" />
+                <option value="0.13295211" />
               </list>
             </option>
           </splitter-proportions>
@@ -970,7 +1541,7 @@
           <splitter-proportions>
             <option name="proportions">
               <list>
-                <option value="0.2" />
+                <option value="0.13295211" />
               </list>
             </option>
           </splitter-proportions>
@@ -982,7 +1553,7 @@
           <splitter-proportions>
             <option name="proportions">
               <list>
-                <option value="0.2" />
+                <option value="0.13295211" />
               </list>
             </option>
           </splitter-proportions>
@@ -990,11 +1561,11 @@
       </state>
       <state key="JdkListConfigurable.UI">
         <settings>
-          <last-edited>1.5</last-edited>
+          <last-edited>1.7</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
-                <option value="0.2" />
+                <option value="0.13295211" />
               </list>
             </option>
           </splitter-proportions>
@@ -1002,11 +1573,11 @@
       </state>
       <state key="ModuleStructureConfigurable.UI">
         <settings>
-          <last-edited>scorWebservice</last-edited>
+          <last-edited>scorWebservice-grailsPlugins</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
-                <option value="0.2" />
+                <option value="0.13295211" />
                 <option value="0.6" />
               </list>
             </option>
@@ -1030,7 +1601,7 @@
           <splitter-proportions>
             <option name="proportions">
               <list>
-                <option value="0.2" />
+                <option value="0.13295211" />
               </list>
             </option>
           </splitter-proportions>

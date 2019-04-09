@@ -414,7 +414,7 @@ class EnginyersService {
 					 */
 
 					if (eElement.getElementsByTagName("gender").item(0) != null) {
-						datosRegistro.sexo = eElement.getElementsByTagName("gender").item(0).getTextContent() == "M" ? "M" : "V"
+						datosRegistro.sexo = eElement.getElementsByTagName("gender").item(0).getTextContent().toString().toUpperCase() == "M" ? "V" : "M"
 					} else {
 						datosRegistro.sexo = "M"
 					}
@@ -696,7 +696,7 @@ class EnginyersService {
 				if (limite == 10) {
 
 					logginService.putInfoMessage("BusquedaExpedienteCrm - Nueva alta de " + companyName + " con numero de solicitud: " + policyNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM")
-					correoUtil.envioEmailErrores("BusquedaExpedienteCrm","Nueva alta de " + companyName + " con numero de solicitud: " + policyNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM",null)
+					correoUtil.envioEmailErrores("ERROR en alta de Mutua de ingenieros","Nueva alta de " + companyName + " con numero de solicitud: " + policyNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM",null)
 
 					/**Metemos en errores
 					 *
@@ -713,7 +713,7 @@ class EnginyersService {
 			} catch (Exception e) {
 
 				logginService.putInfoMessage("BusquedaExpedienteCrm - Nueva alta de " + companyName + " con numero de solicitud: " + policyNumber.toString() + " . Error: " + e.getMessage())
-				correoUtil.envioEmailErrores("BusquedaExpedienteCrm","Nueva alta de " + companyName + " con numero de solicitud: " + policyNumber.toString(), e)
+				correoUtil.envioEmailErrores("ERROR en alta de Mutua de ingenieros","Nueva alta de " + companyName + " con numero de solicitud: " + policyNumber.toString(), e)
 			}
 		}
 	}

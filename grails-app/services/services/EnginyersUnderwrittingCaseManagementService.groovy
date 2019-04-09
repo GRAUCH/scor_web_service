@@ -85,7 +85,7 @@ class EnginyersUnderwrittingCaseManagementService {
 
 				def operacion = estadisticasService.obtenerObjetoOperacion(opername)
 
-				logginService.putInfoEndpoint("Endpoint-"+opername," Peticion de " + company.nombre + " para solicitud: " + addExp.d.getPolicyNumber())
+				logginService.putInfoMessage("Realizando peticion de informacion de servicio GestionReconocimientoMedico para la cia " + company.nombre)
 
 					if (operacion && operacion.activo) {
 
@@ -134,7 +134,7 @@ class EnginyersUnderwrittingCaseManagementService {
 						fault.setFaultString("La operacion " + opername + " esta desactivada temporalmente")
 
 						logginService.putInfoEndpoint("GestionReconocimientoMedico", "Esta operacion para " + company.nombre + " esta desactivada temporalmente")
-						correoUtil.envioEmail("GestionReconocimientoMedico", "Peticion de " + company.nombre + " con numero de solicitud: " + addExp.d.getPolicyNumber() + ". Esta operacion para " + company.nombre + " esta desactivada temporalmente", 0)
+						correoUtil.envioEmailErrores("ERROR en alta de Mutua de ingenieros","Peticion de " + company.nombre + " con numero de solicitud: " + addExp.d.getPolicyNumber(), "Esta operacion para " + company.nombre + " esta desactivada temporalmente")
 
 					}
 			} catch (Exception e){
@@ -142,7 +142,7 @@ class EnginyersUnderwrittingCaseManagementService {
 				enginyersService.insertarError(company,addExp.d.getPolicyNumber(), requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + addExp.d.getPolicyNumber() + ". Error: " + e.getMessage())
 
 				logginService.putErrorEndpoint("GestionReconocimientoMedico","Peticion no realizada de " + company.nombre + " con numero de solicitud: " + addExp.d.getPolicyNumber() + ". Error: " + e.getMessage())
-				correoUtil.envioEmailErrores("GestionReconocimientoMedico","Peticion de " + company.nombre + " con numero de solicitud: " + addExp.d.getPolicyNumber(), e)
+				correoUtil.envioEmailErrores("ERROR en alta de Mutua de ingenieros","Peticion de " + company.nombre + " con numero de solicitud: " + addExp.d.getPolicyNumber(), e)
 
 				expedient.setAddExpResultCode(-1)
 				fault.setFaultCode("2")

@@ -14,9 +14,8 @@ import javax.xml.bind.annotation.XmlType;
  * &lt;simpleType name="ContactTimeType">
  *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
  *     &lt;enumeration value="M"/>
- *     &lt;enumeration value="C"/>
- *     &lt;enumeration value="T"/>
- *     &lt;enumeration value="N"/>
+ *     &lt;enumeration value="P"/>
+ *     &lt;enumeration value="I"/>
  *   &lt;/restriction>
  * &lt;/simpleType>
  * </pre>
@@ -27,9 +26,8 @@ import javax.xml.bind.annotation.XmlType;
 public enum ContactTimeType {
 
     M,
-    C,
-    T,
-    N;
+    P,
+    I;
 
     public String value() {
         return name();

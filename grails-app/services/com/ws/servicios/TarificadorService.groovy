@@ -558,7 +558,7 @@ class TarificadorService {
 				if (limite == 10) {
 
 					logginService.putInfoMessage("Nueva alta de Afiesca con numero de solicitud: " + policyNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM")
-					correoUtil.envioEmailErrores(opername,"Nueva alta de Afiesca con numero de solicitud: " + policyNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM",null)
+					correoUtil.envioEmailErrores("ERROR en alta de AfiEsca","Nueva alta de Afiesca con numero de solicitud: " + policyNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM",null)
 
 
 					/**Metemos en errores
@@ -577,7 +577,7 @@ class TarificadorService {
 			} catch (Exception e) {
 
 				logginService.putErrorMessage("Nueva alta de Afiesca con numero de solicitud: " + policyNumber.toString() + " no se ha procesado: Motivo: " + e.getMessage())
-				correoUtil.envioEmailErrores(opername,"Nueva alta de Afiesca con numero de solicitud: " + policyNumber.toString() + " no se ha procesado: Motivo: " + e.getMessage(),null)
+				correoUtil.envioEmailErrores("ERROR en alta de AfiEsca","Nueva alta de Afiesca con numero de solicitud: " + policyNumber.toString() + " no se ha procesado: Motivo: " + e.getMessage(),null)
 
 			}
 
@@ -647,7 +647,7 @@ class TarificadorService {
 				if (limite == 10) {
 
 					logginService.putInfoMessage("Nueva alta de Alptis con numero de solicitud: " + policyNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM")
-					correoUtil.envioEmailErrores(opername," Nueva alta de Alptis con numero de solicitud: " + policyNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM",null)
+					correoUtil.envioEmailErrores("ERROR en alta de Alptis"," Nueva alta de Alptis con numero de solicitud: " + policyNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM",null)
 
 
 					/**Metemos en errores
@@ -669,7 +669,7 @@ class TarificadorService {
 			} catch (Exception e) {
 
 				logginService.putErrorMessage("Nueva alta de Alptis con numero de solicitud: " + policyNumber.toString() + " no se ha procesado: Motivo: " + e.getMessage())
-				correoUtil.envioEmailErrores(opername,"Nueva alta de Alptis con numero de solicitud: " + policyNumber.toString() + " no se ha procesado: Motivo: " + e.getMessage(),null)
+				correoUtil.envioEmailErrores("ERROR en alta de Alptis","Nueva alta de Alptis con numero de solicitud: " + policyNumber.toString() + " no se ha procesado: Motivo: " + e.getMessage(),null)
 
 			}
 
@@ -738,7 +738,7 @@ class TarificadorService {
 				if (limite == 10) {
 
 					logginService.putInfoMessage("Nueva alta automatica de Lifesquare con numero de solicitud: " + policyNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM")
-					correoUtil.envioEmailErrores(opername,"Nueva alta automatica de Lifesquare con numero de solicitud: " + policyNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM",null)
+					correoUtil.envioEmailErrores("ERROR en alta de Lifesquare","Nueva alta automatica de Lifesquare con numero de solicitud: " + policyNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM",null)
 
 
 					/**Metemos en errores
@@ -758,7 +758,7 @@ class TarificadorService {
 			} catch (Exception e) {
 
 				logginService.putErrorMessage("Nueva alta automatica de Lifesquare con numero de solicitud: " + policyNumber.toString() + " no se ha procesado: Motivo: " + e.getMessage())
-				correoUtil.envioEmailErrores(opername,"Nueva alta automatica de Lifesquare con numero de solicitud: " + policyNumber.toString() + " no se ha procesado: Motivo: " + e.getMessage(),null)
+				correoUtil.envioEmailErrores("ERROR en alta de Lifesquare","Nueva alta automatica de Lifesquare con numero de solicitud: " + policyNumber.toString() + " no se ha procesado: Motivo: " + e.getMessage(),null)
 			}
 
 		}

@@ -1,4 +1,6 @@
 package com.scortelemed
+
+import com.scortelemed.schemas.enginyers.AddExp
 import grails.plugin.springsecurity.annotation.Secured
 import grails.util.Holders
 
@@ -23,6 +25,7 @@ import com.ws.servicios.CaserService
 import com.ws.servicios.LagunaroService
 import com.ws.servicios.LogginService
 import com.ws.servicios.NetinsuranceService;
+import com.ws.servicios.EnginyersService
 
 @Secured(['ROLE_ADMIN'])
 class RequestController {
@@ -42,6 +45,8 @@ class RequestController {
 	private CajamarService cajamarService
 	@Autowired
 	private NetinsuranceService netinsuranceService
+	@Autowired
+	private EnginyersService enginyersService
 
 
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -595,6 +600,26 @@ class RequestController {
 					flash.error = "${message(code: 'default.invalid.type.operation.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
 				}
 
+				break
+			case "enginyers":
+
+				JAXBContext jaxbContext = JAXBContext.newInstance(AddExp.class);
+				Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+
+				StringReader reader = new StringReader(requestInstance.getRequest().trim());
+
+				JAXBElement<AddExp> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), AddExp.class);
+				AddExp addExp = root.getValue();
+
+				if (Company.findByNombre(requestInstance.company).generationAutomatic) {
+					def compania=Company.findByNombre(requestInstance.company)
+					session.companyST=compania.codigoSt
+					requestXML=enginyersService.marshall("http://www.scortelemed.com/schemas/enginyers",addExp)
+					requestBBDD = requestService.crear("EnginyersResultadoReconocimientoMedicoRequest",requestXML)
+					logginService.putInfoMessage("Se ha procesado una request namnualmente para: " + requestInstance.company)
+					netinsuranceService.crearExpediente(requestBBDD)
+					flash.message = "${message(code: 'default.processed.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
+				}
 				break
 			default:
 				break

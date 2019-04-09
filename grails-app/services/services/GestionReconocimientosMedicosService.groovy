@@ -135,7 +135,7 @@ class GestionReconocimientosMedicosService {
 
 				if (Company.findByNombre("lagunaro").generationAutomatic && gestionReconocimientoMedicoRequest.getDatos_envio().getMovimiento().getNombre().equals("B")){
 
-					def msg = "Ha llegado una cancelacion de Lagunaro con número de solicitud: " + gestionReconocimientoMedicoRequest.poliza.cod_poliza + ", certificado: " + gestionReconocimientoMedicoRequest.poliza.certificado + ", numero de suplemento: " + gestionReconocimientoMedicoRequest.poliza.movimiento
+					def msg = "Ha llegado una cancelacion de Lagunaro con nï¿½mero de solicitud: " + gestionReconocimientoMedicoRequest.poliza.cod_poliza + ", certificado: " + gestionReconocimientoMedicoRequest.poliza.certificado + ", numero de suplemento: " + gestionReconocimientoMedicoRequest.poliza.movimiento
 
 					requestXML=requestService.marshall(gestionReconocimientoMedicoRequest,GestionReconocimientoMedicoRequest.class)
 					requestBBDD = requestService.crear(opername,requestXML)
@@ -155,7 +155,7 @@ class GestionReconocimientosMedicosService {
 					resultado.setFecha(new Date())
 					resultado.setStatusType(StatusType.ok)
 
-					logginService.putInfoMessage("Ha llegado una cancelacion de Lagunaro con número de referencia: " + gestionReconocimientoMedicoRequest.poliza.cod_poliza)
+					logginService.putInfoMessage("Ha llegado una cancelacion de Lagunaro con nï¿½mero de referencia: " + gestionReconocimientoMedicoRequest.poliza.cod_poliza)
 
 					correoUtil.envioEmailNoTratados(opername,msg)
 
@@ -167,13 +167,13 @@ class GestionReconocimientosMedicosService {
 				resultado.setMensaje("La operacion esta desactivada temporalmente.")
 				resultado.setFecha(util.fromDateToXmlCalendar(new Date()))
 				logginService.putInfoEndpoint("Endpoint-"+opername,"Peticion no realizada para POLIZA: " + gestionReconocimientoMedicoRequest.poliza.cod_poliza)
-				correoUtil.envioEmailErrores(opername,"Endpoint-"+ opername + ". La operacion esta desactivada temporalmente",null)
+				correoUtil.envioEmailErrores("ERROR en alta de Gestion reconocimiento medico","Endpoint-"+ opername + ". La operacion esta desactivada temporalmente",null)
 			}
 
 		} catch (Exception e){
 
 			logginService.putErrorEndpoint("Endpoint-"+opername,"Peticion no realizada para solicitud: " + gestionReconocimientoMedicoRequest.poliza.cod_poliza + " y certificado: " + gestionReconocimientoMedicoRequest.poliza.certificado + "- Error: "+e)
-			correoUtil.envioEmailErrores(opername,"Peticion no realizada para solicitud: " + gestionReconocimientoMedicoRequest.poliza.cod_poliza + " y certificado: " + gestionReconocimientoMedicoRequest.poliza.certificado ,e)
+			correoUtil.envioEmailErrores("ERROR en alta de Gestion reconocimiento medico","Peticion no realizada para solicitud: " + gestionReconocimientoMedicoRequest.poliza.cod_poliza + " y certificado: " + gestionReconocimientoMedicoRequest.poliza.certificado ,e)
 			resultado.setMensaje("Error: " + "Peticion no realizada para solicitud: " + gestionReconocimientoMedicoRequest.poliza.cod_poliza + " y certificado: " + gestionReconocimientoMedicoRequest.poliza.certificado)
 			resultado.setFecha(new Date())
 			resultado.setStatusType(StatusType.error)
@@ -338,7 +338,6 @@ class GestionReconocimientosMedicosService {
 			error.save(flush:true)
 
 			logginService.putErrorEndpoint("Endpoint-"+opername,"Peticion no realizada para fecha: " + tramitacionReconocimientoMedicoRequest.fecha + "- Error: "+e)
-			correoUtil.envioEmailErrores("TramitacionReconocimientoMedicoRequest","Peticion no realizada para fecha: " + tramitacionReconocimientoMedicoRequest.fecha,e)
 			result.setStatusType(StatusType.error)
 			result.setObservaciones("Error en TramitacionReconocimientoMedicoRequest: "+e)
 		}finally{

@@ -33,6 +33,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
  *                   &lt;element name="requestDate" type="{http://www.w3.org/2001/XMLSchema}dateTime"/>
  *                   &lt;element name="requestNumber" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *                   &lt;element name="requestState" type="{http://www.scortelemed.com/schemas/cbpita}RequestStateType"/>
+ *                   &lt;element name="cancellationReason" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *                   &lt;element name="productCode" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *                   &lt;element name="policyNumber" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *                   &lt;element name="certificateNumber" type="{http://www.w3.org/2001/XMLSchema}string"/>
@@ -208,6 +209,7 @@ public class CbpitaUnderwrittingCasesResultsResponse {
      *         &lt;element name="requestDate" type="{http://www.w3.org/2001/XMLSchema}dateTime"/>
      *         &lt;element name="requestNumber" type="{http://www.w3.org/2001/XMLSchema}string"/>
      *         &lt;element name="requestState" type="{http://www.scortelemed.com/schemas/cbpita}RequestStateType"/>
+     *         &lt;element name="cancellationReason" type="{http://www.w3.org/2001/XMLSchema}string"/>
      *         &lt;element name="productCode" type="{http://www.w3.org/2001/XMLSchema}string"/>
      *         &lt;element name="policyNumber" type="{http://www.w3.org/2001/XMLSchema}string"/>
      *         &lt;element name="certificateNumber" type="{http://www.w3.org/2001/XMLSchema}string"/>
@@ -231,6 +233,7 @@ public class CbpitaUnderwrittingCasesResultsResponse {
         "requestDate",
         "requestNumber",
         "requestState",
+        "cancellationReason",
         "productCode",
         "policyNumber",
         "certificateNumber",
@@ -251,6 +254,8 @@ public class CbpitaUnderwrittingCasesResultsResponse {
         protected String requestNumber;
         @XmlElement(required = true)
         protected RequestStateType requestState;
+        @XmlElement(required = true)
+        protected String cancellationReason;
         @XmlElement(required = true)
         protected String productCode;
         @XmlElement(required = true)
@@ -342,6 +347,30 @@ public class CbpitaUnderwrittingCasesResultsResponse {
          */
         public void setRequestState(RequestStateType value) {
             this.requestState = value;
+        }
+
+        /**
+         * Gets the value of the cancellationReason property.
+         * 
+         * @return
+         *     possible object is
+         *     {@link String }
+         *     
+         */
+        public String getCancellationReason() {
+            return cancellationReason;
+        }
+
+        /**
+         * Sets the value of the cancellationReason property.
+         * 
+         * @param value
+         *     allowed object is
+         *     {@link String }
+         *     
+         */
+        public void setCancellationReason(String value) {
+            this.cancellationReason = value;
         }
 
         /**
