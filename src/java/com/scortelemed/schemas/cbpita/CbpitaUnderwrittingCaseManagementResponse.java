@@ -21,6 +21,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
  *         &lt;element name="status" type="{http://www.scortelemed.com/schemas/cbpita}StatusType" minOccurs="0"/>
  *         &lt;element name="date" type="{http://www.w3.org/2001/XMLSchema}date" minOccurs="0"/>
  *         &lt;element name="message" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="code" type="{http://www.w3.org/2001/XMLSchema}int"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -33,7 +34,8 @@ import javax.xml.datatype.XMLGregorianCalendar;
 @XmlType(name = "CbpitaUnderwrittingCaseManagementResponse", propOrder = {
     "status",
     "date",
-    "message"
+    "message",
+    "code"
 })
 public class CbpitaUnderwrittingCaseManagementResponse {
 
@@ -41,6 +43,15 @@ public class CbpitaUnderwrittingCaseManagementResponse {
     @XmlSchemaType(name = "date")
     protected XMLGregorianCalendar date;
     protected String message;
+    protected int code;
+
+    public int getCode() {
+        return code;
+    }
+
+    public void setCode(int code) {
+        this.code = code;
+    }
 
     /**
      * Gets the value of the status property.

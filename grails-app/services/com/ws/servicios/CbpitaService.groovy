@@ -3,9 +3,12 @@ package com.ws.servicios
 import com.scortelemed.Company
 import com.scortelemed.Envio
 import com.scortelemed.Recibido
+import com.scortelemed.schemas.cbpita.BenefictNameType
 import com.scortelemed.schemas.cbpita.BenefictResultType
 import com.scortelemed.schemas.cbpita.BenefitsType
+import com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCasesResultsRequest
 import com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCasesResultsResponse
+import com.scortelemed.schemas.cbpita.RequestStateType
 import hwsol.webservices.WsError
 import servicios.TipoEstadoExpediente
 import servicios.TipoMotivoAnulacion
@@ -60,7 +63,12 @@ class CbpitaService {
 			def root = null
 			QName qName = null
 
-			if (clase instanceof CbpitaUnderwrittingCaseManagementRequest){
+			if (clase instanceof com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCasesResultsRequest){
+				qName = new QName(nameSpace, "CbpitaUnderwrittingCasesResultsRequest");
+				root = new JAXBElement<CbpitaUnderwrittingCasesResultsRequest	>(qName, CbpitaUnderwrittingCasesResultsRequest.class, clase);
+			}
+
+			if (clase instanceof com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCaseManagementRequest){
 				qName = new QName(nameSpace, "CbpitaUnderwrittingCaseManagementRequest");
 				root = new JAXBElement<CbpitaUnderwrittingCaseManagementRequest	>(qName, CbpitaUnderwrittingCaseManagementRequest.class, clase);
 			}
@@ -383,14 +391,14 @@ class CbpitaService {
 					/**CODIGO DE AGENTE
 					 *                    */
 
-					if (eElement.getElementsByTagName("fiscalIdentificationNumber").item(0) != null) {
-						datosRegistro.codigoAgencia = eElement.getElementsByTagName("fiscalIdentificationNumber").item(0).getTextContent()
+					if (eElement.getElementsByTagName("agent").item(0) != null) {
+						datosRegistro.codigoAgencia = eElement.getElementsByTagName("agent").item(0).getTextContent()
 					}
 
 					/**NOMBRE DE AGENTE
 					 *                    */
-					if (eElement.getElementsByTagName("name").item(0) != null) {
-						nombreAgente = eElement.getElementsByTagName("name").item(0).getTextContent()
+					if (eElement.getElementsByTagName("agent").item(0) != null) {
+						nombreAgente = eElement.getElementsByTagName("agent").item(0).getTextContent()
 					}
 
 					if (eElement.getElementsByTagName("surname1").item(0) != null) {
@@ -605,11 +613,11 @@ class CbpitaService {
 		}
 	}
 
-	def busquedaCrm (policyNumber, ou, requestNumber, opername, companyCodigoSt, companyId, requestBBDD, certificateNumber, String nombrecia) {
+	def busquedaCrm (solicitud, ou, companyCodigoSt, companyId, requestBBDD, String nombrecia) {
 
 		task {
 
-			logginService.putInfoMessage("Buscando en CRM solicitud de " + nombrecia + " con requestNumber: " + requestNumber.toString())
+			logginService.putInfoMessage("Buscando en CRM solicitud de " + nombrecia + " con requestNumber: " + solicitud.toString())
 
 			def respuestaCrm
 			int limite = 0;
@@ -632,12 +640,7 @@ class CbpitaService {
 
 					servicios.Filtro filtroRelacionado1 = new servicios.Filtro()
 					filtroRelacionado1.setClave(servicios.ClaveFiltro.NUM_SOLICITUD)
-					filtroRelacionado1.setValor(requestNumber.toString())
-
-					servicios.Filtro filtroRelacionado2 = new servicios.Filtro()
-					filtroRelacionado2.setClave(servicios.ClaveFiltro.NUM_CERTIFICADO);
-					filtroRelacionado2.setValor(certificateNumber.toString())
-					filtroRelacionado1.setFiltroRelacionado(filtroRelacionado2)
+					filtroRelacionado1.setValor(solicitud.toString())
 
 					filtro.setFiltroRelacionado(filtroRelacionado1)
 
@@ -652,8 +655,7 @@ class CbpitaService {
 							String fechaCreacion = format.format(new Date());
 
 							if (exp.getCandidato() != null && exp.getCandidato().getCompanya() != null && exp.getCandidato().getCompanya().getCodigoST().equals(companyCodigoSt.toString()) &&
-							exp.getNumSolicitud() != null && exp.getNumSolicitud().equals(requestNumber.toString()) && exp.getNumPoliza() != null &&
-							exp.getNumPoliza().equals(policyNumber.toString()) && fechaCreacion != null && fechaCreacion.equals(exp.getFechaApertura()) && exp.getNumCertificado() != null && exp.getNumCertificado().equals(certificateNumber)){
+							exp.getNumSolicitud() != null && exp.getNumSolicitud().equals(solicitud.toString()) && fechaCreacion != null && fechaCreacion.equals(exp.getFechaApertura())){
 
 								/**Alta procesada correctamente
 								 *
@@ -666,7 +668,7 @@ class CbpitaService {
 
 					if (encontrado) {
 
-						logginService.putInfoMessage("Nueva alta automatica de " + nombrecia + " con numero de solicitud: " + requestNumber.toString() + " procesada correctamente")
+						logginService.putInfoMessage("Nueva alta automatica de " + nombrecia + " con numero de solicitud: " + solicitud.toString() + " procesada correctamente")
 					}
 
 					limite++
@@ -678,8 +680,8 @@ class CbpitaService {
 				 */
 				if (limite == 10) {
 
-					logginService.putInfoMessage("Nueva alta de " + nombrecia + " con numero de solicitud: " + requestNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM")
-					correoUtil.envioEmailErrores("ERROR en alta de HMI-CBP","Nueva alta de " + nombrecia + " con numero de solicitud: " + requestNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM",null)
+					logginService.putInfoMessage("Nueva alta de " + nombrecia + " con numero de solicitud: " + solicitud.toString() + " se ha procesado pero no se ha dado de alta en CRM")
+					correoUtil.envioEmailErrores("ERROR en alta de HMI-CBP","Nueva alta de " + nombrecia + " con numero de solicitud: " + solicitud.toString() + " se ha procesado pero no se ha dado de alta en CRM",null)
 
 
 					/**Metemos en errores
@@ -688,16 +690,16 @@ class CbpitaService {
 					com.scortelemed.Error error = new com.scortelemed.Error()
 					error.setFecha(new Date())
 					error.setCia(companyId.toString())
-					error.setIdentificador(requestNumber.toString())
+					error.setIdentificador(solicitud.toString())
 					error.setInfo(requestBBDD.request)
 					error.setOperacion("ALTA")
-					error.setError("Peticion procesada para numero de solicitud: " + policyNumber.toString() + ". No encontrada en CRM")
+					error.setError("Peticion procesada para numero de solicitud: " + solicitud.toString() + ". No encontrada en CRM")
 					error.save(flush:true)
 				}
 			} catch (Exception e) {
 
-				logginService.putErrorMessage("Nueva alta de " + nombrecia + " con numero de solicitud: " + requestNumber.toString() + " no se ha procesado: Motivo: " + e.getMessage())
-				correoUtil.envioEmailErrores("ERROR en alta de HMI-CBP","Nueva alta de " + nombrecia + " con numero de solicitud: " + requestNumber.toString() + " no se ha procesado: Motivo: " + e.getMessage(),null)
+				logginService.putErrorMessage("Nueva alta de " + nombrecia + " con numero de solicitud: " + solicitud.toString() + " no se ha procesado: Motivo: " + e.getMessage())
+				correoUtil.envioEmailErrores("ERROR en alta de HMI-CBP","Nueva alta de " + nombrecia + " con numero de solicitud: " + solicitud.toString() + " no se ha procesado: Motivo: " + e.getMessage(),null)
 			}
 		}
 	}
@@ -892,7 +894,7 @@ class CbpitaService {
 		if (expedientePoliza.getCodigoEstado() == TipoEstadoExpediente.ANULADO && expedientePoliza.getMotivoAnulacion() != TipoMotivoAnulacion.ABIERTO_POR_ERROR) {
 			expediente.setCancellationReason(traducirMotivo(expedientePoliza.getMotivoAnulacion().toString()))
 		} else {
-			expediente.setCancellationReason(null)
+			expediente.setCancellationReason("")
 		}
 
 		expediente.setProductCode(util.devolverDatos(expedientePoliza.getProducto().getCodigoProductoCompanya()))
@@ -925,7 +927,7 @@ class CbpitaService {
 
 					BenefitsType benefitsType = new BenefitsType()
 
-					benefitsType.setBenefictName(util.devolverDatos(coberturasPoliza.getNombreCobertura().toString()))
+					benefitsType.setBenefictName(devolverNombreCobertura(coberturasPoliza.getCodigoCobertura()))
 					benefitsType.setBenefictCode(util.devolverDatos(coberturasPoliza.getCodigoCobertura()))
 					benefitsType.setBenefictCapital(util.devolverDatos(coberturasPoliza.getCapitalCobertura()))
 
@@ -1003,5 +1005,28 @@ class CbpitaService {
 
 	private def obtenerProductos (req, nameCompany) {
 		return null
+	}
+
+	def devolverStateType(estado){
+
+		switch(estado){
+			case "CERRADO": return RequestStateType.CLOSED;
+			case "ANULADO": return RequestStateType.CANCELLED;
+			case "RECHAZADO": return RequestStateType.REJECTED;
+			default: return null;
+		}
+	}
+
+	def devolverNombreCobertura(codigo){
+
+		if (codigo.equals("COB5")) {
+			return BenefictNameType.DEAD
+		} else if (codigo.equals("COB4")) {
+			return BenefictNameType.DISABILITY_30
+		} else if (codigo.equals("COB2")) {
+			return BenefictNameType.ACCIDENTAL_DEAD
+		} else {
+			return null
+		}
 	}
 }

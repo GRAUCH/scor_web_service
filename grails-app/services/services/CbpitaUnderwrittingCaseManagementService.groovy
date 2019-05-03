@@ -1,7 +1,7 @@
 package services
 
 import com.scortelemed.Company
-
+import com.scortelemed.schemas.cbpita.StatusType
 import com.ws.servicios.*
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
@@ -20,8 +20,6 @@ import javax.jws.WebResult
 import javax.jws.WebService
 import javax.jws.soap.SOAPBinding
 import grails.util.Environment
-import com.scortelemed.schemas.netinsurance.StatusType
-import com.scortelemed.schemas.netinsurance.StatusType
 import com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCaseManagementRequest
 import com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCaseManagementResponse
 import com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCasesResultsRequest
@@ -62,7 +60,7 @@ class CbpitaUnderwrittingCaseManagementService	 {
 		Company company = null
 		String message = null
 		StatusType status = null
-		String code = 0
+		int code = 0
 
 		try{
 
@@ -98,7 +96,7 @@ class CbpitaUnderwrittingCaseManagementService	 {
 						 *                    */
 
 						logginService.putInfoMessage("Buscando en CRM solicitud de " + company.nombre + " con numero de solicitud: " + cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber)
-						cbpitaService.busquedaCrm(cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, company.ou, cbpitaUnderwrittingCaseManagementRequest.candidateInformation.policyNumber, opername, company.codigoSt, company.id, requestBBDD, cbpitaUnderwrittingCaseManagementRequest.candidateInformation.certificateNumber, company.nombre)
+						cbpitaService.busquedaCrm(cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, company.ou, company.codigoSt, company.id, requestBBDD, company.nombre)
 
 					} else {
 
@@ -121,7 +119,6 @@ class CbpitaUnderwrittingCaseManagementService	 {
 				code = 1
 
 				logginService.putInfoEndpoint("GestionReconocimientoMedico","Esta operacion para " + company.nombre + " esta desactivada temporalmente")
-				correoUtil.envioEmailErrores("ERROR en alta de HMI-CBP","Peticion de " + company.nombre + " con numero de solicitud: " + cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber,"Esta operacion para " + company.nombre + " esta desactivada temporalmente")
 			}
 		} catch (Exception e){
 
@@ -172,7 +169,7 @@ class CbpitaUnderwrittingCaseManagementService	 {
 
 			Operacion operacion = estadisticasService.obtenerObjetoOperacion(opername)
 
-			logginService.putInfoMessage("Realizando proceso envio de informacion para " + company.nombre + " con fecha " + netInsuranteUnderwrittingCasesResults.dateStart.toString() + "-" + netInsuranteUnderwrittingCasesResults.dateEnd.toString())
+			logginService.putInfoMessage("Realizando proceso envio de informacion para " + company.nombre + " con fecha " + cbpitaUnderwrittingCasesResultsRequest.dateStart.toString() + "-" + cbpitaUnderwrittingCasesResultsRequest.dateEnd.toString())
 
 			if(operacion && operacion.activo ) {
 
@@ -192,11 +189,7 @@ class CbpitaUnderwrittingCaseManagementService	 {
 
 
 						for (int i = 1; i < 3; i++) {
-							if (Environment.current.name.equals("production_wildfly")) {
-								expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1071", null, i, fechaIni, fechaFin, "IT"))
-							} else {
-								expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1071", null, i, fechaIni, fechaFin, "IT"))
-							}
+							expedientes.addAll(tarificadorService.obtenerInformeExpedientes(company.getCodigoSt().toString(), null, i, fechaIni, fechaFin, company.getOu().toString()))
 						}
 
 						cbpitaService.insertarEnvio(company, cbpitaUnderwrittingCasesResultsRequest.dateStart.toString().substring(0, 10) + "-" + cbpitaUnderwrittingCasesResultsRequest.dateEnd.toString().substring(0, 10), requestXML.toString())
@@ -256,7 +249,7 @@ class CbpitaUnderwrittingCaseManagementService	 {
 			sesion.removeAttribute("companyST")
 		}
 
-		resultado.setMessage(notes)
+		resultado.setMessage(message)
 		resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 		resultado.setStatus(status)
 		resultado.setCode(code)
