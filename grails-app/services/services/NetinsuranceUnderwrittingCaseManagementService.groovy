@@ -4,8 +4,6 @@ import com.scor.global.WSException
 import grails.util.Environment
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
-import servicios.ExpedienteInforme
-import servicios.Frontal
 
 import java.text.SimpleDateFormat
 
@@ -100,54 +98,17 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 					requestBBDD = requestService.crear(opername,requestXML)
 					requestBBDD.fecha_procesado = new Date()
 					requestBBDD.save(flush:true)
+					netinsuranceService.crearExpediente(requestBBDD)
 
-					servicios.Expediente expediente  = netinsuranceService.existeExpediente(netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber, company.nombre, company.codigoSt, company.ou.toString())
+					message = "Il caso � stato elaborato correttamente";
+					status = StatusType.OK
 
-					if (expediente == null) {
+					netinsuranceService.insertarRecibido(company, netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber, requestXML.toString(), "ALTA")
 
-						netinsuranceService.crearExpediente(requestBBDD)
-
-						message = "Il caso e stato elaborato correttamente";
-						status = StatusType.OK
-
-						netinsuranceService.insertarRecibido(company, netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber, requestXML.toString(), "ALTA")
-
-						netinsuranceService.busquedaCrm(netInsuranteUnderwrittingCaseManagement.candidateInformation.policyNumber, netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber, company.ou, opername, company.codigoSt, company.id, requestBBDD, company.nombre)
-
-					} else {
-
-						try {
-
-							com.scortelemed.servicios.Expediente expedienteModificado = new com.scortelemed.servicios.Expediente()
-							expedienteModificado = netinsuranceService.componerExpedienteModificado(expediente, netInsuranteUnderwrittingCaseManagement.getCandidateInformation());
-							com.scortelemed.servicios.RespuestaCRM respuestaModificaExpediente = netinsuranceService.modificarExpediente(expedienteModificado, company.ou.toString())
-
-							if (respuestaModificaExpediente.getErrorCRM() != null) {
-
-								logginService.putErrorEndpoint("Modificacion expediente","Peticion no realizada de " + company.nombre + " con numero de solicitud: " + netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber + ". Error: " + respuestaModificaExpediente.getErrorCRM().getDetalle())
-
-								message = "Il caso non e stato modificato"
-								status = StatusType.ERROR
-
-							} else {
-
-								message = "Il caso e stato modificato correttamente"
-								status = StatusType.OK
-
-								netinsuranceService.insertarRecibido(company, netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber, requestXML.toString(), "MODIFICACION")
-								logginService.putInfoMessage("Modificacion realizada para " + company.nombre + " con numero de solicitud: " + netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber)
-							}
-						} catch (Exception e) {
-
-							message = "Error: " + e.printStackTrace();
-							status = StatusType.ERROR
-
-							netinsuranceService.insertarError(company, netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber, requestXML.toString(), "MODIFICACION", "Peticion no realizada para solicitud: " + netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber + ". Error: " + e.getMessage())
-
-							logginService.putErrorEndpoint("Modificacion expediente para "+ company.nombre,"Modificaición no realizada de " + company.nombre + " con numero de solicitud: " + netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber + ". Error: " + e.getMessage())
-							correoUtil.envioEmailErrores("ERROR en modificaicon de " + company.nombre ,"Peticion de " + company.nombre + " con numero de solicitud: " + netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber,e.getMessage())
-						}
-					}
+					/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
+					 *
+					 */
+					netinsuranceService.busquedaCrm(netInsuranteUnderwrittingCaseManagement.candidateInformation.policyNumber, netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber, company.ou, opername, company.codigoSt, company.id, requestBBDD, company.nombre)
 				}
 			} else {
 
