@@ -484,28 +484,41 @@ class CbpitaService {
 
 			NodeList nList = doc.getElementsByTagName("ServiceInformation")
 
-			for (int temp = 0; temp < nList.getLength(); temp++) {
+			if (nList != null && nList.length > 0){
 
-				Node nNode = nList.item(temp)
+				for (int temp = 0; temp < nList.getLength(); temp++) {
 
-				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+					Node nNode = nList.item(temp)
 
-					Element eElement = (Element) nNode;
+					if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-					if (eElement.getElementsByTagName("serviceCode").item(0) != null) {
+						Element eElement = (Element) nNode;
 
-						DATOS.Servicio servicio = new DATOS.Servicio()
+						if (eElement.getElementsByTagName("serviceCode").item(0) != null) {
 
-						servicio.codigoServicio = eElement.getElementsByTagName("serviceCode").item(0).getTextContent()
-						servicio.tipoServicios = "S"
-						if (eElement.getElementsByTagName("serviceDescription").item(0) != null) {
-							servicio.descripcionServicio = eElement.getElementsByTagName("serviceDescription").item(0).getTextContent()
+							DATOS.Servicio servicio = new DATOS.Servicio()
+
+							servicio.codigoServicio = eElement.getElementsByTagName("serviceCode").item(0).getTextContent()
+							servicio.tipoServicios = "S"
+							if (eElement.getElementsByTagName("serviceDescription").item(0) != null) {
+								servicio.descripcionServicio = eElement.getElementsByTagName("serviceDescription").item(0).getTextContent()
+							}
+
+							servicio.filler = ""
+							listadoServicios.add(servicio)
 						}
-
-						servicio.filler = ""
-						listadoServicios.add(servicio)
 					}
 				}
+			} else {
+
+				DATOS.Servicio servicio = new DATOS.Servicio()
+
+				servicio.codigoServicio = "TM"
+				servicio.tipoServicios = "S"
+				servicio.descripcionServicio = "Teleselezione"
+				servicio.filler = ""
+
+				listadoServicios.add(servicio)
 			}
 
 			return listadoServicios
