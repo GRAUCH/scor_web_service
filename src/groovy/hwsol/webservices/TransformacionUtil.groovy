@@ -1383,4 +1383,34 @@ class TransformacionUtil {
 
 	}
 
+	private String codificarResultado(String resultadoCobertura) {
+
+		switch (resultadoCobertura) {
+
+			case "1":
+				return "3"; //Standard
+			case "5":
+				return "11";//In attesa referto médico
+			case "6":
+				return "8";//In attesa prova médica
+			case "7":
+				return "4";//Rifuto cobertura
+			case "8":
+				return "9";//Posporre
+			case "9":
+				return "10";//Consultar tariffatore
+			case "10":
+				return "12";//Accordo
+			case "20":
+				return "13";//Non valutato
+			case "30":
+				return "5";//Sovrapremio
+			case "31":
+				return "6";//Sovramortalita
+			default:
+				return null;
+		}
+
+	}
+
 }

@@ -947,7 +947,7 @@ class CbpitaService {
 					BenefictResultType benefictResultType = new BenefictResultType()
 
 					benefictResultType.setDescResult(util.devolverDatos(coberturasPoliza.getResultadoCobertura()))
-					benefictResultType.setResultCode(util.devolverDatos(coberturasPoliza.getCodResultadoCobertura()))
+					benefictResultType.setResultCode(util.codificarResultado(coberturasPoliza.getCodResultadoCobertura()))
 
 					benefictResultType.setPremiumLoading(util.devolverDatos(coberturasPoliza.getValoracionPrima()))
 					benefictResultType.setCapitalLoading(util.devolverDatos(coberturasPoliza.getValoracionCapital()))
