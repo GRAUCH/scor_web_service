@@ -9,7 +9,12 @@ import com.scortelemed.schemas.cbpita.BenefitsType
 import com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCasesResultsRequest
 import com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCasesResultsResponse
 import com.scortelemed.schemas.cbpita.RequestStateType
+import com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCaseManagementRequest
+import com.scortelemed.servicios.Candidato
+import com.scortelemed.servicios.Frontal
+import com.scortelemed.servicios.FrontalServiceLocator
 import hwsol.webservices.WsError
+import servicios.RespuestaCRM
 import servicios.TipoEstadoExpediente
 import servicios.TipoMotivoAnulacion
 
@@ -80,6 +85,77 @@ class CbpitaService {
 		}
 
 		return writer
+	}
+
+	com.scortelemed.servicios.RespuestaCRM modificarExpediente (com.scortelemed.servicios.Expediente expediente, String ou) {
+
+		Frontal frontal = instanciarFrontal(Conf.findByName("frontal.wsdl")?.value)
+
+		com.scortelemed.servicios.Usuario usuario = new com.scortelemed.servicios.Usuario()
+
+		usuario.clave = "P@ssword"
+		usuario.dominio = "scor.local"
+		usuario.unidadOrganizativa = "IT"
+		usuario.usuario = "admin-ITA"
+
+		return  frontal.modificaExpediente(usuario,expediente,null,null)
+	}
+
+	def instanciarFrontal(String frontalPortAddress){
+
+		FrontalServiceLocator fs = new FrontalServiceLocator();
+		fs.setFrontalPortEndpointAddress(frontalPortAddress);
+		Frontal frontal = fs.getFrontalPort();
+
+		return frontal;
+	}
+
+	public List<servicios.Expediente> existeExpediente(String numPoliza, String nombreCia, String companyCodigoSt, String ou) {
+
+		logginService.putInfoMessage("Buscando si existe expediente con numero de poliza " + numPoliza + " para " + nombreCia)
+
+		CorreoUtil correoUtil = new CorreoUtil()
+		servicios.Filtro filtro = new servicios.Filtro()
+		List<servicios.Expediente> expedientes = new ArrayList<servicios.Expediente>()
+		RespuestaCRM respuestaCrm
+
+		try {
+
+			filtro.setClave(servicios.ClaveFiltro.CLIENTE);
+			filtro.setValor(companyCodigoSt.toString());
+
+			servicios.Filtro filtroRelacionado1 = new servicios.Filtro()
+			filtroRelacionado1.setClave(servicios.ClaveFiltro.NUM_SOLICITUD)
+			filtroRelacionado1.setValor(numPoliza.toString())
+
+			filtro.setFiltroRelacionado(filtroRelacionado1)
+
+			respuestaCrm = consultaExpediente(ou.toString(), filtro)
+
+			if (respuestaCrm != null && respuestaCrm.getListaExpedientes() != null && respuestaCrm.getListaExpedientes().size() > 0) {
+
+				for (int i = 0; i < respuestaCrm.getListaExpedientes().size(); i++) {
+
+					servicios.Expediente exp = respuestaCrm.getListaExpedientes().get(i)
+
+					if (exp.getCandidato() != null && exp.getCandidato().getCompanya() != null && exp.getCandidato().getCompanya().getCodigoST().equals(companyCodigoSt.toString()) && exp.getNumSolicitud() != null && exp.getNumSolicitud().equals(numPoliza.toString())) {
+
+						logginService.putInfoMessage("Expediente con número de poliza " + numPoliza + " y expediente " + exp.getCodigoST() + " para " + nombreCia + " ya existe en el sistema")
+						expedientes.add(respuestaCrm.getListaExpedientes().get(i))
+					}
+				}
+			} else {
+
+				logginService.putInfoMessage("Expediente con número de poliza " + numPoliza + " para " + nombreCia + " no se existe en el sistema")
+			}
+
+		} catch (Exception e) {
+
+			logginService.putInfoMessage("Buscando si existe expediente con numero de poliza " + numPoliza + " para " + nombreCia + " . Error: " + + e.getMessage())
+			correoUtil.envioEmailErrores("ERROR en búsqueda de duplicados para " + nombreCia,"Buscando si existe expediente con numero de poliza " + numPoliza + " para " + nombreCia, e)
+		}
+
+		return expedientes
 	}
 
 	def crearExpediente = { req ->
@@ -392,13 +468,13 @@ class CbpitaService {
 					 *                    */
 
 					if (eElement.getElementsByTagName("agent").item(0) != null) {
-						datosRegistro.codigoAgencia = eElement.getElementsByTagName("agent").item(0).getTextContent()
+						datosRegistro.codigoAgencia = codificarAgente(eElement.getElementsByTagName("agent").item(0).getTextContent())
 					}
 
 					/**NOMBRE DE AGENTE
 					 *                    */
 					if (eElement.getElementsByTagName("agent").item(0) != null) {
-						nombreAgente = eElement.getElementsByTagName("agent").item(0).getTextContent()
+						nombreAgente = codificarAgente(eElement.getElementsByTagName("agent").item(0).getTextContent())
 					}
 
 					if (eElement.getElementsByTagName("surname1").item(0) != null) {
@@ -1042,4 +1118,44 @@ class CbpitaService {
 			return null
 		}
 	}
+	com.scortelemed.servicios.Expediente componerExpedienteModificado(servicios.Expediente expediente, CbpitaUnderwrittingCaseManagementRequest.CandidateInformation infoCandidato) {
+
+		com.scortelemed.servicios.Expediente expedienteModificado = new com.scortelemed.servicios.Expediente()
+
+		expedienteModificado.setCodigoST(expediente.getCodigoST())
+		expedienteModificado.setCandidato(new Candidato())
+		expedienteModificado.getCandidato().setDireccion(infoCandidato.getAddress())
+		expedienteModificado.getCandidato().setCodigoPostal(infoCandidato.getPostalCode())
+		expedienteModificado.getCandidato().setProvincia(infoCandidato.getProvince())
+		expedienteModificado.getCandidato().setLocalidad(infoCandidato.getCity())
+
+		if (infoCandidato.getPhoneNumber1() != null && !infoCandidato.getPhoneNumber1().toString().isEmpty()) {
+			expedienteModificado.getCandidato().setTelefono1(infoCandidato.getPhoneNumber1().toString())
+		}
+		if (infoCandidato.getPhoneNumber2() != null && !infoCandidato.getPhoneNumber2().toString().isEmpty()) {
+			expedienteModificado.getCandidato().setTelefono2(infoCandidato.getPhoneNumber2().toString())
+		}
+		if (infoCandidato.getMobileNumber() != null && !infoCandidato.getMobileNumber().toString().isEmpty()) {
+			expedienteModificado.getCandidato().setTelefono3(infoCandidato.getMobileNumber())
+		}
+
+		return expedienteModificado
+	}
+
+
+	public String codificarAgente(String agente) {
+
+		switch (agente) {
+
+			case "PITAGORA":
+				return "300.CBPPIT";
+			case "SPEFIN":
+				return "300.CBPSPE";
+			case "BANCA PROGETTO":
+				return "300.CBPPRO";
+			default:
+				return null;
+		}
+	}
+
 }

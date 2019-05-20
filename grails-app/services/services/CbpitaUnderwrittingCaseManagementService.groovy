@@ -53,7 +53,7 @@ class CbpitaUnderwrittingCaseManagementService	 {
 		TransformacionUtil util = new TransformacionUtil()
 		CorreoUtil correoUtil = new CorreoUtil()
 		List<WsError> wsErrors = new ArrayList<WsError>()
-		def opername="CbpitaUnderwrittingCaseManagementRequest"
+		def opername = "CbpitaUnderwrittingCaseManagementRequest"
 		def requestXML = ""
 		def requestBBDD
 		def tarificadorService
@@ -61,16 +61,17 @@ class CbpitaUnderwrittingCaseManagementService	 {
 		String message = null
 		StatusType status = null
 		int code = 0
+		List<servicios.Expediente> expedientes = new ArrayList<servicios.Expediente>()
 
-		try{
+		try {
 
 			company = Company.findByNombre('cbp-italia')
 
 			def operacion = estadisticasService.obtenerObjetoOperacion(opername)
 
-			logginService.putInfoEndpoint("Endpoint-"+opername," Peticion de " + company.nombre + " para solicitud: " + cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber)
+			logginService.putInfoEndpoint("Endpoint-" + opername, " Peticion de " + company.nombre + " para solicitud: " + cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber)
 
-			if (operacion && operacion.activo){
+			if (operacion && operacion.activo) {
 
 				if (company.generationAutomatic) {
 
@@ -83,21 +84,78 @@ class CbpitaUnderwrittingCaseManagementService	 {
 
 					if (wsErrors != null && wsErrors.size() == 0) {
 
-						message = "Il caso e stato elaborato correttamente";
-						status = StatusType.OK
-						code = 0
 
-						cbpitaService.crearExpediente(requestBBDD)
+						expedientes = cbpitaService.existeExpediente(cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, company.nombre, company.codigoSt, company.ou.toString())
 
-						logginService.putInfoMessage("Se procede el alta automatica de " + company.nombre + " con numero de solicitud " + cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber)
-						cbpitaService.insertarRecibido(company, cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, requestXML.toString(), "ALTA")
+						if (expedientes != null && expedientes.size() == 0) {
 
-						/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
-						 *                    */
+							message = "Il caso e stato elaborato correttamente";
+							status = StatusType.OK
+							code = 0
 
-						logginService.putInfoMessage("Buscando en CRM solicitud de " + company.nombre + " con numero de solicitud: " + cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber)
-						cbpitaService.busquedaCrm(cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, company.ou, company.codigoSt, company.id, requestBBDD, company.nombre)
+							cbpitaService.crearExpediente(requestBBDD)
 
+							logginService.putInfoMessage("Se procede el alta automatica de " + company.nombre + " con numero de solicitud " + cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber)
+							cbpitaService.insertarRecibido(company, cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, requestXML.toString(), "ALTA")
+
+							/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
+							 *                    */
+
+							cbpitaService.busquedaCrm(cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, company.ou, company.codigoSt, company.id, requestBBDD, company.nombre)
+
+						} else if (expedientes != null && expedientes.size() == 1) {
+
+							try {
+
+								com.scortelemed.servicios.Expediente expedienteModificado = new com.scortelemed.servicios.Expediente()
+								expedienteModificado = cbpitaService.componerExpedienteModificado(expedientes.get(0), cbpitaUnderwrittingCaseManagementRequest.getCandidateInformation())
+								com.scortelemed.servicios.RespuestaCRM respuestaModificaExpediente = cbpitaService.modificarExpediente(expedienteModificado, company.ou.toString())
+
+								if (respuestaModificaExpediente.getErrorCRM() != null) {
+
+									message = "Il caso non e stato modificato"
+									status = StatusType.ERROR
+									code = 2
+
+									logginService.putErrorEndpoint("Modificacion expediente para " + company.nombre, "Modificaición no realizada de " + company.nombre + " con numero de solicitud: " + cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber + ". Error: " + respuestaModificaExpediente.getErrorCRM().getDetalle())
+									correoUtil.envioEmailErrores("ERROR en modificación de " + company.nombre, "Modificacion de " + company.nombre + " con numero de solicitud: " + cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber + " se ha procesado pero no se ha modificado en CRM",null)
+
+
+								} else {
+
+									message = "Il caso e stato modificato correttamente"
+									status = StatusType.OK
+									code = 0
+
+									cbpitaService.insertarRecibido(company, cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, requestXML.toString(), "MODIFICACION")
+									logginService.putInfoMessage("Modificacion realizada para " + company.nombre + " con numero de solicitud: " + cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber)
+									correoUtil.envioEmailNoTratados("Modificacion webservices " + company.nombre ,"Se ha procesado una modificacion para " + company.nombre + "con numero de solicitud: " + cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber)
+
+								}
+
+							} catch (Exception e) {
+
+								message = "Error: C'è stata un'eccezione"
+								status = StatusType.ERROR
+								code = 2
+
+								cbpitaService.insertarError(company, cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, requestXML.toString(), "MODIFICACION", "Peticion no realizada para solicitud: " + cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber + ". Error: " + e.getMessage())
+
+								logginService.putErrorEndpoint("Modificacion expediente para " + company.nombre, "Modificaición no realizada de " + company.nombre + " con numero de solicitud: " + cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber + ". Error: " + e.getMessage())
+								correoUtil.envioEmailErrores("ERROR en modificación de " + company.nombre, "Modificacion de " + company.nombre + " con numero de solicitud: " + cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber + " se ha procesado pero no se ha modificado en CRM",null)
+							}
+						} else {
+
+							message = "Error: Existe mas de un expediente"
+							status = StatusType.ERROR
+							code = 5
+
+							cbpitaService.insertarError(company, cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, requestXML.toString(), "MODIFICACION", "Peticion no realizada para solicitud: " + cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber + ". Error: Existe mas de un expediente")
+
+							logginService.putErrorEndpoint("Modificacion expediente para " + company.nombre, "Modificaición no realizada de " + company.nombre + " con numero de solicitud: " + cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber + ". Error: Exiete mas de un expediente")
+							correoUtil.envioEmailErrores("ERROR en modificación de " + company.nombre, "Modificacion de " + company.nombre + " con numero de solicitud: " + cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber + " se ha procesado pero no se ha modificado en CRM porque existe mas de un expediente",null)
+
+						}
 					} else {
 
 						String error = util.detalleError(wsErrors)
@@ -111,7 +169,6 @@ class CbpitaUnderwrittingCaseManagementService	 {
 
 					}
 				}
-				
 			} else {
 
 				message = "L'operazione viene disattivata temporaneamente";
