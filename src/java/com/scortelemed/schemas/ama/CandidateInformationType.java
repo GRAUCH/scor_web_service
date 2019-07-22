@@ -21,11 +21,11 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element name="fiscalIdentificationNumber" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *         &lt;element name="name" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *         &lt;element name="surname" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *         &lt;element name="address" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *         &lt;element name="city" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="address" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="city" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;element name="province" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
- *         &lt;element name="country" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *         &lt;element name="postalCode" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="country" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="postalCode" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;element name="email" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;element name="gender" type="{http://www.scortelemed.com/schemas/ama}GenderType" minOccurs="0"/>
  *         &lt;element name="civilState" type="{http://www.scortelemed.com/schemas/ama}CivilStateType" minOccurs="0"/>
@@ -74,14 +74,10 @@ public class CandidateInformationType {
     protected String name;
     @XmlElement(required = true)
     protected String surname;
-    @XmlElement(required = true)
     protected String address;
-    @XmlElement(required = true)
     protected String city;
     protected String province;
-    @XmlElement(required = true)
     protected String country;
-    @XmlElement(required = true)
     protected String postalCode;
     protected String email;
     protected GenderType gender;

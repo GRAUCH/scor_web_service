@@ -45,6 +45,7 @@ import com.scor.srpfileinbound.REGISTRODATOS
 import com.scor.srpfileinbound.RootElement
 import com.scortelemed.Conf
 import com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCaseManagementRequest
+import com.scor.global.ZipUtils
 
 class CbpitaService {
 
@@ -54,6 +55,7 @@ class CbpitaService {
 	GenerarZip generarZip = new GenerarZip()
 	def tarificadorService
 	TransformacionUtil transformacionUtil = new TransformacionUtil()
+	ZipUtils zipUtils = new ZipUtils()
 
 	def marshall (nameSpace, clase){
 
@@ -356,15 +358,15 @@ class CbpitaService {
 					 *                    */
 
 					if (eElement.getElementsByTagName("phoneNumber1").item(0) != null) {
-						telefono1 = eElement.getElementsByTagName("phoneNumber1").item(0).getTextContent()
+						telefono1 = "0039" + eElement.getElementsByTagName("phoneNumber1").item(0).getTextContent()
 					}
 
 					if (eElement.getElementsByTagName("phoneNumber2").item(0) != null) {
-						telefono2 = eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent()
+						telefono2 = "0039" + eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent()
 					}
 
 					if (eElement.getElementsByTagName("mobileNumber").item(0) != null) {
-						telefonoMovil = eElement.getElementsByTagName("mobileNumber").item(0).getTextContent()
+						telefonoMovil = "0039" + eElement.getElementsByTagName("mobileNumber").item(0).getTextContent()
 					}
 
 					if (telefonoMovil != null && !telefonoMovil.isEmpty()) {
@@ -971,8 +973,7 @@ class CbpitaService {
 	}
 
 
-	public def rellenaDatosSalidaConsulta(servicios.Expediente expedientePoliza, requestDate) {
-
+	public def rellenaDatosSalidaConsulta(servicios.ExpedienteInforme expedientePoliza, codigoSt, requestDate, String zipPath, String user, String password) {
 
 		CbpitaUnderwrittingCasesResultsResponse.Expediente expediente = new CbpitaUnderwrittingCasesResultsResponse.Expediente()
 
@@ -1002,9 +1003,16 @@ class CbpitaService {
 			expediente.setPhoneNumber2("")
 		}
 
-		byte[] compressedData=tarificadorService.obtenerZip(expedientePoliza.getNodoAlfresco())
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+		String dateString = formatter.format(requestDate.toGregorianCalendar().getTime());
 
+        logginService.putInfoMessage("Iniciado generacion de zip")
+
+		byte[] compressedData=zipUtils.generarZips(expedientePoliza, codigoSt, dateString, zipPath, user, password)
+		zipUtils.eraseFiles(expedientePoliza, zipPath)
 		expediente.setZip(compressedData)
+
+        logginService.putInfoMessage("Fin generacion de zip")
 
 		expediente.setNotes(util.devolverDatos(expedientePoliza.getTarificacion().getObservaciones()))
 
@@ -1120,7 +1128,10 @@ class CbpitaService {
 	}
 	com.scortelemed.servicios.Expediente componerExpedienteModificado(servicios.Expediente expediente, CbpitaUnderwrittingCaseManagementRequest.CandidateInformation infoCandidato) {
 
-		com.scortelemed.servicios.Expediente expedienteModificado = new com.scortelemed.servicios.Expediente()
+        com.scortelemed.servicios.Expediente expedienteModificado = new com.scortelemed.servicios.Expediente()
+        SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
+        String observaciones = ""
+        String modificaciones = ""
 
 		expedienteModificado.setCodigoST(expediente.getCodigoST())
 		expedienteModificado.setCandidato(new Candidato())
@@ -1130,14 +1141,24 @@ class CbpitaService {
 		expedienteModificado.getCandidato().setLocalidad(infoCandidato.getCity())
 
 		if (infoCandidato.getPhoneNumber1() != null && !infoCandidato.getPhoneNumber1().toString().isEmpty()) {
-			expedienteModificado.getCandidato().setTelefono1(infoCandidato.getPhoneNumber1().toString())
+			expedienteModificado.getCandidato().setTelefono1("0039" + infoCandidato.getPhoneNumber1().toString())
+            modificaciones += "Telefono1: " + "0039" + infoCandidato.getPhoneNumber1().toString() + " "
 		}
 		if (infoCandidato.getPhoneNumber2() != null && !infoCandidato.getPhoneNumber2().toString().isEmpty()) {
-			expedienteModificado.getCandidato().setTelefono2(infoCandidato.getPhoneNumber2().toString())
+			expedienteModificado.getCandidato().setTelefono2("0039" + infoCandidato.getPhoneNumber2().toString())
+            modificaciones += "Telefono2: " + "0039" + infoCandidato.getPhoneNumber1().toString() + " "
 		}
 		if (infoCandidato.getMobileNumber() != null && !infoCandidato.getMobileNumber().toString().isEmpty()) {
-			expedienteModificado.getCandidato().setTelefono3(infoCandidato.getMobileNumber())
+			expedienteModificado.getCandidato().setTelefono3("0039" + infoCandidato.getMobileNumber())
+            modificaciones += "Mobile: " + "0039" + infoCandidato.getPhoneNumber1().toString() + " "
 		}
+
+        if (expediente.getObservaciones() != null) {
+            observaciones = expediente.getObservaciones() + "\n"
+            expedienteModificado.setObservaciones(observaciones + formato.format(new Date()) + ": " + modificaciones)
+        } else {
+            expedienteModificado.setObservaciones(formato.format(new Date()) + ": " + modificaciones)
+        }
 
 		return expedienteModificado
 	}
@@ -1147,12 +1168,12 @@ class CbpitaService {
 
 		switch (agente) {
 
-			case "PITAGORA":
-				return "300.CBPPIT";
-			case "SPEFIN":
-				return "300.CBPSPE";
-			case "BANCA PROGETTO":
-				return "300.CBPPRO";
+			case "300.CBPPIT":
+				return "PITAGORA";
+			case "300.CBPSPE":
+				return "SPEFIN";
+			case "300.CBPPRO":
+				return "BANCA PROGETTO";
 			default:
 				return null;
 		}

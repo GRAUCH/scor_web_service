@@ -695,291 +695,291 @@ class WsController {
 
 						expediente = expedientes.get(i)
 
-						if (!amaService.seExcluyeEnvio(expediente)){
+						    if (!amaService.seExcluyeEnvio(expediente)) {
 
-							identificadorCaso = expediente.getNumSolicitud()
+								identificadorCaso = expediente.getNumSolicitud()
 
-							files = new ArrayList<File>()
-							listaBenefitInformation = new ArrayList<BenefitInformation>();
+								files = new ArrayList<File>()
+								listaBenefitInformation = new ArrayList<BenefitInformation>();
 
-							dossier.setDossierCode(expediente.getNumSolicitud())
-							dossier.setResultsCode("OK")
-							dossier.setState((short) 1)
+								dossier.setDossierCode(expediente.getNumSolicitud())
+								dossier.setResultsCode("OK")
+								dossier.setState((short) 1)
 
-							/**CANDIDATO
-							 * 
-							 */
-							Candidate candidate = new Candidate()
-							candidate.setBirthDate(transformacion.fromStringToCalendar(expediente.getCandidato().getFechaNacimiento()))
-							candidate.setFullName(expediente.getCandidato().getNombre()+ " " + expediente.getCandidato().getApellidos())
+								/**CANDIDATO
+								 *
+								 */
+								Candidate candidate = new Candidate()
+								candidate.setBirthDate(transformacion.fromStringToCalendar(expediente.getCandidato().getFechaNacimiento()))
+								candidate.setFullName(expediente.getCandidato().getNombre() + " " + expediente.getCandidato().getApellidos())
 
-							if (expediente.getCandidato().getSexo() != null){
-								candidate.setGender(expediente.getCandidato().getSexo()==TipoSexo.HOMBRE?(short) 1:(short) 2)
-							} else {
-								candidate.setGender((short) 1)
-							}
-
-							candidate.setOccupation("")
-							dossier.setCandidate(candidate)
-
-							/**CIA
-							 * 
-							 */
-							com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.Company cia = new com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.Company()
-
-
-
-							if (expediente.getCandidato() != null && expediente.getCandidato().getCompanya() != null && expediente.getCandidato().getCompanya().getCodigoST().equals("1064")){
-								cia.setCompanyCode("C0803")
-								cia.setCompanyDescription("A.M.A. Vida")
-							}
-							if (expediente.getCandidato() != null && expediente.getCandidato().getCompanya() != null && expediente.getCandidato().getCompanya().getCodigoST().equals("1059")){
-								cia.setCompanyCode("M0328")
-								cia.setCompanyDescription("A.M.A.")
-							}
-
-							dossier.setCompany(cia)
-							/**PRODUCTO
-							 * 
-							 */
-							Product producto = new Product()
-
-							if (expediente.getProducto() != null) {
-								if (expediente.getProducto().getCodigoProductoCompanya().toString().equals("P49")){
-									producto.setProductCode("0013")
+								if (expediente.getCandidato().getSexo() != null) {
+									candidate.setGender(expediente.getCandidato().getSexo() == TipoSexo.HOMBRE ? (short) 1 : (short) 2)
 								} else {
-									producto.setProductCode(expediente.getProducto().getCodigoProductoCompanya())
+									candidate.setGender((short) 1)
 								}
-								producto.setProductDescription(expediente.getProducto().getNombre());
-							} else {
-								producto.setProductCode("")
-								producto.setProductDescription("");
-							}
 
-							dossier.setProduct(producto)
+								candidate.setOccupation("")
+								dossier.setCandidate(candidate)
 
-							if (expediente.getCoberturasExpediente() != null && expediente.getCoberturasExpediente().size() > 0) {
-
-								expediente.getCoberturasExpediente().each { CoberturaExpediente coberturasPoliza ->
+								/**CIA
+								 *
+								 */
+								com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.Company cia = new com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.Company()
 
 
-									BenefitInformation benefitInformation = new BenefitInformation();
 
-									benefitInformation.setBenefitName(coberturasPoliza.getNombreCobertura());
-									benefitInformation.setBenefitCode(coberturasPoliza.getCodigoCobertura());
+								if (expediente.getCandidato() != null && expediente.getCandidato().getCompanya() != null && expediente.getCandidato().getCompanya().getCodigoST().equals("1064")) {
+									cia.setCompanyCode("C0803")
+									cia.setCompanyDescription("A.M.A. Vida")
+								}
+								if (expediente.getCandidato() != null && expediente.getCandidato().getCompanya() != null && expediente.getCandidato().getCompanya().getCodigoST().equals("1059")) {
+									cia.setCompanyCode("M0328")
+									cia.setCompanyDescription("A.M.A.")
+								}
 
-									BenefitResultValue benefitResultValue = new BenefitResultValue();
+								dossier.setCompany(cia)
+								/**PRODUCTO
+								 *
+								 */
+								Product producto = new Product()
 
-									benefitResultValue.setDescLoadingCapital("");
-									benefitResultValue.setDescLoadingPremium("");
-									benefitResultValue.setLoadingCapital(BigDecimal.valueOf(Long.valueOf("0")));
-									benefitResultValue.setLoadingPremium(BigDecimal.valueOf(Long.valueOf("0")));
+								if (expediente.getProducto() != null) {
+									if (expediente.getProducto().getCodigoProductoCompanya().toString().equals("P49")) {
+										producto.setProductCode("0013")
+									} else {
+										producto.setProductCode(expediente.getProducto().getCodigoProductoCompanya())
+									}
+									producto.setProductDescription(expediente.getProducto().getNombre());
+								} else {
+									producto.setProductCode("")
+									producto.setProductDescription("");
+								}
+
+								dossier.setProduct(producto)
+
+								if (expediente.getCoberturasExpediente() != null && expediente.getCoberturasExpediente().size() > 0) {
+
+									expediente.getCoberturasExpediente().each { CoberturaExpediente coberturasPoliza ->
 
 
-									if (coberturasPoliza.getCodResultadoCobertura() != null && coberturasPoliza.getCodResultadoCobertura().trim().startsWith("3")){
+										BenefitInformation benefitInformation = new BenefitInformation();
+
+										benefitInformation.setBenefitName(coberturasPoliza.getNombreCobertura());
+										benefitInformation.setBenefitCode(coberturasPoliza.getCodigoCobertura());
+
+										BenefitResultValue benefitResultValue = new BenefitResultValue();
+
+										benefitResultValue.setDescLoadingCapital("");
+										benefitResultValue.setDescLoadingPremium("");
+										benefitResultValue.setLoadingCapital(BigDecimal.valueOf(Long.valueOf("0")));
+										benefitResultValue.setLoadingPremium(BigDecimal.valueOf(Long.valueOf("0")));
 
 
-										/**
-										 * SOBREMORTALIDAD (EXTRAPRIMA para AMA)
-										 */
-										if (coberturasPoliza.getValoracionCapital() != null && !coberturasPoliza.getValoracionCapital().trim().isEmpty() && (coberturasPoliza.getValoracionPrima() == null || coberturasPoliza.getValoracionPrima().trim().isEmpty())) {
+										if (coberturasPoliza.getCodResultadoCobertura() != null && coberturasPoliza.getCodResultadoCobertura().trim().startsWith("3")) {
 
-											benefitInformation.setBenefitResultCode("31");
-											benefitInformation.setBenefitResultType("Sobremortalidad");
-											benefitResultValue.setDescLoadingCapital(coberturasPoliza.getCodResultadoCobertura().toString());
-											benefitResultValue.setDescLoadingPremium("");
-											benefitResultValue.setLoadingCapital(new BigDecimal(coberturasPoliza.getValoracionCapital().replace(",", ".")));
-											benefitResultValue.setLoadingPremium(new BigDecimal(0));
 
 											/**
-											 * SOBREPRIMA 
+											 * SOBREMORTALIDAD (EXTRAPRIMA para AMA)
 											 */
-										} else if (coberturasPoliza.getValoracionPrima() != null && !coberturasPoliza.getValoracionPrima().trim().isEmpty() && (coberturasPoliza.getValoracionCapital() == null || coberturasPoliza.getValoracionCapital().trim().isEmpty())) {
+											if (coberturasPoliza.getValoracionCapital() != null && !coberturasPoliza.getValoracionCapital().trim().isEmpty() && (coberturasPoliza.getValoracionPrima() == null || coberturasPoliza.getValoracionPrima().trim().isEmpty())) {
 
-											benefitInformation.setBenefitResultCode("30");
-											benefitInformation.setBenefitResultType("Sobreprima");
+												benefitInformation.setBenefitResultCode("31");
+												benefitInformation.setBenefitResultType("Sobremortalidad");
+												benefitResultValue.setDescLoadingCapital(coberturasPoliza.getCodResultadoCobertura().toString());
+												benefitResultValue.setDescLoadingPremium("");
+												benefitResultValue.setLoadingCapital(new BigDecimal(coberturasPoliza.getValoracionCapital().replace(",", ".")));
+												benefitResultValue.setLoadingPremium(new BigDecimal(0));
+
+												/**
+												 * SOBREPRIMA
+												 */
+											} else if (coberturasPoliza.getValoracionPrima() != null && !coberturasPoliza.getValoracionPrima().trim().isEmpty() && (coberturasPoliza.getValoracionCapital() == null || coberturasPoliza.getValoracionCapital().trim().isEmpty())) {
+
+												benefitInformation.setBenefitResultCode("30");
+												benefitInformation.setBenefitResultType("Sobreprima");
+												benefitResultValue.setDescLoadingCapital("");
+												benefitResultValue.setDescLoadingPremium(coberturasPoliza.getCodResultadoCobertura().toString());
+												benefitResultValue.setLoadingCapital(new BigDecimal(0));
+												benefitResultValue.setLoadingPremium(new BigDecimal(coberturasPoliza.getValoracionPrima().replace(",", ".")));
+
+											} else {
+
+												if (coberturasPoliza.getCodResultadoCobertura() != null) {
+
+													benefitInformation.setBenefitResultCode("3");
+													benefitInformation.setBenefitResultType("Combinado");
+													benefitResultValue.setDescLoadingCapital(coberturasPoliza.getCodResultadoCobertura().toString())
+													benefitResultValue.setDescLoadingPremium(coberturasPoliza.getCodResultadoCobertura().toString())
+													benefitResultValue.setLoadingCapital(new BigDecimal(coberturasPoliza.getValoracionCapital().replace(",", ".")))
+													benefitResultValue.setLoadingPremium(new BigDecimal(coberturasPoliza.getValoracionPrima().replace(",", ".")))
+												}
+											}
+										} else if (coberturasPoliza.getCodResultadoCobertura() != null) {
+
+
+											benefitInformation.setBenefitResultCode(coberturasPoliza.getCodResultadoCobertura());
+											benefitInformation.setBenefitResultType(amaService.devolverLiteralCobertura(coberturasPoliza.getCodResultadoCobertura()));
 											benefitResultValue.setDescLoadingCapital("");
-											benefitResultValue.setDescLoadingPremium(coberturasPoliza.getCodResultadoCobertura().toString());
+											benefitResultValue.setDescLoadingPremium("");
 											benefitResultValue.setLoadingCapital(new BigDecimal(0));
-											benefitResultValue.setLoadingPremium(new BigDecimal(coberturasPoliza.getValoracionPrima().replace(",", ".")));
+											benefitResultValue.setLoadingPremium(new BigDecimal(0));
 
 										} else {
 
-											if (coberturasPoliza.getCodResultadoCobertura() != null){
+											benefitInformation.setBenefitResultCode("");
+											benefitInformation.setBenefitResultType("");
+											benefitResultValue.setDescLoadingCapital("");
+											benefitResultValue.setDescLoadingPremium("");
+											benefitResultValue.setLoadingCapital(new BigDecimal(0));
+											benefitResultValue.setLoadingPremium(new BigDecimal(0));
 
-												benefitInformation.setBenefitResultCode("3");
-												benefitInformation.setBenefitResultType("Combinado");
-												benefitResultValue.setDescLoadingCapital(coberturasPoliza.getCodResultadoCobertura().toString())
-												benefitResultValue.setDescLoadingPremium(coberturasPoliza.getCodResultadoCobertura().toString())
-												benefitResultValue.setLoadingCapital(new BigDecimal(coberturasPoliza.getValoracionCapital().replace(",", ".")))
-												benefitResultValue.setLoadingPremium(new BigDecimal(coberturasPoliza.getValoracionPrima().replace(",", ".")))
+										}
+
+										benefitInformation.setBenefitResultValue(benefitResultValue);
+
+										if (transformacion.hasElements(coberturasPoliza.getExclusiones())) {
+
+											StringTokenizer st = new StringTokenizer(coberturasPoliza.getExclusiones(), ";");
+
+											while (st.hasMoreTokens()) {
+
+												Exclusion exlusion = new Exclusion();
+												exlusion.setText(st.nextToken());
+												exlusion.setType("4");
+												benefitInformation.addExclusionsList(exlusion);
+
 											}
-										}
-									} else if (coberturasPoliza.getCodResultadoCobertura() != null){
 
-
-										benefitInformation.setBenefitResultCode(coberturasPoliza.getCodResultadoCobertura());
-										benefitInformation.setBenefitResultType(amaService.devolverLiteralCobertura(coberturasPoliza.getCodResultadoCobertura()));
-										benefitResultValue.setDescLoadingCapital("");
-										benefitResultValue.setDescLoadingPremium("");
-										benefitResultValue.setLoadingCapital(new BigDecimal(0));
-										benefitResultValue.setLoadingPremium(new BigDecimal(0));
-
-									} else {
-
-										benefitInformation.setBenefitResultCode("");
-										benefitInformation.setBenefitResultType("");
-										benefitResultValue.setDescLoadingCapital("");
-										benefitResultValue.setDescLoadingPremium("");
-										benefitResultValue.setLoadingCapital(new BigDecimal(0));
-										benefitResultValue.setLoadingPremium(new BigDecimal(0));
-
-									}
-
-									benefitInformation.setBenefitResultValue(benefitResultValue);
-
-									if (transformacion.hasElements(coberturasPoliza.getExclusiones())) {
-
-										StringTokenizer st = new StringTokenizer(coberturasPoliza.getExclusiones(),";");
-
-										while (st.hasMoreTokens()){
-
-											Exclusion exlusion = new Exclusion();
-											exlusion.setText(st.nextToken());
-											exlusion.setType("4");
-											benefitInformation.addExclusionsList(exlusion);
-
+										} else {
+											benefitInformation.setExclusionsList(null);
 										}
 
-									} else {
-										benefitInformation.setExclusionsList(null);
-									}
+										if (transformacion.hasElements(coberturasPoliza.getInformesMedicos())) {
 
-									if (transformacion.hasElements(coberturasPoliza.getInformesMedicos())) {
+											StringTokenizer st = new StringTokenizer(coberturasPoliza.getInformesMedicos(), ";");
 
-										StringTokenizer st = new StringTokenizer(coberturasPoliza.getInformesMedicos (),";");
+											while (st.hasMoreTokens()) {
 
-										while (st.hasMoreTokens()){
+												MedicalReport medicalReport = new MedicalReport();
+												medicalReport.setText(st.nextToken());
+												medicalReport.setType("1");
+												benefitInformation.addMedicalReportsList(medicalReport);
 
-											MedicalReport medicalReport = new MedicalReport();
-											medicalReport.setText(st.nextToken());
-											medicalReport.setType("1");
-											benefitInformation.addMedicalReportsList(medicalReport);
+											}
 
+										} else {
+											benefitInformation.addMedicalReportsList(null);
 										}
 
-									} else {
-										benefitInformation.addMedicalReportsList(null);
-									}
+										if (transformacion.hasElements(coberturasPoliza.getNotas())) {
 
-									if (transformacion.hasElements(coberturasPoliza.getNotas())) {
+											StringTokenizer st = new StringTokenizer(coberturasPoliza.getNotas(), ";");
 
-										StringTokenizer st = new StringTokenizer(coberturasPoliza.getNotas(),";");
+											while (st.hasMoreTokens()) {
 
-										while (st.hasMoreTokens()){
+												AdditionalNote note = new AdditionalNote();
+												note.setText(st.nextToken());
+												note.setType("5");
+												benefitInformation.addAdditionalNotesList(note);
 
-											AdditionalNote note = new AdditionalNote();
-											note.setText(st.nextToken());
-											note.setType("5");
-											benefitInformation.addAdditionalNotesList(note);
+											}
 
+										} else {
+											benefitInformation.addAdditionalNotesList(null);
 										}
 
-									} else {
-										benefitInformation.addAdditionalNotesList(null);
-									}
+										if (transformacion.hasElements(coberturasPoliza.getValoracionTemporal())) {
 
-									if (transformacion.hasElements(coberturasPoliza.getValoracionTemporal())) {
+											StringTokenizer st = new StringTokenizer(coberturasPoliza.getValoracionTemporal(), ";");
 
-										StringTokenizer st = new StringTokenizer(coberturasPoliza.getValoracionTemporal(),";");
+											while (st.hasMoreTokens()) {
 
-										while (st.hasMoreTokens()){
+												TemporalLoading temporal = new TemporalLoading()
+												temporal.setText(st.nextToken());
+												temporal.setType("3");
 
-											TemporalLoading temporal = new TemporalLoading()
-											temporal.setText(st.nextToken());
-											temporal.setType("3");
+												benefitInformation.addTemporalLoadingsList(temporal)
+											}
 
-											benefitInformation.addTemporalLoadingsList(temporal)
+										} else {
+											benefitInformation.addTemporalLoadingsList(null);
 										}
 
-									} else {
-										benefitInformation.addTemporalLoadingsList(null);
+										if (coberturasPoliza.getCapitalCobertura() != null && !coberturasPoliza.getCapitalCobertura().isEmpty()) {
+											dossier.setCapitalInsured(new BigDecimal(coberturasPoliza.getCapitalCobertura()))
+										} else {
+											dossier.setCapitalInsured(new BigDecimal(0))
+										}
+
+										listaBenefitInformation.add(benefitInformation)
 									}
 
-									if (coberturasPoliza.getCapitalCobertura() != null && !coberturasPoliza.getCapitalCobertura().isEmpty()){
-										dossier.setCapitalInsured(new BigDecimal(coberturasPoliza.getCapitalCobertura()))
+									byte[] compressedData = tarificadorService.obtenerZip(expediente.getNodoAlfresco())
+
+									File file = new File()
+									file.setFileBase64(new String(compressedData))
+									file.setTypeFile("zip")
+
+									files.add(file)
+
+
+									saveResultIN.setListFiles((File[]) files.toArray())
+									saveResultIN.setBenefitsInformationsList((BenefitInformation[]) listaBenefitInformation.toArray());
+									saveResultIN.setDossier(dossier)
+									saveResultIN.getDossier().setResultsCode("OK");
+									saveResultIN.getDossier().setState((short) 1);
+									saveResult.setDossierResultsIN(saveResultIN)
+									resultsE.setSaveDossierResults(saveResult)
+
+									respuestaCRM = stub.saveDossierResults(resultsE);
+
+									if (respuestaCRM != null && respuestaCRM.localSaveDossierResultsResponse != null && respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT() != null && respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localTypeResult.equals("OK")) {
+
+										com.scortelemed.Envio envio = new com.scortelemed.Envio()
+										envio.setFecha(new Date())
+										envio.setCia(company.id.toString())
+										envio.setIdentificador(expediente.getNumSolicitud())
+										envio.setInfo("Estado: " + expediente.getCodigoEstado().toString() + "-Respuesta: " + respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localDescriptionResultList[0])
+										envio.save(flush: true)
+
+										logginService.putInfoMessage("Informacion de salida de expediente " + expediente.getCodigoST() + ". Codigo AMA: " + expediente.getNumSolicitud())
+										logginService.putInfoMessage("Respuesta desde AMA al envio de informacion para expediente " + expediente.getCodigoST() + ". " + respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localDescriptionResultList[0])
+										logginService.putInfoMessage("Informacion expediente " + expediente.getCodigoST() + " enviado a " + company.nombre + " correctamente")
+
+									} else if (respuestaCRM != null && respuestaCRM.localSaveDossierResultsResponse != null && respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT() != null && respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localTypeResult.equals("ERROR")) {
+
+										com.scortelemed.Error error = new com.scortelemed.Error()
+										error.setFecha(new Date())
+										error.setCia(company.id.toString())
+										error.setIdentificador(identificadorCaso)
+										error.setInfo("Error en el envio")
+										error.setOperacion("ENVIO")
+										error.setError("Peticion no realizada para solicitud: " + identificadorCaso + ". Error: " + respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localDescriptionResultList[0])
+										error.save(flush: true)
+
+										logginService.putInfoMessage("Informacion de salida de expediente " + expediente.getCodigoST() + ". Codigo AMA: " + expediente.getNumSolicitud())
+										logginService.putInfoMessage("Respuesta desde AMA al envio de informacion para expediente " + expediente.getCodigoST() + ". ERROR:" + respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localDescriptionResultList[0])
+										logginService.putInfoMessage("Informacion expediente " + expediente.getCodigoST() + " no enviado a " + company.nombre + " correctamente")
+
 									} else {
-										dossier.setCapitalInsured(new BigDecimal(0))
+
+										com.scortelemed.Error error = new com.scortelemed.Error()
+										error.setFecha(new Date())
+										error.setCia(company.id.toString())
+										error.setIdentificador(identificadorCaso)
+										error.setInfo("Error en el envio")
+										error.setOperacion("ENVIO")
+										error.setError("Peticion no realizada para solicitud: " + identificadorCaso + ". Error: desconocido")
+										error.save(flush: true)
+
+										logginService.putInfoMessage("Informacion de salida de expediente " + expediente.getCodigoST() + ". Codigo AMA: " + expediente.getNumSolicitud())
+										logginService.putInfoMessage("Respuesta desde AMA al envio de informacion para expediente " + expediente.getCodigoST() + ". ERROR: Desconocido")
+										logginService.putInfoMessage("IInformacion expediente " + expediente.getCodigoST() + " no enviado a " + company.nombre + " correctamente")
+
 									}
-
-									listaBenefitInformation.add(benefitInformation)
-								}
-
-								byte[] compressedData=tarificadorService.obtenerZip(expediente.getNodoAlfresco())
-
-								File file = new File()
-								file.setFileBase64(new String(compressedData))
-								file.setTypeFile("zip")
-
-								files.add(file)
-
-
-								saveResultIN.setListFiles((File[]) files.toArray())
-								saveResultIN.setBenefitsInformationsList((BenefitInformation[]) listaBenefitInformation.toArray());
-								saveResultIN.setDossier(dossier)
-								saveResultIN.getDossier().setResultsCode("OK");
-								saveResultIN.getDossier().setState((short) 1);
-								saveResult.setDossierResultsIN(saveResultIN)
-								resultsE.setSaveDossierResults(saveResult)
-
-								respuestaCRM = stub.saveDossierResults(resultsE);
-
-								if (respuestaCRM != null && respuestaCRM.localSaveDossierResultsResponse != null &&  respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT() != null && respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localTypeResult.equals("OK")){
-
-									com.scortelemed.Envio envio = new com.scortelemed.Envio()
-									envio.setFecha(new Date())
-									envio.setCia(company.id.toString())
-									envio.setIdentificador(expediente.getNumSolicitud())
-									envio.setInfo("Estado: " + expediente.getCodigoEstado().toString() + "-Respuesta: " + respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localDescriptionResultList[0])
-									envio.save(flush:true)
-
-									logginService.putInfoMessage("Informacion de salida de expediente " + expediente.getCodigoST() +". Codigo AMA: " + expediente.getNumSolicitud())
-									logginService.putInfoMessage("Respuesta desde AMA al envio de informacion para expediente " + expediente.getCodigoST() + ". " + respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localDescriptionResultList[0])
-									logginService.putInfoMessage("Informacion expediente " + expediente.getCodigoST() + " enviado a " + company.nombre + " correctamente")
-
-								} else if (respuestaCRM != null && respuestaCRM.localSaveDossierResultsResponse != null &&  respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT() != null && respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localTypeResult.equals("ERROR")){
-
-									com.scortelemed.Error error = new com.scortelemed.Error()
-									error.setFecha(new Date())
-									error.setCia(company.id.toString())
-									error.setIdentificador(identificadorCaso)
-									error.setInfo("Error en el envio")
-									error.setOperacion("ENVIO")
-									error.setError("Peticion no realizada para solicitud: " + identificadorCaso + ". Error: "+ respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localDescriptionResultList[0])
-									error.save(flush:true)
-
-									logginService.putInfoMessage("Informacion de salida de expediente " + expediente.getCodigoST() +". Codigo AMA: " + expediente.getNumSolicitud())
-									logginService.putInfoMessage("Respuesta desde AMA al envio de informacion para expediente " + expediente.getCodigoST() + ". ERROR:" + respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localDescriptionResultList[0])
-									logginService.putInfoMessage("Informacion expediente " + expediente.getCodigoST() + " no enviado a " + company.nombre + " correctamente")
-
-								} else {
-
-									com.scortelemed.Error error = new com.scortelemed.Error()
-									error.setFecha(new Date())
-									error.setCia(company.id.toString())
-									error.setIdentificador(identificadorCaso)
-									error.setInfo("Error en el envio")
-									error.setOperacion("ENVIO")
-									error.setError("Peticion no realizada para solicitud: " + identificadorCaso + ". Error: desconocido")
-									error.save(flush:true)
-
-									logginService.putInfoMessage("Informacion de salida de expediente " + expediente.getCodigoST() +". Codigo AMA: " + expediente.getNumSolicitud())
-									logginService.putInfoMessage("Respuesta desde AMA al envio de informacion para expediente " + expediente.getCodigoST() + ". ERROR: Desconocido")
-									logginService.putInfoMessage("IInformacion expediente " + expediente.getCodigoST() + " no enviado a " + company.nombre + " correctamente")
-
 								}
 							}
-						}
 
 					} catch (Exception ex) {
 

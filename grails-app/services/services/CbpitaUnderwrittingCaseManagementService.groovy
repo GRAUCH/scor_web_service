@@ -1,6 +1,7 @@
 package services
 
 import com.scortelemed.Company
+import com.scortelemed.Conf
 import com.scortelemed.schemas.cbpita.StatusType
 import com.ws.servicios.*
 import hwsol.webservices.CorreoUtil
@@ -135,7 +136,7 @@ class CbpitaUnderwrittingCaseManagementService	 {
 
 							} catch (Exception e) {
 
-								message = "Error: C'è stata un'eccezione"
+								message = "Errore: C'è stata un'eccezione"
 								status = StatusType.ERROR
 								code = 2
 
@@ -146,7 +147,7 @@ class CbpitaUnderwrittingCaseManagementService	 {
 							}
 						} else {
 
-							message = "Error: Existe mas de un expediente"
+							message = "Errore: c'è più di un file"
 							status = StatusType.ERROR
 							code = 5
 
@@ -179,7 +180,7 @@ class CbpitaUnderwrittingCaseManagementService	 {
 			}
 		} catch (Exception e){
 
-			message = "Error: " + e.getMessage()
+			message = "Errore: " + e.getMessage()
 			status = StatusType.ERROR
 			code = 2
 
@@ -255,7 +256,7 @@ class CbpitaUnderwrittingCaseManagementService	 {
 
 							expedientes.each { expedientePoliza ->
 
-								resultado.getExpediente().add(cbpitaService.rellenaDatosSalidaConsulta(expedientePoliza, cbpitaUnderwrittingCasesResultsRequest.dateStart))
+								resultado.getExpediente().add(cbpitaService.rellenaDatosSalidaConsulta(expedientePoliza, "CBP", cbpitaUnderwrittingCasesResultsRequest.dateStart, Conf.findByName("rutaFicheroZip")?.value, Conf.findByName("usuarioZip")?.value, Conf.findByName("passwordZip")?.value))
 							}
 
 							message = "Risultati restituiti"
