@@ -357,44 +357,49 @@ class CbpitaService {
 					/**TELEFONOS
 					 *                    */
 
-					if (eElement.getElementsByTagName("phoneNumber1").item(0) != null) {
-						telefono1 = "0039" + eElement.getElementsByTagName("phoneNumber1").item(0).getTextContent()
+                    if (eElement.getElementsByTagName("phoneNumber1").item(0) != null && eElement.getElementsByTagName("phoneNumber1").item(0).getTextContent() != null && !eElement.getElementsByTagName("phoneNumber1").item(0).getTextContent().isEmpty()) {
+
+                        telefono1 = eElement.getElementsByTagName("phoneNumber1").item(0).getTextContent()
+
+                        if (telefono1 != null && !telefono1.isEmpty() && (telefono1.startsWith("0039") || telefono1.startsWith("+39"))) {
+                            datosRegistro.telefono1 = telefono1
+                        } else if (telefono1 != null && !telefono1.isEmpty()){
+                            datosRegistro.telefono1 = "0039" + telefono1
+                        } else {
+                            datosRegistro.telefono1 = null
+                        }
 					}
 
-					if (eElement.getElementsByTagName("phoneNumber2").item(0) != null) {
-						telefono2 = "0039" + eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent()
-					}
+                    if (eElement.getElementsByTagName("phoneNumber2").item(0) != null && eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent() != null && !eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent().isEmpty()) {
+
+                        telefono2 = eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent()
+
+                        if (telefono2 != null && !telefono2.isEmpty() && (telefono2.startsWith("0039") || telefono2.startsWith("+39"))) {
+                            datosRegistro.telefono2 = telefono2
+                        } else if (telefono2 != null && !telefono2.isEmpty()){
+                            datosRegistro.telefono2 = "0039" + telefono2
+                        } else {
+                            datosRegistro.telefono2 = null
+                        }
+                    }
 
 					if (eElement.getElementsByTagName("mobileNumber").item(0) != null) {
-						telefonoMovil = "0039" + eElement.getElementsByTagName("mobileNumber").item(0).getTextContent()
+						telefonoMovil = eElement.getElementsByTagName("mobileNumber").item(0).getTextContent()
 					}
 
 					if (telefonoMovil != null && !telefonoMovil.isEmpty()) {
 						datosRegistro.telefono1 = telefonoMovil
 					}
 
-					if (telefono1 != null || telefono2 != null) {
-
-						if (telefonoMovil == null || telefonoMovil.isEmpty()) {
-							datosRegistro.telefono1 = new String("999999999")
-							datosRegistro.telefono2 = new String("")
-							datosRegistro.telefono3 = new String("")
-						} else {
-
-							if (telefono1 != null && telefono2 == null) {
-								datosRegistro.telefono2 = telefono1
-								datosRegistro.telefono3 = new String("")
-							}
-
-							if (telefono1 != null && telefono2 != null) datosRegistro.telefono2 = telefono1
-							datosRegistro.telefono3 = telefono2
-						}
-
-						if (telefono1 == null && telefono2 != null) {
-							datosRegistro.telefono2 = telefono2
-							datosRegistro.telefono3 = new String("")
-						}
-					}
+                    if (datosRegistro.telefono1 == null || datosRegistro.telefono1.isEmpty()){
+                        if (datosRegistro.telefono3 != null && !datosRegistro.telefono3.isEmpty()){
+                            datosRegistro.telefono1 = datosRegistro.telefono3
+                        } else if (datosRegistro.telefono2 != null && !datosRegistro.telefono2.isEmpty()){
+                            datosRegistro.telefono1 = datosRegistro.telefono2
+                        } else {
+                            datosRegistro.telefono1 = "999999999"
+                        }
+                    }
 
 					/**CODIGO CIA
 					 *                    */
@@ -1006,13 +1011,17 @@ class CbpitaService {
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 		String dateString = formatter.format(requestDate.toGregorianCalendar().getTime());
 
-        logginService.putInfoMessage("Iniciado generacion de zip")
+        logginService.putInfoMessage("Iniciado generacion de zip para expediente " + codigoSt)
 
-		byte[] compressedData=zipUtils.generarZips(expedientePoliza, codigoSt, dateString, zipPath, user, password)
-		zipUtils.eraseFiles(expedientePoliza, zipPath)
-		expediente.setZip(compressedData)
+		if (expedientePoliza.getCodigoEstado() != TipoEstadoExpediente.ANULADO) {
+			byte[] compressedData = zipUtils.generarZips(expedientePoliza, codigoSt, dateString, zipPath, user, password)
+			expediente.setZip(compressedData)
+			//zipUtils.eraseFiles(expedientePoliza, zipPath)
+		} else {
+			expediente.setZip(new byte[0])
+		}
 
-        logginService.putInfoMessage("Fin generacion de zip")
+        logginService.putInfoMessage("Fin generacion de zip para expediente " + codigoSt)
 
 		expediente.setNotes(util.devolverDatos(expedientePoliza.getTarificacion().getObservaciones()))
 
