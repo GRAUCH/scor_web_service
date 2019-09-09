@@ -461,8 +461,8 @@ class WsController {
 
 		} catch (Exception ex) {
 			logginService.putErrorMessage("Error: " + opername + ". " + ex.getMessage().toString() + ". Detalles:" + ex.printStackTrace())
-			println "Error: " + ex.detailMessage()
-			println "Detalles:" + ex.printStackTrace()
+			println "Error: " + ex.getMessage()
+			println "Detalles:" + ex.getMessage()
 			render "KO"
 		}
 	}
