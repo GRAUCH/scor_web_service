@@ -531,20 +531,40 @@ class NetinsuranceService {
 					 */
 
 					if (eElement.getElementsByTagName("phoneNumber1").item(0) != null && eElement.getElementsByTagName("phoneNumber1").item(0).getTextContent() != null && !eElement.getElementsByTagName("phoneNumber1").item(0).getTextContent().isEmpty()) {
+
 						telefono1 = eElement.getElementsByTagName("phoneNumber1").item(0).getTextContent()
-						datosRegistro.telefono1 = telefono1
+
+						if (telefono1 != null && !telefono1.isEmpty() && (telefono1.startsWith("0039") || telefono1.startsWith("+39"))) {
+							datosRegistro.telefono1 = telefono1
+						} else if (telefono1 != null && !telefono1.isEmpty()){
+							datosRegistro.telefono1 = "0039" + telefono1
+						} else {
+							datosRegistro.telefono1 = null
+						}
 					}
 
 					if (eElement.getElementsByTagName("phoneNumber2").item(0) != null && eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent() != null && !eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent().isEmpty()) {
+
 						telefono2 = eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent()
-						datosRegistro.telefono2 = telefono2
+
+						if (telefono2 != null && !telefono2.isEmpty() && (telefono2.startsWith("0039") || telefono2.startsWith("+39"))) {
+							datosRegistro.telefono2 = telefono2
+						} else if (telefono2 != null && !telefono2.isEmpty()){
+							datosRegistro.telefono2 = "0039" + telefono2
+						} else {
+							datosRegistro.telefono2 = null
+						}
 					}
 
 					if (eElement.getElementsByTagName("mobileNumber").item(0) != null && eElement.getElementsByTagName("mobileNumber").item(0).getTextContent() != null && !eElement.getElementsByTagName("mobileNumber").item(0).getTextContent().isEmpty()) {
+
 						telefonoMovil = eElement.getElementsByTagName("mobileNumber").item(0).getTextContent()
-						datosRegistro.telefono3 = telefonoMovil
+
 					}
 
+					if (telefonoMovil != null && !telefonoMovil.isEmpty()) {
+						datosRegistro.telefono1 = telefonoMovil
+					}
 
 					if (datosRegistro.telefono1 == null || datosRegistro.telefono1.isEmpty()){
 						if (datosRegistro.telefono3 != null && !datosRegistro.telefono3.isEmpty()){
