@@ -13,8 +13,11 @@ import org.grails.cxf.utils.GrailsCxfEndpoint
 import org.grails.cxf.utils.GrailsCxfEndpointProperty
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.context.request.RequestContextHolder
+import servicios.Documentacion
 import servicios.RespuestaCRMInforme
 import com.scortelemed.Operacion
+import servicios.TipoEstadoExpediente
+
 import java.text.SimpleDateFormat
 import javax.jws.WebParam
 import javax.jws.WebResult
@@ -25,6 +28,7 @@ import com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCaseManagementRequest
 import com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCaseManagementResponse
 import com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCasesResultsRequest
 import com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCasesResultsResponse
+import com.scor.global.ZipUtils
 
 
 
@@ -218,6 +222,8 @@ class CbpitaUnderwrittingCaseManagementService	 {
 		String message = null
 		StatusType status = null
 		int code = 0
+        ZipUtils zipUtils = new ZipUtils()
+        boolean audioEncontrado = false;
 
 		CbpitaUnderwrittingCasesResultsResponse resultado = new CbpitaUnderwrittingCasesResultsResponse()
 
@@ -239,11 +245,18 @@ class CbpitaUnderwrittingCaseManagementService	 {
 
 						requestService.crear(opername, requestXML)
 
+						Calendar calendarIni = Calendar.getInstance();
 						Date date = cbpitaUnderwrittingCasesResultsRequest.dateStart.toGregorianCalendar().getTime()
+						calendarIni.setTime(date)
+						calendarIni.add(Calendar.HOUR, -1)
 						SimpleDateFormat sdfr = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
-						String fechaIni = sdfr.format(date);
+						String fechaIni = sdfr.format(calendarIni.getTime());
+
+						Calendar calendarFin = Calendar.getInstance();
 						date = cbpitaUnderwrittingCasesResultsRequest.dateEnd.toGregorianCalendar().getTime()
-						String fechaFin = sdfr.format(date);
+						calendarFin.setTime(date)
+						calendarFin.add(Calendar.HOUR, -1)
+						String fechaFin = sdfr.format(calendarFin.getTime());
 
 
 						for (int i = 1; i < 3; i++) {
@@ -256,7 +269,42 @@ class CbpitaUnderwrittingCaseManagementService	 {
 
 							expedientes.each { expedientePoliza ->
 
-								resultado.getExpediente().add(cbpitaService.rellenaDatosSalidaConsulta(expedientePoliza, "CBP", cbpitaUnderwrittingCasesResultsRequest.dateStart, Conf.findByName("rutaFicheroZip")?.value, Conf.findByName("usuarioZip")?.value, Conf.findByName("passwordZip")?.value))
+								if (!expedientePoliza.getCodigoEstado().toString().equals("ANULADO")){
+
+								List<Documentacion> listaDocumentosAudio = new ArrayList<Documentacion>()
+                                audioEncontrado = false;
+
+                                listaDocumentosAudio = zipUtils.obtenerAudios(expedientePoliza, null);
+
+                                if (listaDocumentosAudio != null && listaDocumentosAudio.size() > 0) {
+
+                                    for (int i = 0; i < listaDocumentosAudio.size(); i++) {
+                                        if (listaDocumentosAudio.get(i).getNombre().contains("TUW realizzata")) {
+                                            audioEncontrado = true;
+                                        }
+                                    }
+                                }
+
+                                if (audioEncontrado) {
+
+                                    resultado.getExpediente().add(cbpitaService.rellenaDatosSalidaConsulta(expedientePoliza, "CBP", cbpitaUnderwrittingCasesResultsRequest.dateStart, Conf.findByName("rutaFicheroZip")?.value, Conf.findByName("usuarioZip")?.value, Conf.findByName("passwordZip")?.value))
+                                    cbpitaService.insertarEnvio(company, cbpitaUnderwrittingCasesResultsRequest.dateStart.toString().substring(0, 10) + "-" + cbpitaUnderwrittingCasesResultsRequest.dateEnd.toString().substring(0, 10), "ST:"+expedientePoliza.getCodigoST()+ "#CIA:"+expedientePoliza.getNumSolicitud())
+                                    logginService.putInfoEndpoint("ResultadoReconocimientoMedico", "Expediente  con codigo ST: " + expedientePoliza.getCodigoST() + " y codigo cia: " + expedientePoliza.getNumSolicitud() + " para la cia: " + company.nombre + " se ha enviado correctamente");
+
+                                } else{
+
+                                    logginService.putInfoEndpoint("ResultadoReconocimientoMedico", "No se han encontardo audio necesarios para completar ZIP para " + company.nombre + " con expediente " + expedientePoliza.getCodigoST())
+                                    cbpitaService.insertarError(company, cbpitaUnderwrittingCasesResultsRequest.dateStart.toString().substring(0,10) + "-" + cbpitaUnderwrittingCasesResultsRequest.dateEnd.toString().substring(0,10), requestXML.toString(), "CONSULTA", "No se han encontardo audio necesarios para completar ZIP para " + company.nombre + " con expediente " + expedientePoliza.getCodigoST())
+                                    correoUtil.envioEmailNoTratados("Error en generacion de zip " + company.nombre ,"El expediente : " + expedientePoliza.getCodigoST() + " no se ha enviado porque no tiene el audio requerido")
+
+                                }
+
+                            } else {
+
+									resultado.getExpediente().add(cbpitaService.rellenaDatosSalidaConsulta(expedientePoliza, "CBP", cbpitaUnderwrittingCasesResultsRequest.dateStart, Conf.findByName("rutaFicheroZip")?.value, Conf.findByName("usuarioZip")?.value, Conf.findByName("passwordZip")?.value))
+									cbpitaService.insertarEnvio(company, cbpitaUnderwrittingCasesResultsRequest.dateStart.toString().substring(0, 10) + "-" + cbpitaUnderwrittingCasesResultsRequest.dateEnd.toString().substring(0, 10), "ST:"+expedientePoliza.getCodigoST()+ "#CIA:"+expedientePoliza.getNumSolicitud())
+									logginService.putInfoEndpoint("ResultadoReconocimientoMedico", "Expediente  con codigo ST: " + expedientePoliza.getCodigoST() + " y codigo cia: " + expedientePoliza.getNumSolicitud() + " para la cia: " + company.nombre + " se ha enviado correctamente sin zip porque esta ANULADO");
+								}
 							}
 
 							message = "Risultati restituiti"
