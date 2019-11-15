@@ -270,13 +270,13 @@ class MethislabService {
 					datosRegistro.codigoProducto = "SRP"
 
 
-					if (eElement.getElementsByTagName("productCode").item(0) != null) {
-						datosRegistro.codigoProducto = eElement.getElementsByTagName("productCode").item(0).getTextContent()
-					}
+					//if (eElement.getElementsByTagName("productCode").item(0) != null) {
+						datosRegistro.codigoProducto = "EUROVITAPEN"
+					//}
 
 					/**NOMBRE DE CANDIDATO
-					 *
-					 */
+                    *
+                    */
 
 					if (eElement.getElementsByTagName("name").item(0) != null) {
 						datosRegistro.nombreCliente = eElement.getElementsByTagName("name").item(0).getTextContent()
@@ -348,28 +348,51 @@ class MethislabService {
 					}
 
 					/**TELEFONOS
-					 * 
-					 */
-
-					/**TELEFONOS
-					 * 
 					 */
 
 					if (eElement.getElementsByTagName("phoneNumber1").item(0) != null && eElement.getElementsByTagName("phoneNumber1").item(0).getTextContent() != null && !eElement.getElementsByTagName("phoneNumber1").item(0).getTextContent().isEmpty()) {
+
 						telefono1 = eElement.getElementsByTagName("phoneNumber1").item(0).getTextContent()
-						datosRegistro.telefono1 = telefono1
+
+						if (telefono1 != null && !telefono1.isEmpty() && (telefono1.startsWith("0039") || telefono1.startsWith("+39"))) {
+							datosRegistro.telefono1 = telefono1
+						} else if (telefono1 != null && !telefono1.isEmpty()){
+							datosRegistro.telefono1 = "0039" + telefono1
+						} else {
+							datosRegistro.telefono1 = null
+						}
 					}
 
 					if (eElement.getElementsByTagName("phoneNumber2").item(0) != null && eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent() != null && !eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent().isEmpty()) {
+
 						telefono2 = eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent()
-						datosRegistro.telefono2 = telefono2
+
+						if (telefono2 != null && !telefono2.isEmpty() && (telefono2.startsWith("0039") || telefono2.startsWith("+39"))) {
+							datosRegistro.telefono2 = telefono2
+						} else if (telefono2 != null && !telefono2.isEmpty()){
+							datosRegistro.telefono2 = "0039" + telefono2
+						} else {
+							datosRegistro.telefono2 = null
+						}
 					}
 
-					if (eElement.getElementsByTagName("mobileNumber").item(0) != null && eElement.getElementsByTagName("mobileNumber").item(0).getTextContent() != null && !eElement.getElementsByTagName("mobileNumber").item(0).getTextContent().isEmpty()) {
+					if (eElement.getElementsByTagName("mobileNumber").item(0) != null) {
+
 						telefonoMovil = eElement.getElementsByTagName("mobileNumber").item(0).getTextContent()
-						datosRegistro.telefono3 = telefonoMovil
+
+						if (telefonoMovil != null && !telefonoMovil.isEmpty() && (telefonoMovil.startsWith("0039") || telefonoMovil.startsWith("+39"))) {
+							telefonoMovil = telefonoMovil
+						} else if (telefonoMovil != null && !telefonoMovil.isEmpty()){
+							telefonoMovil = "0039" + telefonoMovil
+						} else {
+							telefonoMovil = null
+						}
 					}
-					
+
+					if (telefonoMovil != null && !telefonoMovil.isEmpty()) {
+						datosRegistro.telefono1 = telefonoMovil
+					}
+
 					if (datosRegistro.telefono1 == null || datosRegistro.telefono1.isEmpty()){
 						if (datosRegistro.telefono3 != null && !datosRegistro.telefono3.isEmpty()){
 							datosRegistro.telefono1 = datosRegistro.telefono3
@@ -464,23 +487,19 @@ class MethislabService {
 					 *
 					 */
 
-					if (eElement.getElementsByTagName("fiscalIdentificationNumber").item(0) != null) {
-						datosRegistro.codigoAgencia = eElement.getElementsByTagName("fiscalIdentificationNumber").item(0).getTextContent()
-					}
+					if (eElement.getElementsByTagName("agent").item(0) != null) {
 
-					/**NOMBRE DE AGENTE
-					 *
-					 */
-					if (eElement.getElementsByTagName("name").item(0) != null) {
-						nombreAgente = eElement.getElementsByTagName("name").item(0).getTextContent()
-					}
+						if (eElement.getElementsByTagName("agent").item(0).getTextContent().toString().length() > 20) {
+							datosRegistro.codigoAgencia = eElement.getElementsByTagName("agent").item(0).getTextContent().substring(0, 19)
+						} else {
+							datosRegistro.codigoAgencia = eElement.getElementsByTagName("agent").item(0).getTextContent()
+						}
 
-					if (eElement.getElementsByTagName("surname1").item(0) != null) {
-						nombreAgente = nombreAgente + " " + eElement.getElementsByTagName("surname1").item(0).getTextContent()
-					}
+						datosRegistro.nomApellAgente = eElement.getElementsByTagName("agent").item(0).getTextContent()
+					} else {
 
-					if (eElement.getElementsByTagName("surname2").item(0) != null) {
-						nombreAgente = nombreAgente + " " + eElement.getElementsByTagName("surname2").item(0).getTextContent()
+						datosRegistro.codigoAgencia = "."
+						datosRegistro.nomApellAgente = "."
 					}
 
 					datosRegistro.nomApellAgente = nombreAgente

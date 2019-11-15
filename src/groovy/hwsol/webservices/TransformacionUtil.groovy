@@ -1341,6 +1341,8 @@ class TransformacionUtil {
 			return BenefictNameType.DISABILITY_30
 		} else if (codigo.equals("COB2")) {
 			return BenefictNameType.ACCIDENTAL_DEAD
+		} else if (codigo.equals("COB1")) {
+			return BenefictNameType.DEPENDENCY
 		} else {
 			return null
 		}

@@ -310,7 +310,7 @@ class CaserService {
 			DATOS dato = new DATOS()
 
 			dato.registro = rellenaDatos(req, company)
-			dato.pregunta = rellenaPreguntas(req, company.nombre)
+			//dato.pregunta = rellenaPreguntas(req, company.nombre)
 			dato.servicio = rellenaServicios(req, company.nombre)
 			dato.coberturas = rellenaCoberturas(req)
 
@@ -363,7 +363,12 @@ class CaserService {
 
 
 					if (eElement.getElementsByTagName("productCode").item(0) != null) {
-						productCia = datosRegistro.nombreCliente = eElement.getElementsByTagName("productCode").item(0).getTextContent()
+						if (eElement.getElementsByTagName("productCode").item(0).getTextContent().toString().equals("1190")) {
+							datosRegistro.codigoProducto = "SRP"
+						} else {
+							//datosRegistro.codigoProducto = "5441" //REAL
+							datosRegistro.codigoProducto = "3635" //PREPRO
+						}
 					}
 
 					/**NOMBRE DE CANDIDATO
@@ -482,6 +487,19 @@ class CaserService {
 						datosRegistro.fechaNacimiento = formato.format(util.fromStringToXmlCalendar(eElement.getElementsByTagName("birthDate").item(0).getTextContent()).toGregorianCalendar().getTime())
 					} else {
 						datosRegistro.fechaNacimiento = formato.format(util.fromStringToXmlCalendar("2017-01-01T00:00:00").toGregorianCalendar().getTime())
+					}
+
+					/**EDAD ACTUARIAL
+					 *
+					 */
+					if (eElement.getElementsByTagName("actuarialAge").item(0) != null && !eElement.getElementsByTagName("actuarialAge").item(0).getTextContent().isEmpty()) {
+
+						datosRegistro.edadActuarial = Integer.parseInt(eElement.getElementsByTagName("actuarialAge").item(0).getTextContent())
+
+					} else {
+
+						datosRegistro.edadActuarial = util.calcularEdadActuarial(util.fromStringToXmlCalendar(eElement.getElementsByTagName("birthDate").item(0).getTextContent()).toGregorianCalendar())
+
 					}
 
 					/**ESTADO CIVIL
@@ -728,6 +746,7 @@ class CaserService {
 
 		def listadoCoberturas = []
 		def capital
+		String codigoProducto
 
 		try {
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
@@ -738,6 +757,38 @@ class CaserService {
 			Document doc = builder.parse(is)
 
 			doc.getDocumentElement().normalize()
+
+			/**Primero tenemos que saber que producto nos llega para actuar en consecuencia
+			 *
+			 */
+
+			NodeList nListP = doc.getElementsByTagName("CandidateInformation")
+
+			for (int tempP = 0; tempP < nListP.getLength(); tempP++) {
+
+				Node nNode = nListP.item(tempP)
+
+				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+
+					Element eElement = (Element) nNode;
+
+					/**NUMERO DE PRODUCTO
+					 *                    */
+
+					if (eElement.getElementsByTagName("productCode").item(0) != null) {
+						if (eElement.getElementsByTagName("productCode").item(0).getTextContent().toString().equals("1190")) {
+							codigoProducto = "SRP"
+						} else {
+							//datosRegistro.codigoProducto = "5441" //REAL
+							codigoProducto = "3635" //PREPRO
+						}
+					}
+				}
+			}
+
+			/**Calculamos las coberturaqs en base al producto
+			 *
+			 */
 
 			NodeList nList = doc.getElementsByTagName("BenefitsType")
 
@@ -764,26 +815,31 @@ class CaserService {
 					capital = Float.parseFloat(eElement.getElementsByTagName("benefictCapital").item(0).getTextContent())
 				}
 			}
-			DATOS.Coberturas cobertura_1 = new DATOS.Coberturas()
 
-			cobertura_1.filler = ""
-			cobertura_1.codigoCobertura = "COB2"
-			cobertura_1.nombreCobertura = "ACCIDENTE"
-			cobertura_1.capital = capital
+			if (codigoProducto.equals("SRP")) {
 
-			listadoCoberturas.add(cobertura_1)
+				DATOS.Coberturas cobertura_1 = new DATOS.Coberturas()
 
-			DATOS.Coberturas cobertura_2 = new DATOS.Coberturas()
+				cobertura_1.filler = ""
+				cobertura_1.codigoCobertura = "COB2"
+				cobertura_1.nombreCobertura = "ACCIDENTE"
+				cobertura_1.capital = capital
 
-			cobertura_2.filler = ""
-			cobertura_2.codigoCobertura = "COB4"
-			cobertura_2.nombreCobertura = "INVALIDEZ"
-			cobertura_2.capital = capital
+				listadoCoberturas.add(cobertura_1)
 
-			listadoCoberturas.add(cobertura_2)
+				DATOS.Coberturas cobertura_2 = new DATOS.Coberturas()
+
+				cobertura_2.filler = ""
+				cobertura_2.codigoCobertura = "COB4"
+				cobertura_2.nombreCobertura = "INVALIDEZ"
+				cobertura_2.capital = capital
+
+				listadoCoberturas.add(cobertura_2)
+			}
 
 
 			return listadoCoberturas
+
 		} catch (Exception e) {
 			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
 		}

@@ -131,7 +131,7 @@ class EnginyersService {
 			DATOS dato = new DATOS()
 
 			dato.registro = rellenaDatos(req, company)
-			dato.servicio = rellenaServicios(req, company.nombre)
+			//dato.servicio = rellenaServicios(req, company.nombre)
 			dato.coberturas = rellenaCoberturas(req)
 
 			return dato
@@ -375,16 +375,15 @@ class EnginyersService {
 					 *
 					 */
 
-					datosRegistro.codigoProducto = "SRP"
+					if (existeDependencia(req)){
+						datosRegistro.codigoProducto = "DEPENDENCIA"
+					}
 
-					if (Environment.current.name.equals("production_wildfly")) {
-
-						datosRegistro.codigoProducto = "PENGINYERS"
-
-					} else {
-
+					if (existeVida(req)){
 						datosRegistro.codigoProducto = "PENGINYERS"
 					}
+
+
 					/**NOMBRE DE CANDIDATO
 					 *
 					 */
@@ -868,5 +867,77 @@ class EnginyersService {
 		} catch (Exception e) {
 			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
 		}
+	}
+
+	private boolean existeDependencia (req){
+
+		try {
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
+			DocumentBuilder builder = factory.newDocumentBuilder()
+
+			InputSource is = new InputSource(new StringReader(req.request))
+			is.setEncoding("UTF-8")
+			Document doc = builder.parse(is)
+
+			doc.getDocumentElement().normalize()
+
+			NodeList nList = doc.getElementsByTagName("riskTypeElement")
+
+			for (int temp = 0; temp < nList.getLength(); temp++) {
+
+				Node nNode = nList.item(temp)
+
+				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+
+					Element eElement = (Element) nNode;
+
+     				if (eElement.getElementsByTagName("idRisk").item(0).getTextContent().toString().equals("1") || eElement.getElementsByTagName("idRisk").item(0).getTextContent().toString().equals("453")){
+						return true
+					}
+				}
+			}
+
+		} catch (Exception e) {
+			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+		}
+
+		return false
+
+	}
+
+	private boolean existeVida (req){
+
+		try {
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
+			DocumentBuilder builder = factory.newDocumentBuilder()
+
+			InputSource is = new InputSource(new StringReader(req.request))
+			is.setEncoding("UTF-8")
+			Document doc = builder.parse(is)
+
+			doc.getDocumentElement().normalize()
+
+			NodeList nList = doc.getElementsByTagName("riskTypeElement")
+
+			for (int temp = 0; temp < nList.getLength(); temp++) {
+
+				Node nNode = nList.item(temp)
+
+				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+
+					Element eElement = (Element) nNode;
+
+					if (eElement.getElementsByTagName("idRisk").item(0).getTextContent().toString().equals("432") || eElement.getElementsByTagName("idRisk").item(0).getTextContent().toString().equals("449")){
+						return true
+					}
+				}
+			}
+
+		} catch (Exception e) {
+			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+		}
+
+		return false
+
 	}
 }

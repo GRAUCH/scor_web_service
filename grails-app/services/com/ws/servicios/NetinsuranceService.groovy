@@ -1,6 +1,7 @@
 package com.ws.servicios
 
 import com.scor.comprimirdocumentos.ParametrosEntrada
+import com.scortelemed.Agente
 import com.scortelemed.servicios.Candidato
 import com.scortelemed.servicios.FrontalServiceLocator
 import com.scortelemed.servicios.Frontal
@@ -560,6 +561,14 @@ class NetinsuranceService {
 
 						telefonoMovil = eElement.getElementsByTagName("mobileNumber").item(0).getTextContent()
 
+                        if (telefonoMovil != null && !telefonoMovil.isEmpty() && (telefonoMovil.startsWith("0039") || telefonoMovil.startsWith("+39"))) {
+                            telefonoMovil = telefonoMovil
+                        } else if (telefonoMovil != null && !telefonoMovil.isEmpty()){
+                            telefonoMovil = "0039" + telefonoMovil
+                        } else {
+                            telefonoMovil = null
+                        }
+
 					}
 
 					if (telefonoMovil != null && !telefonoMovil.isEmpty()) {
@@ -660,15 +669,26 @@ class NetinsuranceService {
 					 *
 					 */
 
-					if (eElement.getElementsByTagName("agency").item(0) != null) {
+					if (eElement.getElementsByTagName("agency").item(0) != null && !eElement.getElementsByTagName("agency").item(0).getTextContent().isEmpty()) {
 
-						if (eElement.getElementsByTagName("agency").item(0).getTextContent().toString().length() > 20) {
-							datosRegistro.codigoAgencia = eElement.getElementsByTagName("agency").item(0).getTextContent().substring(0, 19)
+						Agente instituto = Agente.findByValor(eElement.getElementsByTagName("agency").item(0).getTextContent().toString())
+
+						if (instituto != null && instituto.getAgente() != null && !instituto.getAgente().isEmpty()) {
+
+							if (instituto.getAgente().length() > 20) {
+								datosRegistro.codigoAgencia = instituto.getAgente().substring(0, 19)
+							} else {
+								datosRegistro.codigoAgencia = instituto.getAgente()
+							}
+
+							datosRegistro.nomApellAgente = instituto.getAgente()
+
 						} else {
-							datosRegistro.codigoAgencia = eElement.getElementsByTagName("agency").item(0).getTextContent()
+
+							datosRegistro.codigoAgencia = eElement.getElementsByTagName("agency").item(0).getTextContent().toString()
+							datosRegistro.nomApellAgente = eElement.getElementsByTagName("agency").item(0).getTextContent().toString()
 						}
 
-						datosRegistro.nomApellAgente = eElement.getElementsByTagName("agency").item(0).getTextContent()
 					} else {
 
 						datosRegistro.codigoAgencia = "."

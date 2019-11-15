@@ -384,7 +384,16 @@ class CbpitaService {
                     }
 
 					if (eElement.getElementsByTagName("mobileNumber").item(0) != null) {
-						telefonoMovil = eElement.getElementsByTagName("mobileNumber").item(0).getTextContent()
+
+                        telefonoMovil = eElement.getElementsByTagName("mobileNumber").item(0).getTextContent()
+
+                        if (telefonoMovil != null && !telefonoMovil.isEmpty() && (telefonoMovil.startsWith("0039") || telefonoMovil.startsWith("+39"))) {
+                            telefonoMovil = telefonoMovil
+                        } else if (telefonoMovil != null && !telefonoMovil.isEmpty()){
+                            telefonoMovil = "0039" + telefonoMovil
+                        } else {
+                            telefonoMovil = null
+                        }
 					}
 
 					if (telefonoMovil != null && !telefonoMovil.isEmpty()) {
