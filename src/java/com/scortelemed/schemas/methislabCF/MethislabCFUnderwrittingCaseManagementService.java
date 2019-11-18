@@ -16,25 +16,25 @@ import javax.xml.bind.annotation.XmlSeeAlso;
  * 
  */
 
-@WebService(targetNamespace = "http://www.scortelemed.com/schemas/methislab", name = "MethislabCFUnderwrittingCaseManagementService")
+@WebService(targetNamespace = "http://www.scortelemed.com/schemas/methislabCF", name = "MethislabCFUnderwrittingCaseManagementService")
 @XmlSeeAlso({ObjectFactory.class})
 @SOAPBinding(parameterStyle = ParameterStyle.BARE)
 
 public interface MethislabCFUnderwrittingCaseManagementService {
 
     @SOAPBinding(parameterStyle = ParameterStyle.BARE)
-    @WebResult(name = "CaseManagementResultsResponse", targetNamespace = "http://www.scortelemed.com/schemas/methislab", partName = "CaseManagementResultsResponse")
+    @WebResult(name = "CaseManagementResultsResponse", targetNamespace = "http://www.scortelemed.com/schemas/methislabCF", partName = "CaseManagementResultsResponse")
     @WebMethod
-    public MethislabCFUnderwrittingCasesResultsResponse methislabUnderwrittingCasesResults(
-            @WebParam(partName = "CaseManagementResultsRequest", name = "CaseManagementResultsRequest", targetNamespace = "http://www.scortelemed.com/schemas/methislab")
+    public MethislabCFUnderwrittingCasesResultsResponse methislabCFUnderwrittingCasesResults(
+            @WebParam(partName = "CaseManagementResultsRequest", name = "CaseManagementResultsRequest", targetNamespace = "http://www.scortelemed.com/schemas/methislabCF")
                     MethislabCFUnderwrittingCasesResultsRequest caseManagementResultsRequest
     );
 
     @SOAPBinding(parameterStyle = ParameterStyle.BARE)
-    @WebResult(name = "CaseManagementResponse", targetNamespace = "http://www.scortelemed.com/schemas/methislab", partName = "CaseManagementResponse")
+    @WebResult(name = "CaseManagementResponse", targetNamespace = "http://www.scortelemed.com/schemas/methislabCF", partName = "CaseManagementResponse")
     @WebMethod
-    public MethislabCFUnderwrittingCaseManagementResponse methislabUnderwrittingCaseManagement(
-            @WebParam(partName = "CaseManagementRequest", name = "CaseManagementRequest", targetNamespace = "http://www.scortelemed.com/schemas/methislab")
+    public MethislabCFUnderwrittingCaseManagementResponse methislabCFUnderwrittingCaseManagement(
+            @WebParam(partName = "CaseManagementRequest", name = "CaseManagementRequest", targetNamespace = "http://www.scortelemed.com/schemas/methislabCF")
                     MethislabCFUnderwrittingCaseManagementRequest caseManagementRequest
     );
 }

@@ -9,8 +9,7 @@ import com.scortelemed.Company
 import com.scortelemed.Conf
 import com.scortelemed.Envio
 import com.scortelemed.Recibido
-import com.scortelemed.schemas.methislab.*
-import com.scortelemed.schemas.methislab.MethislabUnderwrittingCasesResultsResponse.Expediente
+import com.scortelemed.schemas.methislabCF.*
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.GenerarZip
 import hwsol.webservices.TransformacionUtil
@@ -42,7 +41,7 @@ class MethislabCFService {
 
 	public def rellenaDatosSalidaConsulta(expedientePoliza, requestDate, logginService) {
 
-		Expediente expediente = new Expediente()
+		MethislabCFUnderwrittingCasesResultsResponse.Expediente expediente = new Expediente()
 
 		expediente.setRequestDate(requestDate)
 		expediente.setRequestNumber(util.devolverDatos(expedientePoliza.getNumSolicitud()))
@@ -118,14 +117,14 @@ class MethislabCFService {
 			def root = null
 			QName qName = null
 
-			if (clase instanceof MethislabUnderwrittingCaseManagementRequest){
+			if (clase instanceof MethislabCFUnderwrittingCaseManagementRequest){
 				qName = new QName(nameSpace, "MethislabCFUnderwrittingCaseManagementRequest");
-				root = new JAXBElement<MethislabUnderwrittingCaseManagementRequest>(qName, MethislabUnderwrittingCaseManagementRequest.class, clase);
+				root = new JAXBElement<MethislabCFUnderwrittingCaseManagementRequest>(qName, MethislabCFUnderwrittingCaseManagementRequest.class, clase);
 			}
 
-			if (clase instanceof MethislabUnderwrittingCasesResultsRequest){
+			if (clase instanceof MethislabCFUnderwrittingCasesResultsRequest){
 				qName = new QName(nameSpace, "MethislabCFUnderwrittingCasesResultsRequest");
-				root = new JAXBElement<MethislabUnderwrittingCasesResultsRequest>(qName, MethislabUnderwrittingCasesResultsRequest.class, clase);
+				root = new JAXBElement<MethislabCFUnderwrittingCasesResultsRequest>(qName, MethislabCFUnderwrittingCasesResultsRequest.class, clase);
 			}
 
 			jaxbMarshaller.marshal(root, writer);
@@ -162,7 +161,7 @@ class MethislabCFService {
 
 			return salida
 		} catch (Exception e) {
-			logginService.putError("obtenerInformeExpedientes de Methislab","No se ha podido obtener el informe de expediente : " + e)
+			logginService.putError("obtenerInformeExpedientes de MethislabFC","No se ha podido obtener el informe de expediente : " + e)
 			return null
 		}
 	}

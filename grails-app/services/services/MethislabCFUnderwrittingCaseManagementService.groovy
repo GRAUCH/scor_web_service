@@ -23,7 +23,7 @@ import java.text.SimpleDateFormat
 
 @WebService(targetNamespace = "http://www.scortelemed.com/schemas/methislabCF")
 @SchemaValidation
-@GrailsCxfEndpoint(address='/methislabcf/MethislabCFUnderwrittingCaseManagement',
+@GrailsCxfEndpoint(address='/methislabCF/MethislabCFUnderwrittingCaseManagement',
 expose = EndpointType.JAX_WS,properties = [@GrailsCxfEndpointProperty(name = "ws-security.enable.nonce.cache", value = "false"), @GrailsCxfEndpointProperty(name = "ws-security.enable.timestamp.cache", value = "false")])
 @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
 class MethislabCFUnderwrittingCaseManagementService {

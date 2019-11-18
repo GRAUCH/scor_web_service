@@ -20,7 +20,7 @@ import java.net.URL;
 
 public final class MethislabCFUnderwrittingCaseManagementService_MethislabCFUnderwrittingCaseManagementServicePort_Client {
 
-    private static final QName SERVICE_NAME = new QName("http://www.scortelemed.com/schemas/methislab", "MethislabCFUnderwrittingCaseManagementServiceService");
+    private static final QName SERVICE_NAME = new QName("http://www.scortelemed.com/schemas/methislabCF", "MethislabCFUnderwrittingCaseManagementServiceService");
 
     private MethislabCFUnderwrittingCaseManagementService_MethislabCFUnderwrittingCaseManagementServicePort_Client() {
     }
@@ -45,75 +45,75 @@ public final class MethislabCFUnderwrittingCaseManagementService_MethislabCFUnde
         
         {
         System.out.println("Invoking methislabUnderwrittingCasesResults...");
-        MethislabCFUnderwrittingCasesResultsRequest _methislabUnderwrittingCasesResults_caseManagementResultsRequest = new MethislabCFUnderwrittingCasesResultsRequest();
-        _methislabUnderwrittingCasesResults_caseManagementResultsRequest.setDateStart(javax.xml.datatype.DatatypeFactory.newInstance().newXMLGregorianCalendar("2018-08-07T14:17:46.936+02:00"));
-        _methislabUnderwrittingCasesResults_caseManagementResultsRequest.setDateEnd(javax.xml.datatype.DatatypeFactory.newInstance().newXMLGregorianCalendar("2018-08-07T14:17:46.937+02:00"));
-        MethislabCFUnderwrittingCasesResultsResponse _methislabUnderwrittingCasesResults__return = port.methislabUnderwrittingCasesResults(_methislabUnderwrittingCasesResults_caseManagementResultsRequest);
-        System.out.println("methislabUnderwrittingCasesResults.result=" + _methislabUnderwrittingCasesResults__return);
+        MethislabCFUnderwrittingCasesResultsRequest _methislabCFUnderwrittingCasesResults_caseManagementResultsRequest = new MethislabCFUnderwrittingCasesResultsRequest();
+            _methislabCFUnderwrittingCasesResults_caseManagementResultsRequest.setDateStart(javax.xml.datatype.DatatypeFactory.newInstance().newXMLGregorianCalendar("2018-08-07T14:17:46.936+02:00"));
+            _methislabCFUnderwrittingCasesResults_caseManagementResultsRequest.setDateEnd(javax.xml.datatype.DatatypeFactory.newInstance().newXMLGregorianCalendar("2018-08-07T14:17:46.937+02:00"));
+        MethislabCFUnderwrittingCasesResultsResponse _methislabCFUnderwrittingCasesResults__return = port.methislabCFUnderwrittingCasesResults(_methislabCFUnderwrittingCasesResults_caseManagementResultsRequest);
+        System.out.println("methislabCFUnderwrittingCasesResults.result=" + _methislabCFUnderwrittingCasesResults__return);
 
 
         }
         {
-        System.out.println("Invoking methislabUnderwrittingCaseManagement...");
-        MethislabCFUnderwrittingCaseManagementRequest _methislabUnderwrittingCaseManagement_caseManagementRequest = new MethislabCFUnderwrittingCaseManagementRequest();
-        MethislabCFUnderwrittingCaseManagementRequest.CandidateInformation _methislabUnderwrittingCaseManagement_caseManagementRequestCandidateInformation = new MethislabCFUnderwrittingCaseManagementRequest.CandidateInformation();
-        _methislabUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setProductCode("ProductCode552966720");
-        _methislabUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setRequestNumber("RequestNumber536419523");
-        _methislabUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setPolicyNumber("PolicyNumber-1045213038");
-        _methislabUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setCertificateNumber("CertificateNumber-1740352435");
-        _methislabUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setRequestDate("RequestDate1412071139");
-        _methislabUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setPassword("Password-876213241");
-        _methislabUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setRequestState("RequestState868115282");
-        _methislabUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setName("Name563299164");
-        _methislabUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setSurname("Surname1385370235");
-        _methislabUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setAddress("Address49061535");
-        _methislabUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setPostalCode("PostalCode161684724");
-        _methislabUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setCity("City1866067532");
-        _methislabUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setProvince("Province-1089269968");
-        _methislabUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setCountry("Country-1194770840");
-        _methislabUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setPhoneNumber1("PhoneNumber1885781441");
-        _methislabUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setPhoneNumber2("PhoneNumber2200399811");
-        _methislabUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setMobileNumber("MobileNumber397231642");
-        _methislabUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setEmail("Email447882798");
-        _methislabUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setBirthDate("BirthDate-610200519");
-        _methislabUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setActuarialAge("ActuarialAge126661083");
-        _methislabUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setBirthCity("BirthCity1638561763");
-        _methislabUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setFiscalIdentificationNumber("FiscalIdentificationNumber-1303054459");
-        _methislabUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setAgency("Agency124626008");
-        _methislabUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setAgent("Agent-156175851");
-        _methislabUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setAgentPhone("AgentPhone2059572138");
-        _methislabUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setAgentEmail("AgentEmail-1258858024");
-        GenderType _methislabUnderwrittingCaseManagement_caseManagementRequestCandidateInformationGender = GenderType.H;
-        _methislabUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setGender(_methislabUnderwrittingCaseManagement_caseManagementRequestCandidateInformationGender);
-        CivilStateType _methislabUnderwrittingCaseManagement_caseManagementRequestCandidateInformationCivilState = CivilStateType.P;
-        _methislabUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setCivilState(_methislabUnderwrittingCaseManagement_caseManagementRequestCandidateInformationCivilState);
-        _methislabUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setCustomerType("CustomerType-1772060630");
-        ContactTimeType _methislabUnderwrittingCaseManagement_caseManagementRequestCandidateInformationContactTime = ContactTimeType.N;
-        _methislabUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setContactTime(_methislabUnderwrittingCaseManagement_caseManagementRequestCandidateInformationContactTime);
-        _methislabUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setComments("Comments1091564609");
-        _methislabUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setEUWReferenceCode("EUWReferenceCode1019538029");
-        _methislabUnderwrittingCaseManagement_caseManagementRequest.setCandidateInformation(_methislabUnderwrittingCaseManagement_caseManagementRequestCandidateInformation);
-        java.util.List<MethislabCFUnderwrittingCaseManagementRequest.PreviousQuestions> _methislabUnderwrittingCaseManagement_caseManagementRequestPreviousQuestions = new java.util.ArrayList<MethislabCFUnderwrittingCaseManagementRequest.PreviousQuestions>();
+        System.out.println("Invoking methislabCFUnderwrittingCaseManagement...");
+        MethislabCFUnderwrittingCaseManagementRequest _methislabCFUnderwrittingCaseManagement_caseManagementRequest = new MethislabCFUnderwrittingCaseManagementRequest();
+        MethislabCFUnderwrittingCaseManagementRequest.CandidateInformation _methislabCFUnderwrittingCaseManagement_caseManagementRequestCandidateInformation = new MethislabCFUnderwrittingCaseManagementRequest.CandidateInformation();
+        _methislabCFUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setProductCode("ProductCode552966720");
+        _methislabCFUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setRequestNumber("RequestNumber536419523");
+        _methislabCFUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setPolicyNumber("PolicyNumber-1045213038");
+        _methislabCFUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setCertificateNumber("CertificateNumber-1740352435");
+        _methislabCFUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setRequestDate("RequestDate1412071139");
+        _methislabCFUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setPassword("Password-876213241");
+        _methislabCFUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setRequestState("RequestState868115282");
+        _methislabCFUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setName("Name563299164");
+        _methislabCFUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setSurname("Surname1385370235");
+        _methislabCFUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setAddress("Address49061535");
+        _methislabCFUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setPostalCode("PostalCode161684724");
+        _methislabCFUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setCity("City1866067532");
+        _methislabCFUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setProvince("Province-1089269968");
+        _methislabCFUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setCountry("Country-1194770840");
+        _methislabCFUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setPhoneNumber1("PhoneNumber1885781441");
+        _methislabCFUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setPhoneNumber2("PhoneNumber2200399811");
+        _methislabCFUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setMobileNumber("MobileNumber397231642");
+        _methislabCFUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setEmail("Email447882798");
+        _methislabCFUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setBirthDate("BirthDate-610200519");
+        _methislabCFUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setActuarialAge("ActuarialAge126661083");
+        _methislabCFUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setBirthCity("BirthCity1638561763");
+        _methislabCFUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setFiscalIdentificationNumber("FiscalIdentificationNumber-1303054459");
+        _methislabCFUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setAgency("Agency124626008");
+        _methislabCFUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setAgent("Agent-156175851");
+        _methislabCFUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setAgentPhone("AgentPhone2059572138");
+        _methislabCFUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setAgentEmail("AgentEmail-1258858024");
+        GenderType _methislabCFUnderwrittingCaseManagement_caseManagementRequestCandidateInformationGender = GenderType.H;
+        _methislabCFUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setGender(_methislabCFUnderwrittingCaseManagement_caseManagementRequestCandidateInformationGender);
+        CivilStateType _methislabCFUnderwrittingCaseManagement_caseManagementRequestCandidateInformationCivilState = CivilStateType.P;
+        _methislabCFUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setCivilState(_methislabCFUnderwrittingCaseManagement_caseManagementRequestCandidateInformationCivilState);
+        _methislabCFUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setCustomerType("CustomerType-1772060630");
+        ContactTimeType _methislabCFUnderwrittingCaseManagement_caseManagementRequestCandidateInformationContactTime = ContactTimeType.N;
+        _methislabCFUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setContactTime(_methislabCFUnderwrittingCaseManagement_caseManagementRequestCandidateInformationContactTime);
+        _methislabCFUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setComments("Comments1091564609");
+        _methislabCFUnderwrittingCaseManagement_caseManagementRequestCandidateInformation.setEUWReferenceCode("EUWReferenceCode1019538029");
+        _methislabCFUnderwrittingCaseManagement_caseManagementRequest.setCandidateInformation(_methislabCFUnderwrittingCaseManagement_caseManagementRequestCandidateInformation);
+        java.util.List<MethislabCFUnderwrittingCaseManagementRequest.PreviousQuestions> _methislabCFUnderwrittingCaseManagement_caseManagementRequestPreviousQuestions = new java.util.ArrayList<MethislabCFUnderwrittingCaseManagementRequest.PreviousQuestions>();
         MethislabCFUnderwrittingCaseManagementRequest.PreviousQuestions _methislabUnderwrittingCaseManagement_caseManagementRequestPreviousQuestionsVal1 = new MethislabCFUnderwrittingCaseManagementRequest.PreviousQuestions();
         QuestionDataType _methislabUnderwrittingCaseManagement_caseManagementRequestPreviousQuestionsVal1DataType = QuestionDataType.STRING;
         _methislabUnderwrittingCaseManagement_caseManagementRequestPreviousQuestionsVal1.setDataType(_methislabUnderwrittingCaseManagement_caseManagementRequestPreviousQuestionsVal1DataType);
         _methislabUnderwrittingCaseManagement_caseManagementRequestPreviousQuestionsVal1.setAnswerCode("AnswerCode1461610396");
         _methislabUnderwrittingCaseManagement_caseManagementRequestPreviousQuestionsVal1.setQuestion("Question1043150933");
         _methislabUnderwrittingCaseManagement_caseManagementRequestPreviousQuestionsVal1.setAnswer("Answer-1921605722");
-        _methislabUnderwrittingCaseManagement_caseManagementRequestPreviousQuestions.add(_methislabUnderwrittingCaseManagement_caseManagementRequestPreviousQuestionsVal1);
-        _methislabUnderwrittingCaseManagement_caseManagementRequest.getPreviousQuestions().addAll(_methislabUnderwrittingCaseManagement_caseManagementRequestPreviousQuestions);
+        _methislabCFUnderwrittingCaseManagement_caseManagementRequestPreviousQuestions.add(_methislabUnderwrittingCaseManagement_caseManagementRequestPreviousQuestionsVal1);
+        _methislabCFUnderwrittingCaseManagement_caseManagementRequest.getPreviousQuestions().addAll(_methislabCFUnderwrittingCaseManagement_caseManagementRequestPreviousQuestions);
         java.util.List<MethislabCFUnderwrittingCaseManagementRequest.Services> _methislabUnderwrittingCaseManagement_caseManagementRequestServices = new java.util.ArrayList<MethislabCFUnderwrittingCaseManagementRequest.Services>();
         MethislabCFUnderwrittingCaseManagementRequest.Services _methislabUnderwrittingCaseManagement_caseManagementRequestServicesVal1 = new MethislabCFUnderwrittingCaseManagementRequest.Services();
         _methislabUnderwrittingCaseManagement_caseManagementRequestServicesVal1.setServiceType("ServiceType-505537832");
         _methislabUnderwrittingCaseManagement_caseManagementRequestServicesVal1.setServiceCode("ServiceCode1225123926");
         _methislabUnderwrittingCaseManagement_caseManagementRequestServicesVal1.setServiceDescription("ServiceDescription-1312378644");
         _methislabUnderwrittingCaseManagement_caseManagementRequestServices.add(_methislabUnderwrittingCaseManagement_caseManagementRequestServicesVal1);
-        _methislabUnderwrittingCaseManagement_caseManagementRequest.getServices().addAll(_methislabUnderwrittingCaseManagement_caseManagementRequestServices);
-        BenefitsType _methislabUnderwrittingCaseManagement_caseManagementRequestBenefits = new BenefitsType();
-        BenefictNameType _methislabUnderwrittingCaseManagement_caseManagementRequestBenefitsBenefictName = BenefictNameType.DISABILITY_30_90;
-        _methislabUnderwrittingCaseManagement_caseManagementRequestBenefits.setBenefictName(_methislabUnderwrittingCaseManagement_caseManagementRequestBenefitsBenefictName);
-        _methislabUnderwrittingCaseManagement_caseManagementRequestBenefits.setBenefictCode("BenefictCode10198593");
-        _methislabUnderwrittingCaseManagement_caseManagementRequestBenefits.setBenefictCapital("BenefictCapital1499980682");
+        _methislabCFUnderwrittingCaseManagement_caseManagementRequest.getServices().addAll(_methislabUnderwrittingCaseManagement_caseManagementRequestServices);
+        BenefitsType _methislabCFUnderwrittingCaseManagement_caseManagementRequestBenefits = new BenefitsType();
+        BenefictNameType _methislabCFUnderwrittingCaseManagement_caseManagementRequestBenefitsBenefictName = BenefictNameType.DISABILITY_30_90;
+        _methislabCFUnderwrittingCaseManagement_caseManagementRequestBenefits.setBenefictName(_methislabCFUnderwrittingCaseManagement_caseManagementRequestBenefitsBenefictName);
+        _methislabCFUnderwrittingCaseManagement_caseManagementRequestBenefits.setBenefictCode("BenefictCode10198593");
+        _methislabCFUnderwrittingCaseManagement_caseManagementRequestBenefits.setBenefictCapital("BenefictCapital1499980682");
         BenefictResultType _methislabUnderwrittingCaseManagement_caseManagementRequestBenefitsBenefictResult = new BenefictResultType();
         _methislabUnderwrittingCaseManagement_caseManagementRequestBenefitsBenefictResult.setDescResult("DescResult-957302485");
         _methislabUnderwrittingCaseManagement_caseManagementRequestBenefitsBenefictResult.setResultCode("ResultCode1025243811");
@@ -121,20 +121,20 @@ public final class MethislabCFUnderwrittingCaseManagementService_MethislabCFUnde
         _methislabUnderwrittingCaseManagement_caseManagementRequestBenefitsBenefictResult.setCapitalLoading("CapitalLoading895265742");
         _methislabUnderwrittingCaseManagement_caseManagementRequestBenefitsBenefictResult.setDescPremiumLoading("DescPremiumLoading782695052");
         _methislabUnderwrittingCaseManagement_caseManagementRequestBenefitsBenefictResult.setDescCapitalLoading("DescCapitalLoading2119111401");
-        java.util.List<String> _methislabUnderwrittingCaseManagement_caseManagementRequestBenefitsBenefictResultTemporalLoading = new java.util.ArrayList<String>();
-        _methislabUnderwrittingCaseManagement_caseManagementRequestBenefitsBenefictResult.getTemporalLoading().addAll(_methislabUnderwrittingCaseManagement_caseManagementRequestBenefitsBenefictResultTemporalLoading);
-        java.util.List<String> _methislabUnderwrittingCaseManagement_caseManagementRequestBenefitsBenefictResultExclusions = new java.util.ArrayList<String>();
-        _methislabUnderwrittingCaseManagement_caseManagementRequestBenefitsBenefictResult.getExclusions().addAll(_methislabUnderwrittingCaseManagement_caseManagementRequestBenefitsBenefictResultExclusions);
-        java.util.List<String> _methislabUnderwrittingCaseManagement_caseManagementRequestBenefitsBenefictResultMedicalReports = new java.util.ArrayList<String>();
-        _methislabUnderwrittingCaseManagement_caseManagementRequestBenefitsBenefictResult.getMedicalReports().addAll(_methislabUnderwrittingCaseManagement_caseManagementRequestBenefitsBenefictResultMedicalReports);
-        java.util.List<String> _methislabUnderwrittingCaseManagement_caseManagementRequestBenefitsBenefictResultMedicalTest = new java.util.ArrayList<String>();
-        _methislabUnderwrittingCaseManagement_caseManagementRequestBenefitsBenefictResult.getMedicalTest().addAll(_methislabUnderwrittingCaseManagement_caseManagementRequestBenefitsBenefictResultMedicalTest);
-        java.util.List<String> _methislabUnderwrittingCaseManagement_caseManagementRequestBenefitsBenefictResultNotes = new java.util.ArrayList<String>();
-        _methislabUnderwrittingCaseManagement_caseManagementRequestBenefitsBenefictResult.getNotes().addAll(_methislabUnderwrittingCaseManagement_caseManagementRequestBenefitsBenefictResultNotes);
-        _methislabUnderwrittingCaseManagement_caseManagementRequestBenefits.setBenefictResult(_methislabUnderwrittingCaseManagement_caseManagementRequestBenefitsBenefictResult);
-        _methislabUnderwrittingCaseManagement_caseManagementRequest.setBenefits(_methislabUnderwrittingCaseManagement_caseManagementRequestBenefits);
-        MethislabCFUnderwrittingCaseManagementResponse _methislabUnderwrittingCaseManagement__return = port.methislabUnderwrittingCaseManagement(_methislabUnderwrittingCaseManagement_caseManagementRequest);
-        System.out.println("methislabUnderwrittingCaseManagement.result=" + _methislabUnderwrittingCaseManagement__return);
+        java.util.List<String> _methislabCFUnderwrittingCaseManagement_caseManagementRequestBenefitsBenefictResultTemporalLoading = new java.util.ArrayList<String>();
+        _methislabUnderwrittingCaseManagement_caseManagementRequestBenefitsBenefictResult.getTemporalLoading().addAll(_methislabCFUnderwrittingCaseManagement_caseManagementRequestBenefitsBenefictResultTemporalLoading);
+        java.util.List<String> _methislabCFUnderwrittingCaseManagement_caseManagementRequestBenefitsBenefictResultExclusions = new java.util.ArrayList<String>();
+        _methislabUnderwrittingCaseManagement_caseManagementRequestBenefitsBenefictResult.getExclusions().addAll(_methislabCFUnderwrittingCaseManagement_caseManagementRequestBenefitsBenefictResultExclusions);
+        java.util.List<String> _methislabCFUnderwrittingCaseManagement_caseManagementRequestBenefitsBenefictResultMedicalReports = new java.util.ArrayList<String>();
+        _methislabUnderwrittingCaseManagement_caseManagementRequestBenefitsBenefictResult.getMedicalReports().addAll(_methislabCFUnderwrittingCaseManagement_caseManagementRequestBenefitsBenefictResultMedicalReports);
+        java.util.List<String> _methislabCFUnderwrittingCaseManagement_caseManagementRequestBenefitsBenefictResultMedicalTest = new java.util.ArrayList<String>();
+        _methislabUnderwrittingCaseManagement_caseManagementRequestBenefitsBenefictResult.getMedicalTest().addAll(_methislabCFUnderwrittingCaseManagement_caseManagementRequestBenefitsBenefictResultMedicalTest);
+        java.util.List<String> _methislabCFUnderwrittingCaseManagement_caseManagementRequestBenefitsBenefictResultNotes = new java.util.ArrayList<String>();
+        _methislabUnderwrittingCaseManagement_caseManagementRequestBenefitsBenefictResult.getNotes().addAll(_methislabCFUnderwrittingCaseManagement_caseManagementRequestBenefitsBenefictResultNotes);
+        _methislabCFUnderwrittingCaseManagement_caseManagementRequestBenefits.setBenefictResult(_methislabUnderwrittingCaseManagement_caseManagementRequestBenefitsBenefictResult);
+        _methislabCFUnderwrittingCaseManagement_caseManagementRequest.setBenefits(_methislabCFUnderwrittingCaseManagement_caseManagementRequestBenefits);
+        MethislabCFUnderwrittingCaseManagementResponse _methislabCFUnderwrittingCaseManagement__return = port.methislabCFUnderwrittingCaseManagement(_methislabCFUnderwrittingCaseManagement_caseManagementRequest);
+        System.out.println("methislabCFUnderwrittingCaseManagement.result=" + _methislabCFUnderwrittingCaseManagement__return);
 
 
         }

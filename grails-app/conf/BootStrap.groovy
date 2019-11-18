@@ -32,6 +32,7 @@ class BootStrap {
     ServerFactoryBean caserUnderwrittingCaseManagementServiceFactory
     ServerFactoryBean netinsuranceUnderwrittingCaseManagementServiceFactory
     ServerFactoryBean methislabUnderwrittingCaseManagementServiceFactory
+    ServerFactoryBean methislabCFUnderwrittingCaseManagementServiceFactory
     ServerFactoryBean cbpitaUnderwrittingCaseManagementServiceFactory
     ServerFactoryBean simplefrUnderwrittingCaseManagementServiceFactory
     ServerFactoryBean societeGeneraleUnderwrittingCaseManagementServiceFactory
@@ -65,6 +66,7 @@ class BootStrap {
         societeGeneraleUnderwrittingCaseManagementServiceFactory.getInInterceptors().add(new WSS4JInInterceptor(inPropsDigest))
         cbpitaUnderwrittingCaseManagementServiceFactory.getInInterceptors().add(new WSS4JInInterceptor(inPropsDigest))
         methislabUnderwrittingCaseManagementServiceFactory.getInInterceptors().add(new WSS4JInInterceptor(inPropsDigest))
+        methislabCFUnderwrittingCaseManagementServiceFactory.getInInterceptors().add(new WSS4JInInterceptor(inPropsDigest))
         //enginyersUnderwrittingCaseManagementServiceFactory.getInInterceptors().add(new WSS4JInInterceptor(inPropsDigest))
     }
 
