@@ -1,29 +1,31 @@
 package com.ws.servicios
 
+import com.scor.global.ExceptionUtils
+import com.scor.global.WSException
+import com.scor.global.ZipUtils
+import com.scor.srpfileinbound.DATOS
+import com.scor.srpfileinbound.REGISTRODATOS
+import com.scor.srpfileinbound.RootElement
 import com.scortelemed.Company
+import com.scortelemed.Conf
 import com.scortelemed.Envio
 import com.scortelemed.Recibido
-import com.scortelemed.schemas.cbpita.BenefictNameType
-import com.scortelemed.schemas.cbpita.BenefictResultType
-import com.scortelemed.schemas.cbpita.BenefitsType
-import com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCasesResultsRequest
-import com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCasesResultsResponse
-import com.scortelemed.schemas.cbpita.RequestStateType
-import com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCaseManagementRequest
+import com.scortelemed.schemas.cbpita.*
 import com.scortelemed.servicios.Candidato
 import com.scortelemed.servicios.Frontal
 import com.scortelemed.servicios.FrontalServiceLocator
-import hwsol.webservices.WsError
-import servicios.RespuestaCRM
-import servicios.TipoEstadoExpediente
-import servicios.TipoMotivoAnulacion
-
-import static grails.async.Promises.*
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.GenerarZip
 import hwsol.webservices.TransformacionUtil
-
-import java.text.SimpleDateFormat
+import hwsol.webservices.WsError
+import org.w3c.dom.Document
+import org.w3c.dom.Element
+import org.w3c.dom.Node
+import org.w3c.dom.NodeList
+import org.xml.sax.InputSource
+import servicios.RespuestaCRM
+import servicios.TipoEstadoExpediente
+import servicios.TipoMotivoAnulacion
 
 import javax.xml.bind.JAXBContext
 import javax.xml.bind.JAXBElement
@@ -31,21 +33,7 @@ import javax.xml.bind.Marshaller
 import javax.xml.namespace.QName
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
-
-import org.w3c.dom.Document
-import org.w3c.dom.Element
-import org.w3c.dom.Node
-import org.w3c.dom.NodeList
-import org.xml.sax.InputSource
-
-import com.scor.global.ExceptionUtils
-import com.scor.global.WSException
-import com.scor.srpfileinbound.DATOS
-import com.scor.srpfileinbound.REGISTRODATOS
-import com.scor.srpfileinbound.RootElement
-import com.scortelemed.Conf
-import com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCaseManagementRequest
-import com.scor.global.ZipUtils
+import java.text.SimpleDateFormat
 
 class CbpitaService {
 
@@ -279,7 +267,8 @@ class CbpitaService {
 					Element eElement = (Element) nNode;
 
 					/**NUMERO DE PRODUCTO
-					 *                    */
+					 *
+					 */
 
 					datosRegistro.codigoProducto = "SRP"
 
@@ -289,14 +278,16 @@ class CbpitaService {
 					}
 
 					/**NOMBRE DE CANDIDATO
-					 *                    */
+					 *
+					 */
 
 					if (eElement.getElementsByTagName("name").item(0) != null) {
 						datosRegistro.nombreCliente = eElement.getElementsByTagName("name").item(0).getTextContent()
 					}
 
 					/**APELLIDO CANDIDATO
-					 *                    */
+					 *
+					 */
 
 					if (eElement.getElementsByTagName("surname").item(0) != null) {
 						apellido = eElement.getElementsByTagName("surname").item(0).getTextContent()
@@ -305,17 +296,19 @@ class CbpitaService {
 					datosRegistro.apellidosCliente = apellido
 
 					/**DNI CANDIDATO
-					 *                    */
+					 *
+					 */
 
 					if (eElement.getElementsByTagName("fiscalIdentificationNumber").item(0) != null) {
 						datosRegistro.dni = eElement.getElementsByTagName("fiscalIdentificationNumber").item(0).getTextContent()
 					}
 
 					/**SEXO CANDIDATO
-					 *                    */
+					 *
+					 */
 
 					if (eElement.getElementsByTagName("gender").item(0) != null) {
-						datosRegistro.sexo = eElement.getElementsByTagName("gender").item(0).getTextContent() == "M" ? "M" : "V"
+						datosRegistro.sexo = eElement.getElementsByTagName("gender").item(0).getTextContent()=="M"?"M":"V"
 					} else {
 						datosRegistro.sexo = "M"
 					}
@@ -329,7 +322,8 @@ class CbpitaService {
 					}
 
 					/**CODIGO POSTAL CLIENTE
-					 *                    */
+					 *
+					 */
 
 					if (eElement.getElementsByTagName("postalCode").item(0) != null) {
 						datosRegistro.codigoPostal = eElement.getElementsByTagName("postalCode").item(0).getTextContent()
@@ -338,7 +332,8 @@ class CbpitaService {
 					}
 
 					/**POBLACION
-					 *                    */
+					 *
+					 */
 
 					if (eElement.getElementsByTagName("city").item(0) != null) {
 						datosRegistro.poblacion = eElement.getElementsByTagName("city").item(0).getTextContent()
@@ -346,7 +341,8 @@ class CbpitaService {
 						datosRegistro.poblacion = "."
 					}
 					/**PROVINCIA
-					 *                    */
+					 *
+					 */
 
 					if (eElement.getElementsByTagName("province").item(0) != null) {
 						datosRegistro.provincia = eElement.getElementsByTagName("province").item(0).getTextContent()
@@ -355,7 +351,8 @@ class CbpitaService {
 					}
 
 					/**TELEFONOS
-					 *                    */
+					 * 
+					 */
 
                     if (eElement.getElementsByTagName("phoneNumber1").item(0) != null && eElement.getElementsByTagName("phoneNumber1").item(0).getTextContent() != null && !eElement.getElementsByTagName("phoneNumber1").item(0).getTextContent().isEmpty()) {
 
@@ -370,7 +367,9 @@ class CbpitaService {
                         }
 					}
 
-                    if (eElement.getElementsByTagName("phoneNumber2").item(0) != null && eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent() != null && !eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent().isEmpty()) {
+                    if (eElement.getElementsByTagName("phoneNumber2").item(0) != null
+						&&  eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent() != null
+						&& !eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent().isEmpty()) {
 
                         telefono2 = eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent()
 
@@ -382,7 +381,6 @@ class CbpitaService {
                             datosRegistro.telefono2 = null
                         }
                     }
-
 					if (eElement.getElementsByTagName("mobileNumber").item(0) != null) {
 
                         telefonoMovil = eElement.getElementsByTagName("mobileNumber").item(0).getTextContent()
@@ -411,12 +409,14 @@ class CbpitaService {
                     }
 
 					/**CODIGO CIA
-					 *                    */
+					 *
+					 */
 
 					datosRegistro.codigoCia = company.codigoSt
 
 					/**FECHA DE NACIMIENTO
-					 *                    */
+					 *
+					 */
 
 					if (eElement.getElementsByTagName("birthDate").item(0) != null && !eElement.getElementsByTagName("birthDate").item(0).getTextContent().isEmpty()) {
 						datosRegistro.fechaNacimiento = formato.format(util.fromStringToXmlCalendar(eElement.getElementsByTagName("birthDate").item(0).getTextContent()).toGregorianCalendar().getTime())
@@ -425,48 +425,55 @@ class CbpitaService {
 					}
 
 					/**ESTADO CIVIL
-					 *                    */
+					 *
+					 */
 
 					if (eElement.getElementsByTagName("civilState").item(0) != null) {
 						datosRegistro.estadoCivil = eElement.getElementsByTagName("civilState").item(0).getTextContent()
 					}
 
 					/**EMAIL
-					 *                    */
+					 *
+					 */
 
 					if (eElement.getElementsByTagName("email").item(0) != null) {
 						datosRegistro.email = eElement.getElementsByTagName("email").item(0).getTextContent()
 					}
 
 					/**CLAVE DE VALIDACION
-					 *                    */
+					 *
+					 */
 					if (eElement.getElementsByTagName("password").item(0) != null) {
 						datosRegistro.claveValidacionCliente = eElement.getElementsByTagName("password").item(0).getTextContent()
 					}
 
 					/**POLIZA
-					 *                    */
+					 *
+					 */
 
 					if (eElement.getElementsByTagName("policyNumber").item(0) != null) {
 						datosRegistro.numPoliza = eElement.getElementsByTagName("policyNumber").item(0).getTextContent()
 					}
 
 					/**CERTIFICADO
-					 *                    */
+					 *
+					 */
 
 					if (eElement.getElementsByTagName("certificateNumber").item(0) != null) {
 						datosRegistro.numCertificado = eElement.getElementsByTagName("certificateNumber").item(0).getTextContent()
 					}
 
 					/**CERTIFICADO
-					 *                    */
+					 *
+					 */
 
 					if (eElement.getElementsByTagName("comments").item(0) != null) {
 						datosRegistro.observaciones = eElement.getElementsByTagName("comments").item(0).getTextContent()
 					}
 
 					/**FECHA DE SOLICITUD
-					 *                    */
+					 *
+					 */
 
 					if (eElement.getElementsByTagName("requestDate").item(0) != null && !eElement.getElementsByTagName("requestDate").item(0).getTextContent().isEmpty()) {
 						datosRegistro.fechaEnvio = formato.format(util.fromStringToXmlCalendar(eElement.getElementsByTagName("requestDate").item(0).getTextContent()).toGregorianCalendar().getTime())
@@ -474,20 +481,23 @@ class CbpitaService {
 						datosRegistro.fechaEnvio = util.fromDateToString(new Date(), "yyyyMMdd")
 					}
 					/**NUMERO DE REFERENCIA
-					 *                    */
+					 *
+					 */
 
 					if (eElement.getElementsByTagName("requestNumber").item(0) != null) {
 						datosRegistro.numSolicitud = eElement.getElementsByTagName("requestNumber").item(0).getTextContent()
 					}
 
 					/**CODIGO DE AGENTE
-					 *                    */
+					 *
+					 */
 
 					if (eElement.getElementsByTagName("agent").item(0) != null) {
 						datosRegistro.codigoAgencia = codificarAgente(eElement.getElementsByTagName("agent").item(0).getTextContent())
 					}
 
 					/**NOMBRE DE AGENTE
+
 					 *                    */
 					if (eElement.getElementsByTagName("agent").item(0) != null) {
 						nombreAgente = codificarAgente(eElement.getElementsByTagName("agent").item(0).getTextContent())
@@ -501,21 +511,18 @@ class CbpitaService {
 						nombreAgente = nombreAgente + " " + eElement.getElementsByTagName("surname2").item(0).getTextContent()
 					}
 
-					datosRegistro.nomApellAgente = nombreAgente
+                    datosRegistro.nomApellAgente = nombreAgente
 
-					/**HORA DE CONTACTO. SE GUARDA EN OBSERVACIONESE
-					 *
-					 */
-					if (eElement.getElementsByTagName("contactTime").item(0) != null) {
+                    if (eElement.getElementsByTagName("contactTime").item(0) != null) {
+                        if (eElement.getElementsByTagName("contactTime").item(0).getTextContent() == "M") {
+                            datosRegistro.observaciones = "Mattina (08:00 a 14:00) C (12:00 a 16:00)"
+                        } else if (eElement.getElementsByTagName("contactTime").item(0).getTextContent() == "P") {
+                            datosRegistro.observaciones = "Pomeriggio (14:00 a 20:00)"
+                        } else if (eElement.getElementsByTagName("contactTime").item(0).getTextContent() == "I") {
+                            datosRegistro.observaciones = "Indifferente"
+                        } else datosRegistro.observaciones = ""
+                    }
 
-						if (eElement.getElementsByTagName("contactTime").item(0).getTextContent() == "M") {
-							datosRegistro.observaciones = "Mattina (08:00 a 14:00) C (12:00 a 16:00)"
-						} else if (eElement.getElementsByTagName("contactTime").item(0).getTextContent() == "P") {
-							datosRegistro.observaciones = "Pomeriggio (14:00 a 20:00)"
-						} else if (eElement.getElementsByTagName("contactTime").item(0).getTextContent() == "I") {
-							datosRegistro.observaciones = "Indifferente"
-						} else datosRegistro.observaciones = ""
-					}
 				}
 			}
 
@@ -785,8 +792,10 @@ class CbpitaService {
 				 */
 				if (limite == 10) {
 
+
 					logginService.putInfoMessage("Nueva alta de " + nombrecia + " con numero de solicitud: " + solicitud.toString() + " se ha procesado pero no se ha dado de alta en CRM")
 					correoUtil.envioEmailErrores("ERROR en alta de HMI-CBP","Nueva alta de " + nombrecia + " con numero de solicitud: " + solicitud.toString() + " se ha procesado pero no se ha dado de alta en CRM",null)
+
 
 
 					/**Metemos en errores
@@ -803,8 +812,10 @@ class CbpitaService {
 				}
 			} catch (Exception e) {
 
+
 				logginService.putErrorMessage("Nueva alta de " + nombrecia + " con numero de solicitud: " + solicitud.toString() + " no se ha procesado: Motivo: " + e.getMessage())
 				correoUtil.envioEmailErrores("ERROR en alta de HMI-CBP","Nueva alta de " + nombrecia + " con numero de solicitud: " + solicitud.toString() + " no se ha procesado: Motivo: " + e.getMessage(),null)
+
 			}
 		}
 	}
@@ -974,6 +985,7 @@ class CbpitaService {
 							wsErrors.add(new WsError("birthDate",eElement.getElementsByTagName("birthDate").item(0).getTextContent(),"Formato della data yyyy-MM-dd"))
 						}
 
+
 					}
 
 				}
@@ -985,7 +997,6 @@ class CbpitaService {
 			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
 		}
 	}
-
 
 	public def rellenaDatosSalidaConsulta(servicios.ExpedienteInforme expedientePoliza, codigoSt, requestDate, String zipPath, String user, String password) {
 
@@ -1182,18 +1193,22 @@ class CbpitaService {
 	}
 
 
-	public String codificarAgente(String agente) {
+	String codificarAgente(String agente) {
 
 		switch (agente) {
 
-			case "300.CBPPIT":
-				return "PITAGORA";
-			case "300.CBPSPE":
-				return "SPEFIN";
-			case "300.CBPPRO":
-				return "BANCA PROGETTO";
+			case "300.CBPPIT": return "PITAGORA"
+			case "300.CBPSPE": return "SPEFIN"
+			case "300.CBPPRO": return "BANCA PROGETTO"
+			case "300.CBPWEF": return "WE FINANCE"
+			case "300.CBPRAC": return "RACES"
+			case "300.CBPSIR": return "SIRIOFIN"
+			case "300.CBPDYN": return "DYNAMICA RETAIL"
+			case "300.CBPCOF": return "COFIDIS"
+			case "300.CBPBPF": return "BANCA POPOLARE DEL FRUSINATE"
+
 			default:
-				return null;
+				return agente
 		}
 	}
 

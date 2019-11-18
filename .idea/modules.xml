@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/scorWebservice.iml" filepath="$PROJECT_DIR$/.idea/scorWebservice.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/scorWebservice-grailsPlugins.iml" filepath="$PROJECT_DIR$/.idea/scorWebservice-grailsPlugins.iml" />
+      <module fileurl="file://$PROJECT_DIR$/scorWebservices.iml" filepath="$PROJECT_DIR$/scorWebservices.iml" />
+      <module fileurl="file://$PROJECT_DIR$/scorWebservices-grailsPlugins.iml" filepath="$PROJECT_DIR$/scorWebservices-grailsPlugins.iml" />
     </modules>
   </component>
 </project>

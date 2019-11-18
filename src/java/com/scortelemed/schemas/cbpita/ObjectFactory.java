@@ -41,30 +41,6 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link ResultsBasicType }
-     * 
-     */
-    public ResultsBasicType createResultsBasicType() {
-        return new ResultsBasicType();
-    }
-
-    /**
-     * Create an instance of {@link CbpitaUnderwrittingCaseManagementRequest.Services }
-     * 
-     */
-    public CbpitaUnderwrittingCaseManagementRequest.Services createCbpitaUnderwrittingCaseManagementRequestServices() {
-        return new CbpitaUnderwrittingCaseManagementRequest.Services();
-    }
-
-    /**
-     * Create an instance of {@link CbpitaUnderwrittingCaseManagementRequest.PreviousQuestions }
-     * 
-     */
-    public CbpitaUnderwrittingCaseManagementRequest.PreviousQuestions createCbpitaUnderwrittingCaseManagementRequestPreviousQuestions() {
-        return new CbpitaUnderwrittingCaseManagementRequest.PreviousQuestions();
-    }
-
-    /**
      * Create an instance of {@link CbpitaUnderwrittingCasesResultsRequest }
      * 
      */
@@ -81,6 +57,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link CbpitaUnderwrittingCaseManagementResponse }
+     * 
+     */
+    public CbpitaUnderwrittingCaseManagementResponse createCbpitaUnderwrittingCaseManagementResponse() {
+        return new CbpitaUnderwrittingCaseManagementResponse();
+    }
+
+    /**
      * Create an instance of {@link CbpitaUnderwrittingCaseManagementRequest }
      * 
      */
@@ -89,11 +73,27 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link CbpitaUnderwrittingCasesResultsResponse.Expediente }
+     * Create an instance of {@link BenefitsType }
      * 
      */
-    public CbpitaUnderwrittingCasesResultsResponse.Expediente createCbpitaUnderwrittingCasesResultsResponseExpediente() {
-        return new CbpitaUnderwrittingCasesResultsResponse.Expediente();
+    public BenefitsType createBenefitsType() {
+        return new BenefitsType();
+    }
+
+    /**
+     * Create an instance of {@link CbpitaUnderwrittingCaseManagementRequest.PreviousQuestions }
+     * 
+     */
+    public CbpitaUnderwrittingCaseManagementRequest.PreviousQuestions createCbpitaUnderwrittingCaseManagementRequestPreviousQuestions() {
+        return new CbpitaUnderwrittingCaseManagementRequest.PreviousQuestions();
+    }
+
+    /**
+     * Create an instance of {@link ResultsBasicType }
+     * 
+     */
+    public ResultsBasicType createResultsBasicType() {
+        return new ResultsBasicType();
     }
 
     /**
@@ -113,19 +113,19 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link BenefitsType }
+     * Create an instance of {@link CbpitaUnderwrittingCasesResultsResponse.Expediente }
      * 
      */
-    public BenefitsType createBenefitsType() {
-        return new BenefitsType();
+    public CbpitaUnderwrittingCasesResultsResponse.Expediente createCbpitaUnderwrittingCasesResultsResponseExpediente() {
+        return new CbpitaUnderwrittingCasesResultsResponse.Expediente();
     }
 
     /**
-     * Create an instance of {@link CbpitaUnderwrittingCaseManagementResponse }
+     * Create an instance of {@link CbpitaUnderwrittingCaseManagementRequest.Services }
      * 
      */
-    public CbpitaUnderwrittingCaseManagementResponse createCbpitaUnderwrittingCaseManagementResponse() {
-        return new CbpitaUnderwrittingCaseManagementResponse();
+    public CbpitaUnderwrittingCaseManagementRequest.Services createCbpitaUnderwrittingCaseManagementRequestServices() {
+        return new CbpitaUnderwrittingCaseManagementRequest.Services();
     }
 
     /**

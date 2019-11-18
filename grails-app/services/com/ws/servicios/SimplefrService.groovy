@@ -627,7 +627,7 @@ class SimplefrService {
 			if (limite == 10) {
 
 				logginService.putInfoMessage("Nueva alta  de Simplefr con numero de solicitud: " + requestNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM")
-				correoUtil.envioEmailErrores("ERROR en alta de Simplefr"," Nueva alta de Simplefr con numero de solicitud: " + requestNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM",null)
+				correoUtil.envioEmailErrores(opername," Nueva alta de Simplefr con numero de solicitud: " + requestNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM",null)
 
 
 				/**Metemos en errores

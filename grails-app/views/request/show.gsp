@@ -87,7 +87,7 @@
 									${requestInstance.request}
 								</textarea> <g:actionSubmit class="save" action="guardarRequest"
 									value="Guardar Request" /> <g:if
-									test="${requestInstance?.company?.encodeAsHTML().equals('lagunaro') || requestInstance?.company?.encodeAsHTML().equals('caser') || requestInstance?.company?.encodeAsHTML().equals('cajamar') || requestInstance?.company?.encodeAsHTML().equals('alptis') || requestInstance?.company?.encodeAsHTML().equals('afiesca') || requestInstance?.company?.encodeAsHTML().equals('ama') || requestInstance?.company?.encodeAsHTML().equals('netinsurance') || requestInstance?.company?.encodeAsHTML().equals('lifesquare') || requestInstance?.company?.encodeAsHTML().equals('enginyers')} ">
+									test="${requestInstance?.company?.encodeAsHTML().equals('lagunaro') || requestInstance?.company?.encodeAsHTML().equals('caser') || requestInstance?.company?.encodeAsHTML().equals('cajamar') || requestInstance?.company?.encodeAsHTML().equals('alptis') || requestInstance?.company?.encodeAsHTML().equals('afiesca') || requestInstance?.company?.encodeAsHTML().equals('ama') || requestInstance?.company?.encodeAsHTML().equals('netinsurance') || requestInstance?.company?.encodeAsHTML().equals('lifesquare')} ">
 									<g:actionSubmit class="save" action="procesarRequest"
 										value="Procesar Request" />
 								</g:if></td>

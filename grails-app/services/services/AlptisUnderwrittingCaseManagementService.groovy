@@ -98,9 +98,9 @@ class AlptisUnderwrittingCaseManagementService {
 				} else {
 
 					resultado.setStatusType(StatusType.error)
-					resultado.setComments("L'opï¿½ration est temporairement dï¿½sactivï¿½e.")
+					resultado.setComments("L'opération est temporairement désactivée.")
 					logginService.putInfoMessage("Peticion " + opername + " no realizada para solicitud: " + alptisUnderwrittingCaseManagementRequest.policy.BasicPolicyGroup.policy_number)
-					correoUtil.envioEmailErrores("ERROR en alta de Alptis","Endpoint-"+ opername + ". La operacion esta desactivada temporalmente",null)
+					correoUtil.envioEmailErrores(opername,"Endpoint-"+ opername + ". La operacion esta desactivada temporalmente",null)
 				}
 			} else {
 
@@ -108,14 +108,14 @@ class AlptisUnderwrittingCaseManagementService {
 				fecha.setTime(new Date())
 
 				def fechaIni = fecha.getTime().format ('yyyyMMdd HH:mm')
-				def msg = "Une annulation est requise pour le dossier " + alptisUnderwrittingCaseManagementRequest.policy.BasicPolicyGroup.policy_number.toString() + " en date du : " + fechaIni + " par la sociï¿½tï¿½ Alptis."
+				def msg = "Une annulation est requise pour le dossier " + alptisUnderwrittingCaseManagementRequest.policy.BasicPolicyGroup.policy_number.toString() + " en date du : " + fechaIni + " par la société Alptis."
 
 				correoUtil.envioEmailNoTratados("AlptisUnderwrittingCaseManagementRequest",msg)
 			}
 		}catch (Exception e){
 
 			logginService.putInfoMessage("Peticion " + opername + " no realizada para solicitud " + alptisUnderwrittingCaseManagementRequest.policy.BasicPolicyGroup.policy_number.toString() + ". - Error: "+e)
-			correoUtil.envioEmailErrores("ERROR en alta de Alptis"," Peticion no realizada para solicitud "+ alptisUnderwrittingCaseManagementRequest.policy.BasicPolicyGroup.policy_number.toString(),e)
+			correoUtil.envioEmailErrores(opername," Peticion no realizada para solicitud "+ alptisUnderwrittingCaseManagementRequest.policy.BasicPolicyGroup.policy_number.toString(),e)
 			resultado.setStatusType(StatusType.error)
 			resultado.setComments(opername+": "+e.getMessage())
 
