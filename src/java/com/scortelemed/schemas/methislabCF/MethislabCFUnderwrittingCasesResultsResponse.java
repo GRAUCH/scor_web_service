@@ -18,7 +18,7 @@ import java.util.List;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
  *         &lt;element name="date" type="{http://www.w3.org/2001/XMLSchema}dateTime"/>
- *         &lt;element name="status" type="{http://www.scortelemed.com/schemas/methislab}StatusType"/>
+ *         &lt;element name="status" type="{http://www.scortelemed.com/schemas/methislabCF}StatusType"/>
  *         &lt;element name="message" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *         &lt;element name="code" type="{http://www.w3.org/2001/XMLSchema}int"/>
  *         &lt;element name="Expediente" maxOccurs="unbounded" minOccurs="0">
@@ -53,7 +53,7 @@ import java.util.List;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "methislabUnderwrittingCasesResultsResponse", propOrder = {
+@XmlType(name = "methislabCFUnderwrittingCasesResultsResponse", propOrder = {
     "date",
     "status",
     "message",

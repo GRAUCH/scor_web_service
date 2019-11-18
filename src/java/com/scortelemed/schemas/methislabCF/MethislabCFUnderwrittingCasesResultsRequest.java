@@ -26,7 +26,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "methislabUnderwrittingCasesResultsRequest", propOrder = {
+@XmlType(name = "methislabCFUnderwrittingCasesResultsRequest", propOrder = {
     "dateStart",
     "dateEnd"
 })
