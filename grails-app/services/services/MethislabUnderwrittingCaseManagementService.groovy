@@ -1,45 +1,25 @@
 package services
 
-import grails.util.Environment
+import com.scortelemed.Company
+import com.scortelemed.Operacion
+import com.scortelemed.schemas.methislab.*
+import com.ws.servicios.*
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
 import hwsol.webservices.WsError
-import java.text.SimpleDateFormat
-
-import javax.jws.WebParam
-import javax.jws.WebResult
-import javax.jws.WebService
-import javax.jws.soap.SOAPBinding
-
 import org.apache.cxf.annotations.SchemaValidation
 import org.grails.cxf.utils.EndpointType
 import org.grails.cxf.utils.GrailsCxfEndpoint
 import org.grails.cxf.utils.GrailsCxfEndpointProperty
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.context.request.RequestContextHolder
-
-import servicios.ClaveFiltro
-import servicios.Expediente
-import servicios.Filtro
-import servicios.RespuestaCRM
 import servicios.RespuestaCRMInforme
 
-import com.scortelemed.Company
-import com.scortelemed.Envio
-import com.scortelemed.Operacion
-import com.scortelemed.Recibido
-import com.scortelemed.schemas.methislab.MethislabUnderwrittingCaseManagementRequest
-import com.scortelemed.schemas.methislab.MethislabUnderwrittingCaseManagementResponse
-import com.scortelemed.schemas.methislab.MethislabUnderwrittingCasesResultsRequest
-import com.scortelemed.schemas.methislab.MethislabUnderwrittingCasesResultsResponse
-import com.scortelemed.schemas.methislab.StatusType;
-import com.ws.servicios.AmaService
-import com.ws.servicios.EstadisticasService
-import com.ws.servicios.LogginService
-import com.ws.servicios.MethislabService
-import com.ws.servicios.RequestService
-import com.ws.servicios.TarificadorService
-
+import javax.jws.WebParam
+import javax.jws.WebResult
+import javax.jws.WebService
+import javax.jws.soap.SOAPBinding
+import java.text.SimpleDateFormat
 
 @WebService(targetNamespace = "http://www.scortelemed.com/schemas/methislab")
 @SchemaValidation
