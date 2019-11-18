@@ -16,18 +16,18 @@ import java.net.URL;
  * 
  */
 
-@WebServiceClient(name = "MethislabCFUnderwrittingCaseManagementServiceService", targetNamespace = "http://www.scortelemed.com/schemas/methislab", wsdlLocation = "http://localhost:8080/scorWebservice/services/methislab/MethislabUnderwrittingCaseManagement?wsdl")
+@WebServiceClient(name = "MethislabCFUnderwrittingCaseManagementServiceService", targetNamespace = "http://www.scortelemed.com/schemas/methislabCF", wsdlLocation = "http://localhost:8080/scorWebservice/services/methislabCF/MethislabCFUnderwrittingCaseManagement?wsdl")
 public class MethislabCFUnderwrittingCaseManagementServiceService extends Service {
 
     public final static URL WSDL_LOCATION;
-    public final static QName SERVICE = new QName("http://www.scortelemed.com/schemas/methislab", "MethislabCFUnderwrittingCaseManagementServiceService");
-    public final static QName MethislabUnderwrittingCaseManagementServicePort = new QName("http://www.scortelemed.com/schemas/methislab", "MethislabUnderwrittingCaseManagementServicePort");
+    public final static QName SERVICE = new QName("http://www.scortelemed.com/schemas/methislabCF", "MethislabCFUnderwrittingCaseManagementServiceService");
+    public final static QName MethislabCFUnderwrittingCaseManagementServicePort = new QName("http://www.scortelemed.com/schemas/methislabCF", "MethislabCFUnderwrittingCaseManagementServicePort");
     static {
         URL url = null;
         try {
-            url = new URL("http://localhost:8080/scorWebservice/services/methislab/MethislabUnderwrittingCaseManagement?wsdl");
+            url = new URL("http://localhost:8080/scorWebservice/services/methislabCF/MethislabCFUnderwrittingCaseManagement?wsdl");
         } catch (MalformedURLException e) {
-            System.err.println("Can not initialize the default wsdl from http://localhost:8080/scorWebservice/services/methislab/MethislabUnderwrittingCaseManagement?wsdl");
+            System.err.println("Can not initialize the default wsdl from http://localhost:8080/scorWebservice/services/methislabCF/MethislabCFUnderwrittingCaseManagement?wsdl");
             // e.printStackTrace();
         }
         WSDL_LOCATION = url;
@@ -50,9 +50,9 @@ public class MethislabCFUnderwrittingCaseManagementServiceService extends Servic
      * @return
      *     returns MethislabCFUnderwrittingCaseManagementService
      */
-    @WebEndpoint(name = "MethislabUnderwrittingCaseManagementServicePort")
+    @WebEndpoint(name = "MethislabCFUnderwrittingCaseManagementServicePort")
     public MethislabCFUnderwrittingCaseManagementService getMethislabUnderwrittingCaseManagementServicePort() {
-        return super.getPort(MethislabUnderwrittingCaseManagementServicePort, MethislabCFUnderwrittingCaseManagementService.class);
+        return super.getPort(MethislabCFUnderwrittingCaseManagementServicePort, MethislabCFUnderwrittingCaseManagementService.class);
     }
 
     /**
@@ -62,9 +62,9 @@ public class MethislabCFUnderwrittingCaseManagementServiceService extends Servic
      * @return
      *     returns MethislabCFUnderwrittingCaseManagementService
      */
-    @WebEndpoint(name = "MethislabUnderwrittingCaseManagementServicePort")
+    @WebEndpoint(name = "MethislabCFUnderwrittingCaseManagementServicePort")
     public MethislabCFUnderwrittingCaseManagementService getMethislabUnderwrittingCaseManagementServicePort(WebServiceFeature... features) {
-        return super.getPort(MethislabUnderwrittingCaseManagementServicePort, MethislabCFUnderwrittingCaseManagementService.class, features);
+        return super.getPort(MethislabCFUnderwrittingCaseManagementServicePort, MethislabCFUnderwrittingCaseManagementService.class, features);
     }
 
 }

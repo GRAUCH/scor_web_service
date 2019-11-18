@@ -18,9 +18,9 @@ import java.util.logging.Logger;
 
 @WebService(name = "MethislabCFUnderwrittingCaseManagementService",
                       serviceName = "MethislabCFUnderwrittingCaseManagementServiceService",
-                      portName = "MethislabUnderwrittingCaseManagementServicePort",
-                      targetNamespace = "http://www.scortelemed.com/schemas/methislab", 
-                      wsdlLocation = "http://localhost:8080/scorWebservice/services/methislab/MethislabUnderwrittingCaseManagement?wsdl",
+                      portName = "MethislabCFUnderwrittingCaseManagementServicePort",
+                      targetNamespace = "http://www.scortelemed.com/schemas/methislabCF",
+                      wsdlLocation = "http://localhost:8080/scorWebservice/services/methislabCF/MethislabCFUnderwrittingCaseManagement?wsdl",
                       endpointInterface = "com.scortelemed.schemas.methislabCF.MethislabCFUnderwrittingCaseManagementService")
                       
 public class MethislabCFUnderwrittingCaseManagementServiceImpl implements MethislabCFUnderwrittingCaseManagementService {
@@ -30,8 +30,8 @@ public class MethislabCFUnderwrittingCaseManagementServiceImpl implements Methis
     /* (non-Javadoc)
      * @see com.scortelemed.schemas.methislab.MethislabCFUnderwrittingCaseManagementService#methislabUnderwrittingCasesResults(com.scortelemed.schemas.methislab.MethislabCFUnderwrittingCasesResultsRequest  caseManagementResultsRequest )*
      */
-    public MethislabCFUnderwrittingCasesResultsResponse methislabUnderwrittingCasesResults(MethislabCFUnderwrittingCasesResultsRequest caseManagementResultsRequest) {
-        LOG.info("Executing operation methislabUnderwrittingCasesResults");
+    public MethislabCFUnderwrittingCasesResultsResponse methislabCFUnderwrittingCasesResults(MethislabCFUnderwrittingCasesResultsRequest caseManagementResultsRequest) {
+        LOG.info("Executing operation methislabCFUnderwrittingCasesResults");
         System.out.println(caseManagementResultsRequest);
         try {
             MethislabCFUnderwrittingCasesResultsResponse _return = new MethislabCFUnderwrittingCasesResultsResponse();
@@ -69,8 +69,8 @@ public class MethislabCFUnderwrittingCaseManagementServiceImpl implements Methis
     /* (non-Javadoc)
      * @see com.scortelemed.schemas.methislab.MethislabCFUnderwrittingCaseManagementService#methislabUnderwrittingCaseManagement(com.scortelemed.schemas.methislab.MethislabCFUnderwrittingCaseManagementRequest  caseManagementRequest )*
      */
-    public MethislabCFUnderwrittingCaseManagementResponse methislabUnderwrittingCaseManagement(MethislabCFUnderwrittingCaseManagementRequest caseManagementRequest) {
-        LOG.info("Executing operation methislabUnderwrittingCaseManagement");
+    public MethislabCFUnderwrittingCaseManagementResponse methislabCFUnderwrittingCaseManagement(MethislabCFUnderwrittingCaseManagementRequest caseManagementRequest) {
+        LOG.info("Executing operation methislabCFUnderwrittingCaseManagement");
         System.out.println(caseManagementRequest);
         try {
             MethislabCFUnderwrittingCaseManagementResponse _return = new MethislabCFUnderwrittingCaseManagementResponse();

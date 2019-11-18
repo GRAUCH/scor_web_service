@@ -24,14 +24,14 @@ import javax.xml.namespace.QName;
 @XmlRegistry
 public class ObjectFactory {
 
-    private final static QName _MethislabUnderwrittingCasesResultsRequest_QNAME = new QName("http://www.scortelemed.com/schemas/methislab", "MethislabCFUnderwrittingCasesResultsRequest");
-    private final static QName _MethislabUnderwrittingCasesResultsResponse_QNAME = new QName("http://www.scortelemed.com/schemas/methislab", "MethislabCFUnderwrittingCasesResultsResponse");
-    private final static QName _CaseManagementResponse_QNAME = new QName("http://www.scortelemed.com/schemas/methislab", "CaseManagementResponse");
-    private final static QName _CaseManagementResultsRequest_QNAME = new QName("http://www.scortelemed.com/schemas/methislab", "CaseManagementResultsRequest");
-    private final static QName _MethislabUnderwrittingCaseManagementRequest_QNAME = new QName("http://www.scortelemed.com/schemas/methislab", "MethislabCFUnderwrittingCaseManagementRequest");
-    private final static QName _CaseManagementRequest_QNAME = new QName("http://www.scortelemed.com/schemas/methislab", "CaseManagementRequest");
-    private final static QName _MethislabUnderwrittingCaseManagementResponse_QNAME = new QName("http://www.scortelemed.com/schemas/methislab", "MethislabCFUnderwrittingCaseManagementResponse");
-    private final static QName _CaseManagementResultsResponse_QNAME = new QName("http://www.scortelemed.com/schemas/methislab", "CaseManagementResultsResponse");
+    private final static QName _MethislabUnderwrittingCasesResultsRequest_QNAME = new QName("http://www.scortelemed.com/schemas/methislabCF", "MethislabCFUnderwrittingCasesResultsRequest");
+    private final static QName _MethislabUnderwrittingCasesResultsResponse_QNAME = new QName("http://www.scortelemed.com/schemas/methislabCF", "MethislabCFUnderwrittingCasesResultsResponse");
+    private final static QName _CaseManagementResponse_QNAME = new QName("http://www.scortelemed.com/schemas/methislabCF", "CaseManagementResponse");
+    private final static QName _CaseManagementResultsRequest_QNAME = new QName("http://www.scortelemed.com/schemas/methislabCF", "CaseManagementResultsRequest");
+    private final static QName _MethislabUnderwrittingCaseManagementRequest_QNAME = new QName("http://www.scortelemed.com/schemas/methislabCF", "MethislabCFUnderwrittingCaseManagementRequest");
+    private final static QName _CaseManagementRequest_QNAME = new QName("http://www.scortelemed.com/schemas/methislabCF", "CaseManagementRequest");
+    private final static QName _MethislabUnderwrittingCaseManagementResponse_QNAME = new QName("http://www.scortelemed.com/schemas/methislabCF", "MethislabCFUnderwrittingCaseManagementResponse");
+    private final static QName _CaseManagementResultsResponse_QNAME = new QName("http://www.scortelemed.com/schemas/methislabCF", "CaseManagementResultsResponse");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: com.scortelemed.schemas.methislab
@@ -132,7 +132,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link MethislabCFUnderwrittingCasesResultsRequest }{@code >}}
      *
      */
-    @XmlElementDecl(namespace = "http://www.scortelemed.com/schemas/methislab", name = "MethislabCFUnderwrittingCasesResultsRequest")
+    @XmlElementDecl(namespace = "http://www.scortelemed.com/schemas/methislabCF", name = "MethislabCFUnderwrittingCasesResultsRequest")
     public JAXBElement<MethislabCFUnderwrittingCasesResultsRequest> createMethislabUnderwrittingCasesResultsRequest(MethislabCFUnderwrittingCasesResultsRequest value) {
         return new JAXBElement<MethislabCFUnderwrittingCasesResultsRequest>(_MethislabUnderwrittingCasesResultsRequest_QNAME, MethislabCFUnderwrittingCasesResultsRequest.class, null, value);
     }
@@ -141,7 +141,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link MethislabCFUnderwrittingCasesResultsResponse }{@code >}}
      *
      */
-    @XmlElementDecl(namespace = "http://www.scortelemed.com/schemas/methislab", name = "MethislabCFUnderwrittingCasesResultsResponse")
+    @XmlElementDecl(namespace = "http://www.scortelemed.com/schemas/methislabCF", name = "MethislabCFUnderwrittingCasesResultsResponse")
     public JAXBElement<MethislabCFUnderwrittingCasesResultsResponse> createMethislabUnderwrittingCasesResultsResponse(MethislabCFUnderwrittingCasesResultsResponse value) {
         return new JAXBElement<MethislabCFUnderwrittingCasesResultsResponse>(_MethislabUnderwrittingCasesResultsResponse_QNAME, MethislabCFUnderwrittingCasesResultsResponse.class, null, value);
     }
@@ -150,7 +150,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link MethislabCFUnderwrittingCaseManagementResponse }{@code >}}
      *
      */
-    @XmlElementDecl(namespace = "http://www.scortelemed.com/schemas/methislab", name = "CaseManagementResponse")
+    @XmlElementDecl(namespace = "http://www.scortelemed.com/schemas/methislabCF", name = "CaseManagementResponse")
     public JAXBElement<MethislabCFUnderwrittingCaseManagementResponse> createCaseManagementResponse(MethislabCFUnderwrittingCaseManagementResponse value) {
         return new JAXBElement<MethislabCFUnderwrittingCaseManagementResponse>(_CaseManagementResponse_QNAME, MethislabCFUnderwrittingCaseManagementResponse.class, null, value);
     }
@@ -159,7 +159,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link MethislabCFUnderwrittingCasesResultsRequest }{@code >}}
      *
      */
-    @XmlElementDecl(namespace = "http://www.scortelemed.com/schemas/methislab", name = "CaseManagementResultsRequest")
+    @XmlElementDecl(namespace = "http://www.scortelemed.com/schemas/methislabCF", name = "CaseManagementResultsRequest")
     public JAXBElement<MethislabCFUnderwrittingCasesResultsRequest> createCaseManagementResultsRequest(MethislabCFUnderwrittingCasesResultsRequest value) {
         return new JAXBElement<MethislabCFUnderwrittingCasesResultsRequest>(_CaseManagementResultsRequest_QNAME, MethislabCFUnderwrittingCasesResultsRequest.class, null, value);
     }
@@ -168,7 +168,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link MethislabCFUnderwrittingCaseManagementRequest }{@code >}}
      *
      */
-    @XmlElementDecl(namespace = "http://www.scortelemed.com/schemas/methislab", name = "MethislabCFUnderwrittingCaseManagementRequest")
+    @XmlElementDecl(namespace = "http://www.scortelemed.com/schemas/methislabCF", name = "MethislabCFUnderwrittingCaseManagementRequest")
     public JAXBElement<MethislabCFUnderwrittingCaseManagementRequest> createMethislabUnderwrittingCaseManagementRequest(MethislabCFUnderwrittingCaseManagementRequest value) {
         return new JAXBElement<MethislabCFUnderwrittingCaseManagementRequest>(_MethislabUnderwrittingCaseManagementRequest_QNAME, MethislabCFUnderwrittingCaseManagementRequest.class, null, value);
     }
@@ -177,7 +177,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link MethislabCFUnderwrittingCaseManagementRequest }{@code >}}
      *
      */
-    @XmlElementDecl(namespace = "http://www.scortelemed.com/schemas/methislab", name = "CaseManagementRequest")
+    @XmlElementDecl(namespace = "http://www.scortelemed.com/schemas/methislabCF", name = "CaseManagementRequest")
     public JAXBElement<MethislabCFUnderwrittingCaseManagementRequest> createCaseManagementRequest(MethislabCFUnderwrittingCaseManagementRequest value) {
         return new JAXBElement<MethislabCFUnderwrittingCaseManagementRequest>(_CaseManagementRequest_QNAME, MethislabCFUnderwrittingCaseManagementRequest.class, null, value);
     }
@@ -186,7 +186,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link MethislabCFUnderwrittingCaseManagementResponse }{@code >}}
      *
      */
-    @XmlElementDecl(namespace = "http://www.scortelemed.com/schemas/methislab", name = "MethislabCFUnderwrittingCaseManagementResponse")
+    @XmlElementDecl(namespace = "http://www.scortelemed.com/schemas/methislabCF", name = "MethislabCFUnderwrittingCaseManagementResponse")
     public JAXBElement<MethislabCFUnderwrittingCaseManagementResponse> createMethislabUnderwrittingCaseManagementResponse(MethislabCFUnderwrittingCaseManagementResponse value) {
         return new JAXBElement<MethislabCFUnderwrittingCaseManagementResponse>(_MethislabUnderwrittingCaseManagementResponse_QNAME, MethislabCFUnderwrittingCaseManagementResponse.class, null, value);
     }
@@ -195,7 +195,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link MethislabCFUnderwrittingCasesResultsResponse }{@code >}}
      *
      */
-    @XmlElementDecl(namespace = "http://www.scortelemed.com/schemas/methislab", name = "CaseManagementResultsResponse")
+    @XmlElementDecl(namespace = "http://www.scortelemed.com/schemas/methislabCF", name = "CaseManagementResultsResponse")
     public JAXBElement<MethislabCFUnderwrittingCasesResultsResponse> createCaseManagementResultsResponse(MethislabCFUnderwrittingCasesResultsResponse value) {
         return new JAXBElement<MethislabCFUnderwrittingCasesResultsResponse>(_CaseManagementResultsResponse_QNAME, MethislabCFUnderwrittingCasesResultsResponse.class, null, value);
     }

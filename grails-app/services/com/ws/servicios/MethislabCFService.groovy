@@ -39,9 +39,9 @@ class MethislabCFService {
 	def tarificadorService
 	TransformacionUtil transformacionUtil = new TransformacionUtil()
 
-	public def rellenaDatosSalidaConsulta(expedientePoliza, requestDate, logginService) {
+	 def rellenaDatosSalidaConsulta(expedientePoliza, requestDate, logginService) {
 
-		MethislabCFUnderwrittingCasesResultsResponse.Expediente expediente = new Expediente()
+		MethislabCFUnderwrittingCasesResultsResponse.Expediente expediente = new MethislabCFUnderwrittingCasesResultsResponse.Expediente()
 
 		expediente.setRequestDate(requestDate)
 		expediente.setRequestNumber(util.devolverDatos(expedientePoliza.getNumSolicitud()))
