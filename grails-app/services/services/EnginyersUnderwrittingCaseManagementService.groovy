@@ -57,9 +57,7 @@ class EnginyersUnderwrittingCaseManagementService {
 
 	@WebResult(name = "addExpResponse")
 	@WebMethod(action = "http://www.scortelemed.com/schemas/enginyers/addExp")
-	AddExpResponse addExp(
-			@WebParam(partName = "addExp",name = "addExp")
-			AddExp addExp) {
+	AddExpResponse addExp(@WebParam(partName = "addExp",name = "addExp")AddExp addExp) {
 
 			def opername="EnginyersResultadoReconocimientoMedicoRequest"
 			def correoUtil = new CorreoUtil()
