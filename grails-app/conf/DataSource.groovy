@@ -18,7 +18,8 @@ environments {
         dataSource {
             dbCreate = "" // one of 'create', 'create-drop','update'
             username = "root"
-            password = "Wcbhjfod!"
+            //password = "Wcbhjfod!"
+            password = "root"
             url = "jdbc:mysql://localhost/scorws-prepro"
         }
     }
@@ -27,7 +28,8 @@ environments {
         dataSource {
             dbCreate = "" // one of 'create', 'create-drop','update'
             username = "root"
-            password = "1FaQ=V:=4yD"
+            //password = "1FaQ=V:=4yD"
+            password = "root"
             url = "jdbc:mysql://localhost/scorws-prepro"
         }
     }

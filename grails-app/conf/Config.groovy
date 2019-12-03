@@ -229,6 +229,14 @@ environments {
 
 pag.maximo = 25
 
+
+
+//grails.plugin.springsecurity.userLookup.userDomainClassName = 'com.scortelemed.Person'
+//grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'com.scortelemed.PersonAuthority'
+//grails.plugin.springsecurity.authority.className = 'com.scortelemed.Authority'
+//grails.plugin.springsecurity.providerNames = ['daoAuthenticationProvider', 'ldapAuthProvider', 'anonymousAuthenticationProvider']
+
+
 grails.plugin.springsecurity.userLookup.userDomainClassName = 'com.scortelemed.SecAppUser'
 grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'com.scortelemed.SecAppUserSecAppRole'
 grails.plugin.springsecurity.authority.className = 'com.scortelemed.SecAppRole'
@@ -400,7 +408,7 @@ log4j = {
             'org.hibernate',
             'net.sf.ehcache.hibernate'
 
-    warn  'org.springframework',
+    warn 'org.springframework',
             'org.hibernate',
             'grails.plugins.springsecurity',
             'groovyx.net.http'

@@ -16,7 +16,8 @@
 	<link rel="stylesheet" href="${resource(dir: 'css', file: 'bootstrap-responsive.css')}" type="text/css">
 	<link rel="stylesheet" href="${resource(dir: 'css', file: 'jquery-ui.css')}" type="text/css">
 	<link rel="stylesheet" href="${resource(dir: 'css', file: 'main.css')}" type="text/css">
-	<link rel="stylesheet" href="${resource(dir: 'css', file: 'menu.css')}" type="text/css">
+
+	<asset:stylesheet src="menu.css"/>
 	<script src="${resource(dir: 'js', file: 'jquery-1.8.js')}"></script>
 	<script src="${resource(dir: 'js', file: 'jquery-1.8-ui.js')}"></script>
 	<script src="${resource(dir: 'js', file: 'bootstrap.js')}"></script>
