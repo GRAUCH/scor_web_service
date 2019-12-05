@@ -11,9 +11,9 @@ import java.util.List;
 
 /**
  * <p>Java class for MethislabCFUnderwrittingCaseManagementRequest complex type.
- * 
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType name="MethislabCFUnderwrittingCaseManagementRequest">
  *   &lt;complexContent>
@@ -94,8 +94,8 @@ import java.util.List;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
+ *
+ *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "MethislabCFUnderwrittingCaseManagementRequest", propOrder = {

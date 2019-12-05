@@ -106,31 +106,29 @@ class MethislabCFService {
 
 	def marshall (nameSpace, clase){
 
-		StringWriter writer = new StringWriter();
+		StringWriter writer = new StringWriter()
 
 		try{
 
-			JAXBContext jaxbContext = JAXBContext.newInstance(clase.class);
-			Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+			JAXBContext jaxbContext = JAXBContext.newInstance(clase.class)
+			Marshaller jaxbMarshaller = jaxbContext.createMarshaller()
 
-			jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+			jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true)
 			def root = null
 			QName qName = null
 
 			if (clase instanceof MethislabCFUnderwrittingCaseManagementRequest){
-				qName = new QName(nameSpace, "MethislabCFUnderwrittingCaseManagementRequest");
-				root = new JAXBElement<MethislabCFUnderwrittingCaseManagementRequest>(qName, MethislabCFUnderwrittingCaseManagementRequest.class, clase);
+				qName = new QName(nameSpace, "MethislabCFUnderwrittingCaseManagementRequest")
+				root = new JAXBElement<MethislabCFUnderwrittingCaseManagementRequest>(qName, MethislabCFUnderwrittingCaseManagementRequest.class, clase)
 			}
 
 			if (clase instanceof MethislabCFUnderwrittingCasesResultsRequest){
-				qName = new QName(nameSpace, "MethislabCFUnderwrittingCasesResultsRequest");
-				root = new JAXBElement<MethislabCFUnderwrittingCasesResultsRequest>(qName, MethislabCFUnderwrittingCasesResultsRequest.class, clase);
+				qName = new QName(nameSpace, "MethislabCFUnderwrittingCasesResultsRequest")
+				root = new JAXBElement<MethislabCFUnderwrittingCasesResultsRequest>(qName, MethislabCFUnderwrittingCasesResultsRequest.class, clase)
 			}
-
-			jaxbMarshaller.marshal(root, writer);
-			String result = writer.toString();
+			jaxbMarshaller.marshal(root, writer)
 		} finally {
-			writer.close();
+			writer.close()
 		}
 
 		return writer
@@ -209,7 +207,6 @@ class MethislabCFService {
 			DATOS dato = new DATOS()
 
 			dato.registro = rellenaDatos(req, company)
-			//dato.pregunta = rellenaPreguntas(req, company.nombre)
 			dato.servicio = rellenaServicios(req, company.nombre)
 			dato.coberturas = rellenaCoberturas(req)
 
@@ -252,7 +249,7 @@ class MethislabCFService {
 
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-					Element eElement = (Element) nNode;
+					Element eElement = (Element) nNode
 
 					/**NUMERO DE PRODUCTO
 					 *

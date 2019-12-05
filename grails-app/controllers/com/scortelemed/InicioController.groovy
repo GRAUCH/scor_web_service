@@ -1,27 +1,10 @@
 package com.scortelemed
 
-import grails.util.Holders
-
-import java.security.Security;
-import java.util.Properties;
-
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import org.apache.commons.lang.*
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ldap.core.DirContextOperations
-import org.springframework.security.core.Authentication
-
-import grails.plugin.springsecurity.annotation.Secured
 import grails.plugin.springsecurity.SpringSecurityUtils
-
+import grails.plugin.springsecurity.annotation.Secured
+import org.apache.commons.lang.StringUtils
 import org.springframework.security.core.authority.SimpleGrantedAuthority
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextHolder
 
 @Secured(['ROLE_ADMIN','ROLE_USER'])
 class InicioController {
