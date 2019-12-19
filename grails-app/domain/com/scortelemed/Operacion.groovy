@@ -1,5 +1,6 @@
 package com.scortelemed
 class Operacion {
+
 	String clave
 	boolean activo
 	
@@ -29,7 +30,7 @@ class Operacion {
 		fecha_modificacion = new Date()
 	}
 	
-	public String toString() {
-		return clave;
+	 String toString() {
+		return clave
 	}
 }

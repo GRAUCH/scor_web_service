@@ -74,7 +74,7 @@
                             <td valign="top" style="text-align: left;" class="value">
                                 <ul>
                                 <g:each in="${webserviceInstance.usuarios}" var="u">
-                                    <div class="botonLupa"><li><g:link controller="person" action="show" id="${u.id}">${u?.encodeAsHTML()}</g:link></li></div>
+                                    <div class="botonLupa"><li><g:link controller="person" action="show" id="${u.id}">${u?.username.encodeAsHTML()}</g:link></li></div>
                                 </g:each>
                                 </ul>
                             </td>

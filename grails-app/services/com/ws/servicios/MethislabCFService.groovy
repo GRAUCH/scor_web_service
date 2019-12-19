@@ -220,7 +220,7 @@ class MethislabCFService {
 
 		def mapDatos = [:]
 		def listadoPreguntas = []
-		def formato = new SimpleDateFormat("yyyyMMdd");
+		def formato = new SimpleDateFormat("yyyyMMdd")
 		def apellido
 		def telefono1
 		def telefono2
