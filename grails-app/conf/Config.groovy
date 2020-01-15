@@ -189,8 +189,8 @@ environments {
         }
     }
 
-    production {
-        println "entra a produccion"
+    production_wildfly{
+        println "entra a produccion_wildfly CONEXIONES"
         grails.logging.jul.usebridge = false
         cxf {
             client {
@@ -324,29 +324,7 @@ log4j = {
 
         }
 
-        production {
-            println "ENTORNO PRODUCCION"
-            appenders {
-                //console name: 'stdout', layout: pattern(conversionPattern: '%c{2} %m%n')
-                appender new DailyRollingFileAppender(
-                        name: 'infoAppender',
-                        datePattern: "'.'yyyy-MM-dd",
-                        threshold: org.apache.log4j.Level.INFO,
-                        fileName: './logs/scorWebserviceInfo.log',
-                        //fileName: '/home/customer/hwsol/logs/prod/webServices/scorWebserviceInfo.log',  //storage path of log file
-                        layout: pattern(conversionPattern: '%d [%t] %-5p %c{2} %x - %m%n')
-                )
-                appender new DailyRollingFileAppender(
-                        name: 'errorAppender',
-                        datePattern: "'.'yyyy-MM-dd",
-                        threshold: org.apache.log4j.Level.ERROR,
-                        fileName: './logs/scorWebserviceError.log',  //storage path of log file
-                        //fileName: '/home/customer/hwsol/logs/prod/webServices/scorWebserviceError.log',  //storage path of log file
-                        layout: pattern(conversionPattern: '%d [%t] %-5p %c{2} %x - %m%n')
-                )
-            }
 
-        }
 
         preproduction_wildfly {
             println "ENTORNO PREPRODUCCION WILDFLY"
@@ -372,7 +350,7 @@ log4j = {
         }
 
         production_wildfly {
-            println "ENTORNO PRODUCCION WILDFLY"
+            println "ENTORNO PRODUCCION WILDFLY LOGS"
             appenders {
                 layout:
                 pattern(conversionPattern: '%c{2} %m%n')
