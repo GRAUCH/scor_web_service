@@ -35,7 +35,7 @@ environments {
     }
 
     production_wildfly {
-        println "COMPILA PARA PRODUCCION Wildfly DATA SOURCE"
+        println "COMPILA PARA PRODUCCION Wildfly"
         dataSource {
             dbCreate = ""
             username = "scorws"
@@ -54,5 +54,13 @@ environments {
         }
     }
 
-
+    production_wildfly {
+        println "COMPILA PARA PRODUCCION Wildfly"
+        dataSource {
+            dbCreate = ""
+            username = "scorws"
+            password = "Sc0rw3bS"
+            url = "jdbc:mysql://localhost/scorws"
+        }
+    }
 }

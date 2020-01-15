@@ -335,14 +335,14 @@ log4j = {
                         name: 'infoAppender',
                         datePattern: "'.'yyyy-MM-dd",
                         threshold: org.apache.log4j.Level.INFO,
-                        fileName: 'C:\\temp\\scorWebserviceInfo.log',  //storage path of log file
+                        fileName: '/datos/apps/logs/webservicessoap/scorWebserviceInfo.log',  //storage path of log file
                         layout: pattern(conversionPattern: '%d [%t] %-5p %c{2} %x - %m%n')
                 )
                 appender new DailyRollingFileAppender(
                         name: 'errorAppender',
                         datePattern: "'.'yyyy-MM-dd",
                         threshold: org.apache.log4j.Level.ERROR,
-                        fileName: 'C:\\temp\\scorWebserviceError.log',  //storage path of log file
+                        fileName: '/datos/apps/logs/webservicessoap/scorWebserviceError.log',  //storage path of log file
                         layout: pattern(conversionPattern: '%d [%t] %-5p %c{2} %x - %m%n')
                 )
             }
