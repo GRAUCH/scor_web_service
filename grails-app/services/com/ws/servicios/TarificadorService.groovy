@@ -260,7 +260,7 @@ class TarificadorService {
 			//SOBREESCRIBIMOS LA URL A LA QUE TIENE QUE LLAMAR EL WSDL
 			def ctx = grailsApplication.mainContext
 			def bean = ctx.getBean("soapClientAlptis")
-			bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY,"http://172.17.0.33:8003/FrontalServiciosCRM/FrontalService?wsdl")
+			bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY,Conf.findByName("frontal.wsdl")?.value)
 
 			def salida=grailsApplication.mainContext.soapClientAlptis.informeExpedientes(obtenerUsuarioFrontal(arg6),arg1,arg2,arg3,arg4,arg5)
 
