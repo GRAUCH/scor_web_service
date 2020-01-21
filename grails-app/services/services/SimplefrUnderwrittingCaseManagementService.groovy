@@ -225,7 +225,7 @@ class SimplefrUnderwrittingCaseManagementService	 {
 				resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 				resultado.setStatus(StatusType.ERROR)
 				logginService.putInfoEndpoint("La operacion " + opername + " esta desactivada temporalmente")
-				correoUtil.envioEmailErrores(opername,"Endpoint-"+ opername + ". La operacion esta desactivada temporalmente","")
+				correoUtil.envioEmailErrores(opername,"Endpoint-"+ opername + ". La operacion esta desactivada temporalmente",null)
 				
 			}
 			

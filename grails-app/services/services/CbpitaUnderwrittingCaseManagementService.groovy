@@ -331,7 +331,7 @@ class CbpitaUnderwrittingCaseManagementService {
                 code = 1
 
                 logginService.putInfoEndpoint("ResultadoReconocimientoMedico", "Esta operacion para " + company.nombre + " esta desactivada temporalmente")
-                correoUtil.envioEmailErrores("ResultadoReconocimientoMedico", "Peticion de " + company.nombre + " con fecha: " + cbpitaUnderwrittingCasesResultsRequest.dateStart.toString() + "-" + cbpitaUnderwrittingCasesResultsRequest.dateEnd.toString(), "Esta operacion para " + company.nombre + " esta desactivada temporalmente")
+                correoUtil.envioEmailErrores("ResultadoReconocimientoMedico", "Peticion de " + company.nombre + " con fecha: " + cbpitaUnderwrittingCasesResultsRequest.dateStart.toString() + "-" + cbpitaUnderwrittingCasesResultsRequest.dateEnd.toString(), "Esta operacion para " + company.nombre + " esta desactivada temporalmente",null)
             }
 
         } catch (Exception e) {
@@ -342,7 +342,7 @@ class CbpitaUnderwrittingCaseManagementService {
             code = 2
 
             logginService.putErrorEndpoint("ResultadoReconocimientoMedico", "Peticion realizada para " + company.nombre + " con fecha: " + cbpitaUnderwrittingCasesResultsRequest.dateStart.toString() + "-" + cbpitaUnderwrittingCasesResultsRequest.dateEnd.toString() + ". Error: " + e.getMessage())
-            correoUtil.envioEmailErrores("ResultadoReconocimientoMedico", "Peticion realizada para " + company.nombre + " con fecha: " + cbpitaUnderwrittingCasesResultsRequest.dateStart.toString() + "-" + cbpitaUnderwrittingCasesResultsRequest.dateEnd.toString() + ". Error: " + e.getMessage())
+            correoUtil.envioEmailErrores("ResultadoReconocimientoMedico", "Peticion realizada para " + company.nombre + " con fecha: " + cbpitaUnderwrittingCasesResultsRequest.dateStart.toString() + "-" + cbpitaUnderwrittingCasesResultsRequest.dateEnd.toString() + ". Error: " + e.getMessage(),e)
 
             cbpitaService.insertarError(company, cbpitaUnderwrittingCasesResultsRequest.dateStart.toString().substring(0, 10) + "-" + cbpitaUnderwrittingCasesResultsRequest.dateEnd.toString().substring(0, 10), requestXML.toString(), "CONSULTA", "Peticion no realizada para solicitud: " + cbpitaUnderwrittingCasesResultsRequest.dateStart.toString() + "-" + cbpitaUnderwrittingCasesResultsRequest.dateEnd.toString() + ". Error: " + e.getMessage())
 

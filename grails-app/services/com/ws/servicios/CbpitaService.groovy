@@ -998,7 +998,7 @@ class CbpitaService {
 		}
 	}
 
-	public def rellenaDatosSalidaConsulta(servicios.ExpedienteInforme expedientePoliza, codigoSt, requestDate, String zipPath, String user, String password) {
+	 def rellenaDatosSalidaConsulta(servicios.ExpedienteInforme expedientePoliza, codigoSt, requestDate, String zipPath, String user, String password) {
 
 		CbpitaUnderwrittingCasesResultsResponse.Expediente expediente = new CbpitaUnderwrittingCasesResultsResponse.Expediente()
 

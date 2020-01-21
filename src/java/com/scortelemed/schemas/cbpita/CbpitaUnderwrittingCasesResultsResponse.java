@@ -231,6 +231,7 @@ public class CbpitaUnderwrittingCasesResultsResponse {
         "requestDate",
         "requestNumber",
         "requestState",
+        "cancellationReason",
         "productCode",
         "policyNumber",
         "certificateNumber",
@@ -251,6 +252,8 @@ public class CbpitaUnderwrittingCasesResultsResponse {
         protected String requestNumber;
         @XmlElement(required = true)
         protected RequestStateType requestState;
+        @XmlElement(required = true)
+        protected String cancellationReason;
         @XmlElement(required = true)
         protected String productCode;
         @XmlElement(required = true)
@@ -343,6 +346,38 @@ public class CbpitaUnderwrittingCasesResultsResponse {
         public void setRequestState(RequestStateType value) {
             this.requestState = value;
         }
+        /**
+         * Gets the value of the cancellationReason property.
+         *
+         * @return
+         *     possible object is
+         *     {@link String }
+         *
+         */
+        public String getCancellationReason() {
+            return cancellationReason;
+        }
+
+        /**
+         * Sets the value of the cancellationReason property.
+         *
+         * @param value
+         *     allowed object is
+         *     {@link String }
+         *
+         */
+        public void setCancellationReason(String value) {
+            this.cancellationReason = value;
+        }
+
+        /**
+         * Gets the value of the productCode property.
+         *
+         * @return
+         *     possible object is
+         *     {@link String }
+         *
+         */
 
         /**
          * Gets the value of the productCode property.
