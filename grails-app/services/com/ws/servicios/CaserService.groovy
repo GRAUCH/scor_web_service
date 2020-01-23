@@ -1,60 +1,35 @@
 package com.ws.servicios
 
-import com.scor.global.WSException
 import com.scor.global.ExceptionUtils
+import com.scor.global.WSException
 import com.scor.srpfileinbound.DATOS
 import com.scor.srpfileinbound.REGISTRODATOS
 import com.scor.srpfileinbound.RootElement
-import com.scortelemed.schemas.caser.BenefictNameType
-import com.scortelemed.schemas.caser.BenefictResultType
-import com.scortelemed.schemas.caser.BenefitsType
-import com.scortelemed.schemas.caser.ConsolidacionPolizaRequest
-import com.scortelemed.schemas.caser.ConsultaExpedienteRequest
-import com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest
-import com.scortelemed.schemas.caser.ResultadoReconocimientoMedicoRequest
+import com.scortelemed.Company
+import com.scortelemed.Conf
+import com.scortelemed.Envio
+import com.scortelemed.Recibido
+import com.scortelemed.schemas.caser.*
 import com.scortelemed.schemas.caser.ConsultaExpedienteResponse.ExpedienteConsulta
 import com.scortelemed.schemas.caser.ResultadoReconocimientoMedicoResponse.Expediente
-import com.scortelemed.servicios.Filtro
-import com.scortelemed.Company
-import com.scortelemed.Envio
-import com.scortelemed.Estadistica
-import com.scortelemed.Conf
-import com.scortelemed.Recibido
-
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.GenerarZip
 import hwsol.webservices.TransformacionUtil
-import servicios.Candidato
-import servicios.DocumentacionExpedienteInforme
-import servicios.RespuestaCRM
-import servicios.RespuestaCRMInforme
-import servicios.TipoDocumentacion;
-import servicios.TipoTelefono;
+import org.w3c.dom.Document
+import org.w3c.dom.Element
+import org.w3c.dom.Node
+import org.w3c.dom.NodeList
+import org.xml.sax.InputSource
 
-import java.nio.file.Path
-import java.text.SimpleDateFormat
-import java.util.zip.ZipEntry
-import java.util.zip.ZipInputStream
-import java.util.zip.ZipOutputStream
-
-import javax.servlet.http.HttpSession
 import javax.xml.bind.JAXBContext
 import javax.xml.bind.JAXBElement
 import javax.xml.bind.Marshaller
-import javax.xml.bind.Unmarshaller
-import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
+import java.text.SimpleDateFormat
 
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Node;
-import org.w3c.dom.Element;
-import org.apache.axis.types.Token
-import org.xml.sax.InputSource
-import static grails.async.Promises.*
-import org.apache.commons.codec.binary.Base64;
+import static grails.async.Promises.task;
 
 class CaserService {
 

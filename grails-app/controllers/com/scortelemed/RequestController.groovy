@@ -1,4 +1,6 @@
 package com.scortelemed
+
+import com.scortelemed.schemas.enginyers.AddExp
 import grails.plugin.springsecurity.annotation.Secured
 import grails.util.Holders
 
@@ -455,7 +457,7 @@ class RequestController {
 					session.companyST=compania.codigoSt
 					requestXML=caserService.marshall("http://www.scortelemed.com/schemas/caser",gestionReconocimientoMedicoRequest)
 					requestBBDD = requestService.crear(opername,requestXML)
-					logginService.putInfoMessage("Se ha procesado una request namnualmente para: " + requestInstance.company)
+					logginService.putInfoMessage("Se ha procesado una request manualmente para: " + requestInstance.company)
 					caserService.crearExpediente(requestBBDD)
 					flash.message = "${message(code: 'default.processed.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
 
@@ -574,28 +576,26 @@ class RequestController {
 					flash.message = "${message(code: 'default.processed.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
 				}
 				break
-			case "lifesquare":
 
-				JAXBContext jaxbContext = JAXBContext.newInstance(LifesquareUnderwrittingCaseManagementRequest.class);
+			case "enginyers":
+
+				JAXBContext jaxbContext = JAXBContext.newInstance(AddExp.class);
 				Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-
 				StringReader reader = new StringReader(requestInstance.getRequest().trim());
-				LifesquareUnderwrittingCaseManagementRequest lifesquareUnderwrittingCaseManagementRequest = (LifesquareUnderwrittingCaseManagementRequest) jaxbUnmarshaller.unmarshal(reader);
+				JAXBElement<AddExp> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), AddExp.class);
+				AddExp addExp = root.getValue();
 
-				if (Company.findByNombre(requestInstance.company).generationAutomatic && lifesquareUnderwrittingCaseManagementRequest.getRequest_Data().getRecord().getNombre().equals("A")) {
+				if (Company.findByNombre(requestInstance.company).generationAutomatic) {
 					def compania=Company.findByNombre(requestInstance.company)
 					session.companyST=compania.codigoSt
-					requestXML = requestService.marshall(lifesquareUnderwrittingCaseManagementRequest,LifesquareUnderwrittingCaseManagementRequest.class)
-					requestBBDD = requestService.crear("LifesquareUnderwrittingCaseManagementRequest",requestXML)
+					requestXML=enginyersService.marshall("http://www.scortelemed.com/schemas/enginyers",addExp)
+					requestBBDD = requestService.crear("EnginyersResultadoReconocimientoMedicoRequest",requestXML)
 					logginService.putInfoMessage("Se ha procesado una request namnualmente para: " + requestInstance.company)
-					crearExpedienteService.crearExpediente(requestBBDD)
+					netinsuranceService.crearExpediente(requestBBDD)
 					flash.message = "${message(code: 'default.processed.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
-
-				} else if (!lifesquareUnderwrittingCaseManagementRequest.getRequest_Data().getRecord().getNombre().equals("A")){
-					flash.error = "${message(code: 'default.invalid.type.operation.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
 				}
-
 				break
+
 			default:
 				break
 

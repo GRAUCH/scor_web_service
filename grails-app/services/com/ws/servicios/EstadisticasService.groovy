@@ -30,8 +30,7 @@ class EstadisticasService {
 				estadistica.value = value
 				estadistica.save()
 			}
-	
-			
+
 			salida.put('claveProceso', request.claveProceso)
 			salida.put('operacion', operacion)
 		}

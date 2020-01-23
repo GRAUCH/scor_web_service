@@ -70,7 +70,7 @@ class CaserUnderwrittingCaseManagementService	 {
 		TransformacionUtil util = new TransformacionUtil()
 		CorreoUtil correoUtil = new CorreoUtil()
 
-		def opername="CaserResultadoReconocimientoMedicoRequest"
+		def opername="CaserGestionReconocimientoMedicoRequest"
 		def requestXML = ""
 		def requestBBDD
 		String notes = null
@@ -292,7 +292,7 @@ class CaserUnderwrittingCaseManagementService	 {
 
 							Expediente expediente = respuestaCRM.getListaExpedientes().get(i)
 
-							/**PARA EVITAR CONSULTAR DATOS DE OTRAS COMPAÑIAS
+							/**PARA EVITAR CONSULTAR DATOS DE OTRAS COMPAï¿½IAS
 							 *
 							 */
 

@@ -205,13 +205,13 @@ class CbpitaUnderwrittingCaseManagementService {
     }
 
     @WebResult(name = "CaseManagementResultsResponse")
-    CbpitaUnderwrittingCasesResultsResponse cbpitaUnderwrittingCasesResultsResponse(
+    CbpitaUnderwrittingCasesResultsResponse cbpitaUnderwrittingCasesResultsResponsecbpitaUnderwrittingCasesResultsResponse(
             @WebParam(partName = "CaseManagementResultsRequest", name = "CaseManagementResultsRequest")
                     CbpitaUnderwrittingCasesResultsRequest cbpitaUnderwrittingCasesResultsRequest) {
 
         def opername = "cbpitaUnderwrittingCaseManagementResponse"
         def requestXML = ""
-        List<RespuestaCRMInforme> expedientes = new ArrayList<RespuestaCRMInforme>();
+        List<RespuestaCRMInforme> expedientes = new ArrayList<RespuestaCRMInforme>()
         TransformacionUtil util = new TransformacionUtil()
         CorreoUtil correoUtil = new CorreoUtil()
         Company company = null
