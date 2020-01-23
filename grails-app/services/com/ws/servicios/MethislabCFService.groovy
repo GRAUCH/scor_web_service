@@ -143,7 +143,7 @@ class MethislabCFService {
 			def salida = grailsApplication.mainContext.soapClientCrearOrabpel.initiate(crearExpedienteBPM(req))
 			return "OK"
 		} catch (Exception e) {
-			throw new WSException(this.getClass(), "crearExpediente", ExceptionUtils.composeMessage(null, e));
+			throw new WSException(this.getClass(), "Error al crearExpediente", ExceptionUtils.composeMessage(null, e));
 		}
 	}
 
@@ -216,7 +216,7 @@ class MethislabCFService {
 		}
 	}
 
-	public def rellenaDatos (req, company) {
+	 def rellenaDatos (req, company) {
 
 		def mapDatos = [:]
 		def listadoPreguntas = []
@@ -255,7 +255,7 @@ class MethislabCFService {
 					 *
 					 */
 
-					datosRegistro.codigoProducto = "SRP"
+
 
 
 					if (eElement.getElementsByTagName("productCode").item(0) != null) {
@@ -768,7 +768,7 @@ class MethislabCFService {
 		}
 	}
 
-	public void insertarRecibido(Company company, String identificador, String info, String operacion) {
+	 void insertarRecibido(Company company, String identificador, String info, String operacion) {
 
 		Recibido recibido = new Recibido()
 		recibido.setFecha(new Date())
@@ -779,7 +779,7 @@ class MethislabCFService {
 		recibido.save(flush:true)
 	}
 
-	public void insertarError(Company company, String identificador, String info, String operacion, String detalleError) {
+	 void insertarError(Company company, String identificador, String info, String operacion, String detalleError) {
 
 		com.scortelemed.Error error = new com.scortelemed.Error()
 		error.setFecha(new Date())
@@ -791,7 +791,7 @@ class MethislabCFService {
 		error.save(flush:true)
 	}
 
-	public void insertarEnvio (Company company, String identificador, String info) {
+	 void insertarEnvio (Company company, String identificador, String info) {
 
 		Envio envio = new Envio()
 		envio.setFecha(new Date())
@@ -835,7 +835,7 @@ class MethislabCFService {
 	 * @param requestBBDD
 	 * @return
 	 */
-	public List<WsError> validarDatosObligatorios(requestBBDD) {
+	 List<WsError> validarDatosObligatorios(requestBBDD) {
 
 		List<WsError> wsErrors = new ArrayList<WsError>()
 		SimpleDateFormat formato = new SimpleDateFormat("yyyyMMdd");

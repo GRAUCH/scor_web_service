@@ -77,15 +77,16 @@ class MethislabCFUnderwrittingCaseManagementService {
 
 					if (wsErrors != null && wsErrors.size() == 0) {
 
-						message = "Il caso e stato elaborato correttamente"
-						status = StatusType.OK
-						code = 0
-
 						logginService.putInfoMessage("Se procede el alta automatica de " + company.nombre + " con numero de solicitud " + MethislabCFUnderwrittingCaseManagementRequest.candidateInformation.requestNumber)
 
 						methislabCFService.crearExpediente(requestBBDD)
 
 						methislabCFService.insertarRecibido(company, MethislabCFUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, requestXML.toString(), "ALTA")
+
+
+						message = "Il caso e stato elaborato correttamente"
+						status = StatusType.OK
+						code = 0
 
 						/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
 						 *

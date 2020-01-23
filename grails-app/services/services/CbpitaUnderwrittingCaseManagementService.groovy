@@ -241,7 +241,7 @@ class CbpitaUnderwrittingCaseManagementService {
 
                         requestService.crear(opername, requestXML)
 
-                        Calendar calendarIni = Calendar.getInstance();
+                        Calendar calendarIni = Calendar.getInstance()
                         Date date = cbpitaUnderwrittingCasesResultsRequest.dateStart.toGregorianCalendar().getTime()
                         calendarIni.setTime(date)
                         calendarIni.add(Calendar.HOUR, -1)

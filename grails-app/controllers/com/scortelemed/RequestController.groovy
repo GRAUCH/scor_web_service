@@ -510,7 +510,6 @@ class RequestController {
 				} else if (!afiEscaUnderwrittingCaseManagementRequest.getRequest_Data().getRecord().getNombre().equals("A")){
 					flash.error = "${message(code: 'default.invalid.type.operation.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
 				}
-
 				break
 			case "alptis":
 
@@ -595,6 +594,7 @@ class RequestController {
 					flash.message = "${message(code: 'default.processed.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
 				}
 				break
+
 
 			default:
 				break
