@@ -35,6 +35,8 @@ import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 import java.text.SimpleDateFormat
 
+import static grails.async.Promises.task
+
 class CbpitaService {
 
     TransformacionUtil util = new TransformacionUtil()
@@ -724,7 +726,7 @@ class CbpitaService {
         }
     }
 
-    def busquedaCrm(solicitud, ou, companyCodigoSt, companyId, requestBBDD, String nombrecia) {
+    def busquedaCrm (solicitud, ou, companyCodigoSt, companyId, requestBBDD, String nombrecia) {
 
         task {
 
