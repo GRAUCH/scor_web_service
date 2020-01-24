@@ -1,13 +1,25 @@
 package com.ws.servicios
 
-import hwsol.webservices.WsError
-
-import static grails.async.Promises.*
+import com.scor.global.ExceptionUtils
+import com.scor.global.WSException
+import com.scor.srpfileinbound.DATOS
+import com.scor.srpfileinbound.REGISTRODATOS
+import com.scor.srpfileinbound.RootElement
+import com.scortelemed.Company
+import com.scortelemed.Conf
+import com.scortelemed.Envio
+import com.scortelemed.Recibido
+import com.scortelemed.schemas.methislab.*
+import com.scortelemed.schemas.methislab.MethislabUnderwrittingCasesResultsResponse.Expediente
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.GenerarZip
 import hwsol.webservices.TransformacionUtil
-
-import java.text.SimpleDateFormat
+import hwsol.webservices.WsError
+import org.w3c.dom.Document
+import org.w3c.dom.Element
+import org.w3c.dom.Node
+import org.w3c.dom.NodeList
+import org.xml.sax.InputSource
 
 import javax.xml.bind.JAXBContext
 import javax.xml.bind.JAXBElement
@@ -15,994 +27,974 @@ import javax.xml.bind.Marshaller
 import javax.xml.namespace.QName
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
+import java.text.SimpleDateFormat
 
-import org.w3c.dom.Document
-import org.w3c.dom.Element
-import org.w3c.dom.Node
-import org.w3c.dom.NodeList
-import org.xml.sax.InputSource
-
-import com.scor.global.ExceptionUtils
-import com.scor.global.WSException
-import com.scor.srpfileinbound.DATOS
-import com.scor.srpfileinbound.REGISTRODATOS
-import com.scor.srpfileinbound.RootElement
-import com.scortelemed.Company;
-import com.scortelemed.Conf
-import com.scortelemed.Envio
-import com.scortelemed.Recibido
-import com.scortelemed.schemas.methislab.BenefictResultType
-import com.scortelemed.schemas.methislab.BenefitsType
-import com.scortelemed.schemas.methislab.MethislabUnderwrittingCaseManagementRequest
-import com.scortelemed.schemas.methislab.MethislabUnderwrittingCasesResultsRequest
-import com.scortelemed.schemas.methislab.MethislabUnderwrittingCasesResultsResponse.Expediente
-import com.scortelemed.schemas.methislab.RequestStateType
-import com.scortelemed.schemas.methislab.BenefictNameType
+import static grails.async.Promises.task
 
 class MethislabService {
 
-	TransformacionUtil util = new TransformacionUtil()
-	def grailsApplication
-	def logginService = new LogginService()
-	GenerarZip generarZip = new GenerarZip()
-	def tarificadorService
-	TransformacionUtil transformacionUtil = new TransformacionUtil()
+    TransformacionUtil util = new TransformacionUtil()
+    def grailsApplication
+    def logginService = new LogginService()
+    GenerarZip generarZip = new GenerarZip()
+    def tarificadorService
+    TransformacionUtil transformacionUtil = new TransformacionUtil()
 
-	public def rellenaDatosSalidaConsulta(expedientePoliza, requestDate, logginService) {
+    public def rellenaDatosSalidaConsulta(expedientePoliza, requestDate, logginService) {
 
-		Expediente expediente = new Expediente()
+        Expediente expediente = new Expediente()
 
-		expediente.setRequestDate(requestDate)
-		expediente.setRequestNumber(util.devolverDatos(expedientePoliza.getNumSolicitud()))
-		expediente.setRequestState(devolverStateType(expedientePoliza.getCodigoEstado()))
-		expediente.setProductCode(util.devolverDatos(expedientePoliza.getProducto().getCodigoProductoCompanya()))
-		expediente.setPolicyNumber(util.devolverDatos(expedientePoliza.getNumPoliza()))
-		expediente.setCertificateNumber(util.devolverDatos(expedientePoliza.getNumCertificado()))
+        expediente.setRequestDate(requestDate)
+        expediente.setRequestNumber(util.devolverDatos(expedientePoliza.getNumSolicitud()))
+        expediente.setRequestState(devolverStateType(expedientePoliza.getCodigoEstado()))
+        expediente.setProductCode(util.devolverDatos(expedientePoliza.getProducto().getCodigoProductoCompanya()))
+        expediente.setPolicyNumber(util.devolverDatos(expedientePoliza.getNumPoliza()))
+        expediente.setCertificateNumber(util.devolverDatos(expedientePoliza.getNumCertificado()))
 
 
-		if (expedientePoliza.getCandidato() != null) {
-			expediente.setFiscalIdentificationNumber(expedientePoliza.getCandidato().getNumeroDocumento())
-			expediente.setMobilePhone(util.devolverTelefonoMovil(expedientePoliza.getCandidato()))
-			expediente.setPhoneNumber1(util.devolverTelefono1(expedientePoliza.getCandidato()))
-			expediente.setPhoneNumber2(util.devolverTelefono2(expedientePoliza.getCandidato()))
-		} else {
-			expediente.setFiscalIdentificationNumber("")
-			expediente.setMobilePhone("")
-			expediente.setPhoneNumber1("")
-			expediente.setPhoneNumber2("")
-		}
+        if (expedientePoliza.getCandidato() != null) {
+            expediente.setFiscalIdentificationNumber(expedientePoliza.getCandidato().getNumeroDocumento())
+            expediente.setMobilePhone(util.devolverTelefonoMovil(expedientePoliza.getCandidato()))
+            expediente.setPhoneNumber1(util.devolverTelefono1(expedientePoliza.getCandidato()))
+            expediente.setPhoneNumber2(util.devolverTelefono2(expedientePoliza.getCandidato()))
+        } else {
+            expediente.setFiscalIdentificationNumber("")
+            expediente.setMobilePhone("")
+            expediente.setPhoneNumber1("")
+            expediente.setPhoneNumber2("")
+        }
 
-		byte[] compressedData=tarificadorService.obtenerZip(expedientePoliza.getNodoAlfresco())
+        byte[] compressedData = tarificadorService.obtenerZip(expedientePoliza.getNodoAlfresco())
 
-		expediente.setZip(compressedData)
+        expediente.setZip(compressedData)
 
-		expediente.setNotes(util.devolverDatos(expedientePoliza.getTarificacion().getObservaciones()))
+        expediente.setNotes(util.devolverDatos(expedientePoliza.getTarificacion().getObservaciones()))
 
-		if (expedientePoliza.getCoberturasExpediente() != null && expedientePoliza.getCoberturasExpediente().size() > 0) {
+        if (expedientePoliza.getCoberturasExpediente() != null && expedientePoliza.getCoberturasExpediente().size() > 0) {
 
-			expedientePoliza.getCoberturasExpediente().each { coberturasPoliza ->
+            expedientePoliza.getCoberturasExpediente().each { coberturasPoliza ->
 
-				BenefitsType benefitsType = new BenefitsType()
+                BenefitsType benefitsType = new BenefitsType()
 
-				benefitsType.setBenefictName(devolverNombreCobertura(coberturasPoliza.getCodigoCobertura()))
-				benefitsType.setBenefictCode(util.devolverDatos(coberturasPoliza.getCodigoCobertura()))
-				benefitsType.setBenefictCapital(util.devolverDatos(coberturasPoliza.getCapitalCobertura()))
+                benefitsType.setBenefictName(devolverNombreCobertura(coberturasPoliza.getCodigoCobertura()))
+                benefitsType.setBenefictCode(util.devolverDatos(coberturasPoliza.getCodigoCobertura()))
+                benefitsType.setBenefictCapital(util.devolverDatos(coberturasPoliza.getCapitalCobertura()))
 
-				BenefictResultType benefictResultType = new BenefictResultType()
+                BenefictResultType benefictResultType = new BenefictResultType()
 
-				benefictResultType.setDescResult(util.devolverDatos(coberturasPoliza.getResultadoCobertura()))
-				benefictResultType.setResultCode(util.devolverDatos(coberturasPoliza.getCodResultadoCobertura()))
+                benefictResultType.setDescResult(util.devolverDatos(coberturasPoliza.getResultadoCobertura()))
+                benefictResultType.setResultCode(util.devolverDatos(coberturasPoliza.getCodResultadoCobertura()))
 
-				benefictResultType.setPremiumLoading(util.devolverDatos(coberturasPoliza.getValoracionPrima()))
-				benefictResultType.setCapitalLoading(util.devolverDatos(coberturasPoliza.getValoracionCapital()))
-				benefictResultType.setDescPremiumLoading("")
-				benefictResultType.setDescCapitalLoading("")
+                benefictResultType.setPremiumLoading(util.devolverDatos(coberturasPoliza.getValoracionPrima()))
+                benefictResultType.setCapitalLoading(util.devolverDatos(coberturasPoliza.getValoracionCapital()))
+                benefictResultType.setDescPremiumLoading("")
+                benefictResultType.setDescCapitalLoading("")
 
-				benefictResultType.exclusions = util.fromStringLoList(coberturasPoliza.getExclusiones())
-				benefictResultType.temporalLoading = util.fromStringLoList(coberturasPoliza.getValoracionTemporal())
-				benefictResultType.medicalReports = util.fromStringLoList(coberturasPoliza.getInformesMedicos())
-				//benefictResultType.medicalTest = util.fromStringLoList(coberturasPoliza.getInformes)
-				benefictResultType.notes = util.fromStringLoList(coberturasPoliza.getNotas())
+                benefictResultType.exclusions = util.fromStringLoList(coberturasPoliza.getExclusiones())
+                benefictResultType.temporalLoading = util.fromStringLoList(coberturasPoliza.getValoracionTemporal())
+                benefictResultType.medicalReports = util.fromStringLoList(coberturasPoliza.getInformesMedicos())
+                //benefictResultType.medicalTest = util.fromStringLoList(coberturasPoliza.getInformes)
+                benefictResultType.notes = util.fromStringLoList(coberturasPoliza.getNotas())
 
-				benefitsType.setBenefictResult(benefictResultType)
+                benefitsType.setBenefictResult(benefictResultType)
 
-				expediente.getBenefitsList().add(benefitsType)
-			}
-		}
+                expediente.getBenefitsList().add(benefitsType)
+            }
+        }
 
-		return expediente
-	}
+        return expediente
+    }
 
-	def marshall (nameSpace, clase){
+    def marshall(nameSpace, clase) {
 
-		StringWriter writer = new StringWriter();
+        StringWriter writer = new StringWriter();
 
-		try{
+        try {
 
-			JAXBContext jaxbContext = JAXBContext.newInstance(clase.class);
-			Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+            JAXBContext jaxbContext = JAXBContext.newInstance(clase.class);
+            Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
 
-			jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-			def root = null
-			QName qName = null
+            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            def root = null
+            QName qName = null
 
-			if (clase instanceof MethislabUnderwrittingCaseManagementRequest){
-				qName = new QName(nameSpace, "MethislabUnderwrittingCaseManagementRequest");
-				root = new JAXBElement<MethislabUnderwrittingCaseManagementRequest	>(qName, MethislabUnderwrittingCaseManagementRequest.class, clase);
-			}
+            if (clase instanceof MethislabUnderwrittingCaseManagementRequest) {
+                qName = new QName(nameSpace, "MethislabUnderwrittingCaseManagementRequest");
+                root = new JAXBElement<MethislabUnderwrittingCaseManagementRequest>(qName, MethislabUnderwrittingCaseManagementRequest.class, clase);
+            }
 
-			if (clase instanceof MethislabUnderwrittingCasesResultsRequest){
-				qName = new QName(nameSpace, "MethislabUnderwrittingCasesResultsRequest");
-				root = new JAXBElement<MethislabUnderwrittingCasesResultsRequest>(qName, MethislabUnderwrittingCasesResultsRequest.class, clase);
-			}
+            if (clase instanceof MethislabUnderwrittingCasesResultsRequest) {
+                qName = new QName(nameSpace, "MethislabUnderwrittingCasesResultsRequest");
+                root = new JAXBElement<MethislabUnderwrittingCasesResultsRequest>(qName, MethislabUnderwrittingCasesResultsRequest.class, clase);
+            }
 
-			jaxbMarshaller.marshal(root, writer);
-			String result = writer.toString();
-		} finally {
-			writer.close();
-		}
+            jaxbMarshaller.marshal(root, writer);
+            String result = writer.toString();
+        } finally {
+            writer.close();
+        }
 
-		return writer
-	}
+        return writer
+    }
 
-	def crearExpediente = { req ->
-		try {
-			//SOBREESCRIBIMOS LA URL A LA QUE TIENE QUE LLAMAR EL WSDL
-			def ctx = grailsApplication.mainContext
-			def bean = ctx.getBean("soapClientCrearOrabpel")
-			bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("orabpelCreacion.wsdl")?.value)
-			def salida = grailsApplication.mainContext.soapClientCrearOrabpel.initiate(crearExpedienteBPM(req))
-			return "OK"
-		} catch (Exception e) {
-			throw new WSException(this.getClass(), "crearExpediente", ExceptionUtils.composeMessage(null, e));
-		}
-	}
+    def crearExpediente = { req ->
+        try {
+            //SOBREESCRIBIMOS LA URL A LA QUE TIENE QUE LLAMAR EL WSDL
+            def ctx = grailsApplication.mainContext
+            def bean = ctx.getBean("soapClientCrearOrabpel")
+            bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("orabpelCreacion.wsdl")?.value)
+            def salida = grailsApplication.mainContext.soapClientCrearOrabpel.initiate(crearExpedienteBPM(req))
+            return "OK"
+        } catch (Exception e) {
+            throw new WSException(this.getClass(), "crearExpediente", ExceptionUtils.composeMessage(null, e));
+        }
+    }
 
-	def consultaExpediente = { ou, filtro ->
+    def consultaExpediente = { ou, filtro ->
 
-		try {
+        try {
 
-			def ctx = grailsApplication.mainContext
-			def bean = ctx.getBean("soapClientAlptis")
-			bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY,Conf.findByName("frontal.wsdl")?.value)
+            def ctx = grailsApplication.mainContext
+            def bean = ctx.getBean("soapClientAlptis")
+            bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("frontal.wsdl")?.value)
 
-			def salida=grailsApplication.mainContext.soapClientAlptis.consultaExpediente(tarificadorService.obtenerUsuarioFrontal(ou),filtro)
+            def salida = grailsApplication.mainContext.soapClientAlptis.consultaExpediente(tarificadorService.obtenerUsuarioFrontal(ou), filtro)
 
-			return salida
-		} catch (Exception e) {
-			logginService.putError("obtenerInformeExpedientes de Methislab","No se ha podido obtener el informe de expediente : " + e)
-			return null
-		}
-	}
+            return salida
+        } catch (Exception e) {
+            logginService.putError("obtenerInformeExpedientes de Methislab", "No se ha podido obtener el informe de expediente : " + e)
+            return null
+        }
+    }
 
-	private def crearExpedienteBPM = { req ->
-		def listadoFinal = []
-		RootElement payload = new RootElement()
+    private def crearExpedienteBPM = { req ->
+        def listadoFinal = []
+        RootElement payload = new RootElement()
 
-		listadoFinal.add(buildCabecera(req))
-		listadoFinal.add(buildDatos(req, req.company))
-		listadoFinal.add(buildPie())
+        listadoFinal.add(buildCabecera(req))
+        listadoFinal.add(buildDatos(req, req.company))
+        listadoFinal.add(buildPie())
 
-		payload.cabeceraOrDATOSOrPIE = listadoFinal
+        payload.cabeceraOrDATOSOrPIE = listadoFinal
 
-		return payload
-	}
+        return payload
+    }
 
-	private def buildCabecera = { req ->
-		def formato = new SimpleDateFormat("yyyyMMdd");
-		RootElement.CABECERA cabecera = new RootElement.CABECERA()
-		cabecera.setCodigoCia(req.company.codigoSt)
-		cabecera.setContadorSecuencial("1")
-		cabecera.setFechaGeneracion(formato.format(new Date()))
-		cabecera.setFiller("")
-		cabecera.setTipoFichero("1")
+    private def buildCabecera = { req ->
+        def formato = new SimpleDateFormat("yyyyMMdd");
+        RootElement.CABECERA cabecera = new RootElement.CABECERA()
+        cabecera.setCodigoCia(req.company.codigoSt)
+        cabecera.setContadorSecuencial("1")
+        cabecera.setFechaGeneracion(formato.format(new Date()))
+        cabecera.setFiller("")
+        cabecera.setTipoFichero("1")
 
-		return cabecera
-	}
+        return cabecera
+    }
 
-	private def buildPie = {
+    private def buildPie = {
 
-		RootElement.PIE pie = new RootElement.PIE()
-		pie.setFiller("")
-		pie.setNumFilasFichero(100)
+        RootElement.PIE pie = new RootElement.PIE()
+        pie.setFiller("")
+        pie.setNumFilasFichero(100)
 
-		pie.setNumRegistros(1)
+        pie.setNumRegistros(1)
 
-		return pie
-	}
+        return pie
+    }
 
-	private def buildDatos = { req, company ->
+    private def buildDatos = { req, company ->
 
-		try {
+        try {
 
-			DATOS dato = new DATOS()
+            DATOS dato = new DATOS()
 
-			dato.registro = rellenaDatos(req, company)
-			//dato.pregunta = rellenaPreguntas(req, company.nombre)
-			dato.servicio = rellenaServicios(req, company.nombre)
-			dato.coberturas = rellenaCoberturas(req)
+            dato.registro = rellenaDatos(req, company)
+            //dato.pregunta = rellenaPreguntas(req, company.nombre)
+            dato.servicio = rellenaServicios(req, company.nombre)
+            dato.coberturas = rellenaCoberturas(req)
 
-			return dato
-		} catch (Exception e) {
-			logginService.putError(e.toString())
-		}
-	}
+            return dato
+        } catch (Exception e) {
+            logginService.putError(e.toString())
+        }
+    }
 
-	public def rellenaDatos (req, company) {
+    public def rellenaDatos(req, company) {
 
-		def mapDatos = [:]
-		def listadoPreguntas = []
-		def formato = new SimpleDateFormat("yyyyMMdd");
-		def apellido
-		def telefono1
-		def telefono2
-		def telefonoMovil
-		def productCia
-		def nombreAgente
+        def mapDatos = [:]
+        def listadoPreguntas = []
+        def formato = new SimpleDateFormat("yyyyMMdd");
+        def apellido
+        def telefono1
+        def telefono2
+        def telefonoMovil
+        def productCia
+        def nombreAgente
 
-		REGISTRODATOS datosRegistro = new REGISTRODATOS()
+        REGISTRODATOS datosRegistro = new REGISTRODATOS()
 
-		try {
+        try {
 
-			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
-			DocumentBuilder builder = factory.newDocumentBuilder()
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
+            DocumentBuilder builder = factory.newDocumentBuilder()
 
-			InputSource is = new InputSource(new StringReader(req.request))
-			is.setEncoding("UTF-8")
-			Document doc = builder.parse(is)
+            InputSource is = new InputSource(new StringReader(req.request))
+            is.setEncoding("UTF-8")
+            Document doc = builder.parse(is)
 
-			doc.getDocumentElement().normalize()
+            doc.getDocumentElement().normalize()
 
-			NodeList nList = doc.getElementsByTagName("CandidateInformation")
+            NodeList nList = doc.getElementsByTagName("CandidateInformation")
 
-			for (int temp = 0; temp < nList.getLength(); temp++) {
+            for (int temp = 0; temp < nList.getLength(); temp++) {
 
-				Node nNode = nList.item(temp)
+                Node nNode = nList.item(temp)
 
-				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+                if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-					Element eElement = (Element) nNode;
+                    Element eElement = (Element) nNode;
 
-					/**NUMERO DE PRODUCTO
-					 *
-					 */
+                    /**NUMERO DE PRODUCTO
+                     *
+                     */
 
-					datosRegistro.codigoProducto = "SRP"
 
 
-					//if (eElement.getElementsByTagName("productCode").item(0) != null) {
-						datosRegistro.codigoProducto = "EUROVITAPEN"
-					//}
+                    datosRegistro.codigoProducto = "EUROVITAPEN"
 
-					/**NOMBRE DE CANDIDATO
-                    *
-                    */
+                    if (eElement.getElementsByTagName("productCode").item(0) != null) {
+                        datosRegistro.campo8 = eElement.getElementsByTagName("productCode").item(0).getTextContent()
+                    }
 
-					if (eElement.getElementsByTagName("name").item(0) != null) {
-						datosRegistro.nombreCliente = eElement.getElementsByTagName("name").item(0).getTextContent()
-					}
+                    /**NOMBRE DE CANDIDATO
+                     *
+                     */
 
-					/**APELLIDO CANDIDATO
-					 *
-					 */
+                    if (eElement.getElementsByTagName("name").item(0) != null) {
+                        datosRegistro.nombreCliente = eElement.getElementsByTagName("name").item(0).getTextContent()
+                    }
 
-					if (eElement.getElementsByTagName("surname").item(0) != null) {
-						apellido = eElement.getElementsByTagName("surname").item(0).getTextContent()
-					}
+                    /**APELLIDO CANDIDATO
+                     *
+                     */
 
-					datosRegistro.apellidosCliente = apellido
+                    if (eElement.getElementsByTagName("surname").item(0) != null) {
+                        apellido = eElement.getElementsByTagName("surname").item(0).getTextContent()
+                    }
 
-					/**DNI CANDIDATO
-					 *
-					 */
+                    datosRegistro.apellidosCliente = apellido
 
-					if (eElement.getElementsByTagName("fiscalIdentificationNumber").item(0) != null) {
-						datosRegistro.dni = eElement.getElementsByTagName("fiscalIdentificationNumber").item(0).getTextContent()
-					}
+                    /**DNI CANDIDATO
+                     *
+                     */
 
-					/**SEXO CANDIDATO
-					 *
-					 */
+                    if (eElement.getElementsByTagName("fiscalIdentificationNumber").item(0) != null) {
+                        datosRegistro.dni = eElement.getElementsByTagName("fiscalIdentificationNumber").item(0).getTextContent()
+                    }
 
-					if (eElement.getElementsByTagName("gender").item(0) != null) {
-						datosRegistro.sexo = eElement.getElementsByTagName("gender").item(0).getTextContent()=="M"?"M":"V"
-					} else {
-						datosRegistro.sexo = "M"
-					}
+                    /**SEXO CANDIDATO
+                     *
+                     */
 
-					/**DIRECCION CLIENTE**/
+                    if (eElement.getElementsByTagName("gender").item(0) != null) {
+                        datosRegistro.sexo = eElement.getElementsByTagName("gender").item(0).getTextContent() == "M" ? "M" : "V"
+                    } else {
+                        datosRegistro.sexo = "M"
+                    }
 
-					if (eElement.getElementsByTagName("address").item(0) != null) {
-						datosRegistro.direccionCliente = eElement.getElementsByTagName("address").item(0).getTextContent()
-					} else {
-						datosRegistro.direccionCliente = "."
-					}
+                    /**DIRECCION CLIENTE**/
 
-					/**CODIGO POSTAL CLIENTE
-					 *
-					 */
+                    if (eElement.getElementsByTagName("address").item(0) != null) {
+                        datosRegistro.direccionCliente = eElement.getElementsByTagName("address").item(0).getTextContent()
+                    } else {
+                        datosRegistro.direccionCliente = "."
+                    }
 
-					if (eElement.getElementsByTagName("postalCode").item(0) != null) {
-						datosRegistro.codigoPostal = eElement.getElementsByTagName("postalCode").item(0).getTextContent()
-					} else {
-						datosRegistro.codigoPostal = "."
-					}
+                    /**CODIGO POSTAL CLIENTE
+                     *
+                     */
 
-					/**POBLACION
-					 *
-					 */
+                    if (eElement.getElementsByTagName("postalCode").item(0) != null) {
+                        datosRegistro.codigoPostal = eElement.getElementsByTagName("postalCode").item(0).getTextContent()
+                    } else {
+                        datosRegistro.codigoPostal = "."
+                    }
 
-					if (eElement.getElementsByTagName("city").item(0) != null) {
-						datosRegistro.poblacion = eElement.getElementsByTagName("city").item(0).getTextContent()
-					} else {
-						datosRegistro.poblacion = "."
-					}
-					/**PROVINCIA
-					 *
-					 */
+                    /**POBLACION
+                     *
+                     */
 
-					if (eElement.getElementsByTagName("province").item(0) != null) {
-						datosRegistro.provincia = eElement.getElementsByTagName("province").item(0).getTextContent()
-					} else {
-						datosRegistro.provincia = "."
-					}
+                    if (eElement.getElementsByTagName("city").item(0) != null) {
+                        datosRegistro.poblacion = eElement.getElementsByTagName("city").item(0).getTextContent()
+                    } else {
+                        datosRegistro.poblacion = "."
+                    }
+                    /**PROVINCIA
+                     *
+                     */
 
-					/**TELEFONOS
-					 */
+                    if (eElement.getElementsByTagName("province").item(0) != null) {
+                        datosRegistro.provincia = eElement.getElementsByTagName("province").item(0).getTextContent()
+                    } else {
+                        datosRegistro.provincia = "."
+                    }
 
-					if (eElement.getElementsByTagName("phoneNumber1").item(0) != null && eElement.getElementsByTagName("phoneNumber1").item(0).getTextContent() != null && !eElement.getElementsByTagName("phoneNumber1").item(0).getTextContent().isEmpty()) {
+                    /**TELEFONOS
+                     */
 
-						telefono1 = eElement.getElementsByTagName("phoneNumber1").item(0).getTextContent()
+                    if (eElement.getElementsByTagName("phoneNumber1").item(0) != null && eElement.getElementsByTagName("phoneNumber1").item(0).getTextContent() != null && !eElement.getElementsByTagName("phoneNumber1").item(0).getTextContent().isEmpty()) {
 
-						if (telefono1 != null && !telefono1.isEmpty() && (telefono1.startsWith("0039") || telefono1.startsWith("+39"))) {
-							datosRegistro.telefono1 = telefono1
-						} else if (telefono1 != null && !telefono1.isEmpty()){
-							datosRegistro.telefono1 = "0039" + telefono1
-						} else {
-							datosRegistro.telefono1 = null
-						}
-					}
+                        telefono1 = eElement.getElementsByTagName("phoneNumber1").item(0).getTextContent()
 
-					if (eElement.getElementsByTagName("phoneNumber2").item(0) != null && eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent() != null && !eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent().isEmpty()) {
+                        if (telefono1 != null && !telefono1.isEmpty() && (telefono1.startsWith("0039") || telefono1.startsWith("+39"))) {
+                            datosRegistro.telefono1 = telefono1
+                        } else if (telefono1 != null && !telefono1.isEmpty()) {
+                            datosRegistro.telefono1 = "0039" + telefono1
+                        } else {
+                            datosRegistro.telefono1 = null
+                        }
+                    }
 
-						telefono2 = eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent()
+                    if (eElement.getElementsByTagName("phoneNumber2").item(0) != null && eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent() != null && !eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent().isEmpty()) {
 
-						if (telefono2 != null && !telefono2.isEmpty() && (telefono2.startsWith("0039") || telefono2.startsWith("+39"))) {
-							datosRegistro.telefono2 = telefono2
-						} else if (telefono2 != null && !telefono2.isEmpty()){
-							datosRegistro.telefono2 = "0039" + telefono2
-						} else {
-							datosRegistro.telefono2 = null
-						}
-					}
-
-					if (eElement.getElementsByTagName("mobileNumber").item(0) != null) {
-
-						telefonoMovil = eElement.getElementsByTagName("mobileNumber").item(0).getTextContent()
-
-						if (telefonoMovil != null && !telefonoMovil.isEmpty() && (telefonoMovil.startsWith("0039") || telefonoMovil.startsWith("+39"))) {
-							telefonoMovil = telefonoMovil
-						} else if (telefonoMovil != null && !telefonoMovil.isEmpty()){
-							telefonoMovil = "0039" + telefonoMovil
-						} else {
-							telefonoMovil = null
-						}
-					}
-
-					if (telefonoMovil != null && !telefonoMovil.isEmpty()) {
-						datosRegistro.telefono1 = telefonoMovil
-					}
-
-					if (datosRegistro.telefono1 == null || datosRegistro.telefono1.isEmpty()){
-						if (datosRegistro.telefono3 != null && !datosRegistro.telefono3.isEmpty()){
-							datosRegistro.telefono1 = datosRegistro.telefono3
-						} else if (datosRegistro.telefono2 != null && !datosRegistro.telefono2.isEmpty()){
-							datosRegistro.telefono1 = datosRegistro.telefono2
-						} else {
-							datosRegistro.telefono1 = "999999999"
-						}
-					}
-
-					/**CODIGO CIA
-					 *
-					 */
-
-					datosRegistro.codigoCia = company.codigoSt
+                        telefono2 = eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent()
 
-					/**FECHA DE NACIMIENTO
-					 *
-					 */
-
-					if (eElement.getElementsByTagName("birthDate").item(0) != null && !eElement.getElementsByTagName("birthDate").item(0).getTextContent().isEmpty()) {
-						datosRegistro.fechaNacimiento = formato.format(util.fromStringToXmlCalendar(eElement.getElementsByTagName("birthDate").item(0).getTextContent()).toGregorianCalendar().getTime())
-					} else {
-						datosRegistro.fechaNacimiento = formato.format(util.fromStringToXmlCalendar("2017-01-01T00:00:00").toGregorianCalendar().getTime())
-					}
+                        if (telefono2 != null && !telefono2.isEmpty() && (telefono2.startsWith("0039") || telefono2.startsWith("+39"))) {
+                            datosRegistro.telefono2 = telefono2
+                        } else if (telefono2 != null && !telefono2.isEmpty()) {
+                            datosRegistro.telefono2 = "0039" + telefono2
+                        } else {
+                            datosRegistro.telefono2 = null
+                        }
+                    }
 
-					/**ESTADO CIVIL
-					 *
-					 */
-
-					if (eElement.getElementsByTagName("civilState").item(0) != null) {
-						datosRegistro.estadoCivil = eElement.getElementsByTagName("civilState").item(0).getTextContent()
-					}
-
-					/**EMAIL
-					 *
-					 */
-
-					if (eElement.getElementsByTagName("email").item(0) != null) {
-						datosRegistro.email = eElement.getElementsByTagName("email").item(0).getTextContent()
-					}
-
-					/**CLAVE DE VALIDACION
-					 *
-					 */
-					if (eElement.getElementsByTagName("password").item(0) != null) {
-						datosRegistro.claveValidacionCliente = eElement.getElementsByTagName("password").item(0).getTextContent()
-					}
-
-					/**POLIZA
-					 *
-					 */
-
-					if (eElement.getElementsByTagName("policyNumber").item(0) != null) {
-						datosRegistro.numPoliza = eElement.getElementsByTagName("policyNumber").item(0).getTextContent()
-					}
-
-					/**CERTIFICADO
-					 *
-					 */
-
-					if (eElement.getElementsByTagName("certificateNumber").item(0) != null) {
-						datosRegistro.numCertificado = eElement.getElementsByTagName("certificateNumber").item(0).getTextContent()
-					}
-
-					/**CERTIFICADO
-					 *
-					 */
-
-					if (eElement.getElementsByTagName("comments").item(0) != null) {
-						datosRegistro.observaciones = eElement.getElementsByTagName("comments").item(0).getTextContent()
-					}
-
-					/**FECHA DE SOLICITUD
-					 *
-					 */
-
-					if (eElement.getElementsByTagName("requestDate").item(0) != null && !eElement.getElementsByTagName("requestDate").item(0).getTextContent().isEmpty()) {
-						datosRegistro.fechaEnvio = formato.format(util.fromStringToXmlCalendar(eElement.getElementsByTagName("requestDate").item(0).getTextContent()).toGregorianCalendar().getTime())
-					} else {
-						datosRegistro.fechaEnvio = util.fromDateToString(new Date(), "yyyyMMdd")
-					}
-					/**NUMERO DE REFERENCIA
-					 *
-					 */
+                    if (eElement.getElementsByTagName("mobileNumber").item(0) != null) {
+
+                        telefonoMovil = eElement.getElementsByTagName("mobileNumber").item(0).getTextContent()
 
-					if (eElement.getElementsByTagName("requestNumber").item(0) != null) {
-						datosRegistro.numSolicitud = eElement.getElementsByTagName("requestNumber").item(0).getTextContent()
-					}
+                        if (telefonoMovil != null && !telefonoMovil.isEmpty() && (telefonoMovil.startsWith("0039") || telefonoMovil.startsWith("+39"))) {
+                            telefonoMovil = telefonoMovil
+                        } else if (telefonoMovil != null && !telefonoMovil.isEmpty()) {
+                            telefonoMovil = "0039" + telefonoMovil
+                        } else {
+                            telefonoMovil = null
+                        }
+                    }
 
-					/**CODIGO DE AGENTE
-					 *
-					 */
-
-					if (eElement.getElementsByTagName("agent").item(0) != null) {
-
-						if (eElement.getElementsByTagName("agent").item(0).getTextContent().toString().length() > 20) {
-							datosRegistro.codigoAgencia = eElement.getElementsByTagName("agent").item(0).getTextContent().substring(0, 19)
-						} else {
-							datosRegistro.codigoAgencia = eElement.getElementsByTagName("agent").item(0).getTextContent()
-						}
-
-						datosRegistro.nomApellAgente = eElement.getElementsByTagName("agent").item(0).getTextContent()
-					} else {
+                    if (telefonoMovil != null && !telefonoMovil.isEmpty()) {
+                        datosRegistro.telefono1 = telefonoMovil
+                    }
 
-						datosRegistro.codigoAgencia = "."
-						datosRegistro.nomApellAgente = "."
-					}
+                    if (datosRegistro.telefono1 == null || datosRegistro.telefono1.isEmpty()) {
+                        if (datosRegistro.telefono3 != null && !datosRegistro.telefono3.isEmpty()) {
+                            datosRegistro.telefono1 = datosRegistro.telefono3
+                        } else if (datosRegistro.telefono2 != null && !datosRegistro.telefono2.isEmpty()) {
+                            datosRegistro.telefono1 = datosRegistro.telefono2
+                        } else {
+                            datosRegistro.telefono1 = "999999999"
+                        }
+                    }
 
-					datosRegistro.nomApellAgente = nombreAgente
-				}
-			}
+                    /**CODIGO CIA
+                     *
+                     */
 
-			setCamposGenericos (datosRegistro)
+                    datosRegistro.codigoCia = company.codigoSt
 
-			return datosRegistro
-		} catch (Exception e) {
-			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
-		}
-	}
+                    /**FECHA DE NACIMIENTO
+                     *
+                     */
 
+                    if (eElement.getElementsByTagName("birthDate").item(0) != null && !eElement.getElementsByTagName("birthDate").item(0).getTextContent().isEmpty()) {
+                        datosRegistro.fechaNacimiento = formato.format(util.fromStringToXmlCalendar(eElement.getElementsByTagName("birthDate").item(0).getTextContent()).toGregorianCalendar().getTime())
+                    } else {
+                        datosRegistro.fechaNacimiento = formato.format(util.fromStringToXmlCalendar("2017-01-01T00:00:00").toGregorianCalendar().getTime())
+                    }
 
-	private void setCamposGenericos(REGISTRODATOS datos) {
+                    /**ESTADO CIVIL
+                     *
+                     */
 
-		datos.lugarNacimiento = ""
-		datos.pais = "IT"
-		datos.emailAgente = ""
-		datos.tipoCliente = "N"
-		datos.franjaHoraria = ""
-		datos.codigoCuestionario = ""
-		datos.campo1 = "it"
-		datos.campo2 = ""
-		datos.campo3 = "IT"
-		datos.campo4 = ""
-		datos.campo5 = ""
-		datos.campo6 = ""
-		datos.campo7 = ""
-		datos.campo8 = ""
-		datos.campo9 = ""
-		datos.campo10 = ""
-		datos.campo11 = ""
-		datos.campo12 = ""
-		datos.campo13 = ""
-		datos.campo14 = ""
-		datos.campo15 = ""
-		datos.campo16 = ""
-		datos.campo17 = ""
-		datos.campo18 = ""
-		datos.campo19 = ""
-		datos.campo20 = ""
-	}
+                    if (eElement.getElementsByTagName("civilState").item(0) != null) {
+                        datosRegistro.estadoCivil = eElement.getElementsByTagName("civilState").item(0).getTextContent()
+                    }
+
+                    /**EMAIL
+                     *
+                     */
+
+                    if (eElement.getElementsByTagName("email").item(0) != null) {
+                        datosRegistro.email = eElement.getElementsByTagName("email").item(0).getTextContent()
+                    }
+
+                    /**CLAVE DE VALIDACION
+                     *
+                     */
+                    if (eElement.getElementsByTagName("password").item(0) != null) {
+                        datosRegistro.claveValidacionCliente = eElement.getElementsByTagName("password").item(0).getTextContent()
+                    }
+
+                    /**POLIZA
+                     *
+                     */
+
+                    if (eElement.getElementsByTagName("policyNumber").item(0) != null) {
+                        datosRegistro.numPoliza = eElement.getElementsByTagName("policyNumber").item(0).getTextContent()
+                    }
+
+                    /**CERTIFICADO
+                     *
+                     */
+
+                    if (eElement.getElementsByTagName("certificateNumber").item(0) != null) {
+                        datosRegistro.numCertificado = eElement.getElementsByTagName("certificateNumber").item(0).getTextContent()
+                    }
+
+                    /**CERTIFICADO
+                     *
+                     */
+
+                    if (eElement.getElementsByTagName("comments").item(0) != null) {
+                        datosRegistro.observaciones = eElement.getElementsByTagName("comments").item(0).getTextContent()
+                    }
+
+                    /**FECHA DE SOLICITUD
+                     *
+                     */
+
+                    if (eElement.getElementsByTagName("requestDate").item(0) != null && !eElement.getElementsByTagName("requestDate").item(0).getTextContent().isEmpty()) {
+                        datosRegistro.fechaEnvio = formato.format(util.fromStringToXmlCalendar(eElement.getElementsByTagName("requestDate").item(0).getTextContent()).toGregorianCalendar().getTime())
+                    } else {
+                        datosRegistro.fechaEnvio = util.fromDateToString(new Date(), "yyyyMMdd")
+                    }
+                    /**NUMERO DE REFERENCIA
+                     *
+                     */
 
-	private def rellenaServicios (req, nameCompany) {
+                    if (eElement.getElementsByTagName("requestNumber").item(0) != null) {
+                        datosRegistro.numSolicitud = eElement.getElementsByTagName("requestNumber").item(0).getTextContent()
+                    }
 
-		def listadoServicios = []
+                    /**CODIGO DE AGENTE
+                     *
+                     */
 
-		try {
+                    if (eElement.getElementsByTagName("agent").item(0) != null) {
 
-			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
-			DocumentBuilder builder = factory.newDocumentBuilder()
+                        if (eElement.getElementsByTagName("agent").item(0).getTextContent().toString().length() > 20) {
+                            datosRegistro.codigoAgencia = eElement.getElementsByTagName("agent").item(0).getTextContent().substring(0, 19)
+                        } else {
+                            datosRegistro.codigoAgencia = eElement.getElementsByTagName("agent").item(0).getTextContent()
+                        }
 
-			InputSource is = new InputSource(new StringReader(req.request))
-			is.setEncoding("UTF-8")
-			Document doc = builder.parse(is)
+                        datosRegistro.nomApellAgente = eElement.getElementsByTagName("agent").item(0).getTextContent()
+                    } else {
 
-			doc.getDocumentElement().normalize()
+                        datosRegistro.codigoAgencia = "."
+                        datosRegistro.nomApellAgente = "."
+                    }
 
-			NodeList nList = doc.getElementsByTagName("ServiceInformation")
+                    datosRegistro.nomApellAgente = nombreAgente
+                }
+            }
 
-			if (nList != null && nList.length > 0){
+            setCamposGenericos(datosRegistro)
 
-				for (int temp = 0; temp < nList.getLength(); temp++) {
+            return datosRegistro
+        } catch (Exception e) {
+            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+        }
+    }
 
-					Node nNode = nList.item(temp)
 
-					if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+    private void setCamposGenericos(REGISTRODATOS datos) {
 
-						Element eElement = (Element) nNode;
+        datos.lugarNacimiento = ""
+        datos.pais = "IT"
+        datos.emailAgente = ""
+        datos.tipoCliente = "N"
+        datos.franjaHoraria = ""
+        datos.codigoCuestionario = ""
+        datos.campo1 = "it"
+        datos.campo2 = ""
+        datos.campo3 = "IT"
+        datos.campo4 = ""
+        datos.campo5 = ""
+        datos.campo6 = ""
+        datos.campo7 = ""
+        datos.campo8 = ""
+        datos.campo9 = ""
+        datos.campo10 = ""
+        datos.campo11 = ""
+        datos.campo12 = ""
+        datos.campo13 = ""
+        datos.campo14 = ""
+        datos.campo15 = ""
+        datos.campo16 = ""
+        datos.campo17 = ""
+        datos.campo18 = ""
+        datos.campo19 = ""
+        datos.campo20 = ""
+    }
 
-						if (eElement.getElementsByTagName("serviceCode").item(0) != null) {
+    private def rellenaServicios(req, nameCompany) {
 
-							DATOS.Servicio servicio = new DATOS.Servicio()
+        def listadoServicios = []
 
-							servicio.codigoServicio = eElement.getElementsByTagName("serviceCode").item(0).getTextContent()
-							servicio.tipoServicios = "S"
-							if (eElement.getElementsByTagName("serviceDescription").item(0) != null) {
-								servicio.descripcionServicio = eElement.getElementsByTagName("serviceDescription").item(0).getTextContent()
-							}
+        try {
 
-							servicio.filler = ""
-							listadoServicios.add(servicio)
-						}
-					}
-				}
-			} else {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
+            DocumentBuilder builder = factory.newDocumentBuilder()
 
-				DATOS.Servicio servicio = new DATOS.Servicio()
+            InputSource is = new InputSource(new StringReader(req.request))
+            is.setEncoding("UTF-8")
+            Document doc = builder.parse(is)
 
-				servicio.codigoServicio = "TS"
-				servicio.tipoServicios = "S"
-				servicio.descripcionServicio = "Teleselezione"
-				servicio.filler = ""
+            doc.getDocumentElement().normalize()
 
-				listadoServicios.add(servicio)
-			}
+            NodeList nList = doc.getElementsByTagName("ServiceInformation")
 
-			return listadoServicios
-		} catch (Exception e) {
-			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
-		}
-	}
+            if (nList != null && nList.length > 0) {
 
-	private def rellenaPreguntas (req, nameCompany) {
+                for (int temp = 0; temp < nList.getLength(); temp++) {
 
-		def listadoPreguntas = []
+                    Node nNode = nList.item(temp)
 
-		try {
-			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
-			DocumentBuilder builder = factory.newDocumentBuilder()
+                    if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-			InputSource is = new InputSource(new StringReader(req.request))
-			is.setEncoding("UTF-8")
-			Document doc = builder.parse(is)
+                        Element eElement = (Element) nNode;
 
-			doc.getDocumentElement().normalize()
+                        if (eElement.getElementsByTagName("serviceCode").item(0) != null) {
 
-			NodeList nList = doc.getElementsByTagName("CandidateInformation")
+                            DATOS.Servicio servicio = new DATOS.Servicio()
 
-			for (int temp = 0; temp < nList.getLength(); temp++) {
+                            servicio.codigoServicio = eElement.getElementsByTagName("serviceCode").item(0).getTextContent()
+                            servicio.tipoServicios = "S"
+                            if (eElement.getElementsByTagName("serviceDescription").item(0) != null) {
+                                servicio.descripcionServicio = eElement.getElementsByTagName("serviceDescription").item(0).getTextContent()
+                            }
 
-				Node nNode = nList.item(temp)
+                            servicio.filler = ""
+                            listadoServicios.add(servicio)
+                        }
+                    }
+                }
+            } else {
 
-				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+                DATOS.Servicio servicio = new DATOS.Servicio()
 
-					Element eElement = (Element) nNode;
+                servicio.codigoServicio = "TS"
+                servicio.tipoServicios = "S"
+                servicio.descripcionServicio = "Teleselezione"
+                servicio.filler = ""
 
+                listadoServicios.add(servicio)
+            }
 
-					/**PREGUNTAS PREVIAS
-					 *
-					 */
+            return listadoServicios
+        } catch (Exception e) {
+            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
+        }
+    }
 
-					if (eElement.getElementsByTagName("igp").item(0) != null && !eElement.getElementsByTagName("igp").item(0).getTextContent().isEmpty()) {
-						DATOS.Pregunta pregunta = new DATOS.Pregunta()
-						pregunta.codigoPregunta = "igp"
-						pregunta.tipoDatos = "STRING"
-						pregunta.respuesta = eElement.getElementsByTagName("igp").item(0).getTextContent().equals("S")?"SI":"NO"
-						listadoPreguntas.add(pregunta)
-					}
-					if (eElement.getElementsByTagName("agente").item(0) != null && !eElement.getElementsByTagName("agente").item(0).getTextContent().isEmpty()) {
-						DATOS.Pregunta pregunta = new DATOS.Pregunta()
-						pregunta.codigoPregunta = "agente"
-						pregunta.tipoDatos = "STRING"
-						pregunta.respuesta = eElement.getElementsByTagName("agente").item(0).getTextContent()
-						listadoPreguntas.add(pregunta)
-					}
-				}
-			}
+    private def rellenaPreguntas(req, nameCompany) {
 
-			return listadoPreguntas
-		} catch (Exception e) {
-			throw new WSException(this.getClass(), "rellenaPreguntas", ExceptionUtils.composeMessage(null, e));
-		}
-	}
+        def listadoPreguntas = []
 
-	private def rellenaCoberturas (req) {
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
+            DocumentBuilder builder = factory.newDocumentBuilder()
 
-		def listadoCoberturas = []
-		def capital
+            InputSource is = new InputSource(new StringReader(req.request))
+            is.setEncoding("UTF-8")
+            Document doc = builder.parse(is)
 
-		try {
-			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
-			DocumentBuilder builder = factory.newDocumentBuilder()
+            doc.getDocumentElement().normalize()
 
-			InputSource is = new InputSource(new StringReader(req.request))
-			is.setEncoding("UTF-8")
-			Document doc = builder.parse(is)
+            NodeList nList = doc.getElementsByTagName("CandidateInformation")
 
-			doc.getDocumentElement().normalize()
+            for (int temp = 0; temp < nList.getLength(); temp++) {
 
-			NodeList nList = doc.getElementsByTagName("BenefitsType")
+                Node nNode = nList.item(temp)
 
-			for (int temp = 0; temp < nList.getLength(); temp++) {
+                if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-				Node nNode = nList.item(temp)
+                    Element eElement = (Element) nNode;
 
-				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+                    /**PREGUNTAS PREVIAS
+                     *
+                     */
 
-					Element eElement = (Element) nNode;
+                    if (eElement.getElementsByTagName("igp").item(0) != null && !eElement.getElementsByTagName("igp").item(0).getTextContent().isEmpty()) {
+                        DATOS.Pregunta pregunta = new DATOS.Pregunta()
+                        pregunta.codigoPregunta = "igp"
+                        pregunta.tipoDatos = "STRING"
+                        pregunta.respuesta = eElement.getElementsByTagName("igp").item(0).getTextContent().equals("S") ? "SI" : "NO"
+                        listadoPreguntas.add(pregunta)
+                    }
+                    if (eElement.getElementsByTagName("agente").item(0) != null && !eElement.getElementsByTagName("agente").item(0).getTextContent().isEmpty()) {
+                        DATOS.Pregunta pregunta = new DATOS.Pregunta()
+                        pregunta.codigoPregunta = "agente"
+                        pregunta.tipoDatos = "STRING"
+                        pregunta.respuesta = eElement.getElementsByTagName("agente").item(0).getTextContent()
+                        listadoPreguntas.add(pregunta)
+                    }
+                }
+            }
 
-					DATOS.Coberturas cobertura = new DATOS.Coberturas()
+            return listadoPreguntas
+        } catch (Exception e) {
+            throw new WSException(this.getClass(), "rellenaPreguntas", ExceptionUtils.composeMessage(null, e));
+        }
+    }
 
-					/**COBERTURAS QUE NOS LLEGA SIEMPRE ES COB5
-					 *
-					 */
-					cobertura.filler = ""
-					cobertura.codigoCobertura = eElement.getElementsByTagName("benefictCode").item(0).getTextContent().toUpperCase()
-					cobertura.nombreCobertura = eElement.getElementsByTagName("benefictName").item(0).getTextContent()
-					cobertura.capital = Float.parseFloat(eElement.getElementsByTagName("benefictCapital").item(0).getTextContent())
+    private def rellenaCoberturas(req) {
 
-					listadoCoberturas.add(cobertura)
+        def listadoCoberturas = []
+        def capital
 
-					capital = Float.parseFloat(eElement.getElementsByTagName("benefictCapital").item(0).getTextContent())
-				}
-			}
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
+            DocumentBuilder builder = factory.newDocumentBuilder()
 
-			return listadoCoberturas
-		} catch (Exception e) {
-			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
-		}
-	}
+            InputSource is = new InputSource(new StringReader(req.request))
+            is.setEncoding("UTF-8")
+            Document doc = builder.parse(is)
 
-	def busquedaCrm (policyNumber, ou, requestNumber, opername, companyCodigoSt, companyId, requestBBDD, certificateNumber, String companyName) {
+            doc.getDocumentElement().normalize()
 
-		task {
+            NodeList nList = doc.getElementsByTagName("BenefitsType")
 
-			logginService.putInfoMessage("BusquedaExpedienteCrm - Buscando en CRM solicitud de " + companyName + " con numero de solicitud: " + requestNumber + " y num. certificado: " + certificateNumber.toString())
+            for (int temp = 0; temp < nList.getLength(); temp++) {
 
-			def respuestaCrm
-			int limite = 0;
-			boolean encontrado = false;
+                Node nNode = nList.item(temp)
 
-			servicios.Filtro filtro = new servicios.Filtro()
-			SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
-			CorreoUtil correoUtil = new CorreoUtil()
+                if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-			Thread.sleep(90000);
+                    Element eElement = (Element) nNode;
 
+                    DATOS.Coberturas cobertura = new DATOS.Coberturas()
 
-			try {
+                    /**COBERTURAS QUE NOS LLEGA SIEMPRE ES COB5
+                     *
+                     */
+                    cobertura.filler = ""
+                    cobertura.codigoCobertura = eElement.getElementsByTagName("benefictCode").item(0).getTextContent().toUpperCase()
+                    cobertura.nombreCobertura = eElement.getElementsByTagName("benefictName").item(0).getTextContent()
+                    cobertura.capital = Float.parseFloat(eElement.getElementsByTagName("benefictCapital").item(0).getTextContent())
 
+                    listadoCoberturas.add(cobertura)
 
-				while( !encontrado && limite < 10) {
+                    capital = Float.parseFloat(eElement.getElementsByTagName("benefictCapital").item(0).getTextContent())
+                }
+            }
 
-					filtro.setClave(servicios.ClaveFiltro.CLIENTE);
-					filtro.setValor(companyCodigoSt.toString());
+            return listadoCoberturas
+        } catch (Exception e) {
+            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+        }
+    }
 
-					servicios.Filtro filtroRelacionado1 = new servicios.Filtro()
-					filtroRelacionado1.setClave(servicios.ClaveFiltro.NUM_SOLICITUD)
-					filtroRelacionado1.setValor(requestNumber.toString())
+    def busquedaCrm(policyNumber, ou, requestNumber, opername, companyCodigoSt, companyId, requestBBDD, certificateNumber, String companyName) {
 
-					servicios.Filtro filtroRelacionado2 = new servicios.Filtro()
-					filtroRelacionado2.setClave(servicios.ClaveFiltro.NUM_CERTIFICADO);
-					filtroRelacionado2.setValor(certificateNumber.toString())
-					filtroRelacionado1.setFiltroRelacionado(filtroRelacionado2)
+        task {
 
-					filtro.setFiltroRelacionado(filtroRelacionado1)
+            logginService.putInfoMessage("BusquedaExpedienteCrm - Buscando en CRM solicitud de " + companyName + " con numero de solicitud: " + requestNumber + " y num. certificado: " + certificateNumber.toString())
 
-					respuestaCrm = consultaExpediente(ou.toString(),filtro)
+            def respuestaCrm
+            int limite = 0;
+            boolean encontrado = false;
 
-					if (respuestaCrm != null && respuestaCrm.getListaExpedientes() != null && respuestaCrm.getListaExpedientes().size() > 0) {
+            servicios.Filtro filtro = new servicios.Filtro()
+            SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
+            CorreoUtil correoUtil = new CorreoUtil()
 
-						for (int i = 0; i < respuestaCrm.getListaExpedientes().size(); i++) {
+            Thread.sleep(90000);
 
-							servicios.Expediente exp = respuestaCrm.getListaExpedientes().get(i)
-							
-							logginService.putInfoMessage("BusquedaExpedienteCrm - Expediente encontrado: " + exp.getCodigoST() + " para " + companyName)
 
-							String fechaCreacion = format.format(new Date());
+            try {
 
-							if (exp.getCandidato() != null && exp.getCandidato().getCompanya() != null && exp.getCandidato().getCompanya().getCodigoST().equals(companyCodigoSt.toString()) &&
-							exp.getNumSolicitud() != null && exp.getNumSolicitud().equals(requestNumber.toString()) && fechaCreacion != null && fechaCreacion.equals(exp.getFechaApertura()) && exp.getNumCertificado() != null && exp.getNumCertificado().equals(certificateNumber)){
 
-								/**Alta procesada correctamente
-								 *
-								 */
+                while (!encontrado && limite < 10) {
 
-								encontrado = true
-								logginService.putInfoMessage("BusquedaExpedienteCrm - Nueva alta automatica de " + companyName + " con numero de solicitud: " + requestNumber.toString() + " y num. certificado: " + certificateNumber.toString() + " procesada correctamente")
-								
-							}
-						}
-					}
+                    filtro.setClave(servicios.ClaveFiltro.CLIENTE);
+                    filtro.setValor(companyCodigoSt.toString());
 
+                    servicios.Filtro filtroRelacionado1 = new servicios.Filtro()
+                    filtroRelacionado1.setClave(servicios.ClaveFiltro.NUM_SOLICITUD)
+                    filtroRelacionado1.setValor(requestNumber.toString())
 
-					limite++
-					Thread.sleep(10000)
-				}
+                    servicios.Filtro filtroRelacionado2 = new servicios.Filtro()
+                    filtroRelacionado2.setClave(servicios.ClaveFiltro.NUM_CERTIFICADO);
+                    filtroRelacionado2.setValor(certificateNumber.toString())
+                    filtroRelacionado1.setFiltroRelacionado(filtroRelacionado2)
 
-				/**Alta procesada pero no se ha encontrado en CRM.
-				 *
-				 */
-				if (limite == 10) {
+                    filtro.setFiltroRelacionado(filtroRelacionado1)
 
-					logginService.putInfoMessage("BusquedaExpedienteCrm - Nueva alta de " + companyName + " con numero de solicitud: " + requestNumber.toString() + " y num. certificado: " + certificateNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM")
-					correoUtil.envioEmailErrores("BusquedaExpedienteCrm","Nueva alta de " + companyName + " con numero de solicitud: " + requestNumber.toString() + " y num. certificado: " + certificateNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM",null)
+                    respuestaCrm = consultaExpediente(ou.toString(), filtro)
 
-					/**Metemos en errores
-					 *
-					 */
-					com.scortelemed.Error error = new com.scortelemed.Error()
-					error.setFecha(new Date())
-					error.setCia(companyId.toString())
-					error.setIdentificador(requestNumber.toString())
-					error.setInfo(requestBBDD.request)
-					error.setOperacion("ALTA")
-					error.setError("Peticion procesada para numero de solicitud: " + requestNumber.toString() + " y num. certificado: " + certificateNumber.toString() + ". No encontrada en CRM")
-					error.save(flush:true)
-				}
-			} catch (Exception e) {
+                    if (respuestaCrm != null && respuestaCrm.getListaExpedientes() != null && respuestaCrm.getListaExpedientes().size() > 0) {
 
-				logginService.putInfoMessage("BusquedaExpedienteCrm - Nueva alta de " + companyName + " con numero de solicitud: " + requestNumber.toString() + " y num. certificado: " + certificateNumber.toString() + ". Error: " + e.getMessage())
-				correoUtil.envioEmailErrores("BusquedaExpedienteCrm","Nueva alta de " + companyName + " con numero de solicitud: " + requestNumber.toString() + " y num. certificado: " + certificateNumber.toString(), e)
-			}
-		}
-	}
+                        for (int i = 0; i < respuestaCrm.getListaExpedientes().size(); i++) {
 
-	public void insertarRecibido(Company company, String identificador, String info, String operacion) {
+                            servicios.Expediente exp = respuestaCrm.getListaExpedientes().get(i)
 
-		Recibido recibido = new Recibido()
-		recibido.setFecha(new Date())
-		recibido.setCia(company.id.toString())
-		recibido.setIdentificador(identificador)
-		recibido.setInfo(info)
-		recibido.setOperacion(operacion)
-		recibido.save(flush:true)
-	}
+                            logginService.putInfoMessage("BusquedaExpedienteCrm - Expediente encontrado: " + exp.getCodigoST() + " para " + companyName)
 
-	public void insertarError(Company company, String identificador, String info, String operacion, String detalleError) {
+                            String fechaCreacion = format.format(new Date());
 
-		com.scortelemed.Error error = new com.scortelemed.Error()
-		error.setFecha(new Date())
-		error.setCia(company.id.toString())
-		error.setIdentificador(identificador)
-		error.setInfo(info)
-		error.setOperacion(operacion)
-		error.setError(detalleError)
-		error.save(flush:true)
-	}
+                            if (exp.getCandidato() != null && exp.getCandidato().getCompanya() != null && exp.getCandidato().getCompanya().getCodigoST().equals(companyCodigoSt.toString()) &&
+                                    exp.getNumSolicitud() != null && exp.getNumSolicitud().equals(requestNumber.toString()) && fechaCreacion != null && fechaCreacion.equals(exp.getFechaApertura()) && exp.getNumCertificado() != null && exp.getNumCertificado().equals(certificateNumber)) {
 
-	public void insertarEnvio (Company company, String identificador, String info) {
+                                /**Alta procesada correctamente
+                                 *
+                                 */
 
-		Envio envio = new Envio()
-		envio.setFecha(new Date())
-		envio.setCia(company.id.toString())
-		envio.setIdentificador(identificador)
-		envio.setInfo(info)
-		envio.save(flush:true)
-	}
+                                encontrado = true
+                                logginService.putInfoMessage("BusquedaExpedienteCrm - Nueva alta automatica de " + companyName + " con numero de solicitud: " + requestNumber.toString() + " y num. certificado: " + certificateNumber.toString() + " procesada correctamente")
 
+                            }
+                        }
+                    }
 
-	private def obtenerProductos (req, nameCompany) {
-		return null
-	}
 
-	def devolverStateType(estado){
+                    limite++
+                    Thread.sleep(10000)
+                }
 
-		switch(estado){
-			case "CERRADO": return RequestStateType.CLOSED;
-			case "ANULADO": return RequestStateType.CANCELLED;
-			case "RECHAZADO": return RequestStateType.REJECTED;
-			default: return null;
-		}
+                /**Alta procesada pero no se ha encontrado en CRM.
+                 *
+                 */
+                if (limite == 10) {
 
-	}
+                    logginService.putInfoMessage("BusquedaExpedienteCrm - Nueva alta de " + companyName + " con numero de solicitud: " + requestNumber.toString() + " y num. certificado: " + certificateNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM")
+                    correoUtil.envioEmailErrores("BusquedaExpedienteCrm", "Nueva alta de " + companyName + " con numero de solicitud: " + requestNumber.toString() + " y num. certificado: " + certificateNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM", null)
 
-	def devolverNombreCobertura(codigo){
+                    /**Metemos en errores
+                     *
+                     */
+                    com.scortelemed.Error error = new com.scortelemed.Error()
+                    error.setFecha(new Date())
+                    error.setCia(companyId.toString())
+                    error.setIdentificador(requestNumber.toString())
+                    error.setInfo(requestBBDD.request)
+                    error.setOperacion("ALTA")
+                    error.setError("Peticion procesada para numero de solicitud: " + requestNumber.toString() + " y num. certificado: " + certificateNumber.toString() + ". No encontrada en CRM")
+                    error.save(flush: true)
+                }
+            } catch (Exception e) {
 
-		if (codigo.equals("COB5")) {
-			return BenefictNameType.DEAD
-		} else if (codigo.equals("COB4")) {
-			return BenefictNameType.DISABILITY_30
-		} else if (codigo.equals("COB2")) {
-			return BenefictNameType.ACCIDENTAL_DEAD
-		} else {
-			return null
-		}
-	}
+                logginService.putInfoMessage("BusquedaExpedienteCrm - Nueva alta de " + companyName + " con numero de solicitud: " + requestNumber.toString() + " y num. certificado: " + certificateNumber.toString() + ". Error: " + e.getMessage())
+                correoUtil.envioEmailErrores("BusquedaExpedienteCrm", "Nueva alta de " + companyName + " con numero de solicitud: " + requestNumber.toString() + " y num. certificado: " + certificateNumber.toString(), e)
+            }
+        }
+    }
 
-	/**Devuelve lista con los errores de validacion
-	 *
-	 * @param requestBBDD
-	 * @return
-	 */
-	public List<WsError> validarDatosObligatorios(requestBBDD) {
+    public void insertarRecibido(Company company, String identificador, String info, String operacion) {
 
-		List<WsError> wsErrors = new ArrayList<WsError>()
-		SimpleDateFormat formato = new SimpleDateFormat("yyyyMMdd");
-		String telefono1 = null
-		String telefono2 = null
-		String telefonoMovil = null
-		String fechaNacimiento = null
+        Recibido recibido = new Recibido()
+        recibido.setFecha(new Date())
+        recibido.setCia(company.id.toString())
+        recibido.setIdentificador(identificador)
+        recibido.setInfo(info)
+        recibido.setOperacion(operacion)
+        recibido.save(flush: true)
+    }
 
-		try {
+    public void insertarError(Company company, String identificador, String info, String operacion, String detalleError) {
 
-			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
-			DocumentBuilder builder = factory.newDocumentBuilder()
+        com.scortelemed.Error error = new com.scortelemed.Error()
+        error.setFecha(new Date())
+        error.setCia(company.id.toString())
+        error.setIdentificador(identificador)
+        error.setInfo(info)
+        error.setOperacion(operacion)
+        error.setError(detalleError)
+        error.save(flush: true)
+    }
 
-			InputSource is = new InputSource(new StringReader(requestBBDD.request))
-			is.setEncoding("UTF-8")
-			Document doc = builder.parse(is)
+    public void insertarEnvio(Company company, String identificador, String info) {
 
-			doc.getDocumentElement().normalize()
+        Envio envio = new Envio()
+        envio.setFecha(new Date())
+        envio.setCia(company.id.toString())
+        envio.setIdentificador(identificador)
+        envio.setInfo(info)
+        envio.save(flush: true)
+    }
 
-			NodeList nList = doc.getElementsByTagName("CandidateInformation")
 
-			for (int temp = 0; temp < nList.getLength(); temp++) {
+    private def obtenerProductos(req, nameCompany) {
+        return null
+    }
 
-				Node nNode = nList.item(temp)
+    def devolverStateType(estado) {
 
-				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+        switch (estado) {
+            case "CERRADO": return RequestStateType.CLOSED;
+            case "ANULADO": return RequestStateType.CANCELLED;
+            case "RECHAZADO": return RequestStateType.REJECTED;
+            default: return null;
+        }
 
-					Element eElement = (Element) nNode;
+    }
 
-					/**CODIGO DE PRODUCTO
-					 *
-					 */
+    def devolverNombreCobertura(codigo) {
 
-					if (eElement.getElementsByTagName("productCode").item(0) == null || eElement.getElementsByTagName("productCode").item(0).getTextContent().isEmpty()) {
-						wsErrors.add(new WsError("productCode",null,"L'elemento non può essere nullo"))
-						break
-					}
+        if (codigo.equals("COB5")) {
+            return BenefictNameType.DEAD
+        } else if (codigo.equals("COB4")) {
+            return BenefictNameType.DISABILITY_30
+        } else if (codigo.equals("COB2")) {
+            return BenefictNameType.ACCIDENTAL_DEAD
+        } else {
+            return null
+        }
+    }
 
-					/**NOMBRE DE CANDIDATO
-					 *
-					 */
+    /**Devuelve lista con los errores de validacion
+     *
+     * @param requestBBDD
+     * @return
+     */
+    public List<WsError> validarDatosObligatorios(requestBBDD) {
 
-					if (eElement.getElementsByTagName("name").item(0) == null || eElement.getElementsByTagName("name").item(0).getTextContent().isEmpty()) {
-						wsErrors.add(new WsError("name",null,"L'elemento non può essere nullo"))
-						break
-					}
+        List<WsError> wsErrors = new ArrayList<WsError>()
+        SimpleDateFormat formato = new SimpleDateFormat("yyyyMMdd");
+        String telefono1 = null
+        String telefono2 = null
+        String telefonoMovil = null
+        String fechaNacimiento = null
 
-					/**APELLIDO CANDIDATO
-					 *
-					 */
+        try {
 
-					if (eElement.getElementsByTagName("surname").item(0) == null || eElement.getElementsByTagName("surname").item(0).getTextContent().isEmpty()) {
-						wsErrors.add(new WsError("surname",null,"L'elemento non può essere nullo"))
-						break
-					}
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
+            DocumentBuilder builder = factory.newDocumentBuilder()
 
-					/**DNI CANDIDATO
-					 *
-					 */
+            InputSource is = new InputSource(new StringReader(requestBBDD.request))
+            is.setEncoding("UTF-8")
+            Document doc = builder.parse(is)
 
-					if (eElement.getElementsByTagName("fiscalIdentificationNumber").item(0) == null || eElement.getElementsByTagName("fiscalIdentificationNumber").item(0).getTextContent().isEmpty()) {
-						wsErrors.add(new WsError("fiscalIdentificationNumber",null,"L'elemento non può essere nullo"))
-						break
-					}
+            doc.getDocumentElement().normalize()
 
-					/**SEXO CANDIDATO
-					 *
-					 */
+            NodeList nList = doc.getElementsByTagName("CandidateInformation")
 
-					if (eElement.getElementsByTagName("gender").item(0) == null || eElement.getElementsByTagName("gender").item(0).getTextContent().isEmpty()) {
-						wsErrors.add(new WsError("gender",null,"L'elemento non può essere nullo"))
-						break
-					}
+            for (int temp = 0; temp < nList.getLength(); temp++) {
 
-					/**PAIS
-					 *
-					 */
+                Node nNode = nList.item(temp)
 
-					if (eElement.getElementsByTagName("country").item(0) != null && !eElement.getElementsByTagName("country").item(0).getTextContent().isEmpty()) {
+                if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-						if (!eElement.getElementsByTagName("country").item(0).getTextContent().equals("IT")) {
+                    Element eElement = (Element) nNode;
 
-							wsErrors.add(new WsError("country",eElement.getElementsByTagName("country").item(0).getTextContent(),"Valori possibili (IT)"))
-							break
-						}
+                    /**CODIGO DE PRODUCTO
+                     *
+                     */
 
-					} else {
-						wsErrors.add(new WsError("country",null,"L'elemento non può essere nullo"))
-						break
-					}
+                    if (eElement.getElementsByTagName("productCode").item(0) == null || eElement.getElementsByTagName("productCode").item(0).getTextContent().isEmpty()) {
+                        wsErrors.add(new WsError("productCode", null, "L'elemento non può essere nullo"))
+                        break
+                    }
 
-					/**TELEFONOS
-					 *
-					 */
+                    /**NOMBRE DE CANDIDATO
+                     *
+                     */
 
-					if (eElement.getElementsByTagName("phoneNumber1").item(0) != null && eElement.getElementsByTagName("phoneNumber1").item(0).getTextContent() != null && !eElement.getElementsByTagName("phoneNumber1").item(0).getTextContent().isEmpty()) {
-						telefono1 = eElement.getElementsByTagName("phoneNumber1").item(0).getTextContent()
-					}
+                    if (eElement.getElementsByTagName("name").item(0) == null || eElement.getElementsByTagName("name").item(0).getTextContent().isEmpty()) {
+                        wsErrors.add(new WsError("name", null, "L'elemento non può essere nullo"))
+                        break
+                    }
 
-					if (eElement.getElementsByTagName("phoneNumber2").item(0) != null && eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent() != null && !eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent().isEmpty()) {
-						telefono2 = eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent()
-					}
+                    /**APELLIDO CANDIDATO
+                     *
+                     */
 
-					if (eElement.getElementsByTagName("mobileNumber").item(0) != null && eElement.getElementsByTagName("mobileNumber").item(0).getTextContent() != null && !eElement.getElementsByTagName("mobileNumber").item(0).getTextContent().isEmpty()) {
-						telefonoMovil = eElement.getElementsByTagName("mobileNumber").item(0).getTextContent()
-					}
+                    if (eElement.getElementsByTagName("surname").item(0) == null || eElement.getElementsByTagName("surname").item(0).getTextContent().isEmpty()) {
+                        wsErrors.add(new WsError("surname", null, "L'elemento non può essere nullo"))
+                        break
+                    }
 
-					if (telefono1 == null && telefono2 == null && telefonoMovil == null) {
-						wsErrors.add(new WsError("telefono",null,"Ci deve essere un telefono di contatto"))
-						break
-					}
+                    /**DNI CANDIDATO
+                     *
+                     */
 
-					/**FECHA DE NACIMIENTO
-					 *
-					 */
+                    if (eElement.getElementsByTagName("fiscalIdentificationNumber").item(0) == null || eElement.getElementsByTagName("fiscalIdentificationNumber").item(0).getTextContent().isEmpty()) {
+                        wsErrors.add(new WsError("fiscalIdentificationNumber", null, "L'elemento non può essere nullo"))
+                        break
+                    }
 
-					if (eElement.getElementsByTagName("birthDate").item(0) == null || eElement.getElementsByTagName("birthDate").item(0).getTextContent().isEmpty()) {
-						wsErrors.add(new WsError("birthDate",null,"L'elemento non può essere nullo"))
-						break
-					} else {
-						try {
-							formato.format(util.fromStringToXmlCalendar(eElement.getElementsByTagName("birthDate").item(0).getTextContent()).toGregorianCalendar().getTime())
-						} catch(Exception e){
-							wsErrors.add(new WsError("birthDate",eElement.getElementsByTagName("birthDate").item(0).getTextContent(),"Formato della data yyyy-MM-dd"))
-						}
+                    /**SEXO CANDIDATO
+                     *
+                     */
 
+                    if (eElement.getElementsByTagName("gender").item(0) == null || eElement.getElementsByTagName("gender").item(0).getTextContent().isEmpty()) {
+                        wsErrors.add(new WsError("gender", null, "L'elemento non può essere nullo"))
+                        break
+                    }
 
-					}
+                    /**PAIS
+                     *
+                     */
 
-				}
-			}
+                    if (eElement.getElementsByTagName("country").item(0) != null && !eElement.getElementsByTagName("country").item(0).getTextContent().isEmpty()) {
 
-			return wsErrors
+                        if (!eElement.getElementsByTagName("country").item(0).getTextContent().equals("IT")) {
 
-		} catch (Exception e) {
-			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
-		}
-	}
+                            wsErrors.add(new WsError("country", eElement.getElementsByTagName("country").item(0).getTextContent(), "Valori possibili (IT)"))
+                            break
+                        }
+
+                    } else {
+                        wsErrors.add(new WsError("country", null, "L'elemento non può essere nullo"))
+                        break
+                    }
+
+                    /**TELEFONOS
+                     *
+                     */
+
+                    if (eElement.getElementsByTagName("phoneNumber1").item(0) != null && eElement.getElementsByTagName("phoneNumber1").item(0).getTextContent() != null && !eElement.getElementsByTagName("phoneNumber1").item(0).getTextContent().isEmpty()) {
+                        telefono1 = eElement.getElementsByTagName("phoneNumber1").item(0).getTextContent()
+                    }
+
+                    if (eElement.getElementsByTagName("phoneNumber2").item(0) != null && eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent() != null && !eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent().isEmpty()) {
+                        telefono2 = eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent()
+                    }
+
+                    if (eElement.getElementsByTagName("mobileNumber").item(0) != null && eElement.getElementsByTagName("mobileNumber").item(0).getTextContent() != null && !eElement.getElementsByTagName("mobileNumber").item(0).getTextContent().isEmpty()) {
+                        telefonoMovil = eElement.getElementsByTagName("mobileNumber").item(0).getTextContent()
+                    }
+
+                    if (telefono1 == null && telefono2 == null && telefonoMovil == null) {
+                        wsErrors.add(new WsError("telefono", null, "Ci deve essere un telefono di contatto"))
+                        break
+                    }
+
+                    /**FECHA DE NACIMIENTO
+                     *
+                     */
+
+                    if (eElement.getElementsByTagName("birthDate").item(0) == null || eElement.getElementsByTagName("birthDate").item(0).getTextContent().isEmpty()) {
+                        wsErrors.add(new WsError("birthDate", null, "L'elemento non può essere nullo"))
+                        break
+                    } else {
+                        try {
+                            formato.format(util.fromStringToXmlCalendar(eElement.getElementsByTagName("birthDate").item(0).getTextContent()).toGregorianCalendar().getTime())
+                        } catch (Exception e) {
+                            wsErrors.add(new WsError("birthDate", eElement.getElementsByTagName("birthDate").item(0).getTextContent(), "Formato della data yyyy-MM-dd"))
+                        }
+
+
+                    }
+
+                }
+            }
+
+            return wsErrors
+
+        } catch (Exception e) {
+            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+        }
+    }
 }
