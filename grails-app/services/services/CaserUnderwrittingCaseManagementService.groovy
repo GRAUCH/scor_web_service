@@ -70,7 +70,7 @@ class CaserUnderwrittingCaseManagementService	 {
 		TransformacionUtil util = new TransformacionUtil()
 		CorreoUtil correoUtil = new CorreoUtil()
 
-		def opername="CaserGestionReconocimientoMedicoRequest"
+		def opername="CaserResultadoReconocimientoMedicoRequest"
 		def requestXML = ""
 		def requestBBDD
 		String notes = null
