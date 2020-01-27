@@ -205,7 +205,7 @@ class CbpitaUnderwrittingCaseManagementService {
     }
 
     @WebResult(name = "CaseManagementResultsResponse")
-    CbpitaUnderwrittingCasesResultsResponse cbpitaUnderwrittingCasesResultsResponsecbpitaUnderwrittingCasesResultsResponse(
+    CbpitaUnderwrittingCasesResultsResponse cbpitaUnderwrittingCasesResultsResponse(
             @WebParam(partName = "CaseManagementResultsRequest", name = "CaseManagementResultsRequest")
                     CbpitaUnderwrittingCasesResultsRequest cbpitaUnderwrittingCasesResultsRequest) {
 
