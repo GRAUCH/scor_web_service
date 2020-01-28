@@ -122,7 +122,7 @@ class NetinsuranceService {
 		return expediente
 	}
 
-	public def rellenaDatosSalidaExpediente(servicios.Expediente expedientePoliza, requestDate, logginService, String cia, Company company) {
+	 def rellenaDatosSalidaExpediente(servicios.Expediente expedientePoliza, requestDate, logginService, String cia, Company company) {
 
 		ExpedienteConsulta expediente = new ExpedienteConsulta()
 		byte[] compressedData = null
@@ -146,21 +146,28 @@ class NetinsuranceService {
 			expediente.setPhoneNumber2("")
 		}
 
-		ZipResponse zipResponse = obtenerZip(expedientePoliza.getCodigoST(), expedientePoliza.getNodoAlfresco(), cia);
+		 /*if (expedientePoliza.getCodigoEstado() == servicios.TipoEstadoExpediente.CERRADO) {
 
-		if (!zipResponse.getError()) {
+             ZipResponse zipResponse = obtenerZip(expedientePoliza.getCodigoST(), expedientePoliza.getNodoAlfresco(), cia);
 
-			compressedData = zipResponse.getDatosRespuesta()
+             if (!zipResponse.getError()) {
+
+                 compressedData = zipResponse.getDatosRespuesta()
 
 
-		} else {
+             } else {
 
-			compressedData = zipResponse.getDatosRespuesta()
-			logginService.putErrorEndpoint("rellenaDatosSalidaExpediente","El método obtener zip ha generado el siguiente error: " + zipResponse.getCodigo() + "-" + zipResponse.getDescripcion())
-			insertarError(company, expedientePoliza.getNumSolicitud(), "Error en generado de zip" , "obtenerZip", zipResponse.getCodigo() + "-" + zipResponse.getDescripcion())
-		}
+                 compressedData = zipResponse.getDatosRespuesta()
+                 logginService.putErrorEndpoint("rellenaDatosSalidaExpediente", "El método obtener zip ha generado el siguiente error: " + zipResponse.getCodigo() + "-" + zipResponse.getDescripcion())
+                 insertarError(company, expedientePoliza.getNumSolicitud(), "Error en generado de zip", "obtenerZip", zipResponse.getCodigo() + "-" + zipResponse.getDescripcion())
+             }
 
-		expediente.setZip(compressedData)
+             expediente.setZip(compressedData)
+         } else {
+             expediente.setZip(new byte[0])
+         }*/
+
+		expediente.setZip(new byte[0])
 		expediente.setNotes(util.devolverDatos(expedientePoliza.getTarificacion().getObservaciones()))
 
 		if (expedientePoliza.getCoberturasExpediente() != null && expedientePoliza.getCoberturasExpediente().size() > 0) {
