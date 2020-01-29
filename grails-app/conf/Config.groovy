@@ -190,7 +190,7 @@ environments {
     }
 
     production_wildfly{
-        println "entra a produccion_wildfly CONEXIONES"
+        println "entra a produccion_wildfly CONEXIONES WSDL"
         grails.logging.jul.usebridge = false
         cxf {
             client {
