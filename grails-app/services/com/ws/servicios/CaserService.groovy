@@ -295,7 +295,7 @@ class CaserService {
 		}
 	}
 
-	public def rellenaDatos (req, company) {
+	 def rellenaDatos (req, company) {
 
 		def mapDatos = [:]
 		def listadoPreguntas = []
@@ -333,16 +333,20 @@ class CaserService {
 					/**NUMERO DE PRODUCTO
 					 *
 					 */
-
-					datosRegistro.codigoProducto = "SRP"
-
-
+                    // se cambia el codigo producto acorde al ambiente para el que se esta ejecutando.
 					if (eElement.getElementsByTagName("productCode").item(0) != null) {
 						if (eElement.getElementsByTagName("productCode").item(0).getTextContent().toString().equals("1190")) {
 							datosRegistro.codigoProducto = "SRP"
 						} else {
-							//datosRegistro.codigoProducto = "5441" //REAL
-							datosRegistro.codigoProducto = "3635" //PREPRO
+							if(grails.util.Environment.current.name == "development"){
+                                datosRegistro.codigoProducto = "3635" //PREPRO
+                            }else if (grails.util.Environment.current.name == "preproduction_wildfly") {
+								datosRegistro.codigoProducto = "3635" //PREPRO
+							}else if (grails.util.Environment.current.name == "production_wildfly"){
+								datosRegistro.codigoProducto = "5441" //REAL
+							}else{
+								datosRegistro.codigoProducto = "SRP"
+							}
 						}
 					}
 
