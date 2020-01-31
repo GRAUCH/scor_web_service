@@ -529,15 +529,15 @@ class WsController {
 			XSDProcessExecutionServiceLocator locator = new XSDProcessExecutionServiceLocator()
 
 
-			//if (Environment.current.name.equals("production_wildfly")) {
-			//	username = "caser"
-			//	password = "a2aa10aPvQ8D5i6VDNwtXU5F7acSeKGre9PLL6iQEFLbbGfRgZdoHRzdygau"
-			//	locator.setXSDProcessExecutionPortEndpointAddress("https://iwssgo.caser.es/sgowschannel/XSDProcessExecution?WSDL")
-			//} else {
+			if (Environment.current.name.equals("production_wildfly")) {
+				username = "caser"
+				password = "a2aa10aPvQ8D5i6VDNwtXU5F7acSeKGre9PLL6iQEFLbbGfRgZdoHRzdygau"
+				locator.setXSDProcessExecutionPortEndpointAddress("https://iwssgo.caser.es/sgowschannel/XSDProcessExecution?WSDL")
+			} else {
 				username = "caser"
 				password = "abdbc632c0dd1807407c6ceee46e0ab48c0bc12c"
 				locator.setXSDProcessExecutionPortEndpointAddress("https://iwssgotest.caser.es/sgowschannel/XSDProcessExecution?WSDL")
-			//}
+			}
 
 
 			XSDProcessExecutionPort port = locator.getXSDProcessExecutionPort()
