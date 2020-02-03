@@ -184,11 +184,11 @@ class CaserUnderwrittingCaseManagementService	 {
 
 					for (int i = 1; i < 3; i++){
 
-					//	if (Environment.current.name.equals("production_wildfly")) {
-					//		expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1061",null,i,fechaIni,fechaFin,"ES"))
-					//	} else {
+						if (Environment.current.name.equals("production_wildfly")) {
+							expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1061",null,i,fechaIni,fechaFin,"ES"))
+						} else {
 							expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1062",null,i,fechaIni,fechaFin,"ES"))
-					//	}
+						}
 					}
 
 					if(expedientes){
