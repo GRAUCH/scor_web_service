@@ -511,15 +511,15 @@ class WsController {
 				fechaIni= fechaIni.toString()+":00"
 			}
 
-			//if (!Environment.current.name.equals("production_wildfly")) {
+			if (!Environment.current.name.equals("production_wildfly")) {
+				for (int i = 0; i < 3; i++) {
+					expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1061",null,i,fechaIni,fechaFin,"ES"))
+				}
+			} else {
 				for (int i = 0; i < 3; i++) {
 					expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1062",null,i,fechaIni,fechaFin,"ES"))
 				}
-			//} else {
-			//	for (int i = 0; i < 3; i++) {
-			//		expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1061",null,i,fechaIni,fechaFin,"ES"))
-			//	}
-			//}
+			}
 
 			CorreoUtil correoUtil = new CorreoUtil()
 
