@@ -1,420 +1,402 @@
 package com.scortelemed
 
-import grails.plugin.springsecurity.annotation.Secured
-import grails.util.Environment
-import hwsol.webservices.CorreoUtil
-import hwsol.webservices.EntradaDetalle
-import hwsol.webservices.TransformacionUtil
-
-import java.text.SimpleDateFormat
-
-import javax.xml.bind.JAXBContext
-import javax.xml.bind.Marshaller
-import javax.xml.rpc.holders.StringHolder
-
-import org.apache.jasper.tagplugins.jstl.core.Catch;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import servicios.Actividad
-import servicios.Cita
-import servicios.CoberturaExpediente
-import servicios.Expediente
-import servicios.ExpedienteInforme
-import servicios.RespuestaCRMInforme
-import servicios.TipoSexo
-import wslite.http.auth.HTTPBasicAuthorization
-import wslite.soap.*
-
+import com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub
+import com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.AdditionalNote
+import com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.BenefitInformation
+import com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.BenefitResultValue
+import com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.Candidate
+import com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.Dossier
+import com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.Exclusion
+import com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.File
+import com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.MedicalReport
+import com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.Product
+import com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.SaveDossierResultsResponseE
+import com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.TemporalLoading
 import com.scortelemed.schemas.caser.XSDProcessExecutionPort
 import com.scortelemed.schemas.caser.XSDProcessExecutionServiceLocator
 import com.ws.alptis.sp.beans.AlptisUnderwrittingCaseResultsRequest
 import com.ws.cajamar.beans.Cobertura
 import com.ws.servicios.AmaService
-import com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub
-import com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.AdditionalNote
-import com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.BenefitInformation;
-import com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.BenefitResultValue;
-import com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.Candidate
-import com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.Dossier
-import com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.DossierResultsIN;
-import com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.Exclusion
-import com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.File;
-import com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.MedicalReport
-import com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.Product
-import com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.SaveDossierResults;
-import com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.SaveDossierResultsE;
-import com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.SaveDossierResultsResponseE;
-import com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.TemporalLoading;
+import grails.plugin.springsecurity.annotation.Secured
+import grails.util.Environment
+import hwsol.webservices.CorreoUtil
+import hwsol.webservices.EntradaDetalle
+import hwsol.webservices.TransformacionUtil
+import org.springframework.beans.factory.annotation.Autowired
+import servicios.*
+import wslite.http.auth.HTTPBasicAuthorization
+import wslite.soap.SOAPClient
+import wslite.soap.SOAPResponse
 
+import javax.xml.rpc.holders.StringHolder
+import java.text.SimpleDateFormat
 
 @Secured('permitAll')
 class WsController {
-	def estadisticasService
-	def alptisService
-
-	def logginService
-	def HwSoapClientAlptisService
-
-	def soapAlptisRecetteWS
-	def soapAlptisRecetteWSPRO
-	def soapCajamarRecetteWS
-	def soapCajamarRecetteWSPRO
-	def soapCaserRecetteWS
-	def soapCaserRecetteWSPRO
-
-	def correoUtil
-	def requestService
-	def tarificadorService
-
-	def crearExpedienteService
-
-	@Autowired
-	private AmaService amaService
-
-	def caseresult = {
-		def fechaFin
-		def fechaIni
-		def responseRecette
-		def soap
-		def opername="caseresult"
-		def cases=[]
-		def resulExpedienteSoap
-		CorreoUtil correoUtil = new CorreoUtil()
-
-		try {
-			def formateador = new java.text.SimpleDateFormat("yyyyMMdd")
-			def operacion = Operacion.findByClave('AlptisUnderwrittingCasesResultsRequest')
-			def company = Company.findByNombre('alptis')
-			session.companyST=company.codigoSt
-
-			def fechaHoy = new Date().format('yyyyMMdd')
-
-			//EJEMPLO DE URL:
-			//http://192.168.1.188:8080/scorWebservice/ws/caseresult?ini=20150512 00:00:00:00&fin=20150512 23:59:59:59
-			if(params.ini && params.fin){
-				fechaIni=URLDecoder.decode(params.ini.trim(), "ISO-8859-1")
-				fechaFin=URLDecoder.decode(params.fin.trim(), "ISO-8859-1")
-			}else{
-				Calendar fecha = Calendar.getInstance();
-				fecha.add(Calendar.MINUTE , -11)
-				fechaFin = fecha.getTime().format ('yyyyMMdd HH:mm')
-				fechaFin= fechaFin.toString()+":59"
-
-				fecha.add(Calendar.MINUTE , -9)
-				fechaIni = fecha.getTime().format ('yyyyMMdd HH:mm')
-				fechaIni= fechaIni.toString()+":00"
-			}
-
-			if (!Environment.current.name.equals("production_wildfly")) {
-				resulExpedienteSoap=tarificadorService.obtenerInformeExpedientes("1019",null,1,fechaIni,fechaFin,"FR")
-				soap = soapAlptisRecetteWS
-			} else {
-				resulExpedienteSoap=tarificadorService.obtenerInformeExpedientes("1019",null,1,fechaIni,fechaFin,"FR")
-				soap = soapAlptisRecetteWSPRO
-			}
-
-			def resulComprimidos = []
-			def i = 0
-			def contadorResultados = 0
-			def x = 0
-
-			StringBuilder sbInfo = new StringBuilder ("Realizando proceso envio de informacion para " + company.nombre + " con fecha ")
-			sbInfo.append(fechaIni).append("-").append(fechaIni)
-
-			logginService.putInfoMessage(sbInfo.toString())
-
-			if(resulExpedienteSoap && resulExpedienteSoap.size() > 0) {
-				resulExpedienteSoap.each { item ->
-					if(item && item.nodoAlfresco) {
-						logginService.putInfoMessage("Obteniendo comprimido para expediente: " + item.getCodigoST() + " con numero de poliza: " + item.getNumPoliza())
-						def comprimido=tarificadorService.obtenerZip(item.nodoAlfresco)
-
-						if(comprimido) {
-							def xml=tarificadorService.obtenerXMLExpedientePorZip(comprimido)
-							resulComprimidos[x]=comprimido+"###"+xml
-							x++
-							cases.add(xml.toString())
-						}
-
-					}
-				}
-
-				cases.each { caso ->
-					String identificador = null
-					String info = caso.toString().replace("\n", "").replace("\t","").replace(" ","").trim()
-					Envio envio = new Envio()
-					envio.setFecha(new Date())
-					envio.setCia(company.id.toString())
-					if (info.toString().indexOf("dossierCode") > -1) {
-						int inicio = info.toString().indexOf("dossierCode")+12
-						identificador = info.toString().substring(inicio,inicio+8)
-						envio.setIdentificador(identificador)
-					}
-					envio.setInfo(info)
-					envio.save(flush:true)
-
-					logginService.putInfoMessage("Informacion expediente " + identificador + " enviado a " + company.nombre + " correctamente")
-
-				}
-
-
-				responseRecette = soap.send(connectTimeout:600000, readTimeout:600000) {
-					body {
-						AlptisUnderwrittingCaseResultsRequest(xmlns: "http://www.scortelemed.com/schemas/alptis") {
-							resulExpedienteSoap.each { item ->
-								tuw_cases() {
-									//AQUI OBTENEMOS EL ZIP EN BYTES Y EL CONTENIDO DEL XML
-									if (resulComprimidos[i]) {
-										def resultado=resulComprimidos[i].split("###")
-										if(resultado.size()==2){
-											if(resultado[1].contains('tuw')) {
-												mkp.yieldUnescaped (resultado[1].toString())
-												zip(resultado[0])
-												contadorResultados ++
-											}
-										}
-									}
-									i++
-								}
-							}
-							dateRequested(params.date.toString())
-							comments("ok")
-						}
-					}
-				}
-
-				def alptisUnderwrittingCaseResultsRequest=new AlptisUnderwrittingCaseResultsRequest()
-				alptisUnderwrittingCaseResultsRequest.tuw_cases=cases
-				alptisUnderwrittingCaseResultsRequest.dateRequested=fechaIni + " - " +fechaFin
-				alptisUnderwrittingCaseResultsRequest.comments="ok"
-				alptisUnderwrittingCaseResultsRequest.respuesta_remota=responseRecette.getBody().toString()
-
-				def requestXML=requestService.marshall(alptisUnderwrittingCaseResultsRequest,AlptisUnderwrittingCaseResultsRequest.class)
-
-				/**Remplazamos caracteres raros
-				 * 
-				 */
-				requestXML=requestXML.toString().replace("<?xml version='1.0' encoding='UTF-8' standalone='yes'?>","").replace("&lt;/","</").replace("&lt;","<").replace("/&gt;", "/>").replace("&gt;", ">")
-				requestService.crear("AlptisUnderwrittingCasesResultsRequest",requestXML)
-
-				/**Enviamos correo informativo
-				 * 
-				 */
-				correoUtil.envioEmail("AlptisUnderwrittingCasesResultsRequest", null, contadorResultados)
-
-				logginService.putInfoMessage("proceso envio de informacion para " + company.nombre + " terminado.")
-
-			}	else {
-
-				logginService.putInfoMessage("No hay resultados para " + company.nombre)
-
-			}
-		} catch (Exception ex) {
-			logginService.putError("Endpoint-"+opername,"Error en al obtener resultados para las fechas " + fechaIni + "-" + fechaFin + ":" + ex)
-
-			correoUtil.envioEmail("AlptisUnderwrittingCasesResultsRequest",cases.toString(),ex)
-
-			responseRecette = soap.send(connectTimeout:300000, readTimeout:300000) {
-				body {
-					AlptisUnderwrittingCaseResultsRequest(xmlns: "http://www.scortelemed.com/schemas/alptis") {
-						dateRequested(params.date.toString())
-						comments(ex)
-					}
-				}
-			}
-
-		}
-	}
-
-	def caseresultCM = {
-		def fechaFin
-		def fechaIni
-		def responseRecette
-		def soap = soapCajamarRecetteWS
-		def opername="caseresultCM"
-		def cases=[]
-		def resulExpedienteSoap = []
-		SOAPResponse response = new SOAPResponse()
-		def estadoCausa = []
-		def coberturas = []
-
-		//EJEMPLO DE URL:
-		//http://localhost:8080/scorWebservice/ws/caseresultCM?ini=20160720 00:00:00:00&fin=20160720 23:59:59:59
-
-		TransformacionUtil transformacion = new TransformacionUtil()
-
-		try {
-
-			def formateador = new java.text.SimpleDateFormat("yyyyMMdd")
-			def operacion = Operacion.findByClave('CajamarUnderwrittingCasesResultsRequest')
-			def company = Company.findByNombre('cajamar')
-			session.companyST=company.codigoSt
-
-			if(params.ini && params.fin){
-				fechaIni=URLDecoder.decode(params.ini.trim(), "ISO-8859-1")
-				fechaFin=URLDecoder.decode(params.fin.trim(), "ISO-8859-1")
-			}else{
-				Calendar fecha = Calendar.getInstance();
-				fecha.add(Calendar.MINUTE , -60)
-				fechaFin = fecha.getTime().format ('yyyyMMdd HH:mm')
-				fechaFin= fechaFin.toString()+":59"
-
-				fecha.add(Calendar.MINUTE , -30)
-				fechaIni = fecha.getTime().format ('yyyyMMdd HH:mm')
-				fechaIni= fechaIni.toString()+":00"
-			}
-
-			if (!Environment.current.name.equals("production_wildfly")) {
-				for (int i = 0; i < 3; i++) {
-					resulExpedienteSoap.addAll(tarificadorService.obtenerInformeExpedientes("1035",null,i,fechaIni,fechaFin,"ES"))
-				}
-			} else {
-				for (int i = 0; i < 3; i++) {
-					resulExpedienteSoap.addAll(tarificadorService.obtenerInformeExpedientes("1018",null,i,fechaIni,fechaFin,"ES"))
-				}
-			}
-
-			CorreoUtil correoUtil = new CorreoUtil()
-
-			def client = new SOAPClient('https://www.generali.es/evi_vidaEmissioServWeb/services/TeleSeleccionHandlerService?Company=M')
-			client.authorization = new HTTPBasicAuthorization("vevisct", "21yb51gs")
-
-			Calendar cal = Calendar.getInstance()
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd")
-			Date fechaSalida = sdf.parse("2016/07/26")
-
-			StringBuilder sbInfo = new StringBuilder ("Realizando proceso envio de informacion para  " + company.nombre + " con fecha ")
-			sbInfo.append(fechaIni).append("-").append(fechaFin)
-
-			logginService.putInfoMessage(sbInfo.toString())
-
-			resulExpedienteSoap.each { expediente ->
-
-				def excluirDelEnvio = false
-
-				if (expediente instanceof ExpedienteInforme) {
-
-					cal.setTime(sdf.parse(expediente.getFechaApertura()))
-
-					if(cal.getTime().after(fechaSalida) || cal.getTime().equals(fechaSalida)){
-
-						def wpers = transformacion.transformarCodigoCliente(expediente.getObservaciones())
-						def numeroSolicitud = expediente.getNumSolicitud()
-						def producto = expediente.getProducto().getCodigoProductoCompanya()
-						def ramo = transformacion.transformarRamo(expediente.getProducto().getCodigoProductoCompanya())
-						estadoCausa = transformacion.transformarTipoCausaTerminacion(expediente.getCodigoEstado(), expediente.getMotivoAnulacion())
-
-						if (estadoCausa != null){
-
-							//FECHA DE ULTIMOCAMBIOESTADO-ESTADO
-							cal.setTime(sdf.parse(expediente.getFechaUltimoCambioEstado()))
-							def anioEstado = cal.get(Calendar.YEAR).toString()
-							int dia = cal.get(Calendar.DAY_OF_MONTH)-1
-							def diaEstado = dia++ < 10 ? "0"+dia:dia.toString()
-							int mes = cal.get(Calendar.MONTH)+1
-							def mesEstado = mes < 10 ?"0"+mes:mes.toString()
-
-							//FECHA DE SOLICITUD-GENERACION
-							cal.setTime(sdf.parse(expediente.getFechaSolicitud()))
-							def anioSolicitud = cal.get(Calendar.YEAR).toString()
-							dia = cal.get(Calendar.DAY_OF_MONTH)-1
-							def diaSolicitud = dia++ < 10 ? "0"+dia:dia.toString()
-							mes = cal.get(Calendar.MONTH)+1
-							def mesSolicitud = mes < 10 ?"0"+mes:mes.toString()
-
-							//SERVICIOS
-							def tlabr = "0"
-							def tlcom = "0"
-
-							for (i in expediente.getServicios()){
-
-								if (Environment.current.name.equals("production_wildfly")) {
-									if (i.getCodigoStFacturacion().toString().equals("002245")) {
-										tlabr = "1"
-									} else if (i.getCodigoStFacturacion().toString().equals("000991")) {
-										tlcom = "1"
-									}
-								} else {
-									if (i.getCodigoStFacturacion().toString().equals("002245")) {
-										tlabr = "1"
-									} else if (i.getCodigoStFacturacion().toString().equals("001761")) {
-										tlcom = "1"
-									}
-								}
-							}
-
-							//COBERTURAS
-
-							def listaCoberturas = []
-							Cobertura cober = new Cobertura()
-
-							if (estadoCausa != null && estadoCausa[0].equals("01")){
-
-								def todasRechazadas = transformacion.obtenerEstadoCoberturas(expediente.getCoberturasExpediente())
-
-								for (i in expediente.getCoberturasExpediente()) {
-
-									String codigoCobertura = transformacion.obtenerCodigoCajamar(i.getCodigoCobertura(), expediente.getProducto().getCodigoProductoCompanya())
-
-									if (codigoCobertura != "10001" && codigoCobertura != "10002"){
-
-										try {
-											cober = transformacion.devolverCoberturaCm(codigoCobertura,i,expediente.getNumSolicitud())
-										} catch (Exception ex) {
-											excluirDelEnvio = true
-											logginService.putInfoMessage("Expediente " + expediente.getCodigoST() + " no tiene tarificacion para la cobertura: " + i.getNombreCobertura() + ". Se excluye del envio")
-
-										}
-
-									} else {//10001,10002 devolvemos vacio
-
-										cober = transformacion.devolverCoberturaVacia(codigoCobertura,todasRechazadas)
-
-									}
-
-									listaCoberturas << cober
-
-								}
-							} else {
-
-								cober.setCobern("")
-								cober.setVacobe("")
-								cober.setSobpri("")
-								cober.setSobmor("")
-
-								listaCoberturas << cober
-
-							}
-
-
-							String cadenaCoberturas = ""
-							listaCoberturas.each {
-
-								cadenaCoberturas = 	cadenaCoberturas + "<cobert>"+"<cobern>"+it.getCobern()+"</cobern>"+"<sobmor>"+it.getSobmor()+"</sobmor>"+"<sobpri>"+it.getSobpri()+"</sobpri>"+"<vacobe>"+it.getVacobe()+"</vacobe>"+"</cobert>"
-							}
-
-							if (!excluirDelEnvio) {
-								response = client.send(
-										"""<soapenv:Envelope xmlns:soapenv='http://schemas.xmlsoap.org/soap/envelope/' xmlns:tel='http://teleseleccion.emissio.b2b.evi.generali.es/' xmlns:bean='http://bean.emissio.b2b.evi.generali.es'>
+    def estadisticasService
+    def alptisService
+
+    def logginService
+    def HwSoapClientAlptisService
+
+    def soapAlptisRecetteWS
+    def soapAlptisRecetteWSPRO
+    def soapCajamarRecetteWS
+    def soapCajamarRecetteWSPRO
+    def soapCaserRecetteWS
+    def soapCaserRecetteWSPRO
+
+    def correoUtil
+    def requestService
+    def tarificadorService
+
+    def crearExpedienteService
+
+    @Autowired
+    private AmaService amaService
+
+    def caseresult = {
+        def fechaFin
+        def fechaIni
+        def responseRecette
+        def soap
+        def opername = "caseresult"
+        def cases = []
+        def resulExpedienteSoap
+        CorreoUtil correoUtil = new CorreoUtil()
+
+        try {
+            def formateador = new java.text.SimpleDateFormat("yyyyMMdd")
+            def operacion = Operacion.findByClave('AlptisUnderwrittingCasesResultsRequest')
+            def company = Company.findByNombre('alptis')
+            session.companyST = company.codigoSt
+
+            def fechaHoy = new Date().format('yyyyMMdd')
+
+            //EJEMPLO DE URL:
+            //http://192.168.1.188:8080/scorWebservice/ws/caseresult?ini=20150512 00:00:00:00&fin=20150512 23:59:59:59
+            if (params.ini && params.fin) {
+                fechaIni = URLDecoder.decode(params.ini.trim(), "ISO-8859-1")
+                fechaFin = URLDecoder.decode(params.fin.trim(), "ISO-8859-1")
+            } else {
+                Calendar fecha = Calendar.getInstance();
+                fecha.add(Calendar.MINUTE, -11)
+                fechaFin = fecha.getTime().format('yyyyMMdd HH:mm')
+                fechaFin = fechaFin.toString() + ":59"
+
+                fecha.add(Calendar.MINUTE, -9)
+                fechaIni = fecha.getTime().format('yyyyMMdd HH:mm')
+                fechaIni = fechaIni.toString() + ":00"
+            }
+
+            if (!Environment.current.name.equals("production_wildfly")) {
+                resulExpedienteSoap = tarificadorService.obtenerInformeExpedientes("1019", null, 1, fechaIni, fechaFin, "FR")
+                soap = soapAlptisRecetteWS
+            } else {
+                resulExpedienteSoap = tarificadorService.obtenerInformeExpedientes("1019", null, 1, fechaIni, fechaFin, "FR")
+                soap = soapAlptisRecetteWSPRO
+            }
+
+            def resulComprimidos = []
+            def i = 0
+            def contadorResultados = 0
+            def x = 0
+
+            StringBuilder sbInfo = new StringBuilder("Realizando proceso envio de informacion para " + company.nombre + " con fecha ")
+            sbInfo.append(fechaIni).append("-").append(fechaIni)
+
+            logginService.putInfoMessage(sbInfo.toString())
+
+            if (resulExpedienteSoap && resulExpedienteSoap.size() > 0) {
+                resulExpedienteSoap.each { item ->
+                    if (item && item.nodoAlfresco) {
+                        logginService.putInfoMessage("Obteniendo comprimido para expediente: " + item.getCodigoST() + " con numero de poliza: " + item.getNumPoliza())
+                        def comprimido = tarificadorService.obtenerZip(item.nodoAlfresco)
+
+                        if (comprimido) {
+                            def xml = tarificadorService.obtenerXMLExpedientePorZip(comprimido)
+                            resulComprimidos[x] = comprimido + "###" + xml
+                            x++
+                            cases.add(xml.toString())
+                        }
+
+                    }
+                }
+
+                cases.each { caso ->
+                    String identificador = null
+                    String info = caso.toString().replace("\n", "").replace("\t", "").replace(" ", "").trim()
+                    Envio envio = new Envio()
+                    envio.setFecha(new Date())
+                    envio.setCia(company.id.toString())
+                    if (info.toString().indexOf("dossierCode") > -1) {
+                        int inicio = info.toString().indexOf("dossierCode") + 12
+                        identificador = info.toString().substring(inicio, inicio + 8)
+                        envio.setIdentificador(identificador)
+                    }
+                    envio.setInfo(info)
+                    envio.save(flush: true)
+
+                    logginService.putInfoMessage("Informacion expediente " + identificador + " enviado a " + company.nombre + " correctamente")
+
+                }
+
+
+                responseRecette = soap.send(connectTimeout: 600000, readTimeout: 600000) {
+                    body {
+                        AlptisUnderwrittingCaseResultsRequest(xmlns: "http://www.scortelemed.com/schemas/alptis") {
+                            resulExpedienteSoap.each { item ->
+                                tuw_cases() {
+                                    //AQUI OBTENEMOS EL ZIP EN BYTES Y EL CONTENIDO DEL XML
+                                    if (resulComprimidos[i]) {
+                                        def resultado = resulComprimidos[i].split("###")
+                                        if (resultado.size() == 2) {
+                                            if (resultado[1].contains('tuw')) {
+                                                mkp.yieldUnescaped(resultado[1].toString())
+                                                zip(resultado[0])
+                                                contadorResultados++
+                                            }
+                                        }
+                                    }
+                                    i++
+                                }
+                            }
+                            dateRequested(params.date.toString())
+                            comments("ok")
+                        }
+                    }
+                }
+
+                def alptisUnderwrittingCaseResultsRequest = new AlptisUnderwrittingCaseResultsRequest()
+                alptisUnderwrittingCaseResultsRequest.tuw_cases = cases
+                alptisUnderwrittingCaseResultsRequest.dateRequested = fechaIni + " - " + fechaFin
+                alptisUnderwrittingCaseResultsRequest.comments = "ok"
+                alptisUnderwrittingCaseResultsRequest.respuesta_remota = responseRecette.getBody().toString()
+
+                def requestXML = requestService.marshall(alptisUnderwrittingCaseResultsRequest, AlptisUnderwrittingCaseResultsRequest.class)
+
+                /**Remplazamos caracteres raros
+                 *
+                 */
+                requestXML = requestXML.toString().replace("<?xml version='1.0' encoding='UTF-8' standalone='yes'?>", "").replace("&lt;/", "</").replace("&lt;", "<").replace("/&gt;", "/>").replace("&gt;", ">")
+                requestService.crear("AlptisUnderwrittingCasesResultsRequest", requestXML)
+
+                /**Enviamos correo informativo
+                 *
+                 */
+                correoUtil.envioEmail("AlptisUnderwrittingCasesResultsRequest", null, contadorResultados)
+
+                logginService.putInfoMessage("proceso envio de informacion para " + company.nombre + " terminado.")
+
+            } else {
+
+                logginService.putInfoMessage("No hay resultados para " + company.nombre)
+
+            }
+        } catch (Exception ex) {
+            logginService.putError("Endpoint-" + opername, "Error en al obtener resultados para las fechas " + fechaIni + "-" + fechaFin + ":" + ex)
+
+            correoUtil.envioEmail("AlptisUnderwrittingCasesResultsRequest", cases.toString(), ex)
+
+            responseRecette = soap.send(connectTimeout: 300000, readTimeout: 300000) {
+                body {
+                    AlptisUnderwrittingCaseResultsRequest(xmlns: "http://www.scortelemed.com/schemas/alptis") {
+                        dateRequested(params.date.toString())
+                        comments(ex)
+                    }
+                }
+            }
+
+        }
+    }
+
+    def caseresultCM = {
+        def fechaFin
+        def fechaIni
+        def responseRecette
+        def soap = soapCajamarRecetteWS
+        def opername = "caseresultCM"
+        def cases = []
+        def resulExpedienteSoap = []
+        SOAPResponse response = new SOAPResponse()
+        def estadoCausa = []
+        def coberturas = []
+
+        //EJEMPLO DE URL:
+        //http://localhost:8080/scorWebservice/ws/caseresultCM?ini=20160720 00:00:00:00&fin=20160720 23:59:59:59
+
+        TransformacionUtil transformacion = new TransformacionUtil()
+
+        try {
+
+            def formateador = new java.text.SimpleDateFormat("yyyyMMdd")
+            def operacion = Operacion.findByClave('CajamarUnderwrittingCasesResultsRequest')
+            def company = Company.findByNombre('cajamar')
+            session.companyST = company.codigoSt
+
+            if (params.ini && params.fin) {
+                fechaIni = URLDecoder.decode(params.ini.trim(), "ISO-8859-1")
+                fechaFin = URLDecoder.decode(params.fin.trim(), "ISO-8859-1")
+            } else {
+                Calendar fecha = Calendar.getInstance();
+                fecha.add(Calendar.MINUTE, -60)
+                fechaFin = fecha.getTime().format('yyyyMMdd HH:mm')
+                fechaFin = fechaFin.toString() + ":59"
+
+                fecha.add(Calendar.MINUTE, -30)
+                fechaIni = fecha.getTime().format('yyyyMMdd HH:mm')
+                fechaIni = fechaIni.toString() + ":00"
+            }
+
+            if (!Environment.current.name.equals("production_wildfly")) {
+                for (int i = 0; i < 3; i++) {
+                    resulExpedienteSoap.addAll(tarificadorService.obtenerInformeExpedientes("1035", null, i, fechaIni, fechaFin, "ES"))
+                }
+            } else {
+                for (int i = 0; i < 3; i++) {
+                    resulExpedienteSoap.addAll(tarificadorService.obtenerInformeExpedientes("1018", null, i, fechaIni, fechaFin, "ES"))
+                }
+            }
+
+
+            def client = new SOAPClient('https://www.generali.es/evi_vidaEmissioServWeb/services/TeleSeleccionHandlerService?Company=M')
+            client.authorization = new HTTPBasicAuthorization("vevisct", "21yb51gs")
+            Calendar cal = Calendar.getInstance()
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd")
+            Date fechaSalida = sdf.parse("2016/07/26")
+
+            StringBuilder sbInfo = new StringBuilder("Realizando proceso envio de informacion para  " + company.nombre + " con fecha ")
+            sbInfo.append(fechaIni).append("-").append(fechaFin)
+
+            logginService.putInfoMessage(sbInfo.toString())
+
+            resulExpedienteSoap.each { expediente ->
+
+                def excluirDelEnvio = false
+
+                if (expediente instanceof ExpedienteInforme) {
+
+                    cal.setTime(sdf.parse(expediente.getFechaApertura()))
+
+                    if (cal.getTime().after(fechaSalida) || cal.getTime().equals(fechaSalida)) {
+
+                        def wpers = transformacion.transformarCodigoCliente(expediente.getObservaciones())
+                        def numeroSolicitud = expediente.getNumSolicitud()
+                        def producto = expediente.getProducto().getCodigoProductoCompanya()
+                        def ramo = transformacion.transformarRamo(expediente.getProducto().getCodigoProductoCompanya())
+                        estadoCausa = transformacion.transformarTipoCausaTerminacion(expediente.getCodigoEstado(), expediente.getMotivoAnulacion())
+
+                        if (estadoCausa != null) {
+
+                            //FECHA DE ULTIMOCAMBIOESTADO-ESTADO
+                            cal.setTime(sdf.parse(expediente.getFechaUltimoCambioEstado()))
+                            def anioEstado = cal.get(Calendar.YEAR).toString()
+                            int dia = cal.get(Calendar.DAY_OF_MONTH) - 1
+                            def diaEstado = dia++ < 10 ? "0" + dia : dia.toString()
+                            int mes = cal.get(Calendar.MONTH) + 1
+                            def mesEstado = mes < 10 ? "0" + mes : mes.toString()
+
+                            //FECHA DE SOLICITUD-GENERACION
+                            cal.setTime(sdf.parse(expediente.getFechaSolicitud()))
+                            def anioSolicitud = cal.get(Calendar.YEAR).toString()
+                            dia = cal.get(Calendar.DAY_OF_MONTH) - 1
+                            def diaSolicitud = dia++ < 10 ? "0" + dia : dia.toString()
+                            mes = cal.get(Calendar.MONTH) + 1
+                            def mesSolicitud = mes < 10 ? "0" + mes : mes.toString()
+
+                            //SERVICIOS
+                            def tlabr = "0"
+                            def tlcom = "0"
+
+                            for (i in expediente.getServicios()) {
+
+                                if (Environment.current.name.equals("production_wildfly")) {
+                                    if (i.getCodigoStFacturacion().toString().equals("002245")) {
+                                        tlabr = "1"
+                                    } else if (i.getCodigoStFacturacion().toString().equals("000991")) {
+                                        tlcom = "1"
+                                    }
+                                } else {
+                                    if (i.getCodigoStFacturacion().toString().equals("002245")) {
+                                        tlabr = "1"
+                                    } else if (i.getCodigoStFacturacion().toString().equals("001761")) {
+                                        tlcom = "1"
+                                    }
+                                }
+                            }
+
+                            //COBERTURAS
+
+                            def listaCoberturas = []
+                            Cobertura cober = new Cobertura()
+
+                            if (estadoCausa != null && estadoCausa[0].equals("01")) {
+
+                                def todasRechazadas = transformacion.obtenerEstadoCoberturas(expediente.getCoberturasExpediente())
+
+                                for (i in expediente.getCoberturasExpediente()) {
+
+                                    String codigoCobertura = transformacion.obtenerCodigoCajamar(i.getCodigoCobertura(), expediente.getProducto().getCodigoProductoCompanya())
+
+                                    if (codigoCobertura != "10001" && codigoCobertura != "10002") {
+
+                                        try {
+                                            cober = transformacion.devolverCoberturaCm(codigoCobertura, i, expediente.getNumSolicitud())
+                                        } catch (Exception ex) {
+                                            excluirDelEnvio = true
+                                            logginService.putInfoMessage("Expediente " + expediente.getCodigoST() + " no tiene tarificacion para la cobertura: " + i.getNombreCobertura() + ". Se excluye del envio")
+
+                                        }
+
+                                    } else {//10001,10002 devolvemos vacio
+
+                                        cober = transformacion.devolverCoberturaVacia(codigoCobertura, todasRechazadas)
+
+                                    }
+
+                                    listaCoberturas << cober
+
+                                }
+                            } else {
+
+                                cober.setCobern("")
+                                cober.setVacobe("")
+                                cober.setSobpri("")
+                                cober.setSobmor("")
+
+                                listaCoberturas << cober
+
+                            }
+
+
+                            String cadenaCoberturas = ""
+                            listaCoberturas.each {
+
+                                cadenaCoberturas = cadenaCoberturas + "<cobert>" + "<cobern>" + it.getCobern() + "</cobern>" + "<sobmor>" + it.getSobmor() + "</sobmor>" + "<sobpri>" + it.getSobpri() + "</sobpri>" + "<vacobe>" + it.getVacobe() + "</vacobe>" + "</cobert>"
+                            }
+
+                            if (!excluirDelEnvio) {
+                                response = client.send(
+                                        """<soapenv:Envelope xmlns:soapenv='http://schemas.xmlsoap.org/soap/envelope/' xmlns:tel='http://teleseleccion.emissio.b2b.evi.generali.es/' xmlns:bean='http://bean.emissio.b2b.evi.generali.es'>
 							   <soapenv:Header/>
 							   <soapenv:Body>
 							      <tel:executeValoracionTeleSeleccion>
 							         <arg0>
 							            <bean:valoracion>
-							               <causte>"""+estadoCausa[1]+"""</causte>
-										   """+cadenaCoberturas+"""
+							               <causte>""" + estadoCausa[1] + """</causte>
+										   """ + cadenaCoberturas + """
 										   <ffesta>
-											  <aaests>"""+anioEstado+"""</aaests>
-							                  <ddests>"""+diaEstado+"""</ddests>
-							                  <mmests>"""+mesEstado+"""</mmests>
+											  <aaests>""" + anioEstado + """</aaests>
+							                  <ddests>""" + diaEstado + """</ddests>
+							                  <mmests>""" + mesEstado + """</mmests>
 							               </ffesta>
 							               <ffgets>
-							                  <aagets>"""+anioSolicitud+"""</aagets>
-							                  <ddgets>"""+diaSolicitud+"""</ddgets>
-							                  <mmgets>"""+mesSolicitud+"""</mmgets>
+							                  <aagets>""" + anioSolicitud + """</aagets>
+							                  <ddgets>""" + diaSolicitud + """</ddgets>
+							                  <mmgets>""" + mesSolicitud + """</mmgets>
 							               </ffgets>
 							               <gclien>
-							                  <wpers>"""+wpers+"""</wpers>
+							                  <wpers>""" + wpers + """</wpers>
 										   </gclien>
 										   <gcontr>
 											  <coder8></coder8>
@@ -422,614 +404,603 @@ class WsController {
 										   </gcontr>
 										   <gpetic>
 											  <cia>8</cia>
-											  <numref>"""+numeroSolicitud+"""</numref>
-							                  <yprodu>"""+producto+"""</yprodu>
-											  <yramex>"""+ramo+"""</yramex>
+											  <numref>""" + numeroSolicitud + """</numref>
+							                  <yprodu>""" + producto + """</yprodu>
+											  <yramex>""" + ramo + """</yramex>
 							               </gpetic>
-							               <tipote>"""+estadoCausa[0]+"""</tipote>
-										   <tlabr>"""+tlabr+"""</tlabr>
-										   <tlcom>"""+tlcom+"""</tlcom>
+							               <tipote>""" + estadoCausa[0] + """</tipote>
+										   <tlabr>""" + tlabr + """</tlabr>
+										   <tlcom>""" + tlcom + """</tlcom>
 										</bean:valoracion>
 									 </arg0>
 								  </tel:executeValoracionTeleSeleccion>
 							   </soapenv:Body>
 							</soapenv:Envelope>""")
 
-								render "OK"
-
-								Envio envio = new Envio()
-								envio.setFecha(new Date())
-								envio.setCia(company.id.toString())
-								envio.setIdentificador(expediente.getNumSolicitud())
-								envio.setInfo(response.getText().trim())
-								envio.save(flush:true)
-
-								logginService.putInfoMessage("Informacion expediente " + expediente.getCodigoST() + " enviado a " + company.nombre + " correctamente")
-							}
-
-
-						} else {
-
-							logginService.putInfoMessage("Expediente " + expediente.getCodigoST() + " no cumple con ningun estado de notificacion")
+                                render "OK"
+                                Envio envio = new Envio()
+                                envio.setFecha(new Date())
+                                envio.setCia(company.id.toString())
+                                envio.setIdentificador(expediente.getNumSolicitud())
+                                envio.setInfo(response.getText().trim())
+                                envio.save(flush: true)
+                                logginService.putInfoMessage("Informacion expediente " + expediente.getCodigoST() + " enviado a " + company.nombre + " correctamente")
+                            }
+
+
+                        } else {
+
+                            logginService.putInfoMessage("Expediente " + expediente.getCodigoST() + " no cumple con ningun estado de notificacion")
+
+                        }
+                    }
+                }
+            }
+
+            logginService.putInfoMessage("proceso envio de informacion para " + company.nombre + " terminado.")
+
+        } catch (Exception ex) {
+            logginService.putErrorMessage("Error: " + opername + ". " + ex.getMessage().toString() + ". Detalles:" + ex.printStackTrace())
+            println "Error: " + ex.getMessage()
+            println "Detalles:" + ex.getMessage()
+            render "KO"
+        }
+    }
+
+    def caseresultCaser = {
+        def fechaFin
+        def fechaIni
+        def responseRecette
+        def soap = soapCaserRecetteWS
+        def opername = "caseresultCaser"
+        def cases = []
+        List<Expediente> expedientes = new ArrayList<Expediente>()
+
+        List<Cita> citas = new ArrayList<Cita>()
+        List<Actividad> actividades = new ArrayList<Actividad>()
+        def estadoCausa = []
+        def coberturas = []
+        def password
+        def username
+        List<RespuestaCRMInforme> expedientesInforme = new ArrayList<RespuestaCRMInforme>();
+
+        //EJEMPLO DE URL:
+        //http://localhost:8080/scorWebservices/ws/caseresultCaser?ini=20170519 00:00:00&fin=20170519 23:59:59
+
+        TransformacionUtil transformacion = new TransformacionUtil()
+
+        try {
+
+            def formateador = new java.text.SimpleDateFormat("yyyyMMdd")
+            def operacion = Operacion.findByClave('CaserUnderwrittingCasesResultsRequest')
+            def company = Company.findByNombre('caser')
+            session.companyST = company.codigoSt
+
+            if (params.ini && params.fin) {
+                fechaIni = URLDecoder.decode(params.ini.trim(), "ISO-8859-1")
+                fechaFin = URLDecoder.decode(params.fin.trim(), "ISO-8859-1")
+            } else {
+                Calendar fecha = Calendar.getInstance();
+                fecha.add(Calendar.MINUTE, -60)
+                fechaFin = fecha.getTime().format('yyyyMMdd HH:mm')
+                fechaFin = fechaFin.toString() + ":59"
+
+                fecha.add(Calendar.MINUTE, -30)
+                fechaIni = fecha.getTime().format('yyyyMMdd HH:mm')
+                fechaIni = fechaIni.toString() + ":00"
+            }
+
+
+            StringBuilder sbInfo = new StringBuilder("Realizando proceso envio de informacion para  " + company.nombre + " con fecha ")
+            if (Environment.current.name.equals("production_wildfly")) {
+                sbInfo.append("** compania 1061 **")
+                for (int i = 0; i < 3; i++) {
+                    expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1061", null, i, fechaIni, fechaFin, "ES"))
+                }
+            } else {
+                sbInfo.append("** compania 1062 **")
+                for (int i = 0; i < 3; i++) {
+                    expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1062", null, i, fechaIni, fechaFin, "ES"))
+                }
+            }
+            sbInfo.append(fechaIni).append("-").append(fechaFin)
+            XSDProcessExecutionServiceLocator locator = new XSDProcessExecutionServiceLocator()
+
+            if (Environment.current.name.equals("production_wildfly")) {
+                sbInfo.append("** Clave  de caser  entorno -> production_wildfly **")
+                username = "caser"
+                password = "a2aa10aPvQ8D5i6VDNwtXU5F7acSeKGre9PLL6iQEFLbbGfRgZdoHRzdygau"
+                locator.setXSDProcessExecutionPortEndpointAddress("https://iwssgo.caser.es/sgowschannel/XSDProcessExecution?WSDL")
+            } else {
+                sbInfo.append("** Clave  de caser  entorno -> preproduction **")
+                username = "caser"
+                password = "abdbc632c0dd1807407c6ceee46e0ab48c0bc12c"
+                locator.setXSDProcessExecutionPortEndpointAddress("https://iwssgotest.caser.es/sgowschannel/XSDProcessExecution?WSDL")
+            }
+
 
-						}
-					}
-				}
-			}
+            XSDProcessExecutionPort port = locator.getXSDProcessExecutionPort()
+            StringHolder salida = new StringHolder()
+            logginService.putInfoMessage(sbInfo.toString())
+            EntradaDetalle entradaDetalle = new EntradaDetalle()
+            String stringRequest = null
+            expedientes.each { expediente ->
+
+                entradaDetalle = transformacion.obtenerDetalle(expediente)
+
+                if (entradaDetalle != null) {
+
+                    stringRequest = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?><service_RegistrarEventoSCOR><inputMap type='map'><username type='String'><_value_>" + username + "</_value_></username><password type='String'><_value_>" + password + "</_value_></password><idExpediente type='Integer'><_value_>" + entradaDetalle.getIdExpediente() + "</_value_></idExpediente><codigoEvento type='String'><_value_>" + entradaDetalle.getCodigoEvento() + "</_value_></codigoEvento><detalle type='String'><_value_>" + entradaDetalle.getDetalle() + "</_value_></detalle><fecha type='Date'><_value_>" + entradaDetalle.getFecha() + "</_value_></fecha></inputMap></service_RegistrarEventoSCOR>"
+
+                    Thread.sleep(6000)
+
+                    try {
+                        port.doProcessExecution(stringRequest, salida)
+
+                        Envio envio = new Envio()
+                        envio.setFecha(new Date())
+                        envio.setCia(company.id.toString())
+                        envio.setIdentificador(entradaDetalle.getIdExpediente())
+                        envio.setInfo(stringRequest)
+                        envio.save(flush: true)
+
+                        logginService.putInfoMessage("Informacion de salida envio de cambios en expedientes " + entradaDetalle.getIdExpediente())
+                        logginService.putInfoMessage("Informacion recibida de cambios en expedientes " + entradaDetalle.getIdExpediente() + ":" + salida.value.trim())
+                        logginService.putInfoMessage("Informacion expedientes " + entradaDetalle.getIdExpediente() + " enviado a " + company.nombre + " correctamente")
+
+                    } catch (Exception ex) {
+
+                        /**Metemos en errores
+                         *
+                         */
+                        com.scortelemed.Error error = new com.scortelemed.Error()
+                        error.setFecha(new Date())
+                        error.setCia(company.id.toString())
+                        error.setIdentificador(entradaDetalle.getIdExpediente())
+                        error.setInfo(stringRequest)
+                        error.setOperacion("ENVIO ESTADO")
+                        error.setError("Peticion no realizada para solicitud: " + entradaDetalle.getIdExpediente() + ". Error: " + ex.getMessage())
+                        error.save(flush: true)
+                        logginService.putErrorMessage("Error: " + opername + ". No se ha podido mandar el caso a Caser. Detalles:" + ex.getMessage())
+
+                    }
+
+                }
+            }
+
+            logginService.putInfoMessage("proceso envio de informacion para " + company.nombre + " terminado.")
+            logginService.putInfoMessage("** Se enviaron :" + expedientes.size() + " **")
+        } catch (Exception ex) {
+            logginService.putErrorMessage("Error: " + opername + ". " + ex.getMessage() + ". Detalles:" + ex.getMessage())
+            render "KO"
+        }
+    }
+
+    def caseresultAma = {
+
+        def fechaFin
+        def fechaIni
+        def responseRecette
+        def soap = soapCaserRecetteWS
+        def opername = "caseresultAma"
+        def cases = []
+        def estadoCausa = []
+        def coberturas = []
+
+        AmaService amaService = new AmaService()
+        List<RespuestaCRMInforme> expedientesInforme = new ArrayList<RespuestaCRMInforme>();
+        List<Expediente> expedientes = new ArrayList<Expediente>()
+        List<Cita> citas = new ArrayList<Cita>()
+        List<Actividad> actividades = new ArrayList<Actividad>()
+        List<File> files = new ArrayList<File>()
+        DossierDataStoreWSStub stub
+        SaveDossierResultsResponseE respuestaCRM = new SaveDossierResultsResponseE()
+        List<BenefitInformation> listaBenefitInformation = new ArrayList<BenefitInformation>();
+
+        //EJEMPLO DE URL:
+        //http://localhost:8080/scorWebservice/ws/caseresultAma?ini=20171107 00:00:00&fin=20171107 23:59:59
+
+        TransformacionUtil transformacion = new TransformacionUtil()
+        def formateador = new java.text.SimpleDateFormat("yyyyMMdd")
+        def operacion = Operacion.findByClave('AmaUnderwrittingCasesResultsRequest')
+        def company = Company.findByNombre('ama')
+        def identificadorCaso
+        Expediente expediente
+        try {
+
+            if (params.ini && params.fin) {
+                fechaIni = URLDecoder.decode(params.ini.trim(), "ISO-8859-1")
+                fechaFin = URLDecoder.decode(params.fin.trim(), "ISO-8859-1")
+            } else {
+                Calendar fecha = Calendar.getInstance();
+                fecha.add(Calendar.MINUTE, -60)
+                fechaFin = fecha.getTime().format('yyyyMMdd HH:mm')
+                fechaFin = fechaFin.toString() + ":59"
+
+                fecha.add(Calendar.MINUTE, -30)
+                fechaIni = fecha.getTime().format('yyyyMMdd HH:mm')
+                fechaIni = fechaIni.toString() + ":00"
+            }
+
+            if (!Environment.current.name.equals("production_wildfly")) {
+                for (int i = 1; i < 3; i++) {
+                    expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1059", null, i, fechaIni, fechaFin, "ES"))
+                    expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1064", null, i, fechaIni, fechaFin, "ES"))
+                }
+            } else {
+                for (int i = 1; i < 3; i++) {
+                    expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1059", null, i, fechaIni, fechaFin, "ES"))
+                    expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1065", null, i, fechaIni, fechaFin, "ES"))
+                }
+            }
+
+
+            StringBuilder sbInfo = new StringBuilder("Realizando proceso envio de informacion para  " + company.nombre + " con fecha ")
+            sbInfo.append(fechaIni).append("-").append(fechaFin)
+
+            logginService.putInfoMessage(sbInfo.toString())
+
+            if (Environment.current.name.equals("production_wildfly")) {
+                def usuario = "aplCORWS"
+                def password = "Wh1t3p&&\$"
+                stub = new DossierDataStoreWSStub("https://servicios.amaseguros.com/AmaPublish/ama/amascortelemed-ws/services/DossierDataStoreWS?wsdl", usuario, password)
+            } else {
+                def usuario = "aplCORWSPRE"
+                def password = "IE4tKQA6"
+                stub = new DossierDataStoreWSStub("https://pre-servicios.amaseguros.com/AMAPublish/ama/amascortelemed-ws/services/DossierDataStoreWS?wsdl", usuario, password)
+            }
+
+            long timeout = 3 * 60 * 1000; // Tres minuitos
+            stub._getServiceClient().getOptions().setTimeOutInMilliSeconds(timeout);
+
+            Dossier dossier = new Dossier();
+            DossierDataStoreWSStub.SaveDossierResultsE resultsE = new DossierDataStoreWSStub.SaveDossierResultsE();
+            DossierDataStoreWSStub.SaveDossierResults saveResult = new DossierDataStoreWSStub.SaveDossierResults();
+            DossierDataStoreWSStub.DossierResultsIN saveResultIN = new DossierDataStoreWSStub.DossierResultsIN();
+
+            if (expedientes) {
+
+                for (int i = 0; i < expedientes.size(); i++) {
+
+
+                    try {
+
+
+                        expediente = expedientes.get(i)
+
+                        if (!amaService.seExcluyeEnvio(expediente)) {
+
+                            identificadorCaso = expediente.getNumSolicitud()
+
+                            files = new ArrayList<File>()
+                            listaBenefitInformation = new ArrayList<BenefitInformation>();
+
+                            dossier.setDossierCode(expediente.getNumSolicitud())
+                            dossier.setResultsCode("OK")
+                            dossier.setState((short) 1)
+
+                            /**CANDIDATO
+                             *
+                             */
+                            Candidate candidate = new Candidate()
+                            candidate.setBirthDate(transformacion.fromStringToCalendar(expediente.getCandidato().getFechaNacimiento()))
+                            candidate.setFullName(expediente.getCandidato().getNombre() + " " + expediente.getCandidato().getApellidos())
+
+                            if (expediente.getCandidato().getSexo() != null) {
+                                candidate.setGender(expediente.getCandidato().getSexo() == TipoSexo.HOMBRE ? (short) 1 : (short) 2)
+                            } else {
+                                candidate.setGender((short) 1)
+                            }
+
+                            candidate.setOccupation("")
+                            dossier.setCandidate(candidate)
+
+                            /**CIA
+                             *
+                             */
+                            com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.Company cia = new com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.Company()
+
+
+
+                            if (expediente.getCandidato() != null && expediente.getCandidato().getCompanya() != null && expediente.getCandidato().getCompanya().getCodigoST().equals("1064")) {
+                                cia.setCompanyCode("C0803")
+                                cia.setCompanyDescription("A.M.A. Vida")
+                            }
+                            if (expediente.getCandidato() != null && expediente.getCandidato().getCompanya() != null && expediente.getCandidato().getCompanya().getCodigoST().equals("1059")) {
+                                cia.setCompanyCode("M0328")
+                                cia.setCompanyDescription("A.M.A.")
+                            }
+
+                            dossier.setCompany(cia)
+                            /**PRODUCTO
+                             *
+                             */
+                            Product producto = new Product()
+
+                            if (expediente.getProducto() != null) {
+                                if (expediente.getProducto().getCodigoProductoCompanya().toString().equals("P49")) {
+                                    producto.setProductCode("0013")
+                                } else {
+                                    producto.setProductCode(expediente.getProducto().getCodigoProductoCompanya())
+                                }
+                                producto.setProductDescription(expediente.getProducto().getNombre());
+                            } else {
+                                producto.setProductCode("")
+                                producto.setProductDescription("");
+                            }
+
+                            dossier.setProduct(producto)
+
+                            if (expediente.getCoberturasExpediente() != null && expediente.getCoberturasExpediente().size() > 0) {
 
-			logginService.putInfoMessage("proceso envio de informacion para " + company.nombre + " terminado.")
+                                expediente.getCoberturasExpediente().each { CoberturaExpediente coberturasPoliza ->
 
-		} catch (Exception ex) {
-			logginService.putErrorMessage("Error: " + opername + ". " + ex.getMessage().toString() + ". Detalles:" + ex.printStackTrace())
-			println "Error: " + ex.getMessage()
-			println "Detalles:" + ex.getMessage()
-			render "KO"
-		}
-	}
 
-	def caseresultCaser = {
-		def fechaFin
-		def fechaIni
-		def responseRecette
-		def soap = soapCaserRecetteWS
-		def opername="caseresultCaser"
-		def cases=[]
-		List<Expediente> expedientes = new ArrayList<Expediente>()
+                                    BenefitInformation benefitInformation = new BenefitInformation();
 
-		List<Cita> citas = new ArrayList<Cita>()
-		List<Actividad> actividades = new ArrayList<Actividad>()
-		def estadoCausa = []
-		def coberturas = []
-		def password
-		def username
-		List<RespuestaCRMInforme> expedientesInforme = new ArrayList<RespuestaCRMInforme>();
+                                    benefitInformation.setBenefitName(coberturasPoliza.getNombreCobertura());
+                                    benefitInformation.setBenefitCode(coberturasPoliza.getCodigoCobertura());
 
+                                    BenefitResultValue benefitResultValue = new BenefitResultValue();
 
-		//EJEMPLO DE URL:
-		//http://localhost:8080/scorWebservice/ws/caseresultCaser?ini=20170519 00:00:00&fin=20170519 23:59:59
+                                    benefitResultValue.setDescLoadingCapital("");
+                                    benefitResultValue.setDescLoadingPremium("");
+                                    benefitResultValue.setLoadingCapital(BigDecimal.valueOf(Long.valueOf("0")));
+                                    benefitResultValue.setLoadingPremium(BigDecimal.valueOf(Long.valueOf("0")));
 
-		TransformacionUtil transformacion = new TransformacionUtil()
 
-		try {
+                                    if (coberturasPoliza.getCodResultadoCobertura() != null && coberturasPoliza.getCodResultadoCobertura().trim().startsWith("3")) {
 
-			def formateador = new java.text.SimpleDateFormat("yyyyMMdd")
-			def operacion = Operacion.findByClave('CaserUnderwrittingCasesResultsRequest')
-			def company = Company.findByNombre('caser')
-			session.companyST=company.codigoSt
+                                        /**
+                                         * SOBREMORTALIDAD (EXTRAPRIMA para AMA)
+                                         */
+                                        if (coberturasPoliza.getValoracionCapital() != null && !coberturasPoliza.getValoracionCapital().trim().isEmpty() && (coberturasPoliza.getValoracionPrima() == null || coberturasPoliza.getValoracionPrima().trim().isEmpty())) {
 
-			if(params.ini && params.fin){
-				fechaIni=URLDecoder.decode(params.ini.trim(), "ISO-8859-1")
-				fechaFin=URLDecoder.decode(params.fin.trim(), "ISO-8859-1")
-			}else{
-				Calendar fecha = Calendar.getInstance();
-				fecha.add(Calendar.MINUTE , -60)
-				fechaFin = fecha.getTime().format ('yyyyMMdd HH:mm')
-				fechaFin= fechaFin.toString()+":59"
+                                            benefitInformation.setBenefitResultCode("31");
+                                            benefitInformation.setBenefitResultType("Sobremortalidad");
+                                            benefitResultValue.setDescLoadingCapital(coberturasPoliza.getCodResultadoCobertura().toString());
+                                            benefitResultValue.setDescLoadingPremium("");
+                                            benefitResultValue.setLoadingCapital(new BigDecimal(coberturasPoliza.getValoracionCapital().replace(",", ".")));
+                                            benefitResultValue.setLoadingPremium(new BigDecimal(0));
 
-				fecha.add(Calendar.MINUTE , -30)
-				fechaIni = fecha.getTime().format ('yyyyMMdd HH:mm')
-				fechaIni= fechaIni.toString()+":00"
-			}
+                                            /**
+                                             * SOBREPRIMA
+                                             */
+                                        } else if (coberturasPoliza.getValoracionPrima() != null && !coberturasPoliza.getValoracionPrima().trim().isEmpty() && (coberturasPoliza.getValoracionCapital() == null || coberturasPoliza.getValoracionCapital().trim().isEmpty())) {
 
-			if (!Environment.current.name.equals("production_wildfly")) {
-				for (int i = 0; i < 3; i++) {
-					expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1061",null,i,fechaIni,fechaFin,"ES"))
-				}
-			} else {
-				for (int i = 0; i < 3; i++) {
-					expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1062",null,i,fechaIni,fechaFin,"ES"))
-				}
-			}
-
-			CorreoUtil correoUtil = new CorreoUtil()
-
-			StringBuilder sbInfo = new StringBuilder ("Realizando proceso envio de informacion para  " + company.nombre + " con fecha ")
-			sbInfo.append(fechaIni).append("-").append(fechaFin)
-
-			XSDProcessExecutionServiceLocator locator = new XSDProcessExecutionServiceLocator()
+                                            benefitInformation.setBenefitResultCode("30");
+                                            benefitInformation.setBenefitResultType("Sobreprima");
+                                            benefitResultValue.setDescLoadingCapital("");
+                                            benefitResultValue.setDescLoadingPremium(coberturasPoliza.getCodResultadoCobertura().toString());
+                                            benefitResultValue.setLoadingCapital(new BigDecimal(0));
+                                            benefitResultValue.setLoadingPremium(new BigDecimal(coberturasPoliza.getValoracionPrima().replace(",", ".")));
 
-
-			if (Environment.current.name.equals("production_wildfly")) {
-				username = "caser"
-				password = "a2aa10aPvQ8D5i6VDNwtXU5F7acSeKGre9PLL6iQEFLbbGfRgZdoHRzdygau"
-				locator.setXSDProcessExecutionPortEndpointAddress("https://iwssgo.caser.es/sgowschannel/XSDProcessExecution?WSDL")
-			} else {
-				username = "caser"
-				password = "abdbc632c0dd1807407c6ceee46e0ab48c0bc12c"
-				locator.setXSDProcessExecutionPortEndpointAddress("https://iwssgotest.caser.es/sgowschannel/XSDProcessExecution?WSDL")
-			}
+                                        } else {
 
+                                            if (coberturasPoliza.getCodResultadoCobertura() != null) {
 
-			XSDProcessExecutionPort port = locator.getXSDProcessExecutionPort()
-			StringHolder salida = new StringHolder()
-
-			logginService.putInfoMessage(sbInfo.toString())
-
-			EntradaDetalle entradaDetalle = new EntradaDetalle()
-			String stringRequest = null
-
-			expedientes.each { expediente ->
-
-				entradaDetalle = transformacion.obtenerDetalle(expediente)
-
-				if (entradaDetalle != null) {
-
-					stringRequest = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?><service_RegistrarEventoSCOR><inputMap type='map'><username type='String'><_value_>"+username+"</_value_></username><password type='String'><_value_>"+password+"</_value_></password><idExpediente type='Integer'><_value_>"+entradaDetalle.getIdExpediente()+"</_value_></idExpediente><codigoEvento type='String'><_value_>"+entradaDetalle.getCodigoEvento()+"</_value_></codigoEvento><detalle type='String'><_value_>"+entradaDetalle.getDetalle()+"</_value_></detalle><fecha type='Date'><_value_>"+entradaDetalle.getFecha()+"</_value_></fecha></inputMap></service_RegistrarEventoSCOR>"
-
-					Thread.sleep(6000);
-
-					try {
-
-						Envio envio = new Envio()
-						envio.setFecha(new Date())
-						envio.setCia(company.id.toString())
-						envio.setIdentificador(entradaDetalle.getIdExpediente())
-						envio.setInfo(stringRequest)
-						envio.save(flush:true)
-
-						port.doProcessExecution(stringRequest,salida);
-
-						logginService.putInfoMessage("Informacion de salida envio de cambios en expedientes " + entradaDetalle.getIdExpediente())
-						logginService.putInfoMessage("Informacion recibida de cambios en expedientes " + entradaDetalle.getIdExpediente() + ":" + salida.value.trim())
-						logginService.putInfoMessage("Informacion expedientes " + entradaDetalle.getIdExpediente() + " enviado a " + company.nombre + " correctamente")
-
-					} catch (Exception ex) {
-
-						/**Metemos en errores
-						 *
-						 */
-						com.scortelemed.Error error = new com.scortelemed.Error()
-						error.setFecha(new Date())
-						error.setCia(company.id.toString())
-						error.setIdentificador(entradaDetalle.getIdExpediente())
-						error.setInfo(stringRequest)
-						error.setOperacion("ENVIO ESTADO")
-						error.setError("Peticion no realizada para solicitud: " + entradaDetalle.getIdExpediente() + ". Error: "+ ex.getMessage())
-						error.save(flush:true)
-
-						logginService.putErrorMessage("Error: " + opername+ ". No se ha podido mandar el caso a Caser. Detalles:" + ex.getMessage())
-
-					}
-
-				}
-			}
+                                                benefitInformation.setBenefitResultCode("3");
+                                                benefitInformation.setBenefitResultType("Combinado");
+                                                benefitResultValue.setDescLoadingCapital(coberturasPoliza.getCodResultadoCobertura().toString())
+                                                benefitResultValue.setDescLoadingPremium(coberturasPoliza.getCodResultadoCobertura().toString())
+                                                benefitResultValue.setLoadingCapital(new BigDecimal(coberturasPoliza.getValoracionCapital().replace(",", ".")))
+                                                benefitResultValue.setLoadingPremium(new BigDecimal(coberturasPoliza.getValoracionPrima().replace(",", ".")))
+                                            }
+                                        }
+                                    } else if (coberturasPoliza.getCodResultadoCobertura() != null) {
 
-			logginService.putInfoMessage("proceso envio de informacion para " + company.nombre + " terminado.")
 
-		} catch (Exception ex) {
-			logginService.putErrorMessage("Error: " + opername+ ". "+ ex.getMessage() + ". Detalles:" + ex.getMessage())
-			render "KO"
-		}
-	}
+                                        benefitInformation.setBenefitResultCode(coberturasPoliza.getCodResultadoCobertura());
+                                        benefitInformation.setBenefitResultType(amaService.devolverLiteralCobertura(coberturasPoliza.getCodResultadoCobertura()));
+                                        benefitResultValue.setDescLoadingCapital("");
+                                        benefitResultValue.setDescLoadingPremium("");
+                                        benefitResultValue.setLoadingCapital(new BigDecimal(0));
+                                        benefitResultValue.setLoadingPremium(new BigDecimal(0));
 
-	def caseresultAma = {
+                                    } else {
 
-		def fechaFin
-		def fechaIni
-		def responseRecette
-		def soap = soapCaserRecetteWS
-		def opername="caseresultAma"
-		def cases=[]
-		def estadoCausa = []
-		def coberturas = []
+                                        benefitInformation.setBenefitResultCode("");
+                                        benefitInformation.setBenefitResultType("");
+                                        benefitResultValue.setDescLoadingCapital("");
+                                        benefitResultValue.setDescLoadingPremium("");
+                                        benefitResultValue.setLoadingCapital(new BigDecimal(0));
+                                        benefitResultValue.setLoadingPremium(new BigDecimal(0));
 
-		AmaService amaService = new AmaService()
-		List<RespuestaCRMInforme> expedientesInforme = new ArrayList<RespuestaCRMInforme>();
-		List<Expediente> expedientes = new ArrayList<Expediente>()
-		List<Cita> citas = new ArrayList<Cita>()
-		List<Actividad> actividades = new ArrayList<Actividad>()
-		List<File> files = new ArrayList<File>()
-		DossierDataStoreWSStub stub
-		SaveDossierResultsResponseE respuestaCRM = new SaveDossierResultsResponseE()
-		List<BenefitInformation> listaBenefitInformation = new ArrayList<BenefitInformation>();
+                                    }
 
-		//EJEMPLO DE URL:
-		//http://localhost:8080/scorWebservice/ws/caseresultAma?ini=20171107 00:00:00&fin=20171107 23:59:59
+                                    benefitInformation.setBenefitResultValue(benefitResultValue);
 
-		TransformacionUtil transformacion = new TransformacionUtil()
-		def formateador = new java.text.SimpleDateFormat("yyyyMMdd")
-		def operacion = Operacion.findByClave('AmaUnderwrittingCasesResultsRequest')
-		def company = Company.findByNombre('ama')
-		def identificadorCaso
-		Expediente expediente
-		try {
+                                    if (transformacion.hasElements(coberturasPoliza.getExclusiones())) {
 
-			if(params.ini && params.fin){
-				fechaIni=URLDecoder.decode(params.ini.trim(), "ISO-8859-1")
-				fechaFin=URLDecoder.decode(params.fin.trim(), "ISO-8859-1")
-			}else{
-				Calendar fecha = Calendar.getInstance();
-				fecha.add(Calendar.MINUTE , -60)
-				fechaFin = fecha.getTime().format ('yyyyMMdd HH:mm')
-				fechaFin= fechaFin.toString()+":59"
+                                        StringTokenizer st = new StringTokenizer(coberturasPoliza.getExclusiones(), ";");
 
-				fecha.add(Calendar.MINUTE , -30)
-				fechaIni = fecha.getTime().format ('yyyyMMdd HH:mm')
-				fechaIni= fechaIni.toString()+":00"
-			}
+                                        while (st.hasMoreTokens()) {
 
-			if (!Environment.current.name.equals("production_wildfly")) {
-				for (int i = 1; i < 3; i++) {
-					expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1059",null,i,fechaIni,fechaFin,"ES"))
-					expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1064",null,i,fechaIni,fechaFin,"ES"))
-				}
-			} else {
-				for (int i = 1; i < 3; i++) {
-					expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1059",null,i,fechaIni,fechaFin,"ES"))
-					expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1065",null,i,fechaIni,fechaFin,"ES"))
-				}
-			}
-
-			CorreoUtil correoUtil = new CorreoUtil()
-
-			StringBuilder sbInfo = new StringBuilder ("Realizando proceso envio de informacion para  " + company.nombre + " con fecha ")
-			sbInfo.append(fechaIni).append("-").append(fechaFin)
+                                            Exclusion exlusion = new Exclusion();
+                                            exlusion.setText(st.nextToken());
+                                            exlusion.setType("4");
+                                            benefitInformation.addExclusionsList(exlusion);
 
-			logginService.putInfoMessage(sbInfo.toString())
+                                        }
 
-			if (Environment.current.name.equals("production_wildfly")) {
-				def usuario = "aplCORWS"
-				def password = "Wh1t3p&&\$"
-				stub = new DossierDataStoreWSStub("https://servicios.amaseguros.com/AmaPublish/ama/amascortelemed-ws/services/DossierDataStoreWS?wsdl",usuario,password)
-			} else {
-				def usuario = "aplCORWSPRE"
-				def password = "IE4tKQA6"
-				stub = new DossierDataStoreWSStub("https://pre-servicios.amaseguros.com/AMAPublish/ama/amascortelemed-ws/services/DossierDataStoreWS?wsdl",usuario,password)
-			}
+                                    } else {
+                                        benefitInformation.setExclusionsList(null);
+                                    }
 
-			long timeout = 3 * 60 * 1000; // Tres minuitos
-			stub._getServiceClient().getOptions().setTimeOutInMilliSeconds(timeout);
+                                    if (transformacion.hasElements(coberturasPoliza.getInformesMedicos())) {
 
-			Dossier dossier = new Dossier();
-			DossierDataStoreWSStub.SaveDossierResultsE resultsE = new DossierDataStoreWSStub.SaveDossierResultsE();
-			DossierDataStoreWSStub.SaveDossierResults saveResult = new DossierDataStoreWSStub.SaveDossierResults();
-			DossierDataStoreWSStub.DossierResultsIN saveResultIN = new DossierDataStoreWSStub.DossierResultsIN();
+                                        StringTokenizer st = new StringTokenizer(coberturasPoliza.getInformesMedicos(), ";");
 
-			if(expedientes){
+                                        while (st.hasMoreTokens()) {
 
-				for (int i = 0; i < expedientes.size(); i++) {
+                                            MedicalReport medicalReport = new MedicalReport();
+                                            medicalReport.setText(st.nextToken());
+                                            medicalReport.setType("1");
+                                            benefitInformation.addMedicalReportsList(medicalReport);
 
+                                        }
 
-					try {
+                                    } else {
+                                        benefitInformation.addMedicalReportsList(null);
+                                    }
 
+                                    if (transformacion.hasElements(coberturasPoliza.getNotas())) {
 
-						expediente = expedientes.get(i)
+                                        StringTokenizer st = new StringTokenizer(coberturasPoliza.getNotas(), ";");
 
-						    if (!amaService.seExcluyeEnvio(expediente)) {
+                                        while (st.hasMoreTokens()) {
 
-								identificadorCaso = expediente.getNumSolicitud()
+                                            AdditionalNote note = new AdditionalNote();
+                                            note.setText(st.nextToken());
+                                            note.setType("5");
+                                            benefitInformation.addAdditionalNotesList(note);
 
-								files = new ArrayList<File>()
-								listaBenefitInformation = new ArrayList<BenefitInformation>();
+                                        }
 
-								dossier.setDossierCode(expediente.getNumSolicitud())
-								dossier.setResultsCode("OK")
-								dossier.setState((short) 1)
+                                    } else {
+                                        benefitInformation.addAdditionalNotesList(null);
+                                    }
 
-								/**CANDIDATO
-								 *
-								 */
-								Candidate candidate = new Candidate()
-								candidate.setBirthDate(transformacion.fromStringToCalendar(expediente.getCandidato().getFechaNacimiento()))
-								candidate.setFullName(expediente.getCandidato().getNombre() + " " + expediente.getCandidato().getApellidos())
+                                    if (transformacion.hasElements(coberturasPoliza.getValoracionTemporal())) {
 
-								if (expediente.getCandidato().getSexo() != null) {
-									candidate.setGender(expediente.getCandidato().getSexo() == TipoSexo.HOMBRE ? (short) 1 : (short) 2)
-								} else {
-									candidate.setGender((short) 1)
-								}
+                                        StringTokenizer st = new StringTokenizer(coberturasPoliza.getValoracionTemporal(), ";");
 
-								candidate.setOccupation("")
-								dossier.setCandidate(candidate)
+                                        while (st.hasMoreTokens()) {
 
-								/**CIA
-								 *
-								 */
-								com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.Company cia = new com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.Company()
+                                            TemporalLoading temporal = new TemporalLoading()
+                                            temporal.setText(st.nextToken());
+                                            temporal.setType("3");
 
+                                            benefitInformation.addTemporalLoadingsList(temporal)
+                                        }
 
+                                    } else {
+                                        benefitInformation.addTemporalLoadingsList(null);
+                                    }
 
-								if (expediente.getCandidato() != null && expediente.getCandidato().getCompanya() != null && expediente.getCandidato().getCompanya().getCodigoST().equals("1064")) {
-									cia.setCompanyCode("C0803")
-									cia.setCompanyDescription("A.M.A. Vida")
-								}
-								if (expediente.getCandidato() != null && expediente.getCandidato().getCompanya() != null && expediente.getCandidato().getCompanya().getCodigoST().equals("1059")) {
-									cia.setCompanyCode("M0328")
-									cia.setCompanyDescription("A.M.A.")
-								}
+                                    if (coberturasPoliza.getCapitalCobertura() != null && !coberturasPoliza.getCapitalCobertura().isEmpty()) {
+                                        dossier.setCapitalInsured(new BigDecimal(coberturasPoliza.getCapitalCobertura()))
+                                    } else {
+                                        dossier.setCapitalInsured(new BigDecimal(0))
+                                    }
 
-								dossier.setCompany(cia)
-								/**PRODUCTO
-								 *
-								 */
-								Product producto = new Product()
+                                    listaBenefitInformation.add(benefitInformation)
+                                }
 
-								if (expediente.getProducto() != null) {
-									if (expediente.getProducto().getCodigoProductoCompanya().toString().equals("P49")) {
-										producto.setProductCode("0013")
-									} else {
-										producto.setProductCode(expediente.getProducto().getCodigoProductoCompanya())
-									}
-									producto.setProductDescription(expediente.getProducto().getNombre());
-								} else {
-									producto.setProductCode("")
-									producto.setProductDescription("");
-								}
+                                byte[] compressedData = tarificadorService.obtenerZip(expediente.getNodoAlfresco())
 
-								dossier.setProduct(producto)
+                                File file = new File()
+                                file.setFileBase64(new String(compressedData))
+                                file.setTypeFile("zip")
 
-								if (expediente.getCoberturasExpediente() != null && expediente.getCoberturasExpediente().size() > 0) {
+                                files.add(file)
 
-									expediente.getCoberturasExpediente().each { CoberturaExpediente coberturasPoliza ->
 
+                                saveResultIN.setListFiles((File[]) files.toArray())
+                                saveResultIN.setBenefitsInformationsList((BenefitInformation[]) listaBenefitInformation.toArray());
+                                saveResultIN.setDossier(dossier)
+                                saveResultIN.getDossier().setResultsCode("OK");
+                                saveResultIN.getDossier().setState((short) 1);
+                                saveResult.setDossierResultsIN(saveResultIN)
+                                resultsE.setSaveDossierResults(saveResult)
 
-										BenefitInformation benefitInformation = new BenefitInformation();
+                                respuestaCRM = stub.saveDossierResults(resultsE);
 
-										benefitInformation.setBenefitName(coberturasPoliza.getNombreCobertura());
-										benefitInformation.setBenefitCode(coberturasPoliza.getCodigoCobertura());
+                                if (respuestaCRM != null && respuestaCRM.localSaveDossierResultsResponse != null && respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT() != null && respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localTypeResult.equals("OK")) {
 
-										BenefitResultValue benefitResultValue = new BenefitResultValue();
+                                    com.scortelemed.Envio envio = new com.scortelemed.Envio()
+                                    envio.setFecha(new Date())
+                                    envio.setCia(company.id.toString())
+                                    envio.setIdentificador(expediente.getNumSolicitud())
+                                    envio.setInfo("Estado: " + expediente.getCodigoEstado().toString() + "-Respuesta: " + respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localDescriptionResultList[0])
+                                    envio.save(flush: true)
 
-										benefitResultValue.setDescLoadingCapital("");
-										benefitResultValue.setDescLoadingPremium("");
-										benefitResultValue.setLoadingCapital(BigDecimal.valueOf(Long.valueOf("0")));
-										benefitResultValue.setLoadingPremium(BigDecimal.valueOf(Long.valueOf("0")));
+                                    logginService.putInfoMessage("Informacion de salida de expediente " + expediente.getCodigoST() + ". Codigo AMA: " + expediente.getNumSolicitud())
+                                    logginService.putInfoMessage("Respuesta desde AMA al envio de informacion para expediente " + expediente.getCodigoST() + ". " + respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localDescriptionResultList[0])
+                                    logginService.putInfoMessage("Informacion expediente " + expediente.getCodigoST() + " enviado a " + company.nombre + " correctamente")
 
+                                } else if (respuestaCRM != null && respuestaCRM.localSaveDossierResultsResponse != null && respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT() != null && respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localTypeResult.equals("ERROR")) {
 
-										if (coberturasPoliza.getCodResultadoCobertura() != null && coberturasPoliza.getCodResultadoCobertura().trim().startsWith("3")) {
+                                    com.scortelemed.Error error = new com.scortelemed.Error()
+                                    error.setFecha(new Date())
+                                    error.setCia(company.id.toString())
+                                    error.setIdentificador(identificadorCaso)
+                                    error.setInfo("Error en el envio")
+                                    error.setOperacion("ENVIO")
+                                    error.setError("Peticion no realizada para solicitud: " + identificadorCaso + ". Error: " + respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localDescriptionResultList[0])
+                                    error.save(flush: true)
 
+                                    logginService.putInfoMessage("Informacion de salida de expediente " + expediente.getCodigoST() + ". Codigo AMA: " + expediente.getNumSolicitud())
+                                    logginService.putInfoMessage("Respuesta desde AMA al envio de informacion para expediente " + expediente.getCodigoST() + ". ERROR:" + respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localDescriptionResultList[0])
+                                    logginService.putInfoMessage("Informacion expediente " + expediente.getCodigoST() + " no enviado a " + company.nombre + " correctamente")
 
-											/**
-											 * SOBREMORTALIDAD (EXTRAPRIMA para AMA)
-											 */
-											if (coberturasPoliza.getValoracionCapital() != null && !coberturasPoliza.getValoracionCapital().trim().isEmpty() && (coberturasPoliza.getValoracionPrima() == null || coberturasPoliza.getValoracionPrima().trim().isEmpty())) {
+                                } else {
 
-												benefitInformation.setBenefitResultCode("31");
-												benefitInformation.setBenefitResultType("Sobremortalidad");
-												benefitResultValue.setDescLoadingCapital(coberturasPoliza.getCodResultadoCobertura().toString());
-												benefitResultValue.setDescLoadingPremium("");
-												benefitResultValue.setLoadingCapital(new BigDecimal(coberturasPoliza.getValoracionCapital().replace(",", ".")));
-												benefitResultValue.setLoadingPremium(new BigDecimal(0));
+                                    com.scortelemed.Error error = new com.scortelemed.Error()
+                                    error.setFecha(new Date())
+                                    error.setCia(company.id.toString())
+                                    error.setIdentificador(identificadorCaso)
+                                    error.setInfo("Error en el envio")
+                                    error.setOperacion("ENVIO")
+                                    error.setError("Peticion no realizada para solicitud: " + identificadorCaso + ". Error: desconocido")
+                                    error.save(flush: true)
 
-												/**
-												 * SOBREPRIMA
-												 */
-											} else if (coberturasPoliza.getValoracionPrima() != null && !coberturasPoliza.getValoracionPrima().trim().isEmpty() && (coberturasPoliza.getValoracionCapital() == null || coberturasPoliza.getValoracionCapital().trim().isEmpty())) {
+                                    logginService.putInfoMessage("Informacion de salida de expediente " + expediente.getCodigoST() + ". Codigo AMA: " + expediente.getNumSolicitud())
+                                    logginService.putInfoMessage("Respuesta desde AMA al envio de informacion para expediente " + expediente.getCodigoST() + ". ERROR: Desconocido")
+                                    logginService.putInfoMessage("IInformacion expediente " + expediente.getCodigoST() + " no enviado a " + company.nombre + " correctamente")
 
-												benefitInformation.setBenefitResultCode("30");
-												benefitInformation.setBenefitResultType("Sobreprima");
-												benefitResultValue.setDescLoadingCapital("");
-												benefitResultValue.setDescLoadingPremium(coberturasPoliza.getCodResultadoCobertura().toString());
-												benefitResultValue.setLoadingCapital(new BigDecimal(0));
-												benefitResultValue.setLoadingPremium(new BigDecimal(coberturasPoliza.getValoracionPrima().replace(",", ".")));
+                                }
+                            }
+                        }
 
-											} else {
+                    } catch (Exception ex) {
 
-												if (coberturasPoliza.getCodResultadoCobertura() != null) {
+                        com.scortelemed.Error error = new com.scortelemed.Error()
+                        error.setFecha(new Date())
+                        error.setCia(company.id.toString())
+                        error.setIdentificador(identificadorCaso)
+                        error.setInfo("Error en el envio")
+                        error.setOperacion("ENVIO")
 
-													benefitInformation.setBenefitResultCode("3");
-													benefitInformation.setBenefitResultType("Combinado");
-													benefitResultValue.setDescLoadingCapital(coberturasPoliza.getCodResultadoCobertura().toString())
-													benefitResultValue.setDescLoadingPremium(coberturasPoliza.getCodResultadoCobertura().toString())
-													benefitResultValue.setLoadingCapital(new BigDecimal(coberturasPoliza.getValoracionCapital().replace(",", ".")))
-													benefitResultValue.setLoadingPremium(new BigDecimal(coberturasPoliza.getValoracionPrima().replace(",", ".")))
-												}
-											}
-										} else if (coberturasPoliza.getCodResultadoCobertura() != null) {
+                        if (respuestaCRM != null && respuestaCRM.localSaveDossierResultsResponse != null && respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT() != null && respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localTypeResult.equals("ERROR")) {
 
+                            error.setError("Peticion no realizada para solicitud: " + identificadorCaso + ". Error: " + respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localDescriptionResultList[0])
 
-											benefitInformation.setBenefitResultCode(coberturasPoliza.getCodResultadoCobertura());
-											benefitInformation.setBenefitResultType(amaService.devolverLiteralCobertura(coberturasPoliza.getCodResultadoCobertura()));
-											benefitResultValue.setDescLoadingCapital("");
-											benefitResultValue.setDescLoadingPremium("");
-											benefitResultValue.setLoadingCapital(new BigDecimal(0));
-											benefitResultValue.setLoadingPremium(new BigDecimal(0));
+                            logginService.putInfoMessage("Informacion de salida de expediente " + expediente.getCodigoST() + ". Codigo AMA: " + expediente.getNumSolicitud())
+                            logginService.putInfoMessage("Respuesta desde AMA al envio de informacion para expediente " + expediente.getCodigoST() + ". ERROR: " + respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localDescriptionResultList[0])
+                            logginService.putInfoMessage("Informacion expediente " + expediente.getCodigoST() + " no enviado a " + company.nombre)
 
-										} else {
+                        } else {
 
-											benefitInformation.setBenefitResultCode("");
-											benefitInformation.setBenefitResultType("");
-											benefitResultValue.setDescLoadingCapital("");
-											benefitResultValue.setDescLoadingPremium("");
-											benefitResultValue.setLoadingCapital(new BigDecimal(0));
-											benefitResultValue.setLoadingPremium(new BigDecimal(0));
+                            error.setError("Peticion no realizada para solicitud: " + identificadorCaso + ". Error: " + ex.getMessage())
 
-										}
+                            logginService.putInfoMessage("Informacion de salida de expediente " + expediente.getCodigoST() + ". Codigo AMA: " + expediente.getNumSolicitud())
+                            logginService.putInfoMessage("Respuesta desde AMA al envio de informacion para expediente " + expediente.getCodigoST() + ". ERROR: " + ex.getMessage())
+                            logginService.putInfoMessage("Informacion expediente " + expediente.getCodigoST() + " no enviado a " + company.nombre)
+                        }
 
-										benefitInformation.setBenefitResultValue(benefitResultValue);
 
-										if (transformacion.hasElements(coberturasPoliza.getExclusiones())) {
 
-											StringTokenizer st = new StringTokenizer(coberturasPoliza.getExclusiones(), ";");
+                        error.save(flush: true)
 
-											while (st.hasMoreTokens()) {
 
-												Exclusion exlusion = new Exclusion();
-												exlusion.setText(st.nextToken());
-												exlusion.setType("4");
-												benefitInformation.addExclusionsList(exlusion);
+                    }
+                }
+            }
 
-											}
 
-										} else {
-											benefitInformation.setExclusionsList(null);
-										}
+            logginService.putInfoMessage("proceso envio de informacion para " + company.nombre + " terminado.")
 
-										if (transformacion.hasElements(coberturasPoliza.getInformesMedicos())) {
+        } catch (Exception ex) {
 
-											StringTokenizer st = new StringTokenizer(coberturasPoliza.getInformesMedicos(), ";");
+            logginService.putErrorMessage("Error: " + opername + ". No se ha podido mandar el caso a Ama. Detalles:" + ex.getMessage())
 
-											while (st.hasMoreTokens()) {
+        }
+    }
 
-												MedicalReport medicalReport = new MedicalReport();
-												medicalReport.setText(st.nextToken());
-												medicalReport.setType("1");
-												benefitInformation.addMedicalReportsList(medicalReport);
-
-											}
-
-										} else {
-											benefitInformation.addMedicalReportsList(null);
-										}
-
-										if (transformacion.hasElements(coberturasPoliza.getNotas())) {
-
-											StringTokenizer st = new StringTokenizer(coberturasPoliza.getNotas(), ";");
-
-											while (st.hasMoreTokens()) {
-
-												AdditionalNote note = new AdditionalNote();
-												note.setText(st.nextToken());
-												note.setType("5");
-												benefitInformation.addAdditionalNotesList(note);
-
-											}
-
-										} else {
-											benefitInformation.addAdditionalNotesList(null);
-										}
-
-										if (transformacion.hasElements(coberturasPoliza.getValoracionTemporal())) {
-
-											StringTokenizer st = new StringTokenizer(coberturasPoliza.getValoracionTemporal(), ";");
-
-											while (st.hasMoreTokens()) {
-
-												TemporalLoading temporal = new TemporalLoading()
-												temporal.setText(st.nextToken());
-												temporal.setType("3");
-
-												benefitInformation.addTemporalLoadingsList(temporal)
-											}
-
-										} else {
-											benefitInformation.addTemporalLoadingsList(null);
-										}
-
-										if (coberturasPoliza.getCapitalCobertura() != null && !coberturasPoliza.getCapitalCobertura().isEmpty()) {
-											dossier.setCapitalInsured(new BigDecimal(coberturasPoliza.getCapitalCobertura()))
-										} else {
-											dossier.setCapitalInsured(new BigDecimal(0))
-										}
-
-										listaBenefitInformation.add(benefitInformation)
-									}
-
-									byte[] compressedData = tarificadorService.obtenerZip(expediente.getNodoAlfresco())
-
-									File file = new File()
-									file.setFileBase64(new String(compressedData))
-									file.setTypeFile("zip")
-
-									files.add(file)
-
-
-									saveResultIN.setListFiles((File[]) files.toArray())
-									saveResultIN.setBenefitsInformationsList((BenefitInformation[]) listaBenefitInformation.toArray());
-									saveResultIN.setDossier(dossier)
-									saveResultIN.getDossier().setResultsCode("OK");
-									saveResultIN.getDossier().setState((short) 1);
-									saveResult.setDossierResultsIN(saveResultIN)
-									resultsE.setSaveDossierResults(saveResult)
-
-									respuestaCRM = stub.saveDossierResults(resultsE);
-
-									if (respuestaCRM != null && respuestaCRM.localSaveDossierResultsResponse != null && respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT() != null && respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localTypeResult.equals("OK")) {
-
-										com.scortelemed.Envio envio = new com.scortelemed.Envio()
-										envio.setFecha(new Date())
-										envio.setCia(company.id.toString())
-										envio.setIdentificador(expediente.getNumSolicitud())
-										envio.setInfo("Estado: " + expediente.getCodigoEstado().toString() + "-Respuesta: " + respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localDescriptionResultList[0])
-										envio.save(flush: true)
-
-										logginService.putInfoMessage("Informacion de salida de expediente " + expediente.getCodigoST() + ". Codigo AMA: " + expediente.getNumSolicitud())
-										logginService.putInfoMessage("Respuesta desde AMA al envio de informacion para expediente " + expediente.getCodigoST() + ". " + respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localDescriptionResultList[0])
-										logginService.putInfoMessage("Informacion expediente " + expediente.getCodigoST() + " enviado a " + company.nombre + " correctamente")
-
-									} else if (respuestaCRM != null && respuestaCRM.localSaveDossierResultsResponse != null && respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT() != null && respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localTypeResult.equals("ERROR")) {
-
-										com.scortelemed.Error error = new com.scortelemed.Error()
-										error.setFecha(new Date())
-										error.setCia(company.id.toString())
-										error.setIdentificador(identificadorCaso)
-										error.setInfo("Error en el envio")
-										error.setOperacion("ENVIO")
-										error.setError("Peticion no realizada para solicitud: " + identificadorCaso + ". Error: " + respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localDescriptionResultList[0])
-										error.save(flush: true)
-
-										logginService.putInfoMessage("Informacion de salida de expediente " + expediente.getCodigoST() + ". Codigo AMA: " + expediente.getNumSolicitud())
-										logginService.putInfoMessage("Respuesta desde AMA al envio de informacion para expediente " + expediente.getCodigoST() + ". ERROR:" + respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localDescriptionResultList[0])
-										logginService.putInfoMessage("Informacion expediente " + expediente.getCodigoST() + " no enviado a " + company.nombre + " correctamente")
-
-									} else {
-
-										com.scortelemed.Error error = new com.scortelemed.Error()
-										error.setFecha(new Date())
-										error.setCia(company.id.toString())
-										error.setIdentificador(identificadorCaso)
-										error.setInfo("Error en el envio")
-										error.setOperacion("ENVIO")
-										error.setError("Peticion no realizada para solicitud: " + identificadorCaso + ". Error: desconocido")
-										error.save(flush: true)
-
-										logginService.putInfoMessage("Informacion de salida de expediente " + expediente.getCodigoST() + ". Codigo AMA: " + expediente.getNumSolicitud())
-										logginService.putInfoMessage("Respuesta desde AMA al envio de informacion para expediente " + expediente.getCodigoST() + ". ERROR: Desconocido")
-										logginService.putInfoMessage("IInformacion expediente " + expediente.getCodigoST() + " no enviado a " + company.nombre + " correctamente")
-
-									}
-								}
-							}
-
-					} catch (Exception ex) {
-
-						com.scortelemed.Error error = new com.scortelemed.Error()
-						error.setFecha(new Date())
-						error.setCia(company.id.toString())
-						error.setIdentificador(identificadorCaso)
-						error.setInfo("Error en el envio")
-						error.setOperacion("ENVIO")
-
-						if (respuestaCRM != null && respuestaCRM.localSaveDossierResultsResponse != null &&  respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT() != null && respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localTypeResult.equals("ERROR")){
-
-							error.setError("Peticion no realizada para solicitud: " + identificadorCaso + ". Error: "+ respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localDescriptionResultList[0])
-
-							logginService.putInfoMessage("Informacion de salida de expediente " + expediente.getCodigoST() +". Codigo AMA: " + expediente.getNumSolicitud())
-							logginService.putInfoMessage("Respuesta desde AMA al envio de informacion para expediente " + expediente.getCodigoST() + ". ERROR: " +  respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localDescriptionResultList[0])
-							logginService.putInfoMessage("Informacion expediente " + expediente.getCodigoST() + " no enviado a " + company.nombre)
-
-						} else {
-
-							error.setError("Peticion no realizada para solicitud: " + identificadorCaso + ". Error: "+ ex.getMessage())
-
-							logginService.putInfoMessage("Informacion de salida de expediente " + expediente.getCodigoST() +". Codigo AMA: " + expediente.getNumSolicitud())
-							logginService.putInfoMessage("Respuesta desde AMA al envio de informacion para expediente " + expediente.getCodigoST() + ". ERROR: " + ex.getMessage())
-							logginService.putInfoMessage("Informacion expediente " + expediente.getCodigoST() + " no enviado a " + company.nombre)
-						}
-
-
-
-						error.save(flush:true)
-
-
-
-					}
-				}
-			}
-
-
-			logginService.putInfoMessage("proceso envio de informacion para " + company.nombre + " terminado.")
-
-		} catch (Exception ex) {
-
-			logginService.putErrorMessage("Error: " + opername+ ". No se ha podido mandar el caso a Ama. Detalles:" + ex.getMessage())
-
-		}
-	}
-
-	def test () {
-		crearExpedienteService.crearExpediente()
-	}
+    def test() {
+        crearExpedienteService.crearExpediente()
+    }
 
 
 }

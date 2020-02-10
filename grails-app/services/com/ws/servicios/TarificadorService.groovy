@@ -226,28 +226,21 @@ class TarificadorService {
     }
 
     def obtenerZip(String nodo) {
-
         def response = new byte[0]
-
         try {
             def parametrosEntrada = new ParametrosEntrada()
             parametrosEntrada.usuario = Conf.findByName("orabpel.usuario")?.value
             parametrosEntrada.clave = Conf.findByName("orabpel.clave")?.value
             parametrosEntrada.refNodo = nodo
-
             //SOBREESCRIBIMOS LA URL A LA QUE TIENE QUE LLAMAR EL WSDL
             def ctx = grailsApplication.mainContext
             def bean = ctx.getBean("soapClientComprimidoAlptis")
             bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("orabpel.wsdl")?.value)
-
             def salida = grailsApplication.mainContext.soapClientComprimidoAlptis.process(parametrosEntrada)
-
             return salida.datosRespuesta.content
-
         } catch (Exception e) {
             logginService.putErrorMessage("No se ha podido obtener el zip del nodo : " + nodo)
         }
-
         return response
     }
 

@@ -297,7 +297,6 @@ class CaserUnderwrittingCaseManagementService	 {
 							 */
 
 							if (expediente.getCandidato().getCompanya().getCodigoST().equals(company.getCodigoSt())) {
-
 								resultado.getExpedienteConsulta().add(caserService.rellenaDatosSalidaConsulta(expediente, util.fromDateToXmlCalendar(new Date()), logginService))
 							}
 						}
