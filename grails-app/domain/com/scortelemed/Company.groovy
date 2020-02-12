@@ -14,7 +14,7 @@ class Company {
 	String orgName
 	boolean generationAutomatic	
 	boolean ipControl
-	String productCode
+	
 	UnidadOrganizativa ou
 	
 	static hasMany = [destinatarios: Destinatario, usuarios: Person, ips: Ipcontrol, requests: Request]
