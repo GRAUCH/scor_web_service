@@ -1,3 +1,4 @@
+
 .idea/workspace.xml
 .idea/scorWebservice-grailsPlugins.iml
 .idea/dataSources.xml
@@ -7,3 +8,11 @@
 .idea/workspace.xml~Stashed changes
 target/stacktrace.log
 target/work/plugins/tomcat-7.0.55/grails-plugin-tomcat-7.0.55.jar
+
+
+.slcache/
+
+out/
+
+target/
+
