@@ -33,9 +33,7 @@
 <body>
 <g:include view="menu/menu.gsp"/>
 <div id="">
-    <div id="top"></div>
 
-    <div id="left"></div>
 
     <div id="content">
         <div class="outer" style="padding: 0px !important;">
@@ -46,42 +44,8 @@
                             <h3>Log de control de los casos recibidos por SCOR Telemed</h3>
                             <hr>
                         </div>
-                <g:each in="${ciasLog}" status="i" var="cia">
-                    <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-                        <p onclick="myFunction(${cia.id});" class="quick-btn "
-                           style="background: none">
-                            <i><asset:image style="height: 50px !important;" src="logos/${cia.logo}"/></i>
-                            <span class="label label-default">${cia.recibidos.size()}</span>
-                        </p>
-                    </tr>
+                    <g:render template="logos" model="['hasta':hasta,'desde':desde,'ciasLog':ciasLog,'max':max,'idCia':idCia]"  />
 
-                </g:each>
-                <div class="container" id="fechas">
-
-                    <div class="right">
-                        <p>
-                            Hasta: <input name="hasta" type="text" id="datepickerHasta" value="${hasta}">
-                        </p>
-                    </div>
-
-
-                    <div class="right">
-                        <p>
-                            Desde: <input name="desde" type="text" id="datepickerDesde" value="${desde}">
-                        </p>
-                    </div>
-
-                    <div class="right">
-                        <p>
-                            Max Value: <g:textField name="max" required="" value="${max}"    class="form-control"/>
-                        </p>
-                    </div>
-
-
-                    <div class="right">
-                       <g:submitButton name="create" class="btn btn-blue"   value="${message(code: 'default.button.find', default: 'Create')}"/>
-                        <input type="hidden" id="idCia" name="idCia" value="${idCia}"/>
-                    </div>
                 </div>
 
             </g:form>
@@ -100,19 +64,11 @@
 <script>
 
 
-
-
-
     function myFunction(id) {
         $('#idCia').val(id);
     }
 
-    function setDatosCia(id) {
-        $("#ciaId").val(id);
-
-    }
-
-    $.datepicker.regional['es'] = {
+      $.datepicker.regional['es'] = {
         closeText: 'Cerrar',
         prevText: '< Ant',
         nextText: 'Sig >',
