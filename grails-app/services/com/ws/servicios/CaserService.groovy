@@ -334,20 +334,16 @@ class CaserService {
 					 *
 					 */
                     // se cambia el codigo producto acorde al ambiente para el que se esta ejecutando.
-					if (eElement.getElementsByTagName("productCode").item(0) != null) {
-						if (eElement.getElementsByTagName("productCode").item(0).getTextContent().toString().equals("1190")) {
-							datosRegistro.codigoProducto = "SRP"
-						} else {
-							if(grails.util.Environment.current.name == "development"){
-                                datosRegistro.codigoProducto = "3635" //PREPRO
-                            }else if (grails.util.Environment.current.name == "preproduction_wildfly") {
-								datosRegistro.codigoProducto = "3635" //PREPRO
-							}else if (grails.util.Environment.current.name == "production_wildfly"){
-								datosRegistro.codigoProducto = "5441" //REAL
-							}else{
-								datosRegistro.codigoProducto = "SRP"
-							}
-						}
+                    datosRegistro.codigoProducto = "SRP"
+                    if (eElement.getElementsByTagName("productCode").item(0) != null && !eElement.getElementsByTagName("productCode").item(0).getTextContent().toString().equals("1190")) {
+                        Company auxiliar = Company.findByNombre("caser")
+                        if(auxiliar.productCode != null && auxiliar.productCode.isEmpty()) {
+                            datosRegistro.codigoProducto = auxiliar.productCode;
+                        }
+                        //TODO seleccionar el código st de la base de datos. Es necesario incluir la columna productCode en todas las tablas de Company antes de subir de entorno
+                        // "3635" //LOCAL
+                        // "3635" //PREPRO
+                        // "5441" //REAL
 					}
 
 					/**NOMBRE DE CANDIDATO
