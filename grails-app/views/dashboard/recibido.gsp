@@ -32,7 +32,7 @@
 
 <body>
 <g:include view="menu/menu.gsp"/>
-<div id="wrap">
+<div id="">
     <div id="top"></div>
 
     <div id="left"></div>
@@ -96,13 +96,14 @@
         </div>
     </div>
 </div>
-</body>
-
-<body>
 <div class="row-fluid">
     <g:include view="comunicacion/${recibidoCia}"/>
 </div>
 </body>
+
+
+
+
 <script>
 
     $(document).ready(function () {
