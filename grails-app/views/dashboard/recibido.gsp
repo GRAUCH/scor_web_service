@@ -59,34 +59,27 @@
                 <div class="container" id="fechas">
 
                     <div class="right">
-                        <p style="margin: 0 0 0px !important;">
-                            Hasta: <input name="hasta" type="text" id="datepickerHasta" value="${hasta}"
-                                          style="width: 50%;">
+                        <p>
+                            Hasta: <input name="hasta" type="text" id="datepickerHasta" value="${hasta}">
                         </p>
                     </div>
-                    <br>
-                    <br>
+
 
                     <div class="right">
-                        <p style="margin: 0 0 0px !important;">
-                            Desde: <input name="desde" type="text" id="datepickerDesde" value="${desde}"
-                                          style="width: 50%;">
+                        <p>
+                            Desde: <input name="desde" type="text" id="datepickerDesde" value="${desde}">
                         </p>
                     </div>
 
                     <div class="right">
-                        <p style="margin: 0 0 0px !important;">
+                        <p>
                             Max Value: <g:textField name="max" required="" value="${max}"    class="form-control"/>
                         </p>
                     </div>
-                    <br>
-                    <br>
+
 
                     <div class="right">
-                        %{--<button onclick="filtrar();">Filtrar</button>--}%
-
-                        <g:submitButton name="create" class="btn btn-blue"
-                                        value="${message(code: 'default.button.create.label', default: 'Create')}"/>
+                       <g:submitButton name="create" class="btn btn-blue"   value="${message(code: 'default.button.find', default: 'Create')}"/>
                         <input type="hidden" id="idCia" name="idCia" value="${idCia}"/>
                     </div>
                 </div>
@@ -106,23 +99,9 @@
 
 <script>
 
-    $(document).ready(function () {
-        var showSpinner = function () {
-            $("#spinner").fadeIn('fast');
-        };
 
-        // Global handlers for AJAX events
-        $(document).on("ajaxSend", showSpinner).on("ajaxStop", function () {
-            $("#spinner").fadeOut('fast');
-        }).on("ajaxError", function (event, jqxhr, settings, exception) {
-            $("#spinner").hide();
-        });
 
-    });
 
-    function filtrar() {
-        ${remoteFunction(action:'recibido', controller:'dashboard', update:'contenido',   params:'\'desde=\' + document.getElementById(\'datepickerDesde\').value +  \'&hasta=\' + document.getElementById(\'datepickerHasta\').value +  \'&idCia=\' + document.getElementById(\'ciaId\').value')}
-    }
 
     function myFunction(id) {
         $('#idCia').val(id);

@@ -5,7 +5,7 @@ public enum UnidadOrganizativa {
 	ES ("ES"),
 	FR ("FR"),
 	PT ("PT"),
-	IT ("IT"),
+	IT ("IT")
 
 	final String value
 

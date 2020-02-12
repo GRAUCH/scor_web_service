@@ -71,7 +71,7 @@ class LogUtil {
         Recibido.executeQuery(hqlQueryBuilder.toString(), namedParams, sortParams)
     }
 
-    public obtenerRecibidos(company, desde, hasta, max) {
+    def obtenerRecibidos(company, desde, hasta, max) {
 
         if (company != null && !company.toString().isEmpty()) {
             List<Recibido> recibidos = new ArrayList<Recibido>()
@@ -341,27 +341,37 @@ class LogUtil {
             return elementos
         }
     }
+    def findEnvios(desde, hasta, Company company, Map sortParams) {
+        StringBuilder hqlQueryBuilder = new StringBuilder(' ')
 
-    public obtenerEnviados(nombre, idCia, desde, hasta) {
+        hqlQueryBuilder << 'FROM Envio AS envio  '
+        Map namedParams = [idCia: company.id]
+        hqlQueryBuilder << 'WHERE cia = :idCia '
+        hqlQueryBuilder << 'AND '
+        hqlQueryBuilder << "fecha BETWEEN  :iniDate "
+        hqlQueryBuilder << 'AND '
+        hqlQueryBuilder << " :endDate "
+        namedParams["endDate"] = hasta
+        namedParams["iniDate"] = desde
 
-        List<Envio> enviados = new ArrayList<Envio>()
+
+        hqlQueryBuilder << "ORDER BY fecha DESC"
+
+        System.out.println("idCia ID  -->>" + company.id)
+
+
+        Recibido.executeQuery(hqlQueryBuilder.toString(), namedParams, sortParams)
+    }
+
+    def obtenerEnviados(company, desde, hasta, max) {
         Parser parser = new Parser()
-        LogUtil logUtil = new LogUtil()
 
-        if (idCia != null && !idCia.toString().isEmpty()) {
+        if (company != null) {
+            List<Envio> enviados = new ArrayList<Envio>()
 
-            def criteria = Envio.createCriteria()
+            enviados = findEnvios(desde, hasta, company, [max: max])
 
-            enviados = criteria.list {
-                eq("cia", idCia)
-                and {
-                    between("fecha", desde, hasta)
-                }
-                order("fecha", "desc")
-            }
-
-
-            switch (nombre) {
+            switch (company.nombre) {
 
                 case "caser":
 

@@ -2,7 +2,6 @@ package com.scortelemed
 
 import com.scor.global.CompanyLog
 import grails.plugin.springsecurity.annotation.Secured
-import grails.util.Holders
 import hwsol.webservices.LogUtil
 
 import java.text.SimpleDateFormat
@@ -47,9 +46,9 @@ class DashboardController {
         idCia = ciasLog.get(0).getId()
 
 
-        elementos = logUtil.obtenerRecibidos(Company.findById(idCia), desde, hasta,params.max)
+        elementos = logUtil.obtenerRecibidos(Company.findById(idCia), desde, hasta, params.max)
 
-        [ciasLog: ciasLog, company: nombre, elementos: elementos, vista: "recibido.gsp", ou: ou, desde: formatter.format(desde), hasta: formatter.format(hasta), max:params.max, recibidoCia: "listaRecibidos" + nombre + ".gsp", idCia: idCia]
+        [ciasLog: ciasLog, company: nombre, elementos: elementos, vista: "recibido.gsp", ou: ou, desde: formatter.format(desde), hasta: formatter.format(hasta), max: params.max, recibidoCia: "listaRecibidos" + nombre + ".gsp", idCia: idCia]
     }
 
 
@@ -63,27 +62,27 @@ class DashboardController {
 
         Calendar calHasta = Calendar.getInstance()
 
-        calHasta.set(Calendar.HOUR_OF_DAY, 23);
-        calHasta.set(Calendar.MINUTE, 59);
-        calHasta.set(Calendar.SECOND, 59);
-        calHasta.set(Calendar.MILLISECOND, 0);
+        calHasta.set(Calendar.HOUR_OF_DAY, 23)
+        calHasta.set(Calendar.MINUTE, 59)
+        calHasta.set(Calendar.SECOND, 59)
+        calHasta.set(Calendar.MILLISECOND, 0)
 
         Date hasta = calHasta.getTime()
 
-        Calendar calDesde = Calendar.getInstance();
+        Calendar calDesde = Calendar.getInstance()
 
-        calDesde.set(Calendar.HOUR_OF_DAY, 0);
-        calDesde.set(Calendar.MINUTE, 0);
-        calDesde.set(Calendar.SECOND, 0);
-        calDesde.set(Calendar.MILLISECOND, 0);
+        calDesde.set(Calendar.HOUR_OF_DAY, 0)
+        calDesde.set(Calendar.MINUTE, 0)
+        calDesde.set(Calendar.SECOND, 0)
+        calDesde.set(Calendar.MILLISECOND, 0)
 
-        Date desde = calDesde.getTime();
+        Date desde = calDesde.getTime()
 
 
-        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy")
 
         if (params.idCia == null) {
-            /**Seleccionmos la primera de las comp��ias
+            /**Seleccionmos la primera de las companias
              *
              */
             nombre = ciasLog.get(0).getName()
@@ -92,26 +91,26 @@ class DashboardController {
             idCia = params.idCia
             nombre = Company.findById(idCia).nombre
         }
-
+        Company company = Company.findById(idCia)
         if (params.desde != null && params.hasta != null) {
 
             calHasta = Calendar.getInstance()
             calHasta.setTime(formatter.parse(params.hasta))
-            calHasta.set(Calendar.HOUR_OF_DAY, 23);
-            calHasta.set(Calendar.MINUTE, 59);
-            calHasta.set(Calendar.SECOND, 59);
-            calHasta.set(Calendar.MILLISECOND, 0);
+            calHasta.set(Calendar.HOUR_OF_DAY, 23)
+            calHasta.set(Calendar.MINUTE, 59)
+            calHasta.set(Calendar.SECOND, 59)
+            calHasta.set(Calendar.MILLISECOND, 0)
 
             hasta = calHasta.getTime()
 
-            elementos = logUtil.obtenerEnviados(nombre, idCia, formatter.parse(params.desde), hasta)
+            elementos = logUtil.obtenerEnviados(company, formatter.parse(params.desde), hasta, params.max)
             session.setAttribute("desde", params.desde)
             session.setAttribute("hasta", params.hasta)
 
-            [ciasLog: ciasLog, company: nombre, elementos: elementos, vista: "recibido.gsp", ou: ou, desde: params.desde, hasta: params.hasta, max:params.max, enviadoCia: "listaEnviados" + nombre + ".gsp", idCia: idCia]
+            [ciasLog: ciasLog, company: nombre, elementos: elementos, vista: "recibido.gsp", ou: ou, desde: params.desde, hasta: params.hasta, max: params.max, enviadoCia: "listaEnviados" + nombre + ".gsp", idCia: idCia]
         } else {
-            elementos = logUtil.obtenerEnviados(nombre, idCia, desde, hasta)
-            [ciasLog: ciasLog, company: nombre, elementos: elementos, vista: "enviado.gsp", ou: ou, desde: formatter.format(desde), hasta: formatter.format(hasta), max:params.max, enviadoCia: "listaEnviados" + nombre + ".gsp", idCia: idCia]
+            elementos = logUtil.obtenerEnviados(company, desde, hasta,params.max)
+            [ciasLog: ciasLog, company: nombre, elementos: elementos, vista: "enviado.gsp", ou: ou, desde: formatter.format(desde), hasta: formatter.format(hasta), max: params.max, enviadoCia: "listaEnviados" + nombre + ".gsp", idCia: idCia]
         }
     }
 
@@ -167,14 +166,14 @@ class DashboardController {
             hasta = calHasta.getTime()
 
 
-            elementos = logUtil.obtenerRecibidos(company, formatter.parse(params.desde), hasta,params.max)
+            elementos = logUtil.obtenerRecibidos(company, formatter.parse(params.desde), hasta, params.max)
             session.setAttribute("desde", params.desde)
             session.setAttribute("hasta", params.hasta)
-            [ciasLog: ciasLog, company: nombre, elementos: elementos, vista: "recibido.gsp", ou: ou, desde: params.desde, hasta: params.hasta, max:params.max, recibidoCia: "listaRecibidos" + nombre + ".gsp", idCia: idCia]
+            [ciasLog: ciasLog, company: nombre, elementos: elementos, vista: "recibido.gsp", ou: ou, desde: params.desde, hasta: params.hasta, max: params.max, recibidoCia: "listaRecibidos" + nombre + ".gsp", idCia: idCia]
 
         } else {
-            elementos = logUtil.obtenerRecibidos(company, desde, hasta,params.max)
-            [ciasLog: ciasLog, company: nombre, elementos: elementos, vista: "recibido.gsp", ou: ou, desde: formatter.format(desde), hasta: formatter.format(hasta), max:params.max, recibidoCia: "listaRecibidos" + nombre + ".gsp", idCia: idCia]
+            elementos = logUtil.obtenerRecibidos(company, desde, hasta, params.max)
+            [ciasLog: ciasLog, company: nombre, elementos: elementos, vista: "recibido.gsp", ou: ou, desde: formatter.format(desde), hasta: formatter.format(hasta), max: params.max, recibidoCia: "listaRecibidos" + nombre + ".gsp", idCia: idCia]
         }
     }
 }
