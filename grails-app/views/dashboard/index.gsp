@@ -46,8 +46,7 @@
                         <h3>Log de control de los casos recibidos por SCOR Telemed</h3>
                         <hr>
                     </div>
-                    <g:render template="logos"
-                              model="['hasta': hasta, 'desde': desde, 'ciasLog': ciasLog, 'max': max, 'idCia': idCia]"/>
+                    <g:render template="logos"   model="['hasta': hasta, 'desde': desde, 'ciasLog': ciasLog, 'max': max, 'idCia': idCia]"/>
 
                 </div>
 
@@ -57,7 +56,7 @@
 </div>
 </div>
 <g:if test="${lista != null}">
-    <div class="row-fluid">
+    <div class="">
         <g:include view="comunicacion/${lista}"/>
     </div>
 </g:if>
