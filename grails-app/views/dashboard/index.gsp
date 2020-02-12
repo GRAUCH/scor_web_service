@@ -43,21 +43,7 @@
 			<g:include view="dashboard/${vista}" />
 		</div>
 	</div>
-	<script>
-		$(document).ready(function() {
-			var showSpinner = function() {
-				$("#spinner").fadeIn('fast');
-			};
 
-			// Global handlers for AJAX events
-			$(document).on("ajaxSend", showSpinner).on("ajaxStop", function() {
-				$("#spinner").fadeOut('fast');
-			}).on("ajaxError", function(event, jqxhr, settings, exception) {
-				$("#spinner").hide();
-			});
-
-		});
-	</script>
 
 </body>
 </html>
