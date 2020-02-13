@@ -115,12 +115,12 @@ class LogUtil {
                 case TipoCompany.CASER:
                     List<com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest> recibidosCaser = new ArrayList<com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest>()
 
-                    for (int i = 0; i < recibidos.size(); i++) {
+                    for (Recibido actual:recibidos) {
 
                         JAXBContext jaxbContext = JAXBContext.newInstance(com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest.class);
                         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 
-                        StringReader reader = new StringReader(recibidos.get(i).info.trim());
+                        StringReader reader = new StringReader(actual.info.trim());
 
                         JAXBElement<com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest.class);
                         com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest gestionReconocimientoMedicoRequest = root.getValue();
@@ -133,17 +133,16 @@ class LogUtil {
                 case TipoCompany.AMA:
                     List<com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest> recibidosAma = new ArrayList<com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest>()
 
-                    for (int i = 0; i < recibidos.size(); i++) {
+                    for (Recibido actual:recibidos) {
 
                         JAXBContext jaxbContext = JAXBContext.newInstance(com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest.class);
                         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 
-                        StringReader reader = new StringReader(recibidos.get(i).info.trim());
-
+                        StringReader reader = new StringReader(actual.info.trim());
                         JAXBElement<com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest.class);
-                        com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest gestionReconocimientoMedicoRequest = root.getValue();
+                        com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest gestionReconocimientoMedicoRequest = root.getValue()
 
-                        recibidosAma.add(recibidosAma)
+                        recibidosAma.add(gestionReconocimientoMedicoRequest)
                     }
                     elementos = recibidosAma
                     break
@@ -151,12 +150,12 @@ class LogUtil {
                 case TipoCompany.CAJAMAR:
                     List<CajamarUnderwrittingCaseManagementRequest> recibidosCajamar = new ArrayList<CajamarUnderwrittingCaseManagementRequest>()
 
-                    for (int i = 0; i < recibidos.size(); i++) {
+                    for (Recibido actual:recibidos) {
 
                         JAXBContext jaxbContext = JAXBContext.newInstance(CajamarUnderwrittingCaseManagementRequest.class);
                         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 
-                        StringReader reader = new StringReader(recibidos.get(i).info.trim());
+                        StringReader reader = new StringReader(actual.info.trim());
 
                         JAXBElement<CajamarUnderwrittingCaseManagementRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), CajamarUnderwrittingCaseManagementRequest.class);
                         CajamarUnderwrittingCaseManagementRequest gestionReconocimientoMedicoRequest = root.getValue();
@@ -169,12 +168,12 @@ class LogUtil {
                 case TipoCompany.LAGUN_ARO:
                     List<com.ws.lagunaro.beans.GestionReconocimientoMedicoRequest> recibidosLagunaro = new ArrayList<com.ws.lagunaro.beans.GestionReconocimientoMedicoRequest>()
 
-                    for (int i = 0; i < recibidos.size(); i++) {
+                    for (Recibido actual:recibidos) {
 
                         JAXBContext jaxbContext = JAXBContext.newInstance(com.ws.lagunaro.beans.GestionReconocimientoMedicoRequest.class);
                         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 
-                        StringReader reader = new StringReader(recibidos.get(i).info.trim());
+                        StringReader reader = new StringReader(actual.info.trim());
 
                         JAXBElement<com.ws.lagunaro.beans.GestionReconocimientoMedicoRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), com.ws.lagunaro.beans.GestionReconocimientoMedicoRequest.class);
                         com.ws.lagunaro.beans.GestionReconocimientoMedicoRequest gestionReconocimientoMedicoRequest = root.getValue();
@@ -187,12 +186,12 @@ class LogUtil {
                 case TipoCompany.ALPTIS:
                     List<AlptisUnderwrittingCaseManagementRequest> recibidosAlptis = new ArrayList<AlptisUnderwrittingCaseManagementRequest>()
 
-                    for (int i = 0; i < recibidos.size(); i++) {
+                    for (Recibido actual:recibidos) {
 
                         JAXBContext jaxbContext = JAXBContext.newInstance(AlptisUnderwrittingCaseManagementRequest.class);
                         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 
-                        StringReader reader = new StringReader(recibidos.get(i).info.trim());
+                        StringReader reader = new StringReader(actual.info.trim());
 
                         JAXBElement<AlptisUnderwrittingCaseManagementRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), AlptisUnderwrittingCaseManagementRequest.class);
                         AlptisUnderwrittingCaseManagementRequest alptisUnderwrittingCaseManagementRequest = root.getValue();
@@ -205,12 +204,12 @@ class LogUtil {
                 case TipoCompany.AFI_ESCA:
                     List<AfiEscaUnderwrittingCaseManagementRequest> recibidosAfiesca = new ArrayList<AfiEscaUnderwrittingCaseManagementRequest>()
 
-                    for (int i = 0; i < recibidos.size(); i++) {
+                    for (Recibido actual:recibidos) {
 
                         JAXBContext jaxbContext = JAXBContext.newInstance(AfiEscaUnderwrittingCaseManagementRequest.class);
                         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 
-                        StringReader reader = new StringReader(recibidos.get(i).info.trim());
+                        StringReader reader = new StringReader(actual.info.trim());
 
                         JAXBElement<AfiEscaUnderwrittingCaseManagementRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), AfiEscaUnderwrittingCaseManagementRequest.class);
                         AfiEscaUnderwrittingCaseManagementRequest afiEscaUnderwrittingCaseManagementRequest = root.getValue();
@@ -223,12 +222,12 @@ class LogUtil {
                 case TipoCompany.ZEN_UP:
                     List<LifesquareUnderwrittingCaseManagementRequest> recibidosLifesquare = new ArrayList<LifesquareUnderwrittingCaseManagementRequest>()
 
-                    for (int i = 0; i < recibidos.size(); i++) {
+                    for (Recibido actual:recibidos) {
 
                         JAXBContext jaxbContext = JAXBContext.newInstance(LifesquareUnderwrittingCaseManagementRequest.class);
                         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 
-                        StringReader reader = new StringReader(recibidos.get(i).info.trim());
+                        StringReader reader = new StringReader(actual.info.trim());
 
                         JAXBElement<LifesquareUnderwrittingCaseManagementRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), LifesquareUnderwrittingCaseManagementRequest.class);
                         LifesquareUnderwrittingCaseManagementRequest lifesquareUnderwrittingCaseManagementRequest = root.getValue();
@@ -241,12 +240,12 @@ class LogUtil {
                 case TipoCompany.PSN:
                     List<com.scortelemed.schemas.psn.GestionReconocimientoMedicoRequest> recibidosPsn = new ArrayList<com.scortelemed.schemas.psn.GestionReconocimientoMedicoRequest>()
 
-                    for (int i = 0; i < recibidos.size(); i++) {
+                    for (Recibido actual:recibidos) {
 
                         JAXBContext jaxbContext = JAXBContext.newInstance(com.scortelemed.schemas.psn.GestionReconocimientoMedicoRequest.class);
                         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 
-                        StringReader reader = new StringReader(recibidos.get(i).info.trim());
+                        StringReader reader = new StringReader(actual.info.trim());
 
                         JAXBElement<com.scortelemed.schemas.psn.GestionReconocimientoMedicoRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), com.scortelemed.schemas.psn.GestionReconocimientoMedicoRequest.class);
                         com.scortelemed.schemas.psn.GestionReconocimientoMedicoRequest psnUnderwrittingCaseManagementRequest = root.getValue();
@@ -259,12 +258,12 @@ class LogUtil {
                 case TipoCompany.NET_INSURANCE:
                     List<com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCaseManagementRequest> recibidosNetinsurance = new ArrayList<com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCaseManagementRequest>()
 
-                    for (int i = 0; i < recibidos.size(); i++) {
+                    for (Recibido actual:recibidos) {
 
                         JAXBContext jaxbContext = JAXBContext.newInstance(com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCaseManagementRequest.class);
                         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 
-                        StringReader reader = new StringReader(recibidos.get(i).info.trim());
+                        StringReader reader = new StringReader(actual.info.trim());
 
                         JAXBElement<com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCaseManagementRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCaseManagementRequest.class);
                         com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCaseManagementRequest netInsuranceUnderwrittingCaseManagementRequest = root.getValue();
@@ -282,7 +281,7 @@ class LogUtil {
                         JAXBContext jaxbContext = JAXBContext.newInstance(com.scortelemed.schemas.simplefr.SimplefrUnderwrittingCaseManagementRequest.class);
                         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 
-                        StringReader reader = new StringReader(recibidos.get(i).info.trim());
+                        StringReader reader = new StringReader(actual.info.trim());
 
                         JAXBElement<com.scortelemed.schemas.simplefr.SimplefrUnderwrittingCaseManagementRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), com.scortelemed.schemas.simplefr.SimplefrUnderwrittingCaseManagementRequest.class);
                         com.scortelemed.schemas.simplefr.SimplefrUnderwrittingCaseManagementRequest simpleFrUnderwrittingCaseManagementRequest = root.getValue();
@@ -295,12 +294,12 @@ class LogUtil {
                 case TipoCompany.SOCIETE_GENERALE:
                     List<com.scortelemed.schemas.societegenerale.SocieteGeneraleUnderwrittingCaseManagementRequest> recibidosSocieteGenerale = new ArrayList<com.scortelemed.schemas.societegenerale.SocieteGeneraleUnderwrittingCaseManagementRequest>()
 
-                    for (int i = 0; i < recibidos.size(); i++) {
+                    for (Recibido actual:recibidos) {
 
                         JAXBContext jaxbContext = JAXBContext.newInstance(com.scortelemed.schemas.societegenerale.SocieteGeneraleUnderwrittingCaseManagementRequest.class);
                         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 
-                        StringReader reader = new StringReader(recibidos.get(i).info.trim());
+                        StringReader reader = new StringReader(actual.info.trim());
 
                         JAXBElement<com.scortelemed.schemas.societegenerale.SocieteGeneraleUnderwrittingCaseManagementRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), com.scortelemed.schemas.societegenerale.SocieteGeneraleUnderwrittingCaseManagementRequest.class);
                         com.scortelemed.schemas.societegenerale.SocieteGeneraleUnderwrittingCaseManagementRequest societeGeneraleUnderwrittingCaseManagementRequest = root.getValue();
@@ -313,12 +312,12 @@ class LogUtil {
                 case TipoCompany.ENGINYERS:
                     List<com.scortelemed.schemas.enginyers.AddExp> recibidosEnginyers = new ArrayList<com.scortelemed.schemas.enginyers.AddExp>()
 
-                    for (int i = 0; i < recibidos.size(); i++) {
+                    for (Recibido actual:recibidos) {
 
                         JAXBContext jaxbContext = JAXBContext.newInstance(com.scortelemed.schemas.enginyers.AddExp.class)
                         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller()
 
-                        StringReader reader = new StringReader(recibidos.get(i).info.trim())
+                        StringReader reader = new StringReader(actual.info.trim())
 
                         JAXBElement<com.scortelemed.schemas.enginyers.AddExp> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), com.scortelemed.schemas.enginyers.AddExp.class)
                         com.scortelemed.schemas.enginyers.AddExp enginyersUnderwrittingCaseManagementRequest = root.getValue()
@@ -331,12 +330,12 @@ class LogUtil {
                 case TipoCompany.METHIS_LAB:
                     List<com.scortelemed.schemas.methislab.MethislabUnderwrittingCaseManagementRequest> recibidosMethislab = new ArrayList<com.scortelemed.schemas.methislab.MethislabUnderwrittingCaseManagementRequest>()
 
-                    for (int i = 0; i < recibidos.size(); i++) {
+                    for (Recibido actual:recibidos) {
 
                         JAXBContext jaxbContext = JAXBContext.newInstance(com.scortelemed.schemas.methislab.MethislabUnderwrittingCaseManagementRequest.class)
                         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller()
 
-                        StringReader reader = new StringReader(recibidos.get(i).info.trim())
+                        StringReader reader = new StringReader(actual.info.trim())
 
                         JAXBElement<com.scortelemed.schemas.methislab.MethislabUnderwrittingCaseManagementRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), com.scortelemed.schemas.methislab.MethislabUnderwrittingCaseManagementRequest.class)
                         com.scortelemed.schemas.methislab.MethislabUnderwrittingCaseManagementRequest methislabUnderwrittingCaseManagementRequest = root.getValue()
@@ -349,12 +348,12 @@ class LogUtil {
                 case TipoCompany.CBP_ITALIA:
                     List<com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCaseManagementRequest> recibidosCbpItalia = new ArrayList<com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCaseManagementRequest>()
 
-                    for (int i = 0; i < recibidos.size(); i++) {
+                    for (Recibido actual:recibidos) {
 
                         JAXBContext jaxbContext = JAXBContext.newInstance(com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCaseManagementRequest.class)
                         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller()
 
-                        StringReader reader = new StringReader(recibidos.get(i).info.trim())
+                        StringReader reader = new StringReader(actual.info.trim())
 
                         JAXBElement<com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCaseManagementRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCaseManagementRequest.class)
                         com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCaseManagementRequest cbpItaliaUnderwrittingCaseManagementRequest = root.getValue()
@@ -367,12 +366,12 @@ class LogUtil {
                 case TipoCompany.CF_LIFE:
                     List<com.scortelemed.schemas.methislabCF.MethislabCFUnderwrittingCaseManagementRequest> recibidosMethislabCF = new ArrayList<com.scortelemed.schemas.methislabCF.MethislabCFUnderwrittingCaseManagementRequest>()
 
-                    for (int i = 0; i < recibidos.size(); i++) {
+                    for (Recibido actual:recibidos) {
 
                         JAXBContext jaxbContext = JAXBContext.newInstance(com.scortelemed.schemas.methislabCF.MethislabCFUnderwrittingCaseManagementRequest.class)
                         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller()
 
-                        StringReader reader = new StringReader(recibidos.get(i).info.trim())
+                        StringReader reader = new StringReader(actual.info.trim())
 
                         JAXBElement<com.scortelemed.schemas.methislabCF.MethislabCFUnderwrittingCaseManagementRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), com.scortelemed.schemas.methislabCF.MethislabCFUnderwrittingCaseManagementRequest.class)
                         com.scortelemed.schemas.methislabCF.MethislabCFUnderwrittingCaseManagementRequest methislabCFUnderwrittingCaseManagementRequest = root.getValue()
