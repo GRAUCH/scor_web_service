@@ -3,446 +3,543 @@ package hwsol.webservices
 import com.scor.global.CompanyLog
 import com.scortelemed.Company
 import com.scortelemed.Envio
+import com.scortelemed.Error
 import com.scortelemed.Recibido
-
-import hwsol.webservices.LogUtil
-import hwsol.webservices.TransformacionUtil
+import com.scortelemed.TipoCompany
+import com.ws.afiesca.beans.AfiEscaUnderwrittingCaseManagementRequest
+import com.ws.alptis.beans.AlptisUnderwrittingCaseManagementRequest
+import com.ws.cajamar.beans.CajamarUnderwrittingCaseManagementRequest
+import com.ws.lifesquare.beans.LifesquareUnderwrittingCaseManagementRequest
 
 import javax.xml.bind.JAXBContext
 import javax.xml.bind.JAXBElement
 import javax.xml.bind.Unmarshaller
 import javax.xml.transform.stream.StreamSource
 
-import com.ws.afiesca.beans.AfiEscaUnderwrittingCaseManagementRequest
-import com.ws.alptis.beans.AlptisUnderwrittingCaseManagementRequest
-import com.ws.cajamar.beans.CajamarUnderwrittingCaseManagementRequest
-import com.ws.lifesquare.beans.LifesquareUnderwrittingCaseManagementRequest
-import com.ws.lifesquare.beans.LifesquareUnderwrittingCasesResultsRequest
-
 class LogUtil {
 
-	def elementos
+    def elementos
 
-	public List<CompanyLog> obtenerCopaniasLog(String ou) {
+    public List<CompanyLog> obtenerCopaniasLog(String ou) {
 
-		List<Company> cias = new ArrayList<Company>()
-		List<CompanyLog> ciasLog = new ArrayList<CompanyLog>()
+        List<Company> cias = new ArrayList<Company>()
+        List<CompanyLog> ciasLog = new ArrayList<CompanyLog>()
 
-		if (ou != null && !ou.isEmpty() && !ou.equals("AD")) {
-			cias = Company.findAllByOu(ou)
-		} else {
-			cias = Company.findAllByOuIsNotNull()
-		}
+        if (ou != null && !ou.isEmpty() && !ou.equals("AD")) {
+            cias = Company.findAllByOu(ou)
+        } else {
+            cias = Company.findAllByOuIsNotNull()
+        }
 
-		for (int i = 0; i < cias.size(); i++) {
+        for (int i = 0; i < cias.size(); i++) {
 
-			if (cias.get(i).generationAutomatic){
+            if (cias.get(i).generationAutomatic) {
 
-				CompanyLog ciaLog = new CompanyLog()
+                CompanyLog ciaLog = new CompanyLog()
 
-				ciaLog.setLogo(cias.get(i).nombre+".jpg")
-				ciaLog.setRecibidos(Recibido.findAllByCia(cias.get(i).id.toString()))
-				ciaLog.setEnviados(Envio.findAllByCia(cias.get(i).id.toString()))
-				ciaLog.setName(cias.get(i).nombre)
-				ciaLog.setId(cias.get(i).id.toString())
-				ciaLog.setOu(cias.get(i).ou)
+                ciaLog.setLogo(cias.get(i).nombre + ".jpg")
+                ciaLog.setRecibidos(Recibido.findAllByCia(cias.get(i).id.toString()))
+                ciaLog.setEnviados(Envio.findAllByCia(cias.get(i).id.toString()))
+                ciaLog.setName(cias.get(i).nombre)
+                ciaLog.setId(cias.get(i).id.toString())
+                ciaLog.setOu(cias.get(i).ou)
 
-				ciasLog.add(ciaLog)
-			}
-		}
+                ciasLog.add(ciaLog)
+            }
+        }
 
-		return ciasLog
-	}
+        return ciasLog
+    }
 
+    def findRecibidos(desde, hasta, Company company, Map sortParams) {
+        StringBuilder hqlQueryBuilder = new StringBuilder(' ')
 
-	public obtenerRecibidos(nombre, idCia, desde, hasta) {
+        hqlQueryBuilder << 'FROM Recibido AS recibido  '
+        Map namedParams = [idCia: company.id]
+        hqlQueryBuilder << 'WHERE cia = :idCia '
+        hqlQueryBuilder << 'AND '
+        hqlQueryBuilder << "fecha BETWEEN  :iniDate "
+        hqlQueryBuilder << 'AND '
+        hqlQueryBuilder << " :endDate "
+        namedParams["endDate"] = hasta
+        namedParams["iniDate"] = desde
 
-		List<Recibido> recibidos = new ArrayList<Recibido>()
 
-		LogUtil logUtil = new LogUtil()
+        hqlQueryBuilder << "ORDER BY fecha DESC"
 
-		if (idCia != null && !idCia.toString().isEmpty()){
+        System.out.println("idCia ID  -->>" + company.id)
 
-			def criteria = Recibido.createCriteria()
 
-			recibidos = criteria.list {
-				eq("cia", idCia)
-				and {
-					between("fecha", desde, hasta)
-				}
-				order("fecha", "desc")
-			}
+        Recibido.executeQuery(hqlQueryBuilder.toString(), namedParams, sortParams)
+    }
 
-			switch (nombre){
+    def findErrores(Company company,desde, hasta, Map sortParams) {
+        StringBuilder hqlQueryBuilder = new StringBuilder(' ')
 
-				case "caser":
+        hqlQueryBuilder << 'FROM Error AS error  '
+        Map namedParams = [idCia: company.id]
+        hqlQueryBuilder << 'WHERE cia = :idCia '
+        hqlQueryBuilder << 'AND '
+        hqlQueryBuilder << "fecha BETWEEN  :iniDate "
+        hqlQueryBuilder << 'AND '
+        hqlQueryBuilder << " :endDate "
+        namedParams["endDate"] = hasta
+        namedParams["iniDate"] = desde
 
-					List<com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest> recibidosCaser = new ArrayList<com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest>()
 
-					for (int i = 0; i < recibidos.size(); i++) {
+        hqlQueryBuilder << "ORDER BY fecha DESC"
 
-						JAXBContext jaxbContext = JAXBContext.newInstance(com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest.class);
-						Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+        System.out.println("idCia ID  -->>" + company.id)
 
-						StringReader reader = new StringReader(recibidos.get(i).info.trim());
 
-						JAXBElement<com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest.class);
-						com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest gestionReconocimientoMedicoRequest = root.getValue();
+        Error.executeQuery(hqlQueryBuilder.toString(), namedParams, sortParams)
+    }
 
-						recibidosCaser.add(gestionReconocimientoMedicoRequest)
-					}
+    def obtenerErrores(company, desde, hasta, max) {
+        List<Error> errores = null
+        if (company != null && !company.toString().isEmpty()) {
+            errores =  new ArrayList<Error>()
+            errores = findErrores(company,desde, hasta, [max: max])
+        }
+    }
 
-					elementos = recibidosCaser
+    def obtenerRecibidos(company, desde, hasta, max) {
 
-					break
+        if (company != null && !company.toString().isEmpty()) {
+            List<Recibido> recibidos = new ArrayList<Recibido>()
+            recibidos = findRecibidos(desde, hasta, company, [max: max])
 
+            TipoCompany filtro = TipoCompany.fromNombre(company.nombre)
 
-				/**RECIBIDOS AMA
-				 *
-				 */
-				case "ama":
+            switch (filtro) {
+                case TipoCompany.CASER:
+                    List<com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest> recibidosCaser = new ArrayList<com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest>()
 
-					List<com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest> recibidosAma = new ArrayList<com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest>()
+                    for (Recibido actual:recibidos) {
 
-					for (int i = 0; i < recibidos.size(); i++) {
+                        JAXBContext jaxbContext = JAXBContext.newInstance(com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest.class);
+                        Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 
-						JAXBContext jaxbContext = JAXBContext.newInstance(com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest.class);
-						Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+                        StringReader reader = new StringReader(actual.info.trim());
 
-						StringReader reader = new StringReader(recibidos.get(i).info.trim());
+                        JAXBElement<com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest.class);
+                        com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest gestionReconocimientoMedicoRequest = root.getValue();
 
-						JAXBElement<com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest.class);
-						com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest gestionReconocimientoMedicoRequest = root.getValue();
+                        recibidosCaser.add(gestionReconocimientoMedicoRequest)
+                    }
+                    elementos = recibidosCaser
+                    break
 
-						recibidosAma.add(recibidosAma)
-					}
+                case TipoCompany.AMA:
+                    List<com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest> recibidosAma = new ArrayList<com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest>()
 
-					elementos = recibidosAma
+                    for (Recibido actual:recibidos) {
 
-					break
+                        JAXBContext jaxbContext = JAXBContext.newInstance(com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest.class);
+                        Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 
-				case "cajamar":
+                        StringReader reader = new StringReader(actual.info.trim());
+                        JAXBElement<com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest.class);
+                        com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest gestionReconocimientoMedicoRequest = root.getValue()
 
-					List<CajamarUnderwrittingCaseManagementRequest> recibidosCajamar = new ArrayList<CajamarUnderwrittingCaseManagementRequest>()
+                        recibidosAma.add(gestionReconocimientoMedicoRequest)
+                    }
+                    elementos = recibidosAma
+                    break
 
-					for (int i = 0; i < recibidos.size(); i++) {
+                case TipoCompany.CAJAMAR:
+                    List<CajamarUnderwrittingCaseManagementRequest> recibidosCajamar = new ArrayList<CajamarUnderwrittingCaseManagementRequest>()
 
-						JAXBContext jaxbContext = JAXBContext.newInstance(CajamarUnderwrittingCaseManagementRequest.class);
-						Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+                    for (Recibido actual:recibidos) {
 
-						StringReader reader = new StringReader(recibidos.get(i).info.trim());
+                        JAXBContext jaxbContext = JAXBContext.newInstance(CajamarUnderwrittingCaseManagementRequest.class);
+                        Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 
-						JAXBElement<CajamarUnderwrittingCaseManagementRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), CajamarUnderwrittingCaseManagementRequest.class);
-						CajamarUnderwrittingCaseManagementRequest gestionReconocimientoMedicoRequest = root.getValue();
+                        StringReader reader = new StringReader(actual.info.trim());
 
-						recibidosCajamar.add(gestionReconocimientoMedicoRequest)
-					}
+                        JAXBElement<CajamarUnderwrittingCaseManagementRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), CajamarUnderwrittingCaseManagementRequest.class);
+                        CajamarUnderwrittingCaseManagementRequest gestionReconocimientoMedicoRequest = root.getValue();
 
-					elementos = recibidosCajamar
+                        recibidosCajamar.add(gestionReconocimientoMedicoRequest)
+                    }
+                    elementos = recibidosCajamar
+                    break
 
-					break
+                case TipoCompany.LAGUN_ARO:
+                    List<com.ws.lagunaro.beans.GestionReconocimientoMedicoRequest> recibidosLagunaro = new ArrayList<com.ws.lagunaro.beans.GestionReconocimientoMedicoRequest>()
 
-				case "lagunaro":
+                    for (Recibido actual:recibidos) {
 
-					List<com.ws.lagunaro.beans.GestionReconocimientoMedicoRequest> recibidosLagunaro = new ArrayList<com.ws.lagunaro.beans.GestionReconocimientoMedicoRequest>()
+                        JAXBContext jaxbContext = JAXBContext.newInstance(com.ws.lagunaro.beans.GestionReconocimientoMedicoRequest.class);
+                        Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 
-					for (int i = 0; i < recibidos.size(); i++) {
+                        StringReader reader = new StringReader(actual.info.trim());
 
-						JAXBContext jaxbContext = JAXBContext.newInstance(com.ws.lagunaro.beans.GestionReconocimientoMedicoRequest.class);
-						Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+                        JAXBElement<com.ws.lagunaro.beans.GestionReconocimientoMedicoRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), com.ws.lagunaro.beans.GestionReconocimientoMedicoRequest.class);
+                        com.ws.lagunaro.beans.GestionReconocimientoMedicoRequest gestionReconocimientoMedicoRequest = root.getValue();
 
-						StringReader reader = new StringReader(recibidos.get(i).info.trim());
+                        recibidosLagunaro.add(gestionReconocimientoMedicoRequest)
+                    }
+                    elementos = recibidosLagunaro
+                    break
 
-						JAXBElement<com.ws.lagunaro.beans.GestionReconocimientoMedicoRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), com.ws.lagunaro.beans.GestionReconocimientoMedicoRequest.class);
-						com.ws.lagunaro.beans.GestionReconocimientoMedicoRequest gestionReconocimientoMedicoRequest = root.getValue();
+                case TipoCompany.ALPTIS:
+                    List<AlptisUnderwrittingCaseManagementRequest> recibidosAlptis = new ArrayList<AlptisUnderwrittingCaseManagementRequest>()
 
-						recibidosLagunaro.add(gestionReconocimientoMedicoRequest)
-					}
+                    for (Recibido actual:recibidos) {
 
-					elementos = recibidosLagunaro
+                        JAXBContext jaxbContext = JAXBContext.newInstance(AlptisUnderwrittingCaseManagementRequest.class);
+                        Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 
-					break
+                        StringReader reader = new StringReader(actual.info.trim());
 
+                        JAXBElement<AlptisUnderwrittingCaseManagementRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), AlptisUnderwrittingCaseManagementRequest.class);
+                        AlptisUnderwrittingCaseManagementRequest alptisUnderwrittingCaseManagementRequest = root.getValue();
 
-				case "alptis":
+                        recibidosAlptis.add(alptisUnderwrittingCaseManagementRequest)
+                    }
+                    elementos = recibidosAlptis
+                    break
 
-					List<AlptisUnderwrittingCaseManagementRequest> recibidosAlptis = new ArrayList<AlptisUnderwrittingCaseManagementRequest>()
+                case TipoCompany.AFI_ESCA:
+                    List<AfiEscaUnderwrittingCaseManagementRequest> recibidosAfiesca = new ArrayList<AfiEscaUnderwrittingCaseManagementRequest>()
 
-					for (int i = 0; i < recibidos.size(); i++) {
+                    for (Recibido actual:recibidos) {
 
-						JAXBContext jaxbContext = JAXBContext.newInstance(AlptisUnderwrittingCaseManagementRequest.class);
-						Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+                        JAXBContext jaxbContext = JAXBContext.newInstance(AfiEscaUnderwrittingCaseManagementRequest.class);
+                        Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 
-						StringReader reader = new StringReader(recibidos.get(i).info.trim());
+                        StringReader reader = new StringReader(actual.info.trim());
 
-						JAXBElement<AlptisUnderwrittingCaseManagementRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), AlptisUnderwrittingCaseManagementRequest.class);
-						AlptisUnderwrittingCaseManagementRequest alptisUnderwrittingCaseManagementRequest = root.getValue();
+                        JAXBElement<AfiEscaUnderwrittingCaseManagementRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), AfiEscaUnderwrittingCaseManagementRequest.class);
+                        AfiEscaUnderwrittingCaseManagementRequest afiEscaUnderwrittingCaseManagementRequest = root.getValue();
 
-						recibidosAlptis.add(alptisUnderwrittingCaseManagementRequest)
-					}
+                        recibidosAfiesca.add(afiEscaUnderwrittingCaseManagementRequest)
+                    }
+                    elementos = recibidosAfiesca
+                    break
 
-					elementos = recibidosAlptis
+                case TipoCompany.ZEN_UP:
+                    List<LifesquareUnderwrittingCaseManagementRequest> recibidosLifesquare = new ArrayList<LifesquareUnderwrittingCaseManagementRequest>()
 
-					break
+                    for (Recibido actual:recibidos) {
 
-				case "afiesca":
+                        JAXBContext jaxbContext = JAXBContext.newInstance(LifesquareUnderwrittingCaseManagementRequest.class);
+                        Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 
-					List<AfiEscaUnderwrittingCaseManagementRequest> recibidosAfiesca = new ArrayList<AfiEscaUnderwrittingCaseManagementRequest>()
+                        StringReader reader = new StringReader(actual.info.trim());
 
-					for (int i = 0; i < recibidos.size(); i++) {
+                        JAXBElement<LifesquareUnderwrittingCaseManagementRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), LifesquareUnderwrittingCaseManagementRequest.class);
+                        LifesquareUnderwrittingCaseManagementRequest lifesquareUnderwrittingCaseManagementRequest = root.getValue();
 
-						JAXBContext jaxbContext = JAXBContext.newInstance(AfiEscaUnderwrittingCaseManagementRequest.class);
-						Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+                        recibidosLifesquare.add(lifesquareUnderwrittingCaseManagementRequest)
+                    }
+                    elementos = recibidosLifesquare
+                    break
 
-						StringReader reader = new StringReader(recibidos.get(i).info.trim());
+                case TipoCompany.PSN:
+                    List<com.scortelemed.schemas.psn.GestionReconocimientoMedicoRequest> recibidosPsn = new ArrayList<com.scortelemed.schemas.psn.GestionReconocimientoMedicoRequest>()
 
-						JAXBElement<AfiEscaUnderwrittingCaseManagementRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), AfiEscaUnderwrittingCaseManagementRequest.class);
-						AfiEscaUnderwrittingCaseManagementRequest afiEscaUnderwrittingCaseManagementRequest = root.getValue();
+                    for (Recibido actual:recibidos) {
 
-						recibidosAfiesca.add(afiEscaUnderwrittingCaseManagementRequest)
-					}
+                        JAXBContext jaxbContext = JAXBContext.newInstance(com.scortelemed.schemas.psn.GestionReconocimientoMedicoRequest.class);
+                        Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 
-					elementos = recibidosAfiesca
+                        StringReader reader = new StringReader(actual.info.trim());
 
-					break
+                        JAXBElement<com.scortelemed.schemas.psn.GestionReconocimientoMedicoRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), com.scortelemed.schemas.psn.GestionReconocimientoMedicoRequest.class);
+                        com.scortelemed.schemas.psn.GestionReconocimientoMedicoRequest psnUnderwrittingCaseManagementRequest = root.getValue();
 
-				case "lifesquare":
+                        recibidosPsn.add(psnUnderwrittingCaseManagementRequest)
+                    }
+                    elementos = recibidosPsn
+                    break
 
-					List<LifesquareUnderwrittingCaseManagementRequest> recibidosLifesquare = new ArrayList<LifesquareUnderwrittingCaseManagementRequest>()
+                case TipoCompany.NET_INSURANCE:
+                    List<com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCaseManagementRequest> recibidosNetinsurance = new ArrayList<com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCaseManagementRequest>()
 
-					for (int i = 0; i < recibidos.size(); i++) {
+                    for (Recibido actual:recibidos) {
 
-						JAXBContext jaxbContext = JAXBContext.newInstance(LifesquareUnderwrittingCaseManagementRequest.class);
-						Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+                        JAXBContext jaxbContext = JAXBContext.newInstance(com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCaseManagementRequest.class);
+                        Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 
-						StringReader reader = new StringReader(recibidos.get(i).info.trim());
+                        StringReader reader = new StringReader(actual.info.trim());
 
-						JAXBElement<LifesquareUnderwrittingCaseManagementRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), LifesquareUnderwrittingCaseManagementRequest.class);
-						LifesquareUnderwrittingCaseManagementRequest lifesquareUnderwrittingCaseManagementRequest = root.getValue();
+                        JAXBElement<com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCaseManagementRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCaseManagementRequest.class);
+                        com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCaseManagementRequest netInsuranceUnderwrittingCaseManagementRequest = root.getValue();
 
-						recibidosLifesquare.add(lifesquareUnderwrittingCaseManagementRequest)
-					}
+                        recibidosNetinsurance.add(netInsuranceUnderwrittingCaseManagementRequest)
+                    }
+                    elementos = recibidosNetinsurance
+                    break
 
-					elementos = recibidosLifesquare
+                case TipoCompany.MALAKOFF_MEDERIC:
+                    List<com.scortelemed.schemas.simplefr.SimplefrUnderwrittingCaseManagementRequest> recibidosSimplefr = new ArrayList<com.scortelemed.schemas.simplefr.SimplefrUnderwrittingCaseManagementRequest>()
 
-					break
+                    for (int i = 0; i < recibidos.size(); i++) {
 
-				case "psn":
+                        JAXBContext jaxbContext = JAXBContext.newInstance(com.scortelemed.schemas.simplefr.SimplefrUnderwrittingCaseManagementRequest.class);
+                        Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 
-					List<com.scortelemed.schemas.psn.GestionReconocimientoMedicoRequest> recibidosPsn = new ArrayList<com.scortelemed.schemas.psn.GestionReconocimientoMedicoRequest>()
+                        StringReader reader = new StringReader(actual.info.trim());
 
-					for (int i = 0; i < recibidos.size(); i++) {
+                        JAXBElement<com.scortelemed.schemas.simplefr.SimplefrUnderwrittingCaseManagementRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), com.scortelemed.schemas.simplefr.SimplefrUnderwrittingCaseManagementRequest.class);
+                        com.scortelemed.schemas.simplefr.SimplefrUnderwrittingCaseManagementRequest simpleFrUnderwrittingCaseManagementRequest = root.getValue();
 
-						JAXBContext jaxbContext = JAXBContext.newInstance(com.scortelemed.schemas.psn.GestionReconocimientoMedicoRequest.class);
-						Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+                        recibidosSimplefr.add(simpleFrUnderwrittingCaseManagementRequest)
+                    }
+                    elementos = recibidosSimplefr
+                    break
 
-						StringReader reader = new StringReader(recibidos.get(i).info.trim());
+                case TipoCompany.SOCIETE_GENERALE:
+                    List<com.scortelemed.schemas.societegenerale.SocieteGeneraleUnderwrittingCaseManagementRequest> recibidosSocieteGenerale = new ArrayList<com.scortelemed.schemas.societegenerale.SocieteGeneraleUnderwrittingCaseManagementRequest>()
 
-						JAXBElement<com.scortelemed.schemas.psn.GestionReconocimientoMedicoRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), com.scortelemed.schemas.psn.GestionReconocimientoMedicoRequest.class);
-						com.scortelemed.schemas.psn.GestionReconocimientoMedicoRequest psnUnderwrittingCaseManagementRequest = root.getValue();
+                    for (Recibido actual:recibidos) {
 
-						recibidosPsn.add(psnUnderwrittingCaseManagementRequest)
-					}
+                        JAXBContext jaxbContext = JAXBContext.newInstance(com.scortelemed.schemas.societegenerale.SocieteGeneraleUnderwrittingCaseManagementRequest.class);
+                        Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 
-					elementos = recibidosPsn
+                        StringReader reader = new StringReader(actual.info.trim());
 
-					break
+                        JAXBElement<com.scortelemed.schemas.societegenerale.SocieteGeneraleUnderwrittingCaseManagementRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), com.scortelemed.schemas.societegenerale.SocieteGeneraleUnderwrittingCaseManagementRequest.class);
+                        com.scortelemed.schemas.societegenerale.SocieteGeneraleUnderwrittingCaseManagementRequest societeGeneraleUnderwrittingCaseManagementRequest = root.getValue();
 
-				case "netinsurance":
+                        recibidosSocieteGenerale.add(societeGeneraleUnderwrittingCaseManagementRequest)
+                    }
+                    elementos = recibidosSocieteGenerale
+                    break
 
-					List<com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCaseManagementRequest> recibidosNetinsurance = new ArrayList<com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCaseManagementRequest>()
+                case TipoCompany.ENGINYERS:
+                    List<com.scortelemed.schemas.enginyers.AddExp> recibidosEnginyers = new ArrayList<com.scortelemed.schemas.enginyers.AddExp>()
 
-					for (int i = 0; i < recibidos.size(); i++) {
+                    for (Recibido actual:recibidos) {
 
-						JAXBContext jaxbContext = JAXBContext.newInstance(com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCaseManagementRequest.class);
-						Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+                        JAXBContext jaxbContext = JAXBContext.newInstance(com.scortelemed.schemas.enginyers.AddExp.class)
+                        Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller()
 
-						StringReader reader = new StringReader(recibidos.get(i).info.trim());
+                        StringReader reader = new StringReader(actual.info.trim())
 
-						JAXBElement<com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCaseManagementRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCaseManagementRequest.class);
-						com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCaseManagementRequest netInsuranceUnderwrittingCaseManagementRequest = root.getValue();
+                        JAXBElement<com.scortelemed.schemas.enginyers.AddExp> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), com.scortelemed.schemas.enginyers.AddExp.class)
+                        com.scortelemed.schemas.enginyers.AddExp enginyersUnderwrittingCaseManagementRequest = root.getValue()
 
-						recibidosNetinsurance.add(netInsuranceUnderwrittingCaseManagementRequest)
-					}
+                        recibidosEnginyers.add(enginyersUnderwrittingCaseManagementRequest)
+                    }
+                    elementos = recibidosEnginyers
+                    break
 
-					elementos = recibidosNetinsurance
+                case TipoCompany.METHIS_LAB:
+                    List<com.scortelemed.schemas.methislab.MethislabUnderwrittingCaseManagementRequest> recibidosMethislab = new ArrayList<com.scortelemed.schemas.methislab.MethislabUnderwrittingCaseManagementRequest>()
 
-					break
+                    for (Recibido actual:recibidos) {
 
-				case "simplefr":
+                        JAXBContext jaxbContext = JAXBContext.newInstance(com.scortelemed.schemas.methislab.MethislabUnderwrittingCaseManagementRequest.class)
+                        Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller()
 
-					List<com.scortelemed.schemas.simplefr.SimplefrUnderwrittingCaseManagementRequest> recibidosSimplefr = new ArrayList<com.scortelemed.schemas.simplefr.SimplefrUnderwrittingCaseManagementRequest>()
+                        StringReader reader = new StringReader(actual.info.trim())
 
-					for (int i = 0; i < recibidos.size(); i++) {
+                        JAXBElement<com.scortelemed.schemas.methislab.MethislabUnderwrittingCaseManagementRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), com.scortelemed.schemas.methislab.MethislabUnderwrittingCaseManagementRequest.class)
+                        com.scortelemed.schemas.methislab.MethislabUnderwrittingCaseManagementRequest methislabUnderwrittingCaseManagementRequest = root.getValue()
 
-						JAXBContext jaxbContext = JAXBContext.newInstance(com.scortelemed.schemas.simplefr.SimplefrUnderwrittingCaseManagementRequest.class);
-						Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+                        recibidosMethislab.add(methislabUnderwrittingCaseManagementRequest)
+                    }
+                    elementos = recibidosMethislab
+                    break
 
-						StringReader reader = new StringReader(recibidos.get(i).info.trim());
+                case TipoCompany.CBP_ITALIA:
+                    List<com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCaseManagementRequest> recibidosCbpItalia = new ArrayList<com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCaseManagementRequest>()
 
-						JAXBElement<com.scortelemed.schemas.simplefr.SimplefrUnderwrittingCaseManagementRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), com.scortelemed.schemas.simplefr.SimplefrUnderwrittingCaseManagementRequest.class);
-						com.scortelemed.schemas.simplefr.SimplefrUnderwrittingCaseManagementRequest simpleFrUnderwrittingCaseManagementRequest = root.getValue();
+                    for (Recibido actual:recibidos) {
 
-						recibidosSimplefr.add(simpleFrUnderwrittingCaseManagementRequest)
-					}
+                        JAXBContext jaxbContext = JAXBContext.newInstance(com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCaseManagementRequest.class)
+                        Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller()
 
-					elementos = recibidosSimplefr
+                        StringReader reader = new StringReader(actual.info.trim())
 
-					break
+                        JAXBElement<com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCaseManagementRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCaseManagementRequest.class)
+                        com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCaseManagementRequest cbpItaliaUnderwrittingCaseManagementRequest = root.getValue()
 
-				case "societegenerale":
+                        recibidosCbpItalia.add(cbpItaliaUnderwrittingCaseManagementRequest)
+                    }
+                    elementos = recibidosCbpItalia
+                    break
 
-					List<com.scortelemed.schemas.societegenerale.SocieteGeneraleUnderwrittingCaseManagementRequest> recibidosSocieteGenerale = new ArrayList<com.scortelemed.schemas.societegenerale.SocieteGeneraleUnderwrittingCaseManagementRequest>()
+                case TipoCompany.CF_LIFE:
+                    List<com.scortelemed.schemas.methislabCF.MethislabCFUnderwrittingCaseManagementRequest> recibidosMethislabCF = new ArrayList<com.scortelemed.schemas.methislabCF.MethislabCFUnderwrittingCaseManagementRequest>()
 
-					for (int i = 0; i < recibidos.size(); i++) {
+                    for (Recibido actual:recibidos) {
 
-						JAXBContext jaxbContext = JAXBContext.newInstance(com.scortelemed.schemas.societegenerale.SocieteGeneraleUnderwrittingCaseManagementRequest.class);
-						Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+                        JAXBContext jaxbContext = JAXBContext.newInstance(com.scortelemed.schemas.methislabCF.MethislabCFUnderwrittingCaseManagementRequest.class)
+                        Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller()
 
-						StringReader reader = new StringReader(recibidos.get(i).info.trim());
+                        StringReader reader = new StringReader(actual.info.trim())
 
-						JAXBElement<com.scortelemed.schemas.societegenerale.SocieteGeneraleUnderwrittingCaseManagementRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), com.scortelemed.schemas.societegenerale.SocieteGeneraleUnderwrittingCaseManagementRequest.class);
-						com.scortelemed.schemas.societegenerale.SocieteGeneraleUnderwrittingCaseManagementRequest societeGeneraleUnderwrittingCaseManagementRequest = root.getValue();
+                        JAXBElement<com.scortelemed.schemas.methislabCF.MethislabCFUnderwrittingCaseManagementRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), com.scortelemed.schemas.methislabCF.MethislabCFUnderwrittingCaseManagementRequest.class)
+                        com.scortelemed.schemas.methislabCF.MethislabCFUnderwrittingCaseManagementRequest methislabCFUnderwrittingCaseManagementRequest = root.getValue()
 
-						recibidosSocieteGenerale.add(societeGeneraleUnderwrittingCaseManagementRequest)
-					}
+                        recibidosMethislabCF.add(methislabCFUnderwrittingCaseManagementRequest)
+                    }
+                    elementos = recibidosMethislabCF
+                    break
 
-					elementos = recibidosSocieteGenerale
+                default:
+                    elementos = new ArrayList<>() //Evitamos nullpointers
+                    break
+            }
 
-					break
-			}
+            return elementos
+        }
+    }
 
-			return elementos
-		}
-	}
+    def findEnvios(desde, hasta, Company company, Map sortParams) {
+        StringBuilder hqlQueryBuilder = new StringBuilder(' ')
 
-	public obtenerEnviados(nombre, idCia, desde, hasta) {
+        hqlQueryBuilder << 'FROM Envio AS envio  '
+        Map namedParams = [idCia: company.id]
+        hqlQueryBuilder << 'WHERE cia = :idCia '
+        hqlQueryBuilder << 'AND '
+        hqlQueryBuilder << "fecha BETWEEN  :iniDate "
+        hqlQueryBuilder << 'AND '
+        hqlQueryBuilder << " :endDate "
+        namedParams["endDate"] = hasta
+        namedParams["iniDate"] = desde
 
-		List<Envio> enviados = new ArrayList<Envio>()
-		Parser parser = new Parser()
-		LogUtil logUtil = new LogUtil()
 
-		if (idCia != null && !idCia.toString().isEmpty()){
+        hqlQueryBuilder << "ORDER BY fecha DESC"
 
-			def criteria = Envio.createCriteria()
+        System.out.println("idCia ID  -->>" + company.id)
 
-			enviados = criteria.list {
-				eq("cia", idCia)
-				and {
-					between("fecha", desde, hasta)
-				}
-				order("fecha", "desc")
-			}
 
+        Recibido.executeQuery(hqlQueryBuilder.toString(), namedParams, sortParams)
+    }
 
-			switch (nombre){
+    def obtenerEnviados(company, desde, hasta, max) {
+        Parser parser = new Parser()
 
-				case "caser":
+        if (company != null) {
+            List<Envio> enviados = new ArrayList<Envio>()
+            enviados = findEnvios(desde, hasta, company, [max: max])
 
-					List<EntradaDetalle> enviadosCaser = new ArrayList<EntradaDetalle>()
+            TipoCompany filtro = TipoCompany.fromNombre(company.nombre)
 
-					for (int i = 0; i < enviados.size(); i++) {
+            switch (filtro) { //TODO: Revisar la tabla de producciÃ³n para conocer el comportamiento de los elementos enviados
 
-						enviadosCaser.add(parser.leerEnvioCaser(enviados.get(i).info.trim()))
-					}
+                case TipoCompany.CASER:
 
-					elementos = enviadosCaser
+                    List<EntradaDetalle> enviadosCaser = new ArrayList<EntradaDetalle>()
 
-					break
+                    for (int i = 0; i < enviados.size(); i++) {
 
+                        enviadosCaser.add(parser.leerEnvioCaser(enviados.get(i).info.trim()))
+                    }
 
-				/**RECIBIDOS AMA
-				 *
-				 */
-				case "ama":
+                    elementos = enviadosCaser
 
-					List<com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.SaveDossierResultsE> enviadosAma = new ArrayList<com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.SaveDossierResultsE>()
+                    break
+                case TipoCompany.AMA:
 
-					for (int i = 0; i < enviados.size(); i++) {
+                    List<com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.SaveDossierResultsE> enviadosAma = new ArrayList<com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.SaveDossierResultsE>()
 
-						JAXBContext jaxbContext = JAXBContext.newInstance(com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.SaveDossierResultsE.class);
-						Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+                    for (int i = 0; i < enviados.size(); i++) {
 
-						StringReader reader = new StringReader(enviados.get(i).info.trim());
+                        JAXBContext jaxbContext = JAXBContext.newInstance(com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.SaveDossierResultsE.class);
+                        Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 
-						JAXBElement<com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.SaveDossierResultsE> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.SaveDossierResultsE.class);
-						com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.SaveDossierResultsE saveDossierResultsE = root.getValue();
+                        StringReader reader = new StringReader(enviados.get(i).info.trim());
 
-						enviadosAma.add(saveDossierResultsE)
-					}
+                        JAXBElement<com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.SaveDossierResultsE> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.SaveDossierResultsE.class);
+                        com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.SaveDossierResultsE saveDossierResultsE = root.getValue();
 
-					elementos = enviadosAma
+                        enviadosAma.add(saveDossierResultsE)
+                    }
 
-					break
+                    elementos = enviadosAma
 
-				case "cajamar":
+                    break
 
-					List<EnvioCajamar> envioadosCajamar = new ArrayList<EnvioCajamar>()
+                case TipoCompany.CAJAMAR:
 
-					for (int i = 0; i < enviados.size(); i++) {
+                    List<EnvioCajamar> envioadosCajamar = new ArrayList<EnvioCajamar>()
 
-						envioadosCajamar.add(parser.leerEnvioCajamar(enviados.get(i).info.trim()))
-					}
+                    for (int i = 0; i < enviados.size(); i++) {
 
-					elementos = envioadosCajamar
+                        envioadosCajamar.add(parser.leerEnvioCajamar(enviados.get(i).info.trim()))
+                    }
 
-					break
+                    elementos = envioadosCajamar
 
-				case "lagunaro":
+                    break
 
-					List<com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest> recibidosLagunaro = new ArrayList<com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest>()
+                case TipoCompany.LAGUN_ARO:
 
-					for (int i = 0; i < enviados.size(); i++) {
+                    List<com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest> recibidosLagunaro = new ArrayList<com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest>()
 
-						JAXBContext jaxbContext = JAXBContext.newInstance(com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest.class);
-						Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+                    for (int i = 0; i < enviados.size(); i++) {
 
-						StringReader reader = new StringReader(enviados.get(i).info.trim());
+                        JAXBContext jaxbContext = JAXBContext.newInstance(com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest.class);
+                        Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 
-						JAXBElement<com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest.class);
-						com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest gestionReconocimientoMedicoRequest = root.getValue();
+                        StringReader reader = new StringReader(enviados.get(i).info.trim());
 
-						recibidosLagunaro.add(gestionReconocimientoMedicoRequest)
-					}
+                        JAXBElement<com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest.class);
+                        com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest gestionReconocimientoMedicoRequest = root.getValue();
 
-					elementos = recibidosLagunaro
+                        recibidosLagunaro.add(gestionReconocimientoMedicoRequest)
+                    }
 
-					break
+                    elementos = recibidosLagunaro
 
+                    break
 
-				case "alptis":
 
-					List<EnvioAlptis> envioadosAlptis = new ArrayList<EnvioAlptis>()
+                case TipoCompany.ALPTIS:
 
-					for (int i = 0; i < enviados.size(); i++) {
+                    List<EnvioAlptis> envioadosAlptis = new ArrayList<EnvioAlptis>()
 
-						envioadosAlptis.add(parser.leerEnvioAlptis(enviados.get(i).info.trim()))
-					}
+                    for (int i = 0; i < enviados.size(); i++) {
 
-					elementos = envioadosAlptis
+                        envioadosAlptis.add(parser.leerEnvioAlptis(enviados.get(i).info.trim()))
+                    }
 
-					break
+                    elementos = envioadosAlptis
 
-				case "afiesca":
+                    break
 
-				/**PARA AFIESCA NO HAY TRANSFORMACIÓN SE RECOGEN LOS DATOS DE LA TABLA ENVIO DIRECTAMENTE
-				 * 
-				 */
-					elementos = enviados
+                case TipoCompany.AFI_ESCA:
 
-					break
+                    /**PARA AFIESCA NO HAY TRANSFORMACIï¿½N SE RECOGEN LOS DATOS DE LA TABLA ENVIO DIRECTAMENTE
+                     *
+                     */
+                    elementos = enviados
 
-				case "lifesquare":
+                    break
 
-				/**PARA LIFESQUARE NO HAY TRANSFORMACIÓN SE RECOGEN LOS DATOS DE LA TABLA ENVIO DIRECTAMENTE
-				 * 
-				 */
-					elementos = enviados
+                case TipoCompany.ZEN_UP:
 
-					break
-			}
+                    /**PARA LIFESQUARE NO HAY TRANSFORMACIï¿½N SE RECOGEN LOS DATOS DE LA TABLA ENVIO DIRECTAMENTE
+                     *
+                     */
+                    elementos = enviados
 
-			return elementos
-		}
-	}
+                    break
+                case TipoCompany.PSN:
+                    break
+                case TipoCompany.NET_INSURANCE:
+                    break
+                case TipoCompany.MALAKOFF_MEDERIC:
+                    break
+                case TipoCompany.SOCIETE_GENERALE:
+                    break
+                case TipoCompany.METHIS_LAB:
+                    break
+                case TipoCompany.CBP_ITALIA:
+                    break
+                case TipoCompany.ENGINYERS:
+                    break
+                case TipoCompany.CF_LIFE:
+                    break
+            }
+
+            return elementos
+        }
+    }
 }

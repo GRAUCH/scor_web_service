@@ -1,6 +1,24 @@
 
+.idea/workspace.xml
+.idea/scorWebservice-grailsPlugins.iml
+.idea/dataSources.xml
+.idea/dataSources.local.xml
+.idea/dataSources/6f1f4c4c-5e3e-46ff-abc8-acd50fee75f8.xml
+.idea/inspectionProfiles/Project_Default.xml
+.idea/workspace.xml~Stashed changes
+target/stacktrace.log
+target/work/plugins/tomcat-7.0.55/grails-plugin-tomcat-7.0.55.jar
+
+
 .slcache/
+
+out/
 
 target/
 
-out/
+
+scorWebservices-grailsPlugins.iml
+
+scorWebservices.iml
+
+.idea/

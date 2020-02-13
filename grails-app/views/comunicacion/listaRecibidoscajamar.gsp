@@ -86,7 +86,7 @@
 									${elemento?.regScor?.nmbase}
 								</td>
 								<td>
-									${elemento?.regScor?.ap1ase} ${elemento?.regScor?.ap2ase}
+									${elemento?.regScor?.ap1Ase} ${elemento?.regScor?.ap2Ase}
 								</td>
 								<td>
 									${elemento?.regScor?.dniase}
@@ -113,39 +113,39 @@
 									${elemento?.regScor?.yramex}
 								</td>
 								<td>
-									<g:each in="${elemento?.regScor?.cobert}" var="cobertura"
+									<g:each in="${elemento?.regScor?.cobert?.cobertType}" var="cobertura"
 										status="j">
 										${cobertura?.cobern}
 									</g:each>
 								</td>
-								<td><g:if test="${elemento?.regScor?.tlcom?.type == 1}">
+								<td><g:if test="${elemento?.regScor?.tlcom?.value == 1}">
 										SI
 									</g:if> <g:else>
 										NO
 									</g:else>
 								</td>
-								<td><g:if test="${elemento?.regScor?.tlabr?.type == 1}">
+								<td><g:if test="${elemento?.regScor?.tlabr?.value == 1}">
 										SI
 									</g:if> <g:else>
 										NO
 									</g:else>
 								</td>
-								<td><g:if test="${elemento?.regScor?.zprumd?.medicalTest?.equals("B")}">
-										637
-									</g:if> 
-									<g:if test="${elemento?.regScor?.zprumd?.medicalTest?.equals("C")}">
-										638
-									</g:if>
-									<g:if test="${elemento?.regScor?.zprumd?.medicalTest?.equals("D")}">
-										639
-									</g:if>  
-									<g:if test="${elemento?.regScor?.zprumd?.medicalTest?.equals("E")}">
-										640
-									</g:if>
-									<g:if test="${elemento?.regScor?.zprumd?.medicalTest?.equals("F")}">
-										641
-									</g:if>
-								</td>
+								%{--<td><g:if test="${elemento?.regScor?.zprumd?. == "B"}">--}%
+										%{--637--}%
+									%{--</g:if> --}%
+									%{--<g:if test="${elemento?.regScor?.zprumd?.name?.equals("C")}">--}%
+										%{--638--}%
+									%{--</g:if>--}%
+									%{--<g:if test="${elemento?.regScor?.zprumd?.name?.equals("D")}">--}%
+										%{--639--}%
+									%{--</g:if>  --}%
+									%{--<g:if test="${elemento?.regScor?.zprumd?.name?.equals("E")}">--}%
+										%{--640--}%
+									%{--</g:if>--}%
+									%{--<g:if test="${elemento?.regScor?.zprumd?.name?.equals("F")}">--}%
+										%{--641--}%
+									%{--</g:if>--}%
+								%{--</td>--}%
 							</tr>
 						</g:each>
 					</tbody>

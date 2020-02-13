@@ -40,8 +40,6 @@
 						</sec:ifAnyGranted>
 					</sec:ifLoggedIn>
 
-					<li><g:remoteLink controller="dashboard" update="contenido"	action="enviado">Enviados</g:remoteLink></li>
-					<li><g:remoteLink controller="dashboard" update="contenido"	action="recibido">Recibidos</g:remoteLink></li>
 				</ul>
 			</div>
 		</div>
