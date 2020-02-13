@@ -49,7 +49,7 @@
 
 			<div class="checkbox">
 				<label> 
-				<input type='checkbox'	name='${rememberMeParameter}' id='remember_me' > Remenber me 
+				<input type='checkbox'	name='${rememberMeParameter}' id='remember_me' > Remember me
 					 
 				</label>
 			</div>
