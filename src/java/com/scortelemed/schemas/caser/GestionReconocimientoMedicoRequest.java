@@ -427,8 +427,8 @@ public class GestionReconocimientoMedicoRequest {
         @XmlElement(required = true)
         protected String productCode;
         @XmlElement(required = true)
-        @XmlSchemaType(name = "anySimpleType")
-        protected Object birthDate;
+        @XmlSchemaType(name = "dateTime")
+        protected XMLGregorianCalendar birthDate;
         protected OperationType operationType;
 
         /**
@@ -871,7 +871,7 @@ public class GestionReconocimientoMedicoRequest {
          *     {@link Object }
          *     
          */
-        public Object getBirthDate() {
+        public XMLGregorianCalendar getBirthDate() {
             return birthDate;
         }
 
@@ -883,7 +883,7 @@ public class GestionReconocimientoMedicoRequest {
          *     {@link Object }
          *     
          */
-        public void setBirthDate(Object value) {
+        public void setBirthDate(XMLGregorianCalendar value) {
             this.birthDate = value;
         }
 
