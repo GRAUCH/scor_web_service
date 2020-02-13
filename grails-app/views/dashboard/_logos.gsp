@@ -27,12 +27,15 @@
             Max Value: <g:textField name="max" required="" value="${max}" class="form-control"/>
         </p>
     </div>
+
     <p>Seleccion el tipo:</p>
     <input type="radio" id="enviado" name="logs" value="enviado"> <label for="enviado">Enviados</label>
     <input type="radio" id="recibido" name="logs" value="recibido"> <label for="recibido">Recibidos</label>
+    <input type="radio" id="error" name="logs" value="error"> <label for="recibido">Errores</label>
 
     <div class="right">
-        <g:submitButton name="create" class="btn btn-blue"        value="${message(code: 'default.button.find', default: 'Create')}"/>
+        <g:submitButton name="create" class="btn btn-blue"
+                        value="${message(code: 'default.button.find', default: 'Create')}"/>
         <input type="hidden" id="idCia" name="idCia" value="${idCia}"/>
     </div>
 </div>

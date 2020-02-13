@@ -3,6 +3,7 @@ package hwsol.webservices
 import com.scor.global.CompanyLog
 import com.scortelemed.Company
 import com.scortelemed.Envio
+import com.scortelemed.Error
 import com.scortelemed.Recibido
 import com.ws.afiesca.beans.AfiEscaUnderwrittingCaseManagementRequest
 import com.ws.alptis.beans.AlptisUnderwrittingCaseManagementRequest
@@ -69,6 +70,36 @@ class LogUtil {
 
 
         Recibido.executeQuery(hqlQueryBuilder.toString(), namedParams, sortParams)
+    }
+
+    def findErrores(Company company,desde, hasta, Map sortParams) {
+        StringBuilder hqlQueryBuilder = new StringBuilder(' ')
+
+        hqlQueryBuilder << 'FROM Error AS error  '
+        Map namedParams = [idCia: company.id]
+        hqlQueryBuilder << 'WHERE cia = :idCia '
+        hqlQueryBuilder << 'AND '
+        hqlQueryBuilder << "fecha BETWEEN  :iniDate "
+        hqlQueryBuilder << 'AND '
+        hqlQueryBuilder << " :endDate "
+        namedParams["endDate"] = hasta
+        namedParams["iniDate"] = desde
+
+
+        hqlQueryBuilder << "ORDER BY fecha DESC"
+
+        System.out.println("idCia ID  -->>" + company.id)
+
+
+        Error.executeQuery(hqlQueryBuilder.toString(), namedParams, sortParams)
+    }
+
+    def obtenerErrores(company, desde, hasta, max) {
+        List<Error> errores = null
+        if (company != null && !company.toString().isEmpty()) {
+            errores =  new ArrayList<Error>()
+            errores = findErrores(company,desde, hasta, [max: max])
+        }
     }
 
     def obtenerRecibidos(company, desde, hasta, max) {
@@ -341,6 +372,7 @@ class LogUtil {
             return elementos
         }
     }
+
     def findEnvios(desde, hasta, Company company, Map sortParams) {
         StringBuilder hqlQueryBuilder = new StringBuilder(' ')
 

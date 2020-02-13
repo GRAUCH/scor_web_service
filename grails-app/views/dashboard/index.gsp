@@ -61,7 +61,7 @@
     </div>
 </g:if>
 <g:else>
-    No hay resultados aún
+    No se ha seleccionado una opción.
 </g:else>
 
 </body>
