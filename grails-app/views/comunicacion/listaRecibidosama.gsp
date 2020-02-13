@@ -45,6 +45,10 @@
 							<th aria-label="Platform(s): activate to sort column ascending"
 								style="width: 150px;" colspan="1" rowspan="1"
 								aria-controls="example" tabindex="0" role="columnheader"
+								class="sorting">Agente</th>
+							<th aria-label="Platform(s): activate to sort column ascending"
+								style="width: 150px;" colspan="1" rowspan="1"
+								aria-controls="example" tabindex="0" role="columnheader"
 								class="sorting">Certificado</th>
 							<th aria-label="Platform(s): activate to sort column ascending"
 								style="width: 150px;" colspan="1" rowspan="1"
@@ -53,7 +57,15 @@
 							<th aria-label="Platform(s): activate to sort column ascending"
 								style="width: 150px;" colspan="1" rowspan="1"
 								aria-controls="example" tabindex="0" role="columnheader"
-								class="sorting">Request</th>	
+								class="sorting">Request</th>
+							<th aria-label="Platform(s): activate to sort column ascending"
+								style="width: 150px;" colspan="1" rowspan="1"
+								aria-controls="example" tabindex="0" role="columnheader"
+								class="sorting">Servicios</th>
+							<th aria-label="Platform(s): activate to sort column ascending"
+								style="width: 150px;" colspan="1" rowspan="1"
+								aria-controls="example" tabindex="0" role="columnheader"
+								class="sorting">Coberturas</th>
 						</tr>
 					</thead>
 
@@ -64,20 +76,15 @@
 									<td>${elemento?.candidateInformation?.name}</td>
 									<td>${elemento?.candidateInformation?.surname}</td>
 									<td>${elemento?.candidateInformation?.fiscalIdentificationNumber}</td>
-									<td><g:if test="${elemento?.candidateInformation?.birthDate?.value != null}">
-										<g:formatDate date="${Date.parse("YYYY-MM-dd'T'hh:mm:ss", elemento?.candidateInformation?.birthDate?.value?.toString())}" format="yyyy-MM-dd"/>
-									</g:if></td>
+									<td>${elemento?.candidateInformation?.birthDate?.value?.toString()}</td>
 									<td>${elemento?.candidateInformation?.gender}</td>
-									<td><g:if test="${elemento?.policyHolderInformation?.requestDate?.value != null}">
-										<g:formatDate date="${Date.parse("YYYY-MM-dd'T'hh:mm:ss", elemento?.policyHolderInformation?.requestDate?.value?.toString())}" format="yyyy-MM-dd"/>
-									</g:if></td>
-									
-									<td>${elemento?.candidateInformation?.agente}</td>
-									<td>${elemento?.policyHolderInformation?.certificateNumber}</td>
-									<td>${elemento?.policyHolderInformation?.policyNumber}</td>
-									<td>${elemento?.policyHolderInformation?.requestNumber}</td>
+									<td>${elemento?.candidateInformation?.requestDate?.value?.toString()}</td>
+									<td>${elemento?.candidateInformation?.agent}</td>
+									<td>${elemento?.candidateInformation?.certificateNumber}</td>
+									<td>${elemento?.candidateInformation?.policyNumber}</td>
+									<td>${elemento?.candidateInformation?.requestNumber}</td>
 									<td>
-										<g:each in="${elemento?.serviceInformation}" var="servicio" status="j">
+										<g:each in="${elemento?.services}" var="servicio" status="j">
 											${servicio.serviceType} - ${servicio.serviceCode}
 										</g:each>
 									</td>
