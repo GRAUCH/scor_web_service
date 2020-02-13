@@ -1,6 +1,6 @@
 package com.ws.enumeration
 
-public enum UnidadOrganizativa {
+enum UnidadOrganizativa {
 
 	ES ("ES"),
 	FR ("FR"),
@@ -14,7 +14,6 @@ public enum UnidadOrganizativa {
 	}
 
 	String toString() {
-		
 		value
 	}
 	String getKey() {

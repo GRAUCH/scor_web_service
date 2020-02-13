@@ -20,3 +20,5 @@ target/
 scorWebservices-grailsPlugins.iml
 
 scorWebservices.iml
+
+.idea/

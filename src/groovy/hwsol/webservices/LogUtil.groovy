@@ -5,6 +5,7 @@ import com.scortelemed.Company
 import com.scortelemed.Envio
 import com.scortelemed.Error
 import com.scortelemed.Recibido
+import com.scortelemed.TipoCompany
 import com.ws.afiesca.beans.AfiEscaUnderwrittingCaseManagementRequest
 import com.ws.alptis.beans.AlptisUnderwrittingCaseManagementRequest
 import com.ws.cajamar.beans.CajamarUnderwrittingCaseManagementRequest
@@ -106,13 +107,12 @@ class LogUtil {
 
         if (company != null && !company.toString().isEmpty()) {
             List<Recibido> recibidos = new ArrayList<Recibido>()
-
             recibidos = findRecibidos(desde, hasta, company, [max: max])
 
-            switch (company.nombre) {
+            TipoCompany filtro = TipoCompany.fromNombre(company.nombre)
 
-                case "caser":
-
+            switch (filtro) {
+                case TipoCompany.CASER:
                     List<com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest> recibidosCaser = new ArrayList<com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest>()
 
                     for (int i = 0; i < recibidos.size(); i++) {
@@ -127,16 +127,10 @@ class LogUtil {
 
                         recibidosCaser.add(gestionReconocimientoMedicoRequest)
                     }
-
                     elementos = recibidosCaser
-
                     break
 
-            /**RECIBIDOS AMA
-             *
-             */
-                case "ama":
-
+                case TipoCompany.AMA:
                     List<com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest> recibidosAma = new ArrayList<com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest>()
 
                     for (int i = 0; i < recibidos.size(); i++) {
@@ -151,13 +145,10 @@ class LogUtil {
 
                         recibidosAma.add(recibidosAma)
                     }
-
                     elementos = recibidosAma
-
                     break
 
-                case "cajamar":
-
+                case TipoCompany.CAJAMAR:
                     List<CajamarUnderwrittingCaseManagementRequest> recibidosCajamar = new ArrayList<CajamarUnderwrittingCaseManagementRequest>()
 
                     for (int i = 0; i < recibidos.size(); i++) {
@@ -172,13 +163,10 @@ class LogUtil {
 
                         recibidosCajamar.add(gestionReconocimientoMedicoRequest)
                     }
-
                     elementos = recibidosCajamar
-
                     break
 
-                case "lagunaro":
-
+                case TipoCompany.LAGUN_ARO:
                     List<com.ws.lagunaro.beans.GestionReconocimientoMedicoRequest> recibidosLagunaro = new ArrayList<com.ws.lagunaro.beans.GestionReconocimientoMedicoRequest>()
 
                     for (int i = 0; i < recibidos.size(); i++) {
@@ -193,14 +181,10 @@ class LogUtil {
 
                         recibidosLagunaro.add(gestionReconocimientoMedicoRequest)
                     }
-
                     elementos = recibidosLagunaro
-
                     break
 
-
-                case "alptis":
-
+                case TipoCompany.ALPTIS:
                     List<AlptisUnderwrittingCaseManagementRequest> recibidosAlptis = new ArrayList<AlptisUnderwrittingCaseManagementRequest>()
 
                     for (int i = 0; i < recibidos.size(); i++) {
@@ -215,13 +199,10 @@ class LogUtil {
 
                         recibidosAlptis.add(alptisUnderwrittingCaseManagementRequest)
                     }
-
                     elementos = recibidosAlptis
-
                     break
 
-                case "afiesca":
-
+                case TipoCompany.AFI_ESCA:
                     List<AfiEscaUnderwrittingCaseManagementRequest> recibidosAfiesca = new ArrayList<AfiEscaUnderwrittingCaseManagementRequest>()
 
                     for (int i = 0; i < recibidos.size(); i++) {
@@ -236,13 +217,10 @@ class LogUtil {
 
                         recibidosAfiesca.add(afiEscaUnderwrittingCaseManagementRequest)
                     }
-
                     elementos = recibidosAfiesca
-
                     break
 
-                case "lifesquare":
-
+                case TipoCompany.ZEN_UP:
                     List<LifesquareUnderwrittingCaseManagementRequest> recibidosLifesquare = new ArrayList<LifesquareUnderwrittingCaseManagementRequest>()
 
                     for (int i = 0; i < recibidos.size(); i++) {
@@ -257,13 +235,10 @@ class LogUtil {
 
                         recibidosLifesquare.add(lifesquareUnderwrittingCaseManagementRequest)
                     }
-
                     elementos = recibidosLifesquare
-
                     break
 
-                case "psn":
-
+                case TipoCompany.PSN:
                     List<com.scortelemed.schemas.psn.GestionReconocimientoMedicoRequest> recibidosPsn = new ArrayList<com.scortelemed.schemas.psn.GestionReconocimientoMedicoRequest>()
 
                     for (int i = 0; i < recibidos.size(); i++) {
@@ -278,13 +253,10 @@ class LogUtil {
 
                         recibidosPsn.add(psnUnderwrittingCaseManagementRequest)
                     }
-
                     elementos = recibidosPsn
-
                     break
 
-                case "netinsurance":
-
+                case TipoCompany.NET_INSURANCE:
                     List<com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCaseManagementRequest> recibidosNetinsurance = new ArrayList<com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCaseManagementRequest>()
 
                     for (int i = 0; i < recibidos.size(); i++) {
@@ -299,13 +271,10 @@ class LogUtil {
 
                         recibidosNetinsurance.add(netInsuranceUnderwrittingCaseManagementRequest)
                     }
-
                     elementos = recibidosNetinsurance
-
                     break
 
-                case "simplefr":
-
+                case TipoCompany.MALAKOFF_MEDERIC:
                     List<com.scortelemed.schemas.simplefr.SimplefrUnderwrittingCaseManagementRequest> recibidosSimplefr = new ArrayList<com.scortelemed.schemas.simplefr.SimplefrUnderwrittingCaseManagementRequest>()
 
                     for (int i = 0; i < recibidos.size(); i++) {
@@ -320,13 +289,10 @@ class LogUtil {
 
                         recibidosSimplefr.add(simpleFrUnderwrittingCaseManagementRequest)
                     }
-
                     elementos = recibidosSimplefr
-
                     break
 
-                case "societegenerale":
-
+                case TipoCompany.SOCIETE_GENERALE:
                     List<com.scortelemed.schemas.societegenerale.SocieteGeneraleUnderwrittingCaseManagementRequest> recibidosSocieteGenerale = new ArrayList<com.scortelemed.schemas.societegenerale.SocieteGeneraleUnderwrittingCaseManagementRequest>()
 
                     for (int i = 0; i < recibidos.size(); i++) {
@@ -341,14 +307,10 @@ class LogUtil {
 
                         recibidosSocieteGenerale.add(societeGeneraleUnderwrittingCaseManagementRequest)
                     }
-
                     elementos = recibidosSocieteGenerale
-
                     break
 
-
-                case "enginyers":
-
+                case TipoCompany.ENGINYERS:
                     List<com.scortelemed.schemas.enginyers.AddExp> recibidosEnginyers = new ArrayList<com.scortelemed.schemas.enginyers.AddExp>()
 
                     for (int i = 0; i < recibidos.size(); i++) {
@@ -363,9 +325,65 @@ class LogUtil {
 
                         recibidosEnginyers.add(enginyersUnderwrittingCaseManagementRequest)
                     }
-
                     elementos = recibidosEnginyers
+                    break
 
+                case TipoCompany.METHIS_LAB:
+                    List<com.scortelemed.schemas.methislab.MethislabUnderwrittingCaseManagementRequest> recibidosMethislab = new ArrayList<com.scortelemed.schemas.methislab.MethislabUnderwrittingCaseManagementRequest>()
+
+                    for (int i = 0; i < recibidos.size(); i++) {
+
+                        JAXBContext jaxbContext = JAXBContext.newInstance(com.scortelemed.schemas.methislab.MethislabUnderwrittingCaseManagementRequest.class)
+                        Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller()
+
+                        StringReader reader = new StringReader(recibidos.get(i).info.trim())
+
+                        JAXBElement<com.scortelemed.schemas.methislab.MethislabUnderwrittingCaseManagementRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), com.scortelemed.schemas.methislab.MethislabUnderwrittingCaseManagementRequest.class)
+                        com.scortelemed.schemas.methislab.MethislabUnderwrittingCaseManagementRequest methislabUnderwrittingCaseManagementRequest = root.getValue()
+
+                        recibidosMethislab.add(methislabUnderwrittingCaseManagementRequest)
+                    }
+                    elementos = recibidosMethislab
+                    break
+
+                case TipoCompany.CBP_ITALIA:
+                    List<com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCaseManagementRequest> recibidosCbpItalia = new ArrayList<com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCaseManagementRequest>()
+
+                    for (int i = 0; i < recibidos.size(); i++) {
+
+                        JAXBContext jaxbContext = JAXBContext.newInstance(com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCaseManagementRequest.class)
+                        Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller()
+
+                        StringReader reader = new StringReader(recibidos.get(i).info.trim())
+
+                        JAXBElement<com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCaseManagementRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCaseManagementRequest.class)
+                        com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCaseManagementRequest cbpItaliaUnderwrittingCaseManagementRequest = root.getValue()
+
+                        recibidosCbpItalia.add(cbpItaliaUnderwrittingCaseManagementRequest)
+                    }
+                    elementos = recibidosCbpItalia
+                    break
+
+                case TipoCompany.CF_LIFE:
+                    List<com.scortelemed.schemas.methislabCF.MethislabCFUnderwrittingCaseManagementRequest> recibidosMethislabCF = new ArrayList<com.scortelemed.schemas.methislabCF.MethislabCFUnderwrittingCaseManagementRequest>()
+
+                    for (int i = 0; i < recibidos.size(); i++) {
+
+                        JAXBContext jaxbContext = JAXBContext.newInstance(com.scortelemed.schemas.methislabCF.MethislabCFUnderwrittingCaseManagementRequest.class)
+                        Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller()
+
+                        StringReader reader = new StringReader(recibidos.get(i).info.trim())
+
+                        JAXBElement<com.scortelemed.schemas.methislabCF.MethislabCFUnderwrittingCaseManagementRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), com.scortelemed.schemas.methislabCF.MethislabCFUnderwrittingCaseManagementRequest.class)
+                        com.scortelemed.schemas.methislabCF.MethislabCFUnderwrittingCaseManagementRequest methislabCFUnderwrittingCaseManagementRequest = root.getValue()
+
+                        recibidosMethislabCF.add(methislabCFUnderwrittingCaseManagementRequest)
+                    }
+                    elementos = recibidosMethislabCF
+                    break
+
+                default:
+                    elementos = new ArrayList<>() //Evitamos nullpointers
                     break
             }
 
@@ -400,12 +418,13 @@ class LogUtil {
 
         if (company != null) {
             List<Envio> enviados = new ArrayList<Envio>()
-
             enviados = findEnvios(desde, hasta, company, [max: max])
 
-            switch (company.nombre) {
+            TipoCompany filtro = TipoCompany.fromNombre(company.nombre)
 
-                case "caser":
+            switch (filtro) { //TODO: Revisar la tabla de producción para conocer el comportamiento de los elementos enviados
+
+                case TipoCompany.CASER:
 
                     List<EntradaDetalle> enviadosCaser = new ArrayList<EntradaDetalle>()
 
@@ -417,11 +436,7 @@ class LogUtil {
                     elementos = enviadosCaser
 
                     break
-
-            /**RECIBIDOS AMA
-             *
-             */
-                case "ama":
+                case TipoCompany.AMA:
 
                     List<com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.SaveDossierResultsE> enviadosAma = new ArrayList<com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.SaveDossierResultsE>()
 
@@ -442,7 +457,7 @@ class LogUtil {
 
                     break
 
-                case "cajamar":
+                case TipoCompany.CAJAMAR:
 
                     List<EnvioCajamar> envioadosCajamar = new ArrayList<EnvioCajamar>()
 
@@ -455,7 +470,7 @@ class LogUtil {
 
                     break
 
-                case "lagunaro":
+                case TipoCompany.LAGUN_ARO:
 
                     List<com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest> recibidosLagunaro = new ArrayList<com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest>()
 
@@ -477,7 +492,7 @@ class LogUtil {
                     break
 
 
-                case "alptis":
+                case TipoCompany.ALPTIS:
 
                     List<EnvioAlptis> envioadosAlptis = new ArrayList<EnvioAlptis>()
 
@@ -490,7 +505,7 @@ class LogUtil {
 
                     break
 
-                case "afiesca":
+                case TipoCompany.AFI_ESCA:
 
                     /**PARA AFIESCA NO HAY TRANSFORMACI�N SE RECOGEN LOS DATOS DE LA TABLA ENVIO DIRECTAMENTE
                      *
@@ -499,13 +514,29 @@ class LogUtil {
 
                     break
 
-                case "lifesquare":
+                case TipoCompany.ZEN_UP:
 
                     /**PARA LIFESQUARE NO HAY TRANSFORMACI�N SE RECOGEN LOS DATOS DE LA TABLA ENVIO DIRECTAMENTE
                      *
                      */
                     elementos = enviados
 
+                    break
+                case TipoCompany.PSN:
+                    break
+                case TipoCompany.NET_INSURANCE:
+                    break
+                case TipoCompany.MALAKOFF_MEDERIC:
+                    break
+                case TipoCompany.SOCIETE_GENERALE:
+                    break
+                case TipoCompany.METHIS_LAB:
+                    break
+                case TipoCompany.CBP_ITALIA:
+                    break
+                case TipoCompany.ENGINYERS:
+                    break
+                case TipoCompany.CF_LIFE:
                     break
             }
 
