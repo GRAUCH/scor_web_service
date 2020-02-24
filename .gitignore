@@ -6,6 +6,8 @@ scorWebservices-grailsPlugins.iml
 scorWebservices.iml
 
 .idea/
+.idea/misc.xml
+.idea/workspace.xml
 
 .slcache/
 
