@@ -437,19 +437,12 @@ class LogUtil {
                     break
                 case TipoCompany.AMA:
 
-                    List<com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.SaveDossierResultsE> enviadosAma = new ArrayList<com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.SaveDossierResultsE>()
+                    List<EnvioAMA> enviadosAma = new ArrayList<>()
 
                     for (int i = 0; i < enviados.size(); i++) {
 
-                        JAXBContext jaxbContext = JAXBContext.newInstance(com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.SaveDossierResultsE.class);
-                        Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+                        enviadosAma.add(parser.leerEnvioAMA(enviados.get(i).info.trim()));
 
-                        StringReader reader = new StringReader(enviados.get(i).info.trim());
-
-                        JAXBElement<com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.SaveDossierResultsE> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.SaveDossierResultsE.class);
-                        com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.SaveDossierResultsE saveDossierResultsE = root.getValue();
-
-                        enviadosAma.add(saveDossierResultsE)
                     }
 
                     elementos = enviadosAma

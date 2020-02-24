@@ -1,12 +1,17 @@
 package hwsol.webservices
 
+import javax.xml.bind.Unmarshaller
+import javax.xml.transform.stream.StreamSource
 import java.text.SimpleDateFormat
 import javax.xml.bind.JAXBContext
 import javax.xml.bind.JAXBElement
-import javax.xml.bind.Marshaller
-import javax.xml.namespace.QName
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
+
+//AMA
+import com.scortelemed.schemas.ama.ResultadoSiniestroRequest
+import com.scortelemed.schemas.ama.ConsultaExpedienteRequest
+
 
 import org.w3c.dom.Document
 import org.w3c.dom.Element
@@ -15,6 +20,76 @@ import org.w3c.dom.NodeList
 import org.xml.sax.InputSource
 
 class Parser {
+
+	/**
+	 * Método principal para leer envíos de AMA
+	 * @param String entrada
+	 * @return EnvioAMA (Expediente, Siniestro u Otro
+	 */
+	EnvioAMA leerEnvioAMA(String entrada) {
+		EnvioAMA salida = new EnvioAMA()
+		if (entrada != null) {
+			if (entrada.charAt(0) == '<') {
+				if (entrada.contains("ConsultaExpedienteRequest")) {
+					ConsultaExpedienteRequest expediente = jaxbParserExpedienteAma(entrada)
+					salida.setExpediente(expediente)
+				} else if (entrada.contains("ResultadoSiniestroRequest")) {
+					ResultadoSiniestroRequest siniestro = jaxbParserSiniestroAma(entrada)
+					salida.setSiniestro(siniestro)
+				}
+			} else {
+				salida = getEnvioAMA(entrada)
+			}
+		}
+		return salida
+	}
+
+
+	private ConsultaExpedienteRequest jaxbParserExpedienteAma(String entrada) {
+		ConsultaExpedienteRequest salida = null
+		if(entrada != null && entrada.length() > 0) {
+
+			JAXBContext jaxbContext = JAXBContext.newInstance(ConsultaExpedienteRequest.class)
+			Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller()
+
+			StringReader reader = new StringReader(entrada)
+
+			JAXBElement<ConsultaExpedienteRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), ConsultaExpedienteRequest.class)
+			salida = root.getValue()
+		}
+		return salida;
+	}
+
+	private ResultadoSiniestroRequest jaxbParserSiniestroAma(String entrada) {
+		ResultadoSiniestroRequest salida = null
+		if(entrada != null && entrada.length() > 0) {
+
+			JAXBContext jaxbContext = JAXBContext.newInstance(ResultadoSiniestroRequest.class)
+			Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller()
+
+			StringReader reader = new StringReader(entrada)
+
+			JAXBElement<ResultadoSiniestroRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), ResultadoSiniestroRequest.class)
+			salida = root.getValue()
+		}
+		return salida;
+	}
+
+	private EnvioAMA getEnvioAMA(String entrada) {
+		EnvioAMA salida = new EnvioAMA()
+		if(entrada != null) {
+			String[] params = entrada.trim().replace("-",":").split(":")
+			if(params != null && params.length == 4) {
+				salida.setEstado(params[1].trim())
+				salida.setRespuesta(params[3].trim())
+			}
+		}
+		return salida
+	}
+
+	/*********
+	 FINAL AMA
+	 *********/
 
 
 	public EntradaDetalle leerEnvioCaser(String salida){
@@ -226,6 +301,86 @@ class Parser {
 		return entradaDetalle
 	}
 
+	private groovy.util.NodeList getNodeListByTagName(String entrada) {
+		def list = new XmlParser().parseText(entrada)
+		assert list instanceof groovy.util.Node
+		return list
+	}
+
+	private EnvioAMA getEnvioAMAByNodeList(groovy.util.NodeList entrada) {
+		EnvioAMA salida = new EnvioAMA()
+		for (Node actual:list) {
+			if(actual.hasChildNodes()) {
+				salida.numExpediente = actual.getFirstChild().nodeValue
+			}
+		}
+	}
+
+	private String getElementByTagName(groovy.util.NodeList list, String tag)  {
+		for (Node actual:list) {
+			actual
+				if (eElement.getElementsByTagName(tag).item(0) != null) {
+					return eElement.getElementsByTagName(tag).item(0).getTextContent()
+					break
+				}
+
+
+		}
+	}
+
+	private <T> T jaxbParser(String entrada) {
+		T salida = null
+		if(entrada != null && entrada.length() > 0) {
+
+			JAXBContext jaxbContext = JAXBContext.newInstance(salida.getClass())
+			Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller()
+
+			StringReader reader = new StringReader(entrada)
+
+			JAXBElement<T> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), salida.getClass())
+			salida = root.getValue()
+		}
+		return salida;
+	}
+
+
+
+		private EnvioAMA getEnvioGroovy(String entrada) {
+		EnvioAMA salida = new EnvioAMA()
+		def list = new XmlParser().parseText(entrada)
+		def children = list.children()
+		List bucle = children.asList()
+		for (groovy.util.Node actual:bucle) {
+			if(actual.value() != null && !actual.value().toString().equalsIgnoreCase("[]")) {
+				if(actual.name().toString().contains("numExpediente")) {
+					salida.setExpediente(actual.value())
+				} else if(actual.name().toString().contains("numSolicitud")) {
+					salida.setSolicitud(actual.value())
+				} else if(actual.name().toString().contains("numSumplemento")) {
+					salida.setSumplemento(actual.value())
+				} else if(actual.name().toString().contains("DateStart")) {
+					salida.setFechaComienzo(actual.value())
+				} else if(actual.name().toString().contains("DateEnd")) {
+					salida.setFechaFin(actual.value())
+				}
+			}
+		}
+		return salida
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	private String tratarXmlAlptis(String entrada) {
 		/**EL XML A TRATAR ESTA MAL FORMADO. TENEMOS QUE SELECCIONAR EL FRAGMENTO QUE QUEREMOS PARA SACAR LOS DATOS.
 		 *
@@ -234,21 +389,21 @@ class Parser {
 		int startIndex = 0
 		int endIndex = 0
 		def toBeReplaced = ""
-		
+
 		def xml = entrada.substring(entrada.indexOf("<generalData>"), entrada.indexOf("</generalData>")+"</generalData>".length())
 
 		if (startIndex != -1){
-		
+
 			startIndex = xml.indexOf("<contractedBenefits>")
 			endIndex = xml.indexOf("</contractedBenefits>")+"</contractedBenefits>".length()
 			toBeReplaced = xml.substring(startIndex, endIndex)
 		}
 
-		
+
 		def xml2 = xml.replace(toBeReplaced, "")
 
 		startIndex = xml2.indexOf("<crmQuestions>")
-		
+
 		if (startIndex != -1){
 			endIndex = xml2.indexOf("</crmQuestions>")+"</crmQuestions>".length()
 			toBeReplaced = xml2.substring(startIndex, endIndex);
@@ -258,4 +413,5 @@ class Parser {
 
 		return "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>"+xml3
 	}
+
 }

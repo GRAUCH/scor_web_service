@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="BookmarkManager">
+    <bookmark url="file://$PROJECT_DIR$/src/groovy/hwsol/webservices/LogUtil.groovy" line="534" />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="2ff4b833-ac99-457b-9225-f9b316241f4d" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/groovy/hwsol/webservices/EnvioAMA.groovy" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/grails-app/views/comunicacion/listaEnviadosama.gsp" beforeDir="false" afterPath="$PROJECT_DIR$/grails-app/views/comunicacion/listaEnviadosama.gsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/groovy/hwsol/webservices/LogUtil.groovy" beforeDir="false" afterPath="$PROJECT_DIR$/src/groovy/hwsol/webservices/LogUtil.groovy" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/groovy/hwsol/webservices/Parser.groovy" beforeDir="false" afterPath="$PROJECT_DIR$/src/groovy/hwsol/webservices/Parser.groovy" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$USER_HOME$/.grails/" />
@@ -28,85 +33,104 @@
     <expand />
     <select />
   </component>
+  <component name="FavoritesManager">
+    <favorites_list name="scorWebservices" />
+    <favorites_list name="Variables" />
+  </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/CajamarService.groovy">
+        <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/webservices/LogUtil.groovy">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3077">
-              <caret line="205" selection-start-line="205" selection-end-line="205" />
+            <state relative-caret-position="314">
+              <caret line="447" selection-start-line="447" selection-end-line="447" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/grails-app/services/services/MethislabCFUnderwrittingCaseManagementService.groovy">
+        <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/webservices/EnvioAMA.groovy">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="85">
+              <caret line="5" column="14" selection-start-line="5" selection-start-column="14" selection-end-line="5" selection-end-column="14" />
+              <folding>
+                <element signature="e#27#87#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="jar://C:/Program Files/Java/jdk1.8.0_221/src.zip!/javax/xml/datatype/XMLGregorianCalendar.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-2201">
+              <caret line="182" column="22" selection-start-line="182" selection-start-column="22" selection-end-line="182" selection-end-column="22" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/webservices/EnvioCajamar.groovy">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="102">
-              <caret line="28" column="6" selection-start-line="28" selection-start-column="6" selection-end-line="28" selection-end-column="6" />
+              <caret line="6" selection-start-line="6" selection-end-line="7" selection-end-column="23" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/grails-app/controllers/com/scortelemed/RequestController.groovy">
+        <entry file="jar://C:/Grails/grails-2.5.0/lib/org.springframework/spring-webmvc/jars/spring-webmvc-4.1.5.RELEASE.jar!/org/springframework/web/servlet/FrameworkServlet.class">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="7361">
-              <caret line="457" column="43" selection-start-line="457" selection-start-column="31" selection-end-line="457" selection-end-column="43" />
+            <state relative-caret-position="60">
+              <caret line="472" column="33" selection-start-line="472" selection-start-column="12" selection-end-line="472" selection-end-column="33" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/webservices/Parser.groovy">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="168">
+              <caret line="63" selection-start-line="63" selection-end-line="63" />
+              <folding>
+                <element signature="e#27#61#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/java/com/scortelemed/schemas/ama/ConsultaExpedienteRequest.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="154">
+              <caret line="33" column="20" lean-forward="true" selection-start-line="33" selection-start-column="20" selection-end-line="33" selection-end-column="20" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/java/com/scortelemed/schemas/ama/ResultadoSiniestroRequest.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="527">
+              <caret line="36" column="38" selection-start-line="36" selection-start-column="13" selection-end-line="36" selection-end-column="38" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/grails-app/controllers/com/scortelemed/DashboardController.groovy">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="315">
+              <caret line="61" selection-start-line="61" selection-end-line="61" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/.gitignore">
+        <entry file="file://$PROJECT_DIR$/grails-app/views/comunicacion/listaEnviadosama.gsp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="102">
-              <caret line="6" lean-forward="true" selection-start-line="6" selection-end-line="6" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/CaserService.groovy">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="629">
-              <caret line="66" column="54" selection-start-line="66" selection-start-column="54" selection-end-line="66" selection-end-column="54" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/TarificadorService.groovy">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3570">
-              <caret line="227" column="8" selection-start-line="227" selection-start-column="8" selection-end-line="227" selection-end-column="8" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/grails-app/controllers/com/scortelemed/RequestmapController.groovy">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="68">
-              <caret line="8" column="6" selection-start-line="8" selection-start-column="6" selection-end-line="8" selection-end-column="6" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/grails-app/controllers/com/scortelemed/WebserviceController.groovy">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="68">
-              <caret line="6" column="6" selection-start-line="6" selection-start-column="6" selection-end-line="6" selection-end-column="6" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/grails-app/controllers/com/scortelemed/WsController.groovy">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="187">
-              <caret line="40" selection-start-line="40" selection-end-line="40" />
+            <state relative-caret-position="416">
+              <caret line="71" column="74" selection-start-line="71" selection-start-column="74" selection-end-line="71" selection-end-column="74" />
             </state>
           </provider>
         </entry>
@@ -124,7 +148,18 @@
       <find>CASER</find>
       <find>Caser</find>
       <find>caserService</find>
+      <find>elementos</find>
+      <find>com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.</find>
+      <find>Gregorian</find>
+      <find>ResultadoSiniestroRequest</find>
+      <find>ConsultaExpedienteRequest</find>
+      <find>com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCaseManagementRequest</find>
+      <find>obtenerEnviados</find>
     </findStrings>
+    <replaceStrings>
+      <replace>currentClass</replace>
+      <replace>T</replace>
+    </replaceStrings>
     <dirStrings>
       <dir>C:\git\scorWebservices</dir>
     </dirStrings>
@@ -146,6 +181,11 @@
         <option value="$PROJECT_DIR$/grails-app/conf/Config.groovy" />
         <option value="$PROJECT_DIR$/grails-app/conf/DataSource.groovy" />
         <option value="$PROJECT_DIR$/.gitignore" />
+        <option value="$PROJECT_DIR$/src/groovy/hwsol/webservices/LogUtil.groovy" />
+        <option value="$PROJECT_DIR$/src/groovy/hwsol/webservices/EnvioCajamar.groovy" />
+        <option value="$PROJECT_DIR$/src/groovy/hwsol/webservices/EnvioAMA.groovy" />
+        <option value="$PROJECT_DIR$/src/groovy/hwsol/webservices/Parser.groovy" />
+        <option value="$PROJECT_DIR$/grails-app/views/comunicacion/listaEnviadosama.gsp" />
       </list>
     </option>
   </component>
@@ -161,10 +201,10 @@
     </packageJsonPaths>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="1922" />
-    <option name="y" value="-1010" />
-    <option name="width" value="1616" />
-    <option name="height" value="876" />
+    <option name="x" value="898" />
+    <option name="y" value="-796" />
+    <option name="width" value="717" />
+    <option name="height" value="396" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -178,6 +218,30 @@
             <path>
               <item name="scorWebservices" type="b2602c69:ProjectViewProjectNode" />
               <item name="scorWebservices" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="scorWebservices" type="b2602c69:ProjectViewProjectNode" />
+              <item name="scorWebservices" type="462c0819:PsiDirectoryNode" />
+              <item name="grails-app" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="scorWebservices" type="b2602c69:ProjectViewProjectNode" />
+              <item name="scorWebservices" type="462c0819:PsiDirectoryNode" />
+              <item name="grails-app" type="462c0819:PsiDirectoryNode" />
+              <item name="services" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="scorWebservices" type="b2602c69:ProjectViewProjectNode" />
+              <item name="scorWebservices" type="462c0819:PsiDirectoryNode" />
+              <item name="grails-app" type="462c0819:PsiDirectoryNode" />
+              <item name="views" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="scorWebservices" type="b2602c69:ProjectViewProjectNode" />
+              <item name="scorWebservices" type="462c0819:PsiDirectoryNode" />
+              <item name="grails-app" type="462c0819:PsiDirectoryNode" />
+              <item name="views" type="462c0819:PsiDirectoryNode" />
+              <item name="comunicacion" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -218,10 +282,15 @@
     <property name="DatabaseDriversLRU" value="mysql" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1581434263349" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1582561118008" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.0" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="hwsol.webservices" />
+    </key>
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -262,30 +331,30 @@
       <workItem from="1581418977211" duration="647000" />
       <workItem from="1581420873176" duration="4154000" />
       <workItem from="1582538306401" duration="2000" />
-      <workItem from="1582538317988" duration="121000" />
+      <workItem from="1582538317988" duration="19825000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="6532000" />
+    <option name="totallyTimeSpent" value="26236000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="1922" y="-1010" width="1616" height="876" extended-state="6" />
+    <frame x="2" y="-1088" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.17480719" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49918434" visible="true" weight="0.14498934" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info id="Persistence" order="2" side_tool="true" />
+      <window_info id="Persistence" order="2" side_tool="true" weight="0.32995737" />
       <window_info id="Designer" order="3" />
       <window_info id="Image Layers" order="4" />
       <window_info id="UI Designer" order="5" />
-      <window_info id="Favorites" order="6" side_tool="true" />
+      <window_info id="Favorites" order="6" sideWeight="0.5008157" side_tool="true" visible="true" weight="0.14498934" />
       <window_info id="Capture Tool" order="7" />
-      <window_info id="Web" order="8" side_tool="true" />
+      <window_info id="Web" order="8" side_tool="true" weight="0.32995737" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
       <window_info anchor="bottom" id="Run" order="2" />
-      <window_info anchor="bottom" id="Debug" order="3" visible="true" weight="0.335141" />
+      <window_info active="true" anchor="bottom" id="Debug" order="3" visible="true" weight="0.335141" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -297,16 +366,17 @@
       <window_info anchor="bottom" id="Database Changes" order="12" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="13" weight="0.14326242" />
       <window_info anchor="bottom" id="Messages" order="14" weight="0.329718" />
+      <window_info anchor="right" id="CDI" weight="0.32995737" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="right" id="Palette" order="3" />
       <window_info anchor="right" id="Capture Analysis" order="4" />
       <window_info anchor="right" id="Maven Projects" order="5" />
-      <window_info anchor="right" id="Database" order="6" visible="true" weight="0.16452442" />
+      <window_info anchor="right" id="Database" order="6" weight="0.13646056" />
       <window_info anchor="right" id="Palette&#9;" order="7" />
       <window_info anchor="right" id="Theme Preview" order="8" />
-      <window_info anchor="right" id="Bean Validation" order="9" />
+      <window_info anchor="right" id="Bean Validation" order="9" weight="0.32995737" />
     </layout>
     <layout-to-restore>
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.26979867" />
@@ -349,6 +419,94 @@
   </component>
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/groovy/hwsol/webservices/Parser.groovy</url>
+          <line>319</line>
+          <properties />
+          <option name="timeStamp" value="13" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/groovy/hwsol/webservices/Parser.groovy</url>
+          <line>96</line>
+          <properties />
+          <option name="timeStamp" value="17" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/groovy/hwsol/webservices/Parser.groovy</url>
+          <line>111</line>
+          <properties />
+          <option name="timeStamp" value="19" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/groovy/hwsol/webservices/Parser.groovy</url>
+          <line>304</line>
+          <properties />
+          <option name="timeStamp" value="21" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/groovy/hwsol/webservices/Parser.groovy</url>
+          <line>310</line>
+          <properties />
+          <option name="timeStamp" value="25" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/views/comunicacion/listaEnviadosama.gsp</url>
+          <line>57</line>
+          <properties />
+          <option name="timeStamp" value="36" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/groovy/hwsol/webservices/Parser.groovy</url>
+          <line>331</line>
+          <properties />
+          <option name="timeStamp" value="43" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/groovy/hwsol/webservices/Parser.groovy</url>
+          <line>334</line>
+          <properties />
+          <option name="timeStamp" value="44" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="debuggerHistoryManager">
+    <expressions id="evaluateExpression">
+      <expression>
+        <expression-string>salida.getClass()</expression-string>
+        <language-id>Groovy</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>T</expression-string>
+        <language-id>Groovy</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>&quot;listaEnviados&quot; + nombre + &quot;.gsp&quot;</expression-string>
+        <language-id>Groovy</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>actual.value().toString()</expression-string>
+        <language-id>Groovy</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>actual.value().toString().length()</expression-string>
+        <language-id>Groovy</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>actual.value().toString().length() &gt; 0</expression-string>
+        <language-id>Groovy</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+    </expressions>
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/grails-app/conf/Config.groovy">
@@ -414,13 +572,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/grails-app/controllers/com/scortelemed/WsController.groovy">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="40" selection-start-line="40" selection-end-line="40" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/grails-app/services/services/MethislabCFUnderwrittingCaseManagementService.groovy">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="102">
@@ -430,8 +581,225 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="238">
+          <caret line="14" lean-forward="true" selection-start-line="14" selection-end-line="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grails-app/controllers/com/scortelemed/WsController.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-15137">
+          <caret line="40" selection-start-line="40" selection-end-line="40" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grails-app/controllers/com/scortelemed/LogOutController.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="4" column="6" selection-start-line="4" selection-start-column="6" selection-end-line="4" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$PROJECT_DIR$/lib/Client_CRM_Ama_.jar!/com/amaseguros/amascortelemed_ws/webservices/DossierDataStoreWSStub.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="281">
+          <caret line="4385" column="47" selection-start-line="4385" selection-start-column="26" selection-end-line="4385" selection-end-column="47" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/webservices/EntradaDetalle.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="21" selection-start-column="21" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://C:/Program Files/Java/jdk1.8.0_221/src.zip!/javax/xml/bind/Unmarshaller.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="553">
+          <caret line="408" column="17" selection-start-line="408" selection-start-column="17" selection-end-line="408" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://C:/Program Files/Java/jdk1.8.0_221/src.zip!/org/w3c/dom/NodeList.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="196">
+          <caret line="51" column="17" selection-start-line="51" selection-start-column="17" selection-end-line="51" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/webservices/EnvioAlptis.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="34">
+          <caret line="2" column="6" selection-start-line="2" selection-start-column="6" selection-end-line="2" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://C:/Program Files/Java/jdk1.8.0_221/src.zip!/javax/xml/bind/JAXBElement.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="196">
+          <caret line="159" column="13" selection-start-line="159" selection-start-column="13" selection-end-line="159" selection-end-column="13" />
+          <folding>
+            <element signature="e#4871#4872#0" expanded="true" />
+            <element signature="e#4899#4900#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grails-app/services/com/ws/servicios/LogginService.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="51">
+          <caret line="7" column="6" selection-start-line="7" selection-start-column="6" selection-end-line="7" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://C:/Program Files/Java/jdk1.8.0_221/jre/lib/rt.jar!/sun/reflect/DelegatingMethodAccessorImpl.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="153">
+          <caret line="13" column="25" lean-forward="true" selection-start-line="13" selection-start-column="25" selection-end-line="13" selection-end-column="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://C:/Program Files/Java/jdk1.8.0_221/src.zip!/java/lang/String.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="196">
+          <caret line="2131" column="38" selection-start-line="2131" selection-start-column="38" selection-end-line="2131" selection-end-column="38" />
+          <folding>
+            <element signature="e#82971#82972#0" expanded="true" />
+            <element signature="e#83020#83021#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://C:/Grails/grails-2.5.0/lib/org.codehaus.groovy/groovy-all/jars/groovy-all-2.4.3-sources.jar!/groovy/util/Node.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1564">
+          <caret line="126" column="7" selection-start-line="126" selection-start-column="7" selection-end-line="126" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://C:/Grails/grails-2.5.0/lib/org.springframework/spring-webmvc/jars/spring-webmvc-4.1.5.RELEASE.jar!/org/springframework/web/servlet/mvc/SimpleControllerHandlerAdapter.class">
+      <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="102">
-          <caret line="6" lean-forward="true" selection-start-line="6" selection-end-line="6" />
+          <caret line="12" column="71" selection-start-line="12" selection-start-column="70" selection-end-line="12" selection-end-column="71" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/target/work/plugins/cache-1.1.8/src/java/grails/plugin/cache/web/filter/PageFragmentCachingFilter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="188">
+          <caret line="198" selection-start-line="198" selection-end-line="198" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/target/work/plugins/cache-1.1.8/src/java/grails/plugin/cache/web/filter/AbstractFilter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="358">
+          <caret line="71" selection-start-line="71" selection-end-line="71" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://C:/Grails/grails-2.5.0/lib/org.springframework/spring-web/jars/spring-web-4.1.5.RELEASE-sources.jar!/org/springframework/web/filter/DelegatingFilterProxy.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="188">
+          <caret line="261" selection-start-line="261" selection-end-line="261" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://C:/Grails/grails-2.5.0/lib/org.springframework/spring-web/jars/spring-web-4.1.5.RELEASE-sources.jar!/org/springframework/web/filter/OncePerRequestFilter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="417">
+          <caret line="113" selection-start-line="113" selection-end-line="113" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://C:/Program Files/Java/jdk1.8.0_221/src.zip!/org/w3c/dom/Element.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="34">
+          <caret line="41" column="20" lean-forward="true" selection-start-line="41" selection-start-column="20" selection-end-line="41" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://C:/Grails/grails-2.5.0/lib/org.springframework/spring-webmvc/jars/spring-webmvc-4.1.5.RELEASE.jar!/org/springframework/web/servlet/DispatcherServlet.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="153">
+          <caret line="392" column="36" lean-forward="true" selection-start-line="392" selection-start-column="36" selection-end-line="392" selection-end-column="36" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/webservices/EnvioCajamar.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="6" selection-start-line="6" selection-end-line="7" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/webservices/EnvioAMA.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="85">
+          <caret line="5" column="14" selection-start-line="5" selection-start-column="14" selection-end-line="5" selection-end-column="14" />
+          <folding>
+            <element signature="e#27#87#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://C:/Program Files/Java/jdk1.8.0_221/src.zip!/javax/xml/datatype/XMLGregorianCalendar.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2201">
+          <caret line="182" column="22" selection-start-line="182" selection-start-column="22" selection-end-line="182" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grails-app/controllers/com/scortelemed/DashboardController.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="315">
+          <caret line="61" selection-start-line="61" selection-end-line="61" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/java/com/scortelemed/schemas/ama/ResultadoSiniestroRequest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="527">
+          <caret line="36" column="38" selection-start-line="36" selection-start-column="13" selection-end-line="36" selection-end-column="38" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/webservices/Parser.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="168">
+          <caret line="63" selection-start-line="63" selection-end-line="63" />
+          <folding>
+            <element signature="e#27#61#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/webservices/LogUtil.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="314">
+          <caret line="447" selection-start-line="447" selection-end-line="447" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://C:/Grails/grails-2.5.0/lib/org.springframework/spring-webmvc/jars/spring-webmvc-4.1.5.RELEASE.jar!/org/springframework/web/servlet/FrameworkServlet.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="472" column="33" selection-start-line="472" selection-start-column="12" selection-end-line="472" selection-end-column="33" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/java/com/scortelemed/schemas/ama/ConsultaExpedienteRequest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="154">
+          <caret line="33" column="20" lean-forward="true" selection-start-line="33" selection-start-column="20" selection-end-line="33" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grails-app/views/comunicacion/listaEnviadosama.gsp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="416">
+          <caret line="71" column="74" selection-start-line="71" selection-start-column="74" selection-end-line="71" selection-end-column="74" />
         </state>
       </provider>
     </entry>
@@ -493,6 +861,7 @@
       </state>
       <state key="GlobalLibrariesConfigurable.UI">
         <settings>
+          <last-edited>grails-2.5.0</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>

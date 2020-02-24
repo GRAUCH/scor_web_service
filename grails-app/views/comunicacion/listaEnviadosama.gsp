@@ -22,59 +22,66 @@
 								aria-label="Rendering engine: activate to sort column descending"
 								aria-sort="ascending" style="width: 25%;" colspan="1"
 								rowspan="1" aria-controls="example" tabindex="0"
-								role="columnheader" class="sorting_asc">Nombre</th>
+								role="columnheader" class="sorting_asc">Tipo de dato</th>
+							<th aria-label="Platform(s): activate to sort column ascending"
+								style="width: 20%;" colspan="1" rowspan="1"
+								aria-controls="example" tabindex="0" role="columnheader"
+								class="sorting">Expediente</th>
 							<th aria-label="Browser: activate to sort column ascending"
 								style="width: 5%;" colspan="1" rowspan="1"
 								aria-controls="example" tabindex="0" role="columnheader"
-								class="sorting">Gender</th>
+								class="sorting">Solicitud</th>
 							<th aria-label="Platform(s): activate to sort column ascending"
 								style="width: 5%;" colspan="1" rowspan="1"
 								aria-controls="example" tabindex="0" role="columnheader"
-								class="sorting">Nacimiento</th>
+								class="sorting">Suplemento</th>
 							<th aria-label="Platform(s): activate to sort column ascending"
 								style="width: 5%;" colspan="1" rowspan="1"
 								aria-controls="example" tabindex="0" role="columnheader"
-								class="sorting">Expediente</th>
+								class="sorting">Fecha Inicio</th>
 							<th aria-label="Platform(s): activate to sort column ascending"
 								style="width: 5%;" colspan="1" rowspan="1"
 								aria-controls="example" tabindex="0" role="columnheader"
-								class="sorting">Producto</th>
+								class="sorting">Fecha fin</th>
 							<th aria-label="Platform(s): activate to sort column ascending"
-									style="width: 20%;" colspan="1" rowspan="1"
-									aria-controls="example" tabindex="0" role="columnheader"
-									class="sorting">Coberturas</th>
+								style="width: 20%;" colspan="1" rowspan="1"
+								aria-controls="example" tabindex="0" role="columnheader"
+								class="sorting">Estado</th>
+							<th aria-label="Platform(s): activate to sort column ascending"
+								style="width: 20%;" colspan="1" rowspan="1"
+								aria-controls="example" tabindex="0" role="columnheader"
+								class="sorting">Respuesta</th>
 						</tr>
 					</thead>
 
 					<tbody aria-relevant="all" aria-live="polite" role="alert">
 						<g:each in="${elementos}" var="elemento" status="i">
 							<tr class="\${(i % 2) == 0 ? 'gradeA even' : 'gradeA odd'}">
-								<td>
-									${elemento?.localSaveDossierResults?.localDossierResultsIN?.localDossier?.localCandidate?.localFullName}
-								</td>
-								<td><g:if
-										test="${elemento?.localSaveDossierResults?.localDossierResultsIN?.localDossier?.localCandidate?.localGender == 2}">
-										MUJER
+								<td><g:if test="${elemento?.siniestro != null}">
+										SINIESTRO
 									</g:if> <g:else>
-										HOMBRE
+										EXPEDIENTE
 									</g:else></td>
-								<td><g:if
-										test="${elemento?.localSaveDossierResults?.localDossierResultsIN?.localDossier?.localCandidate?.localBirthDate?.time != null}">
-										<g:formatDate format="yyyy-MM-dd"
-											date="${elemento?.localSaveDossierResults?.localDossierResultsIN?.localDossier?.localCandidate?.localBirthDate?.time}" />
-									</g:if></td>
 								<td>
-									${elemento?.localSaveDossierResults?.localDossierResultsIN?.localDossier?.localDossierCode}
+									${elemento?.expediente?.numExpediente}
 								</td>
 								<td>
-									${elemento?.localSaveDossierResults?.localDossierResultsIN?.localDossier?.localProduct?.localProductCode}
+									${elemento?.expediente?.numSolicitud}
 								</td>
 								<td>
-									<g:each
-									in="${elemento?.localSaveDossierResults?.localDossierResultsIN?.localBenefitsInformationsList}"
-									var="cobertura" status="j">
-										${cobertura.localBenefitCode} - ${cobertura.localBenefitResultType} 
-									</g:each>
+									${elemento?.expediente?.numSumplemento}
+								</td>
+								<td>
+									${elemento?.siniestro?.dateStart}
+								</td>
+								<td>
+									${elemento?.siniestro?.dateEnd}
+								</td>
+								<td>
+									${elemento?.estado}
+								</td>
+								<td>
+									${elemento?.respuesta}
 								</td>
 							</tr>
 						</g:each>
