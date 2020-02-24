@@ -588,14 +588,14 @@ class WsController {
         def coberturas = []
 
         AmaService amaService = new AmaService()
-        List<RespuestaCRMInforme> expedientesInforme = new ArrayList<RespuestaCRMInforme>();
+        List<RespuestaCRMInforme> expedientesInforme = new ArrayList<RespuestaCRMInforme>()
         List<Expediente> expedientes = new ArrayList<Expediente>()
         List<Cita> citas = new ArrayList<Cita>()
         List<Actividad> actividades = new ArrayList<Actividad>()
         List<File> files = new ArrayList<File>()
         DossierDataStoreWSStub stub
         SaveDossierResultsResponseE respuestaCRM = new SaveDossierResultsResponseE()
-        List<BenefitInformation> listaBenefitInformation = new ArrayList<BenefitInformation>();
+        List<BenefitInformation> listaBenefitInformation = new ArrayList<BenefitInformation>()
 
         //EJEMPLO DE URL:
         //http://localhost:8080/scorWebservice/ws/caseresultAma?ini=20171107 00:00:00&fin=20171107 23:59:59
@@ -612,7 +612,7 @@ class WsController {
                 fechaIni = URLDecoder.decode(params.ini.trim(), "ISO-8859-1")
                 fechaFin = URLDecoder.decode(params.fin.trim(), "ISO-8859-1")
             } else {
-                Calendar fecha = Calendar.getInstance();
+                Calendar fecha = Calendar.getInstance()
                 fecha.add(Calendar.MINUTE, -60)
                 fechaFin = fecha.getTime().format('yyyyMMdd HH:mm')
                 fechaFin = fechaFin.toString() + ":59"
@@ -622,15 +622,17 @@ class WsController {
                 fechaIni = fechaIni.toString() + ":00"
             }
 
-            if (!Environment.current.name.equals("production_wildfly")) {
+            if (Environment.current.name.equals("production_wildfly")) {
                 for (int i = 1; i < 3; i++) {
+                    //Ambas son companias de AMA en Produccion.
                     expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1059", null, i, fechaIni, fechaFin, "ES"))
-                    expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1064", null, i, fechaIni, fechaFin, "ES"))
+                    expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1065", null, i, fechaIni, fechaFin, "ES"))
                 }
             } else {
                 for (int i = 1; i < 3; i++) {
+                    //Ambas son companias de AMA en PRE PRODUCCION.
                     expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1059", null, i, fechaIni, fechaFin, "ES"))
-                    expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1065", null, i, fechaIni, fechaFin, "ES"))
+                    expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1064", null, i, fechaIni, fechaFin, "ES"))
                 }
             }
 
@@ -653,28 +655,21 @@ class WsController {
             long timeout = 3 * 60 * 1000; // Tres minuitos
             stub._getServiceClient().getOptions().setTimeOutInMilliSeconds(timeout);
 
-            Dossier dossier = new Dossier();
-            DossierDataStoreWSStub.SaveDossierResultsE resultsE = new DossierDataStoreWSStub.SaveDossierResultsE();
-            DossierDataStoreWSStub.SaveDossierResults saveResult = new DossierDataStoreWSStub.SaveDossierResults();
-            DossierDataStoreWSStub.DossierResultsIN saveResultIN = new DossierDataStoreWSStub.DossierResultsIN();
+            Dossier dossier = new Dossier()
+            DossierDataStoreWSStub.SaveDossierResultsE resultsE = new DossierDataStoreWSStub.SaveDossierResultsE()
+            DossierDataStoreWSStub.SaveDossierResults saveResult = new DossierDataStoreWSStub.SaveDossierResults()
+            DossierDataStoreWSStub.DossierResultsIN saveResultIN = new DossierDataStoreWSStub.DossierResultsIN()
 
             if (expedientes) {
-
                 for (int i = 0; i < expedientes.size(); i++) {
-
-
                     try {
-
 
                         expediente = expedientes.get(i)
 
                         if (!amaService.seExcluyeEnvio(expediente)) {
-
                             identificadorCaso = expediente.getNumSolicitud()
-
                             files = new ArrayList<File>()
                             listaBenefitInformation = new ArrayList<BenefitInformation>();
-
                             dossier.setDossierCode(expediente.getNumSolicitud())
                             dossier.setResultsCode("OK")
                             dossier.setState((short) 1)
@@ -723,10 +718,10 @@ class WsController {
                                 } else {
                                     producto.setProductCode(expediente.getProducto().getCodigoProductoCompanya())
                                 }
-                                producto.setProductDescription(expediente.getProducto().getNombre());
+                                producto.setProductDescription(expediente.getProducto().getNombre())
                             } else {
                                 producto.setProductCode("")
-                                producto.setProductDescription("");
+                                producto.setProductDescription("")
                             }
 
                             dossier.setProduct(producto)
@@ -886,7 +881,7 @@ class WsController {
 
                                     listaBenefitInformation.add(benefitInformation)
                                 }
-
+                                logginService.putInfoMessage("Agrego ZIP")
                                 byte[] compressedData = tarificadorService.obtenerZip(expediente.getNodoAlfresco())
 
                                 File file = new File()

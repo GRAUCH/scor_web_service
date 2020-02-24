@@ -55,7 +55,7 @@ class NetinsuranceService {
 	GenerarZip generarZip = new GenerarZip()
 	def grailsApplication
 
-	public def rellenaDatosSalidaConsulta(servicios.Expediente expedientePoliza, requestDate, logginService) {
+	 def rellenaDatosSalidaConsulta(servicios.Expediente expedientePoliza, requestDate, logginService) {
 
 
 		Expediente expediente = new Expediente()
@@ -408,7 +408,7 @@ class NetinsuranceService {
 		}
 	}
 
-	public def rellenaDatos (req, company) {
+	 def rellenaDatos (req, company) {
 
 		def mapDatos = [:]
 		def listadoPreguntas = []
@@ -416,6 +416,7 @@ class NetinsuranceService {
 		def apellido
 		def telefono1
 		def telefono2
+		def telefono3
 		def telefonoMovil
 		def productCia
 		def nombreAgente
@@ -533,20 +534,7 @@ class NetinsuranceService {
 
 					if (eElement.getElementsByTagName("phoneNumber1").item(0) != null && eElement.getElementsByTagName("phoneNumber1").item(0).getTextContent() != null && !eElement.getElementsByTagName("phoneNumber1").item(0).getTextContent().isEmpty()) {
 
-						telefono1 = eElement.getElementsByTagName("phoneNumber1").item(0).getTextContent()
-
-						if (telefono1 != null && !telefono1.isEmpty() && (telefono1.startsWith("0039") || telefono1.startsWith("+39"))) {
-							datosRegistro.telefono1 = telefono1
-						} else if (telefono1 != null && !telefono1.isEmpty()){
-							datosRegistro.telefono1 = "0039" + telefono1
-						} else {
-							datosRegistro.telefono1 = null
-						}
-					}
-
-					if (eElement.getElementsByTagName("phoneNumber2").item(0) != null && eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent() != null && !eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent().isEmpty()) {
-
-						telefono2 = eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent()
+						telefono2 = eElement.getElementsByTagName("phoneNumber1").item(0).getTextContent()
 
 						if (telefono2 != null && !telefono2.isEmpty() && (telefono2.startsWith("0039") || telefono2.startsWith("+39"))) {
 							datosRegistro.telefono2 = telefono2
@@ -554,6 +542,19 @@ class NetinsuranceService {
 							datosRegistro.telefono2 = "0039" + telefono2
 						} else {
 							datosRegistro.telefono2 = null
+						}
+					}
+
+					if (eElement.getElementsByTagName("phoneNumber2").item(0) != null && eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent() != null && !eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent().isEmpty()) {
+
+						telefono3 = eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent()
+
+						if (telefono3 != null && !telefono3.isEmpty() && (telefono3.startsWith("0039") || telefono3.startsWith("+39"))) {
+							datosRegistro.telefono3 = telefono3
+						} else if (telefono2 != null && !telefono2.isEmpty()){
+							datosRegistro.telefono3 = "0039" + telefono3
+						} else {
+							datosRegistro.telefono3 = null
 						}
 					}
 
