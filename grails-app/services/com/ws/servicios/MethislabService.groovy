@@ -107,31 +107,31 @@ class MethislabService {
 
     def marshall(nameSpace, clase) {
 
-        StringWriter writer = new StringWriter();
+        StringWriter writer = new StringWriter()
 
         try {
 
-            JAXBContext jaxbContext = JAXBContext.newInstance(clase.class);
-            Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+            JAXBContext jaxbContext = JAXBContext.newInstance(clase.class)
+            Marshaller jaxbMarshaller = jaxbContext.createMarshaller()
 
-            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true)
             def root = null
             QName qName = null
 
             if (clase instanceof MethislabUnderwrittingCaseManagementRequest) {
-                qName = new QName(nameSpace, "MethislabUnderwrittingCaseManagementRequest");
-                root = new JAXBElement<MethislabUnderwrittingCaseManagementRequest>(qName, MethislabUnderwrittingCaseManagementRequest.class, clase);
+                qName = new QName(nameSpace, "MethislabUnderwrittingCaseManagementRequest")
+                root = new JAXBElement<MethislabUnderwrittingCaseManagementRequest>(qName, MethislabUnderwrittingCaseManagementRequest.class, clase)
             }
 
             if (clase instanceof MethislabUnderwrittingCasesResultsRequest) {
-                qName = new QName(nameSpace, "MethislabUnderwrittingCasesResultsRequest");
-                root = new JAXBElement<MethislabUnderwrittingCasesResultsRequest>(qName, MethislabUnderwrittingCasesResultsRequest.class, clase);
+                qName = new QName(nameSpace, "MethislabUnderwrittingCasesResultsRequest")
+                root = new JAXBElement<MethislabUnderwrittingCasesResultsRequest>(qName, MethislabUnderwrittingCasesResultsRequest.class, clase)
             }
 
-            jaxbMarshaller.marshal(root, writer);
-            String result = writer.toString();
+            jaxbMarshaller.marshal(root, writer)
+            String result = writer.toString()
         } finally {
-            writer.close();
+            writer.close()
         }
 
         return writer

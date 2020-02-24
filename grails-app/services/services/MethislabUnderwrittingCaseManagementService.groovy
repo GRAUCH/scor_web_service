@@ -158,15 +158,13 @@ class MethislabUnderwrittingCaseManagementService {
 		int code = 0
 
 		MethislabUnderwrittingCasesResultsResponse resultado =new MethislabUnderwrittingCasesResultsResponse()
-
 		Company company = Company.findByNombre("methislab")
 
+		def timedelay = System.currentTimeMillis()
+		logginService.putInfoEndpoint("Endpoint-" + opername + "Tiempo inicial: ", timedelay)
 		try{
-
 			Operacion operacion = estadisticasService.obtenerObjetoOperacion(opername)
-
 			logginService.putInfoMessage("Realizando proceso envio de informacion para " + company.nombre + " con fecha " + methislabUnderwrittingCasesResults.dateStart.toString() + "-" + methislabUnderwrittingCasesResults.dateEnd.toString())
-
 			if(operacion && operacion.activo ) {
 
 				if (methislabUnderwrittingCasesResults && methislabUnderwrittingCasesResults.dateStart && methislabUnderwrittingCasesResults.dateEnd){
@@ -189,16 +187,12 @@ class MethislabUnderwrittingCaseManagementService {
 					methislabService.insertarEnvio(company, methislabUnderwrittingCasesResults.dateStart.toString().substring(0,10) + "-" + methislabUnderwrittingCasesResults.dateEnd.toString().substring(0,10), requestXML.toString())
 
 					if(expedientes){
-
 						expedientes.each { expedientePoliza ->
-
 							resultado.getExpediente().add(methislabService.rellenaDatosSalidaConsulta(expedientePoliza, methislabUnderwrittingCasesResults.dateStart, logginService))
 						}
-
 						messages = "Risultati restituiti"
 						status = StatusType.OK
 						code = 3
-
 						logginService.putInfoEndpoint("ResultadoReconocimientoMedico","Peticion realizada correctamente para " + company.nombre + " con fecha: " + methislabUnderwrittingCasesResults.dateStart.toString() + "-" + methislabUnderwrittingCasesResults.dateEnd.toString())
 					}else{
 
@@ -248,7 +242,9 @@ class MethislabUnderwrittingCaseManagementService {
 		resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 		resultado.setStatus(status)
 		resultado.setCode(code)
-
+		logginService.putInfoEndpoint(opername,"Estoy devolviendo resultado ${resultado}")
+		def timeFinal = System.currentTimeMillis() - timedelay
+		logginService.putInfoEndpoint("Endpoint-"+opername +"Tiempo tiempo TOTAL: ", timeFinal)
 		return resultado
 	}
 }
