@@ -33,33 +33,22 @@ class EventIntrceptorListener extends AbstractLoggingInterceptor  {
     void handleMessage(Message message) throws Fault {
 
         String requestUri = (String)message.getExchange().getInMessage().get(Message.REQUEST_URI)
-
         def ctx = grailsApplication.mainContext
-
         def service = ctx.getBean("interceptorEventosService")
-
         Uri uri = service.getComapnyFromRequest(requestUri)
-
         Company company = Company.findByNombre(uri.getCompany())
-
         def sesion = RequestContextHolder.currentRequestAttributes().getSession()
         sesion.setAttribute("companyST",company?.codigoSt)
-
         def request = WebUtils.retrieveGrailsWebRequest().getCurrentRequest()
-        def ip = request.getRemoteAddr();
-
+        def ip = request.getRemoteAddr()
+        def host = request.getRemoteHost()
         log LOG, "$name :: Calling from " + company.getNombre() + " con ip " + ip
-
+        log LOG, "$name :: Calling from " + company.getNombre() + " con host " + host
         if (!service.validIp(company.getNombre(), ip)) {
-
             log LOG, "$name :: Forbidden: IP address rejected"
             throw new WebServiceException("Forbidden: IP address rejected")
-
         }
-
         log LOG, "$name :: IP permitida para operacion compañia " + uri.getCompany()
-
-
     }
 
     @Override
