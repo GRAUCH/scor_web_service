@@ -30,7 +30,7 @@ class TarificadorService {
     def soapAlptisRecetteWSPRO
     def soapAlptisRecetteWS
     def logginService = new LogginService()
-
+    CorreoUtil correoUtil = new CorreoUtil()
     def tarificador = { fecha ->
         def listaExpedientes = []
         try {
@@ -239,7 +239,9 @@ class TarificadorService {
             def salida = grailsApplication.mainContext.soapClientComprimidoAlptis.process(parametrosEntrada)
             return salida.datosRespuesta.content
         } catch (Exception e) {
-            logginService.putErrorMessage("No se ha podido obtener el zip del nodo : " + nodo)
+            logginService.putErrorMessage("No se ha podido obtener el zip del nodo : " + nodo + ". Error msg: "  + e.getMessage())
+            logginService.putErrorMessage("Causa : " + e.getCause())
+            correoUtil.envioEmailErrores("No se ha podido obtener el zip del nodo", "No se ha podido obtener el ZIP", e)
         }
         return response
     }
@@ -252,8 +254,9 @@ class TarificadorService {
             bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("frontal.wsdl")?.value)
             def salida = grailsApplication.mainContext.soapClientAlptis.informeExpedientes(obtenerUsuarioFrontal(arg6), arg1, arg2, arg3, arg4, arg5)
             return salida.listaExpedientesInforme
-        } catch (Exception e) {
+        } catch (Throwable e) {
             logginService.putError("obtenerInformeExpedientes", "No se ha podido obtener el informe de expediente : " + e)
+            correoUtil.envioEmailErrores("obtenerInformeExpedientes", "No se ha podido obtener el informe de expediente", e)
             return false
         }
     }
@@ -273,6 +276,7 @@ class TarificadorService {
             return salida.listaExpedientes
         } catch (Exception e) {
             logginService.putError("obtenerInformeExpedientes", "No se ha podido obtener el informe de expediente : " + e)
+            correoUtil.envioEmailErrores("obtenerInformeExpedientes", "No se ha podido obtener el informe de expediente ->   Error msg: "  + e.getMessage()+"    Causa : " + e.getCause())
             response = false
         }
     }

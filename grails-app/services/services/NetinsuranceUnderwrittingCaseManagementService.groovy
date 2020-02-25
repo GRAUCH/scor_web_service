@@ -281,11 +281,8 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 					requestService.crear(opername,requestXML)
 
 					logginService.putInfoEndpoint("ConsultaExpediente","Realizando peticion para " + company.nombre + " con numero de expiente: " + consultaExpediente.requestNumber)
-
 					respuestaCRM = tarificadorService.consultaExpedienteNumSolicitud(consultaExpediente.requestNumber, company.ou.toString() ,company.codigoSt)
-
 					netinsuranceService.insertarEnvio (company, consultaExpediente.requestNumber, requestXML.toString())
-
 					if(respuestaCRM != null && respuestaCRM.getListaExpedientes() != null){
 
 						for (int i = 0; i < respuestaCRM.getListaExpedientes().size(); i++){
@@ -302,19 +299,14 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 							}
 						}
 					}
-
 					if (resultado.getExpedienteConsulta() != null && resultado.getExpedienteConsulta().size() > 0) {
-
 						notes = "Risultati restituiti"
 						status = StatusType.OK
-
 						logginService.putInfoEndpoint("ConsultaExpediente","Peticion realizada correctamente para " + company.nombre + " con numero de expiente: " + consultaExpediente.requestNumber)
 					} else {
-
 						resultado.expedienteConsulta = null
 						notes = "Nessun risultato per le dossier indicate"
 						status = StatusType.OK
-
 						logginService.putInfoEndpoint("ConsultaExpediente","No hay resultados para " + company.nombre)
 					}
 				} else {

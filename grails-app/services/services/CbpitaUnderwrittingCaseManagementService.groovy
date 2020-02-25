@@ -276,19 +276,18 @@ class CbpitaUnderwrittingCaseManagementService {
 
                                         for (int i = 0; i < listaDocumentosAudio.size(); i++) {
                                             if (listaDocumentosAudio.get(i).getNombre().contains("TUW realizzata")) {
-                                                audioEncontrado = true;
+                                                audioEncontrado = true
+                                                break
                                             }
                                         }
                                     }
 
                                     if (audioEncontrado) {
-
                                         resultado.getExpediente().add(cbpitaService.rellenaDatosSalidaConsulta(expedientePoliza, "CBP", cbpitaUnderwrittingCasesResultsRequest.dateStart, Conf.findByName("rutaFicheroZip")?.value, Conf.findByName("usuarioZip")?.value, Conf.findByName("passwordZip")?.value))
                                         cbpitaService.insertarEnvio(company, cbpitaUnderwrittingCasesResultsRequest.dateStart.toString().substring(0, 10) + "-" + cbpitaUnderwrittingCasesResultsRequest.dateEnd.toString().substring(0, 10), "ST:" + expedientePoliza.getCodigoST() + "#CIA:" + expedientePoliza.getNumSolicitud())
                                         logginService.putInfoEndpoint("ResultadoReconocimientoMedico", "Expediente  con codigo ST: " + expedientePoliza.getCodigoST() + " y codigo cia: " + expedientePoliza.getNumSolicitud() + " para la cia: " + company.nombre + " se ha enviado correctamente");
 
                                     } else {
-
                                         logginService.putInfoEndpoint("ResultadoReconocimientoMedico", "No se han encontardo audio necesarios para completar ZIP para " + company.nombre + " con expediente " + expedientePoliza.getCodigoST())
                                         cbpitaService.insertarError(company, cbpitaUnderwrittingCasesResultsRequest.dateStart.toString().substring(0, 10) + "-" + cbpitaUnderwrittingCasesResultsRequest.dateEnd.toString().substring(0, 10), requestXML.toString(), "CONSULTA", "No se han encontardo audio necesarios para completar ZIP para " + company.nombre + " con expediente " + expedientePoliza.getCodigoST())
                                         correoUtil.envioEmailNoTratados("Error en generacion de zip " + company.nombre, "El expediente : " + expedientePoliza.getCodigoST() + " no se ha enviado porque no tiene el audio requerido")
@@ -296,7 +295,6 @@ class CbpitaUnderwrittingCaseManagementService {
                                     }
 
                                 } else {
-
                                     resultado.getExpediente().add(cbpitaService.rellenaDatosSalidaConsulta(expedientePoliza, "CBP", cbpitaUnderwrittingCasesResultsRequest.dateStart, Conf.findByName("rutaFicheroZip")?.value, Conf.findByName("usuarioZip")?.value, Conf.findByName("passwordZip")?.value))
                                     cbpitaService.insertarEnvio(company, cbpitaUnderwrittingCasesResultsRequest.dateStart.toString().substring(0, 10) + "-" + cbpitaUnderwrittingCasesResultsRequest.dateEnd.toString().substring(0, 10), "ST:" + expedientePoliza.getCodigoST() + "#CIA:" + expedientePoliza.getNumSolicitud())
                                     logginService.putInfoEndpoint("ResultadoReconocimientoMedico", "Expediente  con codigo ST: " + expedientePoliza.getCodigoST() + " y codigo cia: " + expedientePoliza.getNumSolicitud() + " para la cia: " + company.nombre + " se ha enviado correctamente sin zip porque esta ANULADO");
@@ -306,14 +304,12 @@ class CbpitaUnderwrittingCaseManagementService {
                             message = "Risultati restituiti"
                             status = StatusType.OK
                             code = 0
-
                             logginService.putInfoEndpoint("ResultadoReconocimientoMedico", "Peticion realizada correctamente para " + company.nombre + " con fecha: " + cbpitaUnderwrittingCasesResultsRequest.dateStart.toString() + "-" + cbpitaUnderwrittingCasesResultsRequest.dateEnd.toString())
                         } else {
 
                             message = "Nessun risultato per le date indicate"
                             status = StatusType.OK
                             code = 6
-
                             logginService.putInfoEndpoint("ResultadoReconocimientoMedico", "No hay resultados para " + company.nombre)
                         }
                     } else {
