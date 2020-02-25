@@ -10,10 +10,6 @@ import com.ws.afiesca.beans.AfiEscaUnderwrittingCaseManagementRequest
 import com.ws.alptis.beans.AlptisUnderwrittingCaseManagementRequest
 import com.ws.cajamar.beans.CajamarUnderwrittingCaseManagementRequest
 import com.ws.lifesquare.beans.LifesquareUnderwrittingCaseManagementRequest
-import hwsol.entities.EnvioAMA
-import hwsol.entities.EnvioAlptis
-import hwsol.entities.EnvioCajamar
-import hwsol.entities.EnvioCaser
 
 import javax.xml.bind.JAXBContext
 import javax.xml.bind.JAXBElement
@@ -119,7 +115,7 @@ class LogUtil {
                 case TipoCompany.CASER:
                     List<com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest> recibidosCaser = new ArrayList<com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest>()
 
-                    for (Recibido actual:recibidos) {
+                    for (Recibido actual : recibidos) {
 
                         JAXBContext jaxbContext = JAXBContext.newInstance(com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest.class);
                         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
@@ -137,7 +133,7 @@ class LogUtil {
                 case TipoCompany.AMA:
                     List<com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest> recibidosAma = new ArrayList<com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest>()
 
-                    for (Recibido actual:recibidos) {
+                    for (Recibido actual : recibidos) {
 
                         JAXBContext jaxbContext = JAXBContext.newInstance(com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest.class);
                         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
@@ -154,7 +150,7 @@ class LogUtil {
                 case TipoCompany.CAJAMAR:
                     List<CajamarUnderwrittingCaseManagementRequest> recibidosCajamar = new ArrayList<CajamarUnderwrittingCaseManagementRequest>()
 
-                    for (Recibido actual:recibidos) {
+                    for (Recibido actual : recibidos) {
 
                         JAXBContext jaxbContext = JAXBContext.newInstance(CajamarUnderwrittingCaseManagementRequest.class);
                         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
@@ -172,7 +168,7 @@ class LogUtil {
                 case TipoCompany.LAGUN_ARO:
                     List<com.ws.lagunaro.beans.GestionReconocimientoMedicoRequest> recibidosLagunaro = new ArrayList<com.ws.lagunaro.beans.GestionReconocimientoMedicoRequest>()
 
-                    for (Recibido actual:recibidos) {
+                    for (Recibido actual : recibidos) {
 
                         JAXBContext jaxbContext = JAXBContext.newInstance(com.ws.lagunaro.beans.GestionReconocimientoMedicoRequest.class);
                         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
@@ -190,7 +186,7 @@ class LogUtil {
                 case TipoCompany.ALPTIS:
                     List<AlptisUnderwrittingCaseManagementRequest> recibidosAlptis = new ArrayList<AlptisUnderwrittingCaseManagementRequest>()
 
-                    for (Recibido actual:recibidos) {
+                    for (Recibido actual : recibidos) {
 
                         JAXBContext jaxbContext = JAXBContext.newInstance(AlptisUnderwrittingCaseManagementRequest.class);
                         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
@@ -208,7 +204,7 @@ class LogUtil {
                 case TipoCompany.AFI_ESCA:
                     List<AfiEscaUnderwrittingCaseManagementRequest> recibidosAfiesca = new ArrayList<AfiEscaUnderwrittingCaseManagementRequest>()
 
-                    for (Recibido actual:recibidos) {
+                    for (Recibido actual : recibidos) {
 
                         JAXBContext jaxbContext = JAXBContext.newInstance(AfiEscaUnderwrittingCaseManagementRequest.class);
                         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
@@ -226,7 +222,7 @@ class LogUtil {
                 case TipoCompany.ZEN_UP:
                     List<LifesquareUnderwrittingCaseManagementRequest> recibidosLifesquare = new ArrayList<LifesquareUnderwrittingCaseManagementRequest>()
 
-                    for (Recibido actual:recibidos) {
+                    for (Recibido actual : recibidos) {
 
                         JAXBContext jaxbContext = JAXBContext.newInstance(LifesquareUnderwrittingCaseManagementRequest.class);
                         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
@@ -244,7 +240,7 @@ class LogUtil {
                 case TipoCompany.PSN:
                     List<com.scortelemed.schemas.psn.GestionReconocimientoMedicoRequest> recibidosPsn = new ArrayList<com.scortelemed.schemas.psn.GestionReconocimientoMedicoRequest>()
 
-                    for (Recibido actual:recibidos) {
+                    for (Recibido actual : recibidos) {
 
                         JAXBContext jaxbContext = JAXBContext.newInstance(com.scortelemed.schemas.psn.GestionReconocimientoMedicoRequest.class);
                         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
@@ -262,7 +258,7 @@ class LogUtil {
                 case TipoCompany.NET_INSURANCE:
                     List<com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCaseManagementRequest> recibidosNetinsurance = new ArrayList<com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCaseManagementRequest>()
 
-                    for (Recibido actual:recibidos) {
+                    for (Recibido actual : recibidos) {
 
                         JAXBContext jaxbContext = JAXBContext.newInstance(com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCaseManagementRequest.class);
                         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
@@ -298,7 +294,7 @@ class LogUtil {
                 case TipoCompany.SOCIETE_GENERALE:
                     List<com.scortelemed.schemas.societegenerale.SocieteGeneraleUnderwrittingCaseManagementRequest> recibidosSocieteGenerale = new ArrayList<com.scortelemed.schemas.societegenerale.SocieteGeneraleUnderwrittingCaseManagementRequest>()
 
-                    for (Recibido actual:recibidos) {
+                    for (Recibido actual : recibidos) {
 
                         JAXBContext jaxbContext = JAXBContext.newInstance(com.scortelemed.schemas.societegenerale.SocieteGeneraleUnderwrittingCaseManagementRequest.class);
                         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
@@ -316,7 +312,7 @@ class LogUtil {
                 case TipoCompany.ENGINYERS:
                     List<com.scortelemed.schemas.enginyers.AddExp> recibidosEnginyers = new ArrayList<com.scortelemed.schemas.enginyers.AddExp>()
 
-                    for (Recibido actual:recibidos) {
+                    for (Recibido actual : recibidos) {
 
                         JAXBContext jaxbContext = JAXBContext.newInstance(com.scortelemed.schemas.enginyers.AddExp.class)
                         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller()
@@ -334,7 +330,7 @@ class LogUtil {
                 case TipoCompany.METHIS_LAB:
                     List<com.scortelemed.schemas.methislab.MethislabUnderwrittingCaseManagementRequest> recibidosMethislab = new ArrayList<com.scortelemed.schemas.methislab.MethislabUnderwrittingCaseManagementRequest>()
 
-                    for (Recibido actual:recibidos) {
+                    for (Recibido actual : recibidos) {
 
                         JAXBContext jaxbContext = JAXBContext.newInstance(com.scortelemed.schemas.methislab.MethislabUnderwrittingCaseManagementRequest.class)
                         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller()
@@ -352,7 +348,7 @@ class LogUtil {
                 case TipoCompany.CBP_ITALIA:
                     List<com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCaseManagementRequest> recibidosCbpItalia = new ArrayList<com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCaseManagementRequest>()
 
-                    for (Recibido actual:recibidos) {
+                    for (Recibido actual : recibidos) {
 
                         JAXBContext jaxbContext = JAXBContext.newInstance(com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCaseManagementRequest.class)
                         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller()
@@ -370,7 +366,7 @@ class LogUtil {
                 case TipoCompany.CF_LIFE:
                     List<com.scortelemed.schemas.methislabCF.MethislabCFUnderwrittingCaseManagementRequest> recibidosMethislabCF = new ArrayList<com.scortelemed.schemas.methislabCF.MethislabCFUnderwrittingCaseManagementRequest>()
 
-                    for (Recibido actual:recibidos) {
+                    for (Recibido actual : recibidos) {
 
                         JAXBContext jaxbContext = JAXBContext.newInstance(com.scortelemed.schemas.methislabCF.MethislabCFUnderwrittingCaseManagementRequest.class)
                         Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller()
@@ -388,151 +384,6 @@ class LogUtil {
                 default:
                     elementos = new ArrayList<>() //Evitamos nullpointers
                     break
-            }
-
-            return elementos
-        }
-    }
-
-    def findEnvios(desde, hasta, Company company, Map sortParams) {
-        StringBuilder hqlQueryBuilder = new StringBuilder(' ')
-
-        hqlQueryBuilder << 'FROM Envio AS envio  '
-        Map namedParams = [idCia: company.id]
-        hqlQueryBuilder << 'WHERE cia = :idCia '
-        hqlQueryBuilder << 'AND '
-        hqlQueryBuilder << "fecha BETWEEN  :iniDate "
-        hqlQueryBuilder << 'AND '
-        hqlQueryBuilder << " :endDate "
-        namedParams["endDate"] = hasta
-        namedParams["iniDate"] = desde
-
-
-        hqlQueryBuilder << "ORDER BY fecha DESC"
-
-        System.out.println("idCia ID  -->>" + company.id)
-
-
-        Recibido.executeQuery(hqlQueryBuilder.toString(), namedParams, sortParams)
-    }
-
-    def obtenerEnviados(company, desde, hasta, max) {
-        Parser parser = new Parser()
-
-        if (company != null) {
-            List<Envio> enviados = new ArrayList<Envio>()
-            enviados = findEnvios(desde, hasta, company, [max: max])
-
-            TipoCompany filtro = TipoCompany.fromNombre(company.nombre)
-
-            switch (filtro) { //TODO: Revisar la tabla de producción para conocer el comportamiento de los elementos enviados
-
-                case TipoCompany.CASER:
-
-                    List<EnvioCaser> enviadosCaser = new ArrayList<EnvioCaser>()
-                    for (int i = 0; i < enviados.size(); i++) {
-                        enviadosCaser.add(parser.leerEnvioCaser(enviados.get(i)))
-                    }
-
-                    elementos = enviadosCaser
-
-                    break
-                case TipoCompany.AMA:
-
-                    List<EnvioAMA> enviadosAma = new ArrayList<>()
-                    for (int i = 0; i < enviados.size(); i++) {
-                        enviadosAma.add(parser.leerEnvioAMA(enviados.get(i)))
-                    }
-
-                    elementos = enviadosAma
-
-                    break
-                default:
-                    elementos = enviados
-                    break
-
-//                case TipoCompany.CAJAMAR:
-//
-//                    List<EnvioCajamar> envioadosCajamar = new ArrayList<EnvioCajamar>()
-//
-//                    for (int i = 0; i < enviados.size(); i++) {
-//
-//                        envioadosCajamar.add(parser.leerEnvioCajamar(enviados.get(i).info.trim()))
-//                    }
-//
-//                    elementos = envioadosCajamar
-//
-//                    break
-//
-//                case TipoCompany.LAGUN_ARO:
-//
-//                    List<com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest> recibidosLagunaro = new ArrayList<com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest>()
-//
-//                    for (int i = 0; i < enviados.size(); i++) {
-//
-//                        JAXBContext jaxbContext = JAXBContext.newInstance(com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest.class);
-//                        Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-//
-//                        StringReader reader = new StringReader(enviados.get(i).info.trim());
-//
-//                        JAXBElement<com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest.class);
-//                        com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest gestionReconocimientoMedicoRequest = root.getValue();
-//
-//                        recibidosLagunaro.add(gestionReconocimientoMedicoRequest)
-//                    }
-//
-//                    elementos = recibidosLagunaro
-//
-//                    break
-//
-//
-//                case TipoCompany.ALPTIS:
-//
-//                    List<EnvioAlptis> envioadosAlptis = new ArrayList<EnvioAlptis>()
-//
-//                    for (int i = 0; i < enviados.size(); i++) {
-//
-//                        envioadosAlptis.add(parser.leerEnvioAlptis(enviados.get(i).info.trim()))
-//                    }
-//
-//                    elementos = envioadosAlptis
-//
-//                    break
-//
-//                case TipoCompany.AFI_ESCA:
-//
-//                    /**PARA AFIESCA NO HAY TRANSFORMACI�N SE RECOGEN LOS DATOS DE LA TABLA ENVIO DIRECTAMENTE
-//                     *
-//                     */
-//                    elementos = enviados
-//
-//                    break
-//
-//                case TipoCompany.ZEN_UP:
-//
-//                    /**PARA LIFESQUARE NO HAY TRANSFORMACI�N SE RECOGEN LOS DATOS DE LA TABLA ENVIO DIRECTAMENTE
-//                     *
-//                     */
-//                    elementos = enviados
-//
-//                    break
-//                case TipoCompany.PSN:
-//                    break
-//                case TipoCompany.NET_INSURANCE:
-//
-//                    break
-//                case TipoCompany.MALAKOFF_MEDERIC:
-//                    break
-//                case TipoCompany.SOCIETE_GENERALE:
-//                    break
-//                case TipoCompany.METHIS_LAB:
-//                    break
-//                case TipoCompany.CBP_ITALIA:
-//                    break
-//                case TipoCompany.ENGINYERS:
-//                    break
-//                case TipoCompany.CF_LIFE:
-//                    break
             }
 
             return elementos

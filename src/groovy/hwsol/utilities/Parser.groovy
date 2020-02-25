@@ -1,13 +1,9 @@
-package hwsol.webservices
+package hwsol.utilities
 
-import com.scortelemed.Envio
-import hwsol.entities.EnvioPSN
-import hwsol.entities.RegistrarEventoSCOR
-import hwsol.factory.SchemaEntities
-import hwsol.entities.EnvioAMA
-import hwsol.entities.EnvioAlptis
-import hwsol.entities.EnvioCajamar
-import hwsol.entities.EnvioCaser
+
+import hwsol.entities.parser.RegistrarEventoSCOR
+import hwsol.entities.parser.AlptisGeneralData
+import hwsol.entities.parser.ValoracionTeleSeleccionResponse
 
 import javax.xml.bind.Unmarshaller
 import javax.xml.transform.stream.StreamSource
@@ -28,6 +24,18 @@ import com.scortelemed.schemas.caser.ResultadoReconocimientoMedicoRequest
 import com.scortelemed.schemas.psn.ConsultaExpedienteRequest as ConsultaExpedienteRequestPsn
 import com.scortelemed.schemas.psn.ResultadoReconocimientoMedicoRequest as ResultadoReconocimientoMedicoRequestPsn
 
+//Netinsurance
+import com.scortelemed.schemas.netinsurance.NetinsuranteGetDossierRequest
+
+//Methislab
+import com.scortelemed.schemas.methislab.MethislabUnderwrittingCasesResultsRequest
+
+//CBP Ita
+import com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCasesResultsRequest
+
+//MethislabCF
+import com.scortelemed.schemas.methislabCF.MethislabCFUnderwrittingCasesResultsRequest
+
 import org.w3c.dom.Document
 import org.w3c.dom.Element
 import org.w3c.dom.Node
@@ -37,30 +45,9 @@ import org.xml.sax.InputSource
 class Parser {
 
 	/**
-	 * Método principal para leer envíos de AMA
-	 * @param Envio entrada
-	 * @return EnvioAMA (Expediente, Siniestro u Otro)
+	 * Métodos de parseo de AMA
 	 */
-
-    EnvioAMA leerEnvioAMA(Envio entrada) {
-		EnvioAMA salida = new EnvioAMA()
-		if (entrada != null) {
-            salida.set(entrada)
-			String info = entrada.info
-			if (info != null && !info.isEmpty() && info.charAt(0) == '<') {
-				if (info.contains("ConsultaExpedienteRequest")) {
-					ConsultaExpedienteRequest expediente = jaxbParserExpedienteAma(info)
-					salida.setInfo(SchemaEntities.toString(expediente))
-				} else if (info.contains("ResultadoSiniestroRequest")) {
-					ResultadoSiniestroRequest siniestro = jaxbParserSiniestroAma(info)
-                    salida.setInfo(SchemaEntities.toString(siniestro))
-				}
-			}
-		}
-		return salida
-	}
-
-	private ConsultaExpedienteRequest jaxbParserExpedienteAma(String entrada) {
+	ConsultaExpedienteRequest jaxbParserExpedienteAma(String entrada) {
 		ConsultaExpedienteRequest salida = null
 		if(entrada != null && entrada.length() > 0) {
 
@@ -75,7 +62,7 @@ class Parser {
 		return salida
 	}
 
-	private ResultadoSiniestroRequest jaxbParserSiniestroAma(String entrada) {
+	ResultadoSiniestroRequest jaxbParserSiniestroAma(String entrada) {
 		ResultadoSiniestroRequest salida = null
 		if(entrada != null && entrada.length() > 0) {
 
@@ -91,32 +78,9 @@ class Parser {
 	}
 
 	/**
-	 * Método principal para leer envíos de CASER
-	 * @param Envio entrada
-	 * @return EnvioAMA (Reconocimiento o Evento)
+	 * Métodos de parseo de CASER
 	 */
-
-	EnvioCaser leerEnvioCaser(Envio entrada) {
-		EnvioCaser salida = new EnvioCaser()
-		if (entrada != null) {
-			salida.set(entrada)
-			String info = entrada.info
-			if (info != null && !info.isEmpty() && info.charAt(0) == '<') {
-				if (info.contains("ResultadoReconocimientoMedicoRequest")) {
-					ResultadoReconocimientoMedicoRequest resultado = jaxbParserResultadoCaser(info)
-					salida.setResultado(resultado)
-					salida.setInfo(SchemaEntities.toString(resultado))
-				} else if (info.contains("service_RegistrarEventoSCOR")) {
-					RegistrarEventoSCOR evento = registrarEventoSCOR(info)
-					salida.setEventoSCOR(evento)
-					salida.setInfo(SchemaEntities.toString(evento))
-				}
-			}
-		}
-		return salida
-	}
-
-	private ResultadoReconocimientoMedicoRequest jaxbParserResultadoCaser(String entrada) {
+	ResultadoReconocimientoMedicoRequest jaxbParserResultadoCaser(String entrada) {
 		ResultadoReconocimientoMedicoRequest salida = null
 		if(entrada != null && entrada.length() > 0) {
 
@@ -168,37 +132,13 @@ class Parser {
 				}
 			}
 		}
-
 		return entradaDetalle
 	}
 
 	/**
-	 * PSN
-	 * @param salida
-	 * @return
+	 * Métodos de parseo de PSN
 	 */
-
-	EnvioPSN leerEnvioPSN(Envio entrada) {
-		EnvioPSN salida = new EnvioPSN()
-		if (entrada != null) {
-			salida.set(entrada)
-			String info = entrada.info
-			if (info != null && !info.isEmpty() && info.charAt(0) == '<') {
-				if (info.contains("ConsultaExpedienteRequest")) {
-					ConsultaExpedienteRequestPsn expediente = jaxbParserExpedientePsn(info)
-					salida.setExpediente(expediente)
-					salida.setInfo(SchemaEntities.toString(expediente))
-				} else if (info.contains("ResultadoReconocimientoMedicoRequest")) {
-					ResultadoReconocimientoMedicoRequestPsn resultado = jaxbParserResultadoPsn(info)
-					salida.setReconocimiento(resultado)
-					salida.setInfo(SchemaEntities.toString(resultado))
-				}
-			}
-		}
-		return salida
-	}
-
-	private ConsultaExpedienteRequestPsn jaxbParserExpedientePsn(String entrada) {
+	ConsultaExpedienteRequestPsn jaxbParserExpedientePsn(String entrada) {
 		ConsultaExpedienteRequestPsn salida = null
 		if(entrada != null && entrada.length() > 0) {
 
@@ -213,7 +153,7 @@ class Parser {
 		return salida
 	}
 
-	private ResultadoReconocimientoMedicoRequestPsn jaxbParserResultadoPsn(String entrada) {
+	ResultadoReconocimientoMedicoRequestPsn jaxbParserResultadoPsn(String entrada) {
 		ResultadoReconocimientoMedicoRequestPsn salida = null
 		if(entrada != null && entrada.length() > 0) {
 
@@ -228,7 +168,79 @@ class Parser {
 		return salida
 	}
 
-	public EnvioCajamar leerEnvioCajamar(String salida){
+	/**
+	 * Métodos de parseo de NetInsurance
+	 */
+	NetinsuranteGetDossierRequest jaxbParserDossierNetInsurance(String entrada) {
+		NetinsuranteGetDossierRequest salida = null
+		if(entrada != null && entrada.length() > 0) {
+
+			JAXBContext jaxbContext = JAXBContext.newInstance(NetinsuranteGetDossierRequest.class)
+			Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller()
+
+			StringReader reader = new StringReader(entrada)
+
+			JAXBElement<NetinsuranteGetDossierRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), NetinsuranteGetDossierRequest.class)
+			salida = root.getValue()
+		}
+		return salida
+	}
+
+	/**
+	 * Métodos de parseo de Methislab
+	 */
+	MethislabUnderwrittingCasesResultsRequest jaxbParserMethislabUnderwritingCases(String entrada) {
+		MethislabUnderwrittingCasesResultsRequest salida = null
+		if(entrada != null && entrada.length() > 0) {
+
+			JAXBContext jaxbContext = JAXBContext.newInstance(MethislabUnderwrittingCasesResultsRequest.class)
+			Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller()
+
+			StringReader reader = new StringReader(entrada)
+
+			JAXBElement<MethislabUnderwrittingCasesResultsRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), MethislabUnderwrittingCasesResultsRequest.class)
+			salida = root.getValue()
+		}
+		return salida
+	}
+
+	/**
+	 * Métodos de parseo de Cbp Ita
+	 */
+	CbpitaUnderwrittingCasesResultsRequest jaxbParserCbpItaUnderwritingCases(String entrada) {
+		CbpitaUnderwrittingCasesResultsRequest salida = null
+		if(entrada != null && entrada.length() > 0) {
+
+			JAXBContext jaxbContext = JAXBContext.newInstance(CbpitaUnderwrittingCasesResultsRequest.class)
+			Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller()
+
+			StringReader reader = new StringReader(entrada)
+
+			JAXBElement<CbpitaUnderwrittingCasesResultsRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), CbpitaUnderwrittingCasesResultsRequest.class)
+			salida = root.getValue()
+		}
+		return salida
+	}
+
+	/**
+	 * Métodos de parseo de MethislabCF
+	 */
+	MethislabCFUnderwrittingCasesResultsRequest jaxbParserMethislabCFUnderwritingCases(String entrada) {
+		MethislabCFUnderwrittingCasesResultsRequest salida = null
+		if(entrada != null && entrada.length() > 0) {
+
+			JAXBContext jaxbContext = JAXBContext.newInstance(MethislabCFUnderwrittingCasesResultsRequest.class)
+			Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller()
+
+			StringReader reader = new StringReader(entrada)
+
+			JAXBElement<MethislabCFUnderwrittingCasesResultsRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), MethislabCFUnderwrittingCasesResultsRequest.class)
+			salida = root.getValue()
+		}
+		return salida
+	}
+
+	ValoracionTeleSeleccionResponse valoracionTeleSeleccionResponse(String salida){
 
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
 		DocumentBuilder builder = factory.newDocumentBuilder()
@@ -241,7 +253,7 @@ class Parser {
 
 		NodeList nList = doc.getElementsByTagName("ns2:valoracion")
 
-		EnvioCajamar entradaDetalle = new EnvioCajamar()
+		ValoracionTeleSeleccionResponse entradaDetalle = new ValoracionTeleSeleccionResponse()
 
 		for (int temp = 0; temp < nList.getLength(); temp++) {
 
@@ -320,7 +332,7 @@ class Parser {
 		return entradaDetalle
 	}
 
-	public EnvioAlptis leerEnvioAlptis(String salida){
+	AlptisGeneralData alptisGeneralData(String salida){
 
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
 		DocumentBuilder builder = factory.newDocumentBuilder()
@@ -333,7 +345,7 @@ class Parser {
 
 		NodeList nList = doc.getElementsByTagName("generalData")
 
-		EnvioAlptis entradaDetalle = new EnvioAlptis()
+		AlptisGeneralData entradaDetalle = new AlptisGeneralData()
 
 		for (int temp = 0; temp < nList.getLength(); temp++) {
 
@@ -395,91 +407,91 @@ class Parser {
 
 		return entradaDetalle
 	}
-
-	/*************************
-	 * MÉTODOS NO UTILIZADOS *
-	 *************************/
-
-	private groovy.util.NodeList getNodeListByTagName(String entrada) {
-		def list = new XmlParser().parseText(entrada)
-		assert list instanceof groovy.util.Node
-		return list
-	}
-
-	private EnvioAMA getEnvioAMAByNodeList(groovy.util.NodeList entrada) {
-		EnvioAMA salida = new EnvioAMA()
-		for (Node actual:list) {
-			if(actual.hasChildNodes()) {
-				salida.numExpediente = actual.getFirstChild().nodeValue
-			}
-		}
-	}
-
-	private String getElementByTagName(groovy.util.NodeList list, String tag)  {
-		for (Node actual:list) {
-			actual
-				if (eElement.getElementsByTagName(tag).item(0) != null) {
-					return eElement.getElementsByTagName(tag).item(0).getTextContent()
-					break
-				}
-
-
-		}
-	}
-
-	private <T> T jaxbParser(String entrada) {
-		T salida = null
-		if(entrada != null && entrada.length() > 0) {
-
-			JAXBContext jaxbContext = JAXBContext.newInstance(salida.getClass())
-			Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller()
-
-			StringReader reader = new StringReader(entrada)
-
-			JAXBElement<T> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), salida.getClass())
-			salida = root.getValue()
-		}
-		return salida;
-	}
-
-
-
-		private EnvioAMA getEnvioGroovy(String entrada) {
-		EnvioAMA salida = new EnvioAMA()
-		def list = new XmlParser().parseText(entrada)
-		def children = list.children()
-		List bucle = children.asList()
-		for (groovy.util.Node actual:bucle) {
-			if(actual.value() != null && !actual.value().toString().equalsIgnoreCase("[]")) {
-				if(actual.name().toString().contains("numExpediente")) {
-					salida.setExpediente(actual.value())
-				} else if(actual.name().toString().contains("numSolicitud")) {
-					salida.setSolicitud(actual.value())
-				} else if(actual.name().toString().contains("numSumplemento")) {
-					salida.setSumplemento(actual.value())
-				} else if(actual.name().toString().contains("DateStart")) {
-					salida.setFechaComienzo(actual.value())
-				} else if(actual.name().toString().contains("DateEnd")) {
-					salida.setFechaFin(actual.value())
-				}
-			}
-		}
-		return salida
-	}
-
-	private EnvioAMA getEnvioAMA(String entrada) {
-		EnvioAMA salida = new EnvioAMA()
-		if(entrada != null) {
-			String[] params = entrada.trim().replace("-",":").split(":")
-			if(params != null && params.length == 4) {
-				salida.setEstado(params[1].trim())
-				salida.setRespuesta(params[3].trim())
-			}
-		}
-		return salida
-	}
-
-
+//
+//	/*************************
+//	 * MÉTODOS NO UTILIZADOS *
+//	 *************************/
+//
+//	private groovy.util.NodeList getNodeListByTagName(String entrada) {
+//		def list = new XmlParser().parseText(entrada)
+//		assert list instanceof groovy.util.Node
+//		return list
+//	}
+//
+//	private EnvioAMA getEnvioAMAByNodeList(groovy.util.NodeList entrada) {
+//		EnvioAMA salida = new EnvioAMA()
+//		for (Node actual:list) {
+//			if(actual.hasChildNodes()) {
+//				salida.numExpediente = actual.getFirstChild().nodeValue
+//			}
+//		}
+//	}
+//
+//	private String getElementByTagName(groovy.util.NodeList list, String tag)  {
+//		for (Node actual:list) {
+//			actual
+//				if (eElement.getElementsByTagName(tag).item(0) != null) {
+//					return eElement.getElementsByTagName(tag).item(0).getTextContent()
+//					break
+//				}
+//
+//
+//		}
+//	}
+//
+//	private <T> T jaxbParser(String entrada) {
+//		T salida = null
+//		if(entrada != null && entrada.length() > 0) {
+//
+//			JAXBContext jaxbContext = JAXBContext.newInstance(salida.getClass())
+//			Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller()
+//
+//			StringReader reader = new StringReader(entrada)
+//
+//			JAXBElement<T> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), salida.getClass())
+//			salida = root.getValue()
+//		}
+//		return salida;
+//	}
+//
+//
+//
+//		private EnvioAMA getEnvioGroovy(String entrada) {
+//		EnvioAMA salida = new EnvioAMA()
+//		def list = new XmlParser().parseText(entrada)
+//		def children = list.children()
+//		List bucle = children.asList()
+//		for (groovy.util.Node actual:bucle) {
+//			if(actual.value() != null && !actual.value().toString().equalsIgnoreCase("[]")) {
+//				if(actual.name().toString().contains("numExpediente")) {
+//					salida.setExpediente(actual.value())
+//				} else if(actual.name().toString().contains("numSolicitud")) {
+//					salida.setSolicitud(actual.value())
+//				} else if(actual.name().toString().contains("numSumplemento")) {
+//					salida.setSumplemento(actual.value())
+//				} else if(actual.name().toString().contains("DateStart")) {
+//					salida.setFechaComienzo(actual.value())
+//				} else if(actual.name().toString().contains("DateEnd")) {
+//					salida.setFechaFin(actual.value())
+//				}
+//			}
+//		}
+//		return salida
+//	}
+//
+//	private EnvioAMA getEnvioAMA(String entrada) {
+//		EnvioAMA salida = new EnvioAMA()
+//		if(entrada != null) {
+//			String[] params = entrada.trim().replace("-",":").split(":")
+//			if(params != null && params.length == 4) {
+//				salida.setEstado(params[1].trim())
+//				salida.setRespuesta(params[3].trim())
+//			}
+//		}
+//		return salida
+//	}
+//
+//
 
 
 

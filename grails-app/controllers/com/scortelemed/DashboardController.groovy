@@ -2,7 +2,9 @@ package com.scortelemed
 
 import com.scor.global.CompanyLog
 import grails.plugin.springsecurity.annotation.Secured
+import hwsol.factory.LogFactory
 import hwsol.webservices.LogUtil
+import hwsol.webservices.LogService
 
 import java.text.SimpleDateFormat
 
@@ -58,7 +60,8 @@ class DashboardController {
             elementos = logUtil.obtenerErrores(company, formatter.parse(params.desde), hasta, params.max)
             [ciasLog: ciasLog, company: nombre, elementos: elementos, ou: ou, desde: params.desde, hasta: params.hasta, max: params.max, lista: "listaErrores.gsp", idCia: idCia]
         } else {
-            elementos = logUtil.obtenerEnviados(company, formatter.parse(params.desde), hasta, params.max)
+            LogService enviados = LogFactory.newLogService(Envio.class)
+            elementos = enviados.obtener(company, formatter.parse(params.desde), hasta, params.max)
             [ciasLog: ciasLog, company: nombre, elementos: elementos, ou: ou, desde: params.desde, hasta: params.hasta, max: params.max, lista: "listaEnviados.gsp", idCia: idCia]
         }
 

@@ -1,9 +1,9 @@
 package hwsol.entities
 
-import com.scortelemed.Envio
 import com.scortelemed.schemas.caser.ResultadoReconocimientoMedicoRequest
+import hwsol.entities.parser.RegistrarEventoSCOR
 
-class EnvioCaser extends Envio implements EnvioCompany{
+class EnvioCaser extends Envio{
 
     RegistrarEventoSCOR eventoSCOR
     ResultadoReconocimientoMedicoRequest resultado
@@ -11,11 +11,4 @@ class EnvioCaser extends Envio implements EnvioCompany{
 	EnvioCaser() {
 		super()
 	}
-    void set(Envio antiguo){
-        if(antiguo != null) {
-            this.fecha = antiguo.getFecha()
-            this.cia = antiguo.getCia()
-            this.identificador = antiguo.getIdentificador()
-        }
-    }
 }

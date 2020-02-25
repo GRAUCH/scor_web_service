@@ -1,4 +1,4 @@
-package hwsol.entities
+package hwsol.entities.parser
 
 class RegistrarEventoSCOR {
 
