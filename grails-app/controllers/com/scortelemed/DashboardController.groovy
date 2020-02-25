@@ -59,7 +59,7 @@ class DashboardController {
             [ciasLog: ciasLog, company: nombre, elementos: elementos, ou: ou, desde: params.desde, hasta: params.hasta, max: params.max, lista: "listaErrores.gsp", idCia: idCia]
         } else {
             elementos = logUtil.obtenerEnviados(company, formatter.parse(params.desde), hasta, params.max)
-            [ciasLog: ciasLog, company: nombre, elementos: elementos, ou: ou, desde: params.desde, hasta: params.hasta, max: params.max, lista: "listaEnviados" + nombre + ".gsp", idCia: idCia]
+            [ciasLog: ciasLog, company: nombre, elementos: elementos, ou: ou, desde: params.desde, hasta: params.hasta, max: params.max, lista: "listaEnviados.gsp", idCia: idCia]
         }
 
 

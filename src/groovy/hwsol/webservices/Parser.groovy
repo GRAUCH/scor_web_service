@@ -1,5 +1,14 @@
 package hwsol.webservices
 
+import com.scortelemed.Envio
+import hwsol.entities.EnvioPSN
+import hwsol.entities.RegistrarEventoSCOR
+import hwsol.factory.SchemaEntities
+import hwsol.entities.EnvioAMA
+import hwsol.entities.EnvioAlptis
+import hwsol.entities.EnvioCajamar
+import hwsol.entities.EnvioCaser
+
 import javax.xml.bind.Unmarshaller
 import javax.xml.transform.stream.StreamSource
 import java.text.SimpleDateFormat
@@ -12,6 +21,12 @@ import javax.xml.parsers.DocumentBuilderFactory
 import com.scortelemed.schemas.ama.ResultadoSiniestroRequest
 import com.scortelemed.schemas.ama.ConsultaExpedienteRequest
 
+//CASER
+import com.scortelemed.schemas.caser.ResultadoReconocimientoMedicoRequest
+
+//PSN
+import com.scortelemed.schemas.psn.ConsultaExpedienteRequest as ConsultaExpedienteRequestPsn
+import com.scortelemed.schemas.psn.ResultadoReconocimientoMedicoRequest as ResultadoReconocimientoMedicoRequestPsn
 
 import org.w3c.dom.Document
 import org.w3c.dom.Element
@@ -23,27 +38,27 @@ class Parser {
 
 	/**
 	 * Método principal para leer envíos de AMA
-	 * @param String entrada
-	 * @return EnvioAMA (Expediente, Siniestro u Otro
+	 * @param Envio entrada
+	 * @return EnvioAMA (Expediente, Siniestro u Otro)
 	 */
-	EnvioAMA leerEnvioAMA(String entrada) {
+
+    EnvioAMA leerEnvioAMA(Envio entrada) {
 		EnvioAMA salida = new EnvioAMA()
 		if (entrada != null) {
-			if (entrada.charAt(0) == '<') {
-				if (entrada.contains("ConsultaExpedienteRequest")) {
-					ConsultaExpedienteRequest expediente = jaxbParserExpedienteAma(entrada)
-					salida.setExpediente(expediente)
-				} else if (entrada.contains("ResultadoSiniestroRequest")) {
-					ResultadoSiniestroRequest siniestro = jaxbParserSiniestroAma(entrada)
-					salida.setSiniestro(siniestro)
+            salida.set(entrada)
+			String info = entrada.info
+			if (info != null && !info.isEmpty() && info.charAt(0) == '<') {
+				if (info.contains("ConsultaExpedienteRequest")) {
+					ConsultaExpedienteRequest expediente = jaxbParserExpedienteAma(info)
+					salida.setInfo(SchemaEntities.toString(expediente))
+				} else if (info.contains("ResultadoSiniestroRequest")) {
+					ResultadoSiniestroRequest siniestro = jaxbParserSiniestroAma(info)
+                    salida.setInfo(SchemaEntities.toString(siniestro))
 				}
-			} else {
-				salida = getEnvioAMA(entrada)
 			}
 		}
 		return salida
 	}
-
 
 	private ConsultaExpedienteRequest jaxbParserExpedienteAma(String entrada) {
 		ConsultaExpedienteRequest salida = null
@@ -57,7 +72,7 @@ class Parser {
 			JAXBElement<ConsultaExpedienteRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), ConsultaExpedienteRequest.class)
 			salida = root.getValue()
 		}
-		return salida;
+		return salida
 	}
 
 	private ResultadoSiniestroRequest jaxbParserSiniestroAma(String entrada) {
@@ -72,27 +87,51 @@ class Parser {
 			JAXBElement<ResultadoSiniestroRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), ResultadoSiniestroRequest.class)
 			salida = root.getValue()
 		}
-		return salida;
+		return salida
 	}
 
-	private EnvioAMA getEnvioAMA(String entrada) {
-		EnvioAMA salida = new EnvioAMA()
-		if(entrada != null) {
-			String[] params = entrada.trim().replace("-",":").split(":")
-			if(params != null && params.length == 4) {
-				salida.setEstado(params[1].trim())
-				salida.setRespuesta(params[3].trim())
+	/**
+	 * Método principal para leer envíos de CASER
+	 * @param Envio entrada
+	 * @return EnvioAMA (Reconocimiento o Evento)
+	 */
+
+	EnvioCaser leerEnvioCaser(Envio entrada) {
+		EnvioCaser salida = new EnvioCaser()
+		if (entrada != null) {
+			salida.set(entrada)
+			String info = entrada.info
+			if (info != null && !info.isEmpty() && info.charAt(0) == '<') {
+				if (info.contains("ResultadoReconocimientoMedicoRequest")) {
+					ResultadoReconocimientoMedicoRequest resultado = jaxbParserResultadoCaser(info)
+					salida.setResultado(resultado)
+					salida.setInfo(SchemaEntities.toString(resultado))
+				} else if (info.contains("service_RegistrarEventoSCOR")) {
+					RegistrarEventoSCOR evento = registrarEventoSCOR(info)
+					salida.setEventoSCOR(evento)
+					salida.setInfo(SchemaEntities.toString(evento))
+				}
 			}
 		}
 		return salida
 	}
 
-	/*********
-	 FINAL AMA
-	 *********/
+	private ResultadoReconocimientoMedicoRequest jaxbParserResultadoCaser(String entrada) {
+		ResultadoReconocimientoMedicoRequest salida = null
+		if(entrada != null && entrada.length() > 0) {
 
+			JAXBContext jaxbContext = JAXBContext.newInstance(ResultadoReconocimientoMedicoRequest.class)
+			Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller()
 
-	public EntradaDetalle leerEnvioCaser(String salida){
+			StringReader reader = new StringReader(entrada)
+
+			JAXBElement<ResultadoReconocimientoMedicoRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), ResultadoReconocimientoMedicoRequest.class)
+			salida = root.getValue()
+		}
+		return salida
+	}
+
+	RegistrarEventoSCOR registrarEventoSCOR(String salida){
 
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
 		DocumentBuilder builder = factory.newDocumentBuilder()
@@ -105,7 +144,7 @@ class Parser {
 
 		NodeList nList = doc.getElementsByTagName("service_RegistrarEventoSCOR")
 
-		EntradaDetalle entradaDetalle = new EntradaDetalle()
+		RegistrarEventoSCOR entradaDetalle = new RegistrarEventoSCOR()
 
 		for (int temp = 0; temp < nList.getLength(); temp++) {
 
@@ -113,7 +152,7 @@ class Parser {
 
 			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-				Element eElement = (Element) nNode;
+				Element eElement = (Element) nNode
 
 				if (eElement.getElementsByTagName("idExpediente").item(0) != null) {
 					entradaDetalle.setIdExpediente(eElement.getElementsByTagName("idExpediente").item(0).getTextContent())
@@ -125,12 +164,68 @@ class Parser {
 					entradaDetalle.setDetalle(eElement.getElementsByTagName("detalle").item(0).getTextContent())
 				}
 				if (eElement.getElementsByTagName("fecha").item(0) != null) {
-					entradaDetalle.setFecha(eElement.getElementsByTagName("fecha").item(0).getTextContent())
+					entradaDetalle.setFechaCierre(eElement.getElementsByTagName("fecha").item(0).getTextContent())
 				}
 			}
 		}
 
 		return entradaDetalle
+	}
+
+	/**
+	 * PSN
+	 * @param salida
+	 * @return
+	 */
+
+	EnvioPSN leerEnvioPSN(Envio entrada) {
+		EnvioPSN salida = new EnvioPSN()
+		if (entrada != null) {
+			salida.set(entrada)
+			String info = entrada.info
+			if (info != null && !info.isEmpty() && info.charAt(0) == '<') {
+				if (info.contains("ConsultaExpedienteRequest")) {
+					ConsultaExpedienteRequestPsn expediente = jaxbParserExpedientePsn(info)
+					salida.setExpediente(expediente)
+					salida.setInfo(SchemaEntities.toString(expediente))
+				} else if (info.contains("ResultadoReconocimientoMedicoRequest")) {
+					ResultadoReconocimientoMedicoRequestPsn resultado = jaxbParserResultadoPsn(info)
+					salida.setReconocimiento(resultado)
+					salida.setInfo(SchemaEntities.toString(resultado))
+				}
+			}
+		}
+		return salida
+	}
+
+	private ConsultaExpedienteRequestPsn jaxbParserExpedientePsn(String entrada) {
+		ConsultaExpedienteRequestPsn salida = null
+		if(entrada != null && entrada.length() > 0) {
+
+			JAXBContext jaxbContext = JAXBContext.newInstance(ConsultaExpedienteRequestPsn.class)
+			Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller()
+
+			StringReader reader = new StringReader(entrada)
+
+			JAXBElement<ConsultaExpedienteRequestPsn> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), ConsultaExpedienteRequestPsn.class)
+			salida = root.getValue()
+		}
+		return salida
+	}
+
+	private ResultadoReconocimientoMedicoRequestPsn jaxbParserResultadoPsn(String entrada) {
+		ResultadoReconocimientoMedicoRequestPsn salida = null
+		if(entrada != null && entrada.length() > 0) {
+
+			JAXBContext jaxbContext = JAXBContext.newInstance(ResultadoReconocimientoMedicoRequestPsn.class)
+			Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller()
+
+			StringReader reader = new StringReader(entrada)
+
+			JAXBElement<ResultadoReconocimientoMedicoRequestPsn> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), ResultadoReconocimientoMedicoRequestPsn.class)
+			salida = root.getValue()
+		}
+		return salida
 	}
 
 	public EnvioCajamar leerEnvioCajamar(String salida){
@@ -301,6 +396,10 @@ class Parser {
 		return entradaDetalle
 	}
 
+	/*************************
+	 * MÉTODOS NO UTILIZADOS *
+	 *************************/
+
 	private groovy.util.NodeList getNodeListByTagName(String entrada) {
 		def list = new XmlParser().parseText(entrada)
 		assert list instanceof groovy.util.Node
@@ -363,6 +462,18 @@ class Parser {
 				} else if(actual.name().toString().contains("DateEnd")) {
 					salida.setFechaFin(actual.value())
 				}
+			}
+		}
+		return salida
+	}
+
+	private EnvioAMA getEnvioAMA(String entrada) {
+		EnvioAMA salida = new EnvioAMA()
+		if(entrada != null) {
+			String[] params = entrada.trim().replace("-",":").split(":")
+			if(params != null && params.length == 4) {
+				salida.setEstado(params[1].trim())
+				salida.setRespuesta(params[3].trim())
 			}
 		}
 		return salida

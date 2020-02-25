@@ -10,6 +10,10 @@ import com.ws.afiesca.beans.AfiEscaUnderwrittingCaseManagementRequest
 import com.ws.alptis.beans.AlptisUnderwrittingCaseManagementRequest
 import com.ws.cajamar.beans.CajamarUnderwrittingCaseManagementRequest
 import com.ws.lifesquare.beans.LifesquareUnderwrittingCaseManagementRequest
+import hwsol.entities.EnvioAMA
+import hwsol.entities.EnvioAlptis
+import hwsol.entities.EnvioCajamar
+import hwsol.entities.EnvioCaser
 
 import javax.xml.bind.JAXBContext
 import javax.xml.bind.JAXBElement
@@ -425,11 +429,9 @@ class LogUtil {
 
                 case TipoCompany.CASER:
 
-                    List<EntradaDetalle> enviadosCaser = new ArrayList<EntradaDetalle>()
-
+                    List<EnvioCaser> enviadosCaser = new ArrayList<EnvioCaser>()
                     for (int i = 0; i < enviados.size(); i++) {
-
-                        enviadosCaser.add(parser.leerEnvioCaser(enviados.get(i).info.trim()))
+                        enviadosCaser.add(parser.leerEnvioCaser(enviados.get(i)))
                     }
 
                     elementos = enviadosCaser
@@ -438,98 +440,99 @@ class LogUtil {
                 case TipoCompany.AMA:
 
                     List<EnvioAMA> enviadosAma = new ArrayList<>()
-
                     for (int i = 0; i < enviados.size(); i++) {
-
-                        enviadosAma.add(parser.leerEnvioAMA(enviados.get(i).info.trim()));
-
+                        enviadosAma.add(parser.leerEnvioAMA(enviados.get(i)))
                     }
 
                     elementos = enviadosAma
 
                     break
-
-                case TipoCompany.CAJAMAR:
-
-                    List<EnvioCajamar> envioadosCajamar = new ArrayList<EnvioCajamar>()
-
-                    for (int i = 0; i < enviados.size(); i++) {
-
-                        envioadosCajamar.add(parser.leerEnvioCajamar(enviados.get(i).info.trim()))
-                    }
-
-                    elementos = envioadosCajamar
-
-                    break
-
-                case TipoCompany.LAGUN_ARO:
-
-                    List<com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest> recibidosLagunaro = new ArrayList<com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest>()
-
-                    for (int i = 0; i < enviados.size(); i++) {
-
-                        JAXBContext jaxbContext = JAXBContext.newInstance(com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest.class);
-                        Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-
-                        StringReader reader = new StringReader(enviados.get(i).info.trim());
-
-                        JAXBElement<com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest.class);
-                        com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest gestionReconocimientoMedicoRequest = root.getValue();
-
-                        recibidosLagunaro.add(gestionReconocimientoMedicoRequest)
-                    }
-
-                    elementos = recibidosLagunaro
-
-                    break
-
-
-                case TipoCompany.ALPTIS:
-
-                    List<EnvioAlptis> envioadosAlptis = new ArrayList<EnvioAlptis>()
-
-                    for (int i = 0; i < enviados.size(); i++) {
-
-                        envioadosAlptis.add(parser.leerEnvioAlptis(enviados.get(i).info.trim()))
-                    }
-
-                    elementos = envioadosAlptis
-
-                    break
-
-                case TipoCompany.AFI_ESCA:
-
-                    /**PARA AFIESCA NO HAY TRANSFORMACI�N SE RECOGEN LOS DATOS DE LA TABLA ENVIO DIRECTAMENTE
-                     *
-                     */
+                default:
                     elementos = enviados
-
                     break
 
-                case TipoCompany.ZEN_UP:
-
-                    /**PARA LIFESQUARE NO HAY TRANSFORMACI�N SE RECOGEN LOS DATOS DE LA TABLA ENVIO DIRECTAMENTE
-                     *
-                     */
-                    elementos = enviados
-
-                    break
-                case TipoCompany.PSN:
-                    break
-                case TipoCompany.NET_INSURANCE:
-                    break
-                case TipoCompany.MALAKOFF_MEDERIC:
-                    break
-                case TipoCompany.SOCIETE_GENERALE:
-                    break
-                case TipoCompany.METHIS_LAB:
-                    break
-                case TipoCompany.CBP_ITALIA:
-                    break
-                case TipoCompany.ENGINYERS:
-                    break
-                case TipoCompany.CF_LIFE:
-                    break
+//                case TipoCompany.CAJAMAR:
+//
+//                    List<EnvioCajamar> envioadosCajamar = new ArrayList<EnvioCajamar>()
+//
+//                    for (int i = 0; i < enviados.size(); i++) {
+//
+//                        envioadosCajamar.add(parser.leerEnvioCajamar(enviados.get(i).info.trim()))
+//                    }
+//
+//                    elementos = envioadosCajamar
+//
+//                    break
+//
+//                case TipoCompany.LAGUN_ARO:
+//
+//                    List<com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest> recibidosLagunaro = new ArrayList<com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest>()
+//
+//                    for (int i = 0; i < enviados.size(); i++) {
+//
+//                        JAXBContext jaxbContext = JAXBContext.newInstance(com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest.class);
+//                        Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+//
+//                        StringReader reader = new StringReader(enviados.get(i).info.trim());
+//
+//                        JAXBElement<com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest.class);
+//                        com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest gestionReconocimientoMedicoRequest = root.getValue();
+//
+//                        recibidosLagunaro.add(gestionReconocimientoMedicoRequest)
+//                    }
+//
+//                    elementos = recibidosLagunaro
+//
+//                    break
+//
+//
+//                case TipoCompany.ALPTIS:
+//
+//                    List<EnvioAlptis> envioadosAlptis = new ArrayList<EnvioAlptis>()
+//
+//                    for (int i = 0; i < enviados.size(); i++) {
+//
+//                        envioadosAlptis.add(parser.leerEnvioAlptis(enviados.get(i).info.trim()))
+//                    }
+//
+//                    elementos = envioadosAlptis
+//
+//                    break
+//
+//                case TipoCompany.AFI_ESCA:
+//
+//                    /**PARA AFIESCA NO HAY TRANSFORMACI�N SE RECOGEN LOS DATOS DE LA TABLA ENVIO DIRECTAMENTE
+//                     *
+//                     */
+//                    elementos = enviados
+//
+//                    break
+//
+//                case TipoCompany.ZEN_UP:
+//
+//                    /**PARA LIFESQUARE NO HAY TRANSFORMACI�N SE RECOGEN LOS DATOS DE LA TABLA ENVIO DIRECTAMENTE
+//                     *
+//                     */
+//                    elementos = enviados
+//
+//                    break
+//                case TipoCompany.PSN:
+//                    break
+//                case TipoCompany.NET_INSURANCE:
+//
+//                    break
+//                case TipoCompany.MALAKOFF_MEDERIC:
+//                    break
+//                case TipoCompany.SOCIETE_GENERALE:
+//                    break
+//                case TipoCompany.METHIS_LAB:
+//                    break
+//                case TipoCompany.CBP_ITALIA:
+//                    break
+//                case TipoCompany.ENGINYERS:
+//                    break
+//                case TipoCompany.CF_LIFE:
+//                    break
             }
 
             return elementos
