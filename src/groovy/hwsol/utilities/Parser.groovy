@@ -240,6 +240,9 @@ class Parser {
 		return salida
 	}
 
+	/**
+	 * Métodos de parseo de Cajamar (antiguos)
+	 */
 	ValoracionTeleSeleccionResponse valoracionTeleSeleccionResponse(String salida){
 
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
@@ -332,6 +335,9 @@ class Parser {
 		return entradaDetalle
 	}
 
+	/**
+	 * Métodos de parseo de Alptis (antiguos)
+	 */
 	AlptisGeneralData alptisGeneralData(String salida){
 
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
@@ -407,6 +413,40 @@ class Parser {
 
 		return entradaDetalle
 	}
+
+	private String tratarXmlAlptis(String entrada) {
+		/**EL XML A TRATAR ESTA MAL FORMADO. TENEMOS QUE SELECCIONAR EL FRAGMENTO QUE QUEREMOS PARA SACAR LOS DATOS.
+		 *
+		 */
+
+		int startIndex = 0
+		int endIndex = 0
+		def toBeReplaced = ""
+
+		def xml = entrada.substring(entrada.indexOf("<generalData>"), entrada.indexOf("</generalData>")+"</generalData>".length())
+
+		if (startIndex != -1){
+
+			startIndex = xml.indexOf("<contractedBenefits>")
+			endIndex = xml.indexOf("</contractedBenefits>")+"</contractedBenefits>".length()
+			toBeReplaced = xml.substring(startIndex, endIndex)
+		}
+
+
+		def xml2 = xml.replace(toBeReplaced, "")
+
+		startIndex = xml2.indexOf("<crmQuestions>")
+
+		if (startIndex != -1){
+			endIndex = xml2.indexOf("</crmQuestions>")+"</crmQuestions>".length()
+			toBeReplaced = xml2.substring(startIndex, endIndex);
+		}
+
+		def xml3 = xml2.replace(toBeReplaced, "")
+
+		return "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>"+xml3
+	}
+
 //
 //	/*************************
 //	 * MÉTODOS NO UTILIZADOS *
@@ -504,37 +544,6 @@ class Parser {
 
 
 
-	private String tratarXmlAlptis(String entrada) {
-		/**EL XML A TRATAR ESTA MAL FORMADO. TENEMOS QUE SELECCIONAR EL FRAGMENTO QUE QUEREMOS PARA SACAR LOS DATOS.
-		 *
-		 */
 
-		int startIndex = 0
-		int endIndex = 0
-		def toBeReplaced = ""
-
-		def xml = entrada.substring(entrada.indexOf("<generalData>"), entrada.indexOf("</generalData>")+"</generalData>".length())
-
-		if (startIndex != -1){
-
-			startIndex = xml.indexOf("<contractedBenefits>")
-			endIndex = xml.indexOf("</contractedBenefits>")+"</contractedBenefits>".length()
-			toBeReplaced = xml.substring(startIndex, endIndex)
-		}
-
-
-		def xml2 = xml.replace(toBeReplaced, "")
-
-		startIndex = xml2.indexOf("<crmQuestions>")
-
-		if (startIndex != -1){
-			endIndex = xml2.indexOf("</crmQuestions>")+"</crmQuestions>".length()
-			toBeReplaced = xml2.substring(startIndex, endIndex);
-		}
-
-		def xml3 = xml2.replace(toBeReplaced, "")
-
-		return "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>"+xml3
-	}
 
 }

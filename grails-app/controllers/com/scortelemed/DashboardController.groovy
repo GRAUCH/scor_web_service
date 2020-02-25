@@ -3,7 +3,7 @@ package com.scortelemed
 import com.scor.global.CompanyLog
 import grails.plugin.springsecurity.annotation.Secured
 import hwsol.factory.LogFactory
-import hwsol.webservices.LogUtil
+import hwsol.utilities.LogUtil
 import hwsol.webservices.LogService
 
 import java.text.SimpleDateFormat
@@ -24,8 +24,7 @@ class DashboardController {
         params.max = Math.min(params.max ? params.int('max') : 10, 10)
         LogUtil logUtil = new LogUtil()
         String ou = session.getAttribute("ou")
-        List<CompanyLog> ciasLog = new ArrayList<CompanyLog>()
-        ciasLog = logUtil.obtenerCopaniasLog(ou)
+        List<CompanyLog> ciasLog = logUtil.obtenerCompanyLogs(ou)
         Company company = null
 
         Calendar calHasta = Calendar.getInstance()
@@ -54,10 +53,12 @@ class DashboardController {
         if (params.logs == null) {
             [ciasLog: ciasLog, company: nombre, elementos: elementos, ou: ou, desde: formatter.format(desde), hasta: formatter.format(hasta), max: params.max, lista: null, idCia: idCia]
         } else if (params.logs == 'recibido') {
-            elementos = logUtil.obtenerRecibidos(company, formatter.parse(params.desde), hasta, params.max)
+            LogService recibidos = LogFactory.newLogService(Recibido.class)
+            elementos = recibidos.obtener(company, formatter.parse(params.desde), hasta, params.max)
             [ciasLog: ciasLog, company: nombre, elementos: elementos, ou: ou, desde: params.desde, hasta: params.hasta, max: params.max, lista: "listaRecibidos" + nombre + ".gsp", idCia: idCia]
         } else if (params.logs == 'error') {
-            elementos = logUtil.obtenerErrores(company, formatter.parse(params.desde), hasta, params.max)
+            LogService errores = LogFactory.newLogService(Error.class)
+            elementos = errores.obtener(company, formatter.parse(params.desde), hasta, params.max)
             [ciasLog: ciasLog, company: nombre, elementos: elementos, ou: ou, desde: params.desde, hasta: params.hasta, max: params.max, lista: "listaErrores.gsp", idCia: idCia]
         } else {
             LogService enviados = LogFactory.newLogService(Envio.class)

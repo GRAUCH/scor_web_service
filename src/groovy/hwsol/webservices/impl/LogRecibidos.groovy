@@ -1,109 +1,30 @@
-package hwsol.webservices
+package hwsol.webservices.impl
 
-import com.scor.global.CompanyLog
 import com.scortelemed.Company
-import com.scortelemed.Envio
-import com.scortelemed.Error
 import com.scortelemed.Recibido
 import com.scortelemed.TipoCompany
+import com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest
 import com.ws.afiesca.beans.AfiEscaUnderwrittingCaseManagementRequest
 import com.ws.alptis.beans.AlptisUnderwrittingCaseManagementRequest
 import com.ws.cajamar.beans.CajamarUnderwrittingCaseManagementRequest
 import com.ws.lifesquare.beans.LifesquareUnderwrittingCaseManagementRequest
+import hwsol.utilities.Parser
+import hwsol.webservices.LogService
 
 import javax.xml.bind.JAXBContext
 import javax.xml.bind.JAXBElement
 import javax.xml.bind.Unmarshaller
 import javax.xml.transform.stream.StreamSource
 
-class LogUtil {
+class LogRecibidos implements LogService{
 
-    def elementos
+    LogRecibidos(){}
 
-    public List<CompanyLog> obtenerCopaniasLog(String ou) {
+    List elementos
+    Parser parser = new Parser()
 
-        List<Company> cias = new ArrayList<Company>()
-        List<CompanyLog> ciasLog = new ArrayList<CompanyLog>()
-
-        if (ou != null && !ou.isEmpty() && !ou.equals("AD")) {
-            cias = Company.findAllByOu(ou)
-        } else {
-            cias = Company.findAllByOuIsNotNull()
-        }
-
-        for (int i = 0; i < cias.size(); i++) {
-
-            if (cias.get(i).generationAutomatic) {
-
-                CompanyLog ciaLog = new CompanyLog()
-
-                ciaLog.setLogo(cias.get(i).nombre + ".jpg")
-                ciaLog.setRecibidos(Recibido.findAllByCia(cias.get(i).id.toString()))
-                ciaLog.setEnviados(Envio.findAllByCia(cias.get(i).id.toString()))
-                ciaLog.setName(cias.get(i).nombre)
-                ciaLog.setId(cias.get(i).id.toString())
-                ciaLog.setOu(cias.get(i).ou)
-
-                ciasLog.add(ciaLog)
-            }
-        }
-
-        return ciasLog
-    }
-
-    def findRecibidos(desde, hasta, Company company, Map sortParams) {
-        StringBuilder hqlQueryBuilder = new StringBuilder(' ')
-
-        hqlQueryBuilder << 'FROM Recibido AS recibido  '
-        Map namedParams = [idCia: company.id]
-        hqlQueryBuilder << 'WHERE cia = :idCia '
-        hqlQueryBuilder << 'AND '
-        hqlQueryBuilder << "fecha BETWEEN  :iniDate "
-        hqlQueryBuilder << 'AND '
-        hqlQueryBuilder << " :endDate "
-        namedParams["endDate"] = hasta
-        namedParams["iniDate"] = desde
-
-
-        hqlQueryBuilder << "ORDER BY fecha DESC"
-
-        System.out.println("idCia ID  -->>" + company.id)
-
-
-        Recibido.executeQuery(hqlQueryBuilder.toString(), namedParams, sortParams)
-    }
-
-    def findErrores(Company company,desde, hasta, Map sortParams) {
-        StringBuilder hqlQueryBuilder = new StringBuilder(' ')
-
-        hqlQueryBuilder << 'FROM Error AS error  '
-        Map namedParams = [idCia: company.id]
-        hqlQueryBuilder << 'WHERE cia = :idCia '
-        hqlQueryBuilder << 'AND '
-        hqlQueryBuilder << "fecha BETWEEN  :iniDate "
-        hqlQueryBuilder << 'AND '
-        hqlQueryBuilder << " :endDate "
-        namedParams["endDate"] = hasta
-        namedParams["iniDate"] = desde
-
-
-        hqlQueryBuilder << "ORDER BY fecha DESC"
-
-        System.out.println("idCia ID  -->>" + company.id)
-
-
-        Error.executeQuery(hqlQueryBuilder.toString(), namedParams, sortParams)
-    }
-
-    def obtenerErrores(company, desde, hasta, max) {
-        List<Error> errores = null
-        if (company != null && !company.toString().isEmpty()) {
-            errores =  new ArrayList<Error>()
-            errores = findErrores(company,desde, hasta, [max: max])
-        }
-    }
-
-    def obtenerRecibidos(company, desde, hasta, max) {
+    @Override
+    List obtener(company, desde, hasta, max) {
 
         if (company != null && !company.toString().isEmpty()) {
             List<Recibido> recibidos = new ArrayList<Recibido>()
@@ -122,7 +43,7 @@ class LogUtil {
 
                         StringReader reader = new StringReader(actual.info.trim());
 
-                        JAXBElement<com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest.class);
+                        JAXBElement<GestionReconocimientoMedicoRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest.class);
                         com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest gestionReconocimientoMedicoRequest = root.getValue();
 
                         recibidosCaser.add(gestionReconocimientoMedicoRequest)
@@ -388,5 +309,28 @@ class LogUtil {
 
             return elementos
         }
+    }
+
+
+    private List<Recibido> findRecibidos(desde, hasta, Company company, Map sortParams) {
+        StringBuilder hqlQueryBuilder = new StringBuilder(' ')
+
+        hqlQueryBuilder << 'FROM Recibido AS recibido  '
+        Map namedParams = [idCia: company.id]
+        hqlQueryBuilder << 'WHERE cia = :idCia '
+        hqlQueryBuilder << 'AND '
+        hqlQueryBuilder << "fecha BETWEEN  :iniDate "
+        hqlQueryBuilder << 'AND '
+        hqlQueryBuilder << " :endDate "
+        namedParams["endDate"] = hasta
+        namedParams["iniDate"] = desde
+
+
+        hqlQueryBuilder << "ORDER BY fecha DESC"
+
+        System.out.println("idCia ID  -->>" + company.id)
+
+
+        Recibido.executeQuery(hqlQueryBuilder.toString(), namedParams, sortParams)
     }
 }

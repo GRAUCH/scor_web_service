@@ -9,8 +9,6 @@ import com.scortelemed.schemas.ama.ConsultaExpedienteRequest
 import com.scortelemed.schemas.ama.ResultadoSiniestroRequest
 //Caser
 import com.scortelemed.schemas.caser.ResultadoReconocimientoMedicoRequest
-import com.scortelemed.schemas.methislabCF.MethislabCFUnderwrittingCasesResultsRequest
-import hwsol.entities.parser.AlptisGeneralData
 import hwsol.entities.parser.RegistrarEventoSCOR
 //PSN
 import com.scortelemed.schemas.psn.ConsultaExpedienteRequest as ConsultaExpedienteRequestPsn
@@ -21,6 +19,12 @@ import com.scortelemed.schemas.netinsurance.NetinsuranteGetDossierRequest
 import com.scortelemed.schemas.methislab.MethislabUnderwrittingCasesResultsRequest
 //CBP Ita
 import com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCasesResultsRequest
+//Methislab CF
+import com.scortelemed.schemas.methislabCF.MethislabCFUnderwrittingCasesResultsRequest
+//Alptis
+import hwsol.entities.parser.AlptisGeneralData
+//Cajamar
+import hwsol.entities.parser.ValoracionTeleSeleccionResponse
 
 import hwsol.entities.EnvioAMA
 import hwsol.entities.EnvioAlptis
@@ -31,7 +35,6 @@ import hwsol.entities.EnvioMethislab
 import hwsol.entities.EnvioMethislabCF
 import hwsol.entities.EnvioCbpIta
 import hwsol.entities.EnvioPSN
-import hwsol.entities.parser.ValoracionTeleSeleccionResponse
 import hwsol.factory.SchemaEntities
 import hwsol.utilities.Parser
 import hwsol.webservices.LogService
