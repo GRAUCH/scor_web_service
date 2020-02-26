@@ -24,11 +24,6 @@ class CorreoUtil {
     def host = "mail.scortelemed.com"
     def port = "25"
 
-    //	def remitente="hwsoltest@gmail.com"
-    //	def usuarioConexion="hwsoltest@gmail.com"
-    //	def passConexion="hwsol1234"
-    //	def host="smtp.gmail.com"
-    //	def port="587"
 
     private String envioEmailNoTratados(String operacion, String mensaje) {
 
@@ -152,12 +147,12 @@ class CorreoUtil {
             String subject = "Webservices: " + operacion
 
             if (!Environment.current.name.equals("production_wildfly")) {
-                subject = "Webservices Test PREPRO: " + operacion;
+                subject = "Webservices Test PREPRO: " + operacion
             }
 
-            String message = null;
+            String message = null
 
-            boolean debug = false;
+            boolean debug = false
 
             Session sessionMail = Session.getDefaultInstance(propertiesMail());
 
@@ -167,21 +162,21 @@ class CorreoUtil {
                 else
                     message = request + "\n" + error + "\n" + new Date()
 
-                sessionMail.setDebug(debug);
-                Message msg = new MimeMessage(sessionMail);
-                InternetAddress addressFrom = new InternetAddress(remitente);
-                msg.setFrom(addressFrom);
-                InternetAddress[] addressTo = new InternetAddress[1];
+                sessionMail.setDebug(debug)
+                Message msg = new MimeMessage(sessionMail)
+                InternetAddress addressFrom = new InternetAddress(remitente)
+                msg.setFrom(addressFrom)
+                InternetAddress[] addressTo = new InternetAddress[1]
 
-                addressTo[0] = new InternetAddress(dameEmailErrores());
+                addressTo[0] = new InternetAddress(dameEmailErrores())
 
-                msg.setRecipients(Message.RecipientType.TO, addressTo);
-                msg.setSubject(subject);
-                msg.setContent(message, "text/plain");
-                Transport t = sessionMail.getTransport("smtp");
-                t.connect(usuarioConexion, passConexion);
-                t.sendMessage(msg, msg.getAllRecipients());
-                t.close();
+                msg.setRecipients(Message.RecipientType.TO, addressTo)
+                msg.setSubject(subject)
+                msg.setContent(message, "text/plain")
+                Transport t = sessionMail.getTransport("smtp")
+                t.connect(usuarioConexion, passConexion)
+                t.sendMessage(msg, msg.getAllRecipients())
+                t.close()
                 return null
             } catch (Exception e) {
                 logginService.putErrorEndpoint("Method envioEmailErrores", "Ha ocurrido un error en envio de email: " + e)

@@ -49,14 +49,13 @@ public class ZipUtils {
         zip.delete();
     }
 
-    public byte[] generarZips(servicios.ExpedienteInforme expediente, String codigoStCia, String fecha, String zipPath, String user, String password) {
+    public byte[] generarZips(servicios.ExpedienteInforme expediente, String codigoStCia, String fecha, String zipPath, String user, String password) throws Exception{
         startSession();
         List<Documentacion> listaDocumentosPdf = new ArrayList<Documentacion>();
         List<Documentacion> listaDocumentosAudios = new ArrayList<Documentacion>();
         String rutaDocumento = null;
 
 
-        try {
 
             if (expediente != null) {
 
@@ -75,11 +74,8 @@ public class ZipUtils {
                         if (listaDocumentosPdf.get(k).getUrlAlfresco() != null) {
 
                             rutaDocumento = descargarPdf(listaDocumentosPdf.get(k).getUrlAlfresco(), listaDocumentosPdf.get(k).getNombre(), expediente, listaDocumentosPdf.get(k).getTipoDocumentacion(), zipPath, user, password);
-
                             System.out.println("Intentando descargar documento: " + listaDocumentosPdf.get(k).getNombre());
-
                             if (rutaDocumento != null) {
-
                                 System.out.println("TUW: Se ha generado el documento " + listaDocumentosPdf.get(k).getNombre() + " para expediente "
                                         + expediente.getCodigoST() + " en la ruta " + rutaDocumento);
                             } else {
@@ -113,15 +109,12 @@ public class ZipUtils {
                     }
 
                     if (listaDocumentosPdf.size() > 0) {
-
                         return generarZip(expediente.getNumSolicitud(), expediente.getCandidato().getApellidos(), zipPath);
                     }
 
                 }
             }
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
+
 
         return null;
     }
@@ -265,8 +258,6 @@ public class ZipUtils {
         String nombre = null;
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-        try {
-
             /**
              * • YYYY.MM.DD-PIT-Survey_APPLICATION NUMBER.pdf
              **/
@@ -291,11 +282,7 @@ public class ZipUtils {
 
             return ficheroLocal.getPath();
 
-        } catch (Exception e) {
 
-            System.out.println(e.getMessage());
-        }
-        return null;
     }
 
     public String descargarAudios(String path, String nombreFichero, servicios.ExpedienteInforme expediente, TipoDocumentacion tipoDocumentacion, int ordinal, int numeroAudios, String zipPath, final String user, final String password)
@@ -306,7 +293,7 @@ public class ZipUtils {
         String nombre = null;
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-        try {
+
 
             /**
              * YYYY.MM.DD-PIT-Call_APPLICATION NUMBER.mp3
@@ -337,11 +324,8 @@ public class ZipUtils {
 
             return ficheroLocal.getPath();
 
-        } catch (Exception e) {
 
-            System.out.println(e.getMessage());
-        }
-        return null;
+
     }
 
     private static byte[] readBytesFromFile(String filePath) {
