@@ -89,7 +89,6 @@ class LogEnviados implements LogService{
                 case TipoCompany.SOCIETE_GENERALE:
                 case TipoCompany.ZEN_UP:
                 case TipoCompany.ENGINYERS:
-                case TipoCompany.SCOR:
                 default: //AFIESCA, ZEN UP(LIFESQUARE), etc
                     elementos = enviados
                     break

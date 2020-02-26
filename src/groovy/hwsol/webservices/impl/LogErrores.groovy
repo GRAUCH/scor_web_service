@@ -60,20 +60,13 @@ class LogErrores implements LogService{
                     elementos = leerErrores(errores, GestionReconocimientoMedicoRequestLagunaro.class)
                     break
                 case TipoCompany.AMA:
+                case TipoCompany.ALPTIS:
+                case TipoCompany.AFI_ESCA:
+                case TipoCompany.MALAKOFF_MEDERIC:
+                case TipoCompany.SOCIETE_GENERALE:
+                case TipoCompany.ZEN_UP:
                 default: //AMA,
                     elementos = errores
-                    break
-                case TipoCompany.ALPTIS:
-                    break
-                case TipoCompany.AFI_ESCA:
-                    break
-                case TipoCompany.MALAKOFF_MEDERIC:
-                    break
-                case TipoCompany.SOCIETE_GENERALE:
-                    break
-                case TipoCompany.ZEN_UP:
-                    break
-                case TipoCompany.SCOR:
                     break
             }
 
