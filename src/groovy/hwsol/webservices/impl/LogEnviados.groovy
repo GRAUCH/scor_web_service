@@ -83,6 +83,13 @@ class LogEnviados implements LogService{
                 case TipoCompany.CF_LIFE:
                     elementos = leerEnvios(enviados, MethislabCFUnderwrittingCasesResultsRequest.class)
                     break
+                case TipoCompany.LAGUN_ARO:
+                case TipoCompany.AFI_ESCA:
+                case TipoCompany.MALAKOFF_MEDERIC:
+                case TipoCompany.SOCIETE_GENERALE:
+                case TipoCompany.ZEN_UP:
+                case TipoCompany.ENGINYERS:
+                case TipoCompany.SCOR:
                 default: //AFIESCA, ZEN UP(LIFESQUARE), etc
                     elementos = enviados
                     break

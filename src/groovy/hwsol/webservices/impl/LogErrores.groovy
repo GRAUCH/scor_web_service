@@ -35,9 +35,6 @@ class LogErrores implements LogService{
                 case TipoCompany.CASER:
                     elementos = leerErroresCaser(errores)
                     break
-//                case TipoCompany.ALPTIS:
-//                    elementos = leerEnviosAlptis(enviados)
-//                    break
                 case TipoCompany.CAJAMAR:
                     elementos = leerErrores(errores, CajamarUnderwrittingCaseManagementRequest.class)
                     break
@@ -65,6 +62,18 @@ class LogErrores implements LogService{
                 case TipoCompany.AMA:
                 default: //AMA,
                     elementos = errores
+                    break
+                case TipoCompany.ALPTIS:
+                    break
+                case TipoCompany.AFI_ESCA:
+                    break
+                case TipoCompany.MALAKOFF_MEDERIC:
+                    break
+                case TipoCompany.SOCIETE_GENERALE:
+                    break
+                case TipoCompany.ZEN_UP:
+                    break
+                case TipoCompany.SCOR:
                     break
             }
 
