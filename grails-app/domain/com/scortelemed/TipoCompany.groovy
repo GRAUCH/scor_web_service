@@ -17,7 +17,8 @@ enum TipoCompany {
     ZEN_UP("lifesquare"),
     ENGINYERS("enginyers"),
     CF_LIFE("methislabCF"),
-    SCOR("Scor")
+    SCOR("Scor"),
+    DEFAULT("default")
 
     private final String nombre
 
@@ -45,6 +46,7 @@ enum TipoCompany {
                 }
             }
         }
+        return TipoCompany.DEFAULT
     }
 
 }
