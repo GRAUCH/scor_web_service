@@ -26,6 +26,7 @@ import hwsol.entities.parser.AlptisGeneralData
 //Cajamar
 import hwsol.entities.parser.ValoracionTeleSeleccionResponse
 
+import hwsol.entities.Envio as NewEnvio
 import hwsol.entities.EnvioAMA
 import hwsol.entities.EnvioAlptis
 import hwsol.entities.EnvioCaser
@@ -80,7 +81,7 @@ class LogEnviados implements LogService{
                     elementos = leerEnviosCbpIta(enviados)
                     break
                 case TipoCompany.CF_LIFE:
-                    elementos = leerEnviosMethislabCF(enviados)
+                    elementos = leerEnvios(enviados, MethislabCFUnderwrittingCasesResultsRequest.class)
                     break
                 default: //AFIESCA, ZEN UP(LIFESQUARE), etc
                     elementos = enviados
@@ -90,6 +91,24 @@ class LogEnviados implements LogService{
             return elementos
         }
     }
+
+    List<NewEnvio> leerEnvios(List<Envio> entrada, Class<?> myObjectClass) {
+        List<NewEnvio> enviados = new ArrayList<>()
+        for (Envio actual:entrada) {
+            NewEnvio salida = new NewEnvio()
+            salida.set(actual)
+            String info = actual.info.trim()
+            if (info != null && !info.isEmpty() && info.charAt(0) == '<') {
+                if (info.contains(myObjectClass.simpleName)) {
+                    Object cases = parser.jaxbParser(info, myObjectClass)
+                    salida.setInfo(SchemaEntities.toString(cases))
+                }
+            }
+            enviados.add(salida)
+        }
+        return enviados
+    }
+
 
     private def findEnvios(desde, hasta, Company company, Map sortParams) {
         StringBuilder hqlQueryBuilder = new StringBuilder(' ')
@@ -126,10 +145,10 @@ class LogEnviados implements LogService{
             String info = actual.info
             if (info != null && !info.isEmpty() && info.charAt(0) == '<') {
                 if (info.contains("ConsultaExpedienteRequest")) {
-                    ConsultaExpedienteRequest expediente = parser.jaxbParserExpedienteAma(info)
+                    ConsultaExpedienteRequest expediente = parser.jaxbParser(info, ConsultaExpedienteRequest.class)
                     salida.setInfo(SchemaEntities.toString(expediente))
                 } else if (info.contains("ResultadoSiniestroRequest")) {
-                    ResultadoSiniestroRequest siniestro = parser.jaxbParserSiniestroAma(info)
+                    ResultadoSiniestroRequest siniestro = parser.jaxbParser(info, ResultadoSiniestroRequest.class)
                     salida.setInfo(SchemaEntities.toString(siniestro))
                 }
             }
@@ -146,7 +165,7 @@ class LogEnviados implements LogService{
             String info = actual.info
             if (info != null && !info.isEmpty() && info.charAt(0) == '<') {
                 if (info.contains("ResultadoReconocimientoMedicoRequest")) {
-                    ResultadoReconocimientoMedicoRequest resultado = parser.jaxbParserResultadoCaser(info)
+                    ResultadoReconocimientoMedicoRequest resultado = parser.jaxbParser(info, ResultadoReconocimientoMedicoRequest.class)
                     salida.setResultado(resultado)
                     salida.setInfo(SchemaEntities.toString(resultado))
                 } else if (info.contains("service_RegistrarEventoSCOR")) {
@@ -169,11 +188,11 @@ class LogEnviados implements LogService{
             String info = actual.info
             if (info != null && !info.isEmpty() && info.charAt(0) == '<') {
                 if (info.contains("ConsultaExpedienteRequest")) {
-                    ConsultaExpedienteRequestPsn expediente = parser.jaxbParserExpedientePsn(info)
+                    ConsultaExpedienteRequestPsn expediente = parser.jaxbParser(info, ConsultaExpedienteRequestPsn.class)
                     salida.setExpediente(expediente)
                     salida.setInfo(SchemaEntities.toString(expediente))
                 } else if (info.contains("ResultadoReconocimientoMedicoRequest")) {
-                    ResultadoReconocimientoMedicoRequestPsn resultado = parser.jaxbParserResultadoPsn(info)
+                    ResultadoReconocimientoMedicoRequestPsn resultado = parser.jaxbParser(info, ResultadoReconocimientoMedicoRequestPsn.class)
                     salida.setReconocimiento(resultado)
                     salida.setInfo(SchemaEntities.toString(resultado))
                 }
@@ -191,7 +210,7 @@ class LogEnviados implements LogService{
             String info = actual.info
             if (info != null && !info.isEmpty() && info.charAt(0) == '<') {
                 if (info.contains("NetinsuranteGetDossierRequest")) {
-                    NetinsuranteGetDossierRequest dossier = parser.jaxbParserDossierNetInsurance(info)
+                    NetinsuranteGetDossierRequest dossier = parser.jaxbParser(info, NetinsuranteGetDossierRequest.class)
                     salida.setDossier(dossier)
                     salida.setInfo(SchemaEntities.toString(dossier))
                 }
@@ -209,7 +228,7 @@ class LogEnviados implements LogService{
             String info = actual.info
             if (info != null && !info.isEmpty() && info.charAt(0) == '<') {
                 if (info.contains("MethislabUnderwrittingCasesResultsRequest")) {
-                    MethislabUnderwrittingCasesResultsRequest cases = parser.jaxbParserMethislabUnderwritingCases(info)
+                    MethislabUnderwrittingCasesResultsRequest cases = parser.jaxbParser(info, MethislabUnderwrittingCasesResultsRequest.class)
                     salida.setResults(cases)
                     salida.setInfo(SchemaEntities.toString(cases))
                 }
@@ -227,7 +246,7 @@ class LogEnviados implements LogService{
             String info = actual.info
             if (info != null && !info.isEmpty() && info.charAt(0) == '<') {
                 if (info.contains("CbpitaUnderwrittingCasesResultsRequest")) {
-                    CbpitaUnderwrittingCasesResultsRequest cases = parser.jaxbParserCbpItaUnderwritingCases(info)
+                    CbpitaUnderwrittingCasesResultsRequest cases = parser.jaxbParser(info, CbpitaUnderwrittingCasesResultsRequest.class)
                     salida.setResults(cases)
                     salida.setInfo(SchemaEntities.toString(cases))
                 }
@@ -245,7 +264,7 @@ class LogEnviados implements LogService{
             String info = actual.info
             if (info != null && !info.isEmpty() && info.charAt(0) == '<') {
                 if (info.contains("MethislabCFUnderwrittingCasesResultsRequest")) {
-                    MethislabCFUnderwrittingCasesResultsRequest cases = parser.jaxbParserMethislabCFUnderwritingCases(info)
+                    MethislabCFUnderwrittingCasesResultsRequest cases = parser.jaxbParser(info, MethislabCFUnderwrittingCasesResultsRequest.class)
                     salida.setResults(cases)
                     salida.setInfo(SchemaEntities.toString(cases))
                 }

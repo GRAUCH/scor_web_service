@@ -1,6 +1,6 @@
 package com.scortelemed
 
-public class Envio {
+class Envio {
 
     Date fecha
     String cia

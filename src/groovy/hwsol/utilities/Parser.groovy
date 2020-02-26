@@ -1,6 +1,7 @@
 package hwsol.utilities
 
-
+import com.scortelemed.Envio
+import com.scortelemed.Recibido
 import hwsol.entities.parser.RegistrarEventoSCOR
 import hwsol.entities.parser.AlptisGeneralData
 import hwsol.entities.parser.ValoracionTeleSeleccionResponse
@@ -43,6 +44,31 @@ import org.w3c.dom.NodeList
 import org.xml.sax.InputSource
 
 class Parser {
+
+	List <?> jaxbListParser(List<Recibido> recibidos, Class<?> myObjectClass) {
+		List<?> objectsList = null
+		if (recibidos != null && !recibidos.isEmpty()) {
+			objectsList = new ArrayList<>(recibidos.size())
+			for (Recibido actual : recibidos) {
+				objectsList.add(jaxbParser(actual.info.trim(), myObjectClass))
+			}
+		}
+		return objectsList
+	}
+
+	def jaxbParser(String entrada, Class<?> myObjectClass) {
+		def objectsList = null
+		if (entrada!= null && !entrada.trim().isEmpty()) {
+			JAXBContext jaxbContext = JAXBContext.newInstance(myObjectClass)
+			Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller()
+
+			StringReader reader = new StringReader(entrada)
+
+			JAXBElement<?> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), myObjectClass)
+			objectsList = root.getValue()
+		}
+		return  objectsList
+	}
 
 	/**
 	 * Métodos de parseo de AMA

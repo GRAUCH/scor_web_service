@@ -5,11 +5,20 @@ import com.scortelemed.schemas.ama.ResultadoSiniestroRequest
 import com.scortelemed.schemas.ama.ConsultaExpedienteRequest
 //Caser
 import com.scortelemed.schemas.caser.ResultadoReconocimientoMedicoRequest
+import com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest
+import com.scortelemed.schemas.enginyers.AddExp
+import com.scortelemed.schemas.methislab.MethislabUnderwrittingCaseManagementRequest
+import com.scortelemed.schemas.methislabCF.MethislabCFUnderwrittingCaseManagementRequest
+import com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCaseManagementRequest
+import com.ws.cajamar.beans.CajamarUnderwrittingCaseManagementRequest
 import hwsol.entities.parser.AlptisGeneralData
 import hwsol.entities.parser.RegistrarEventoSCOR
+import com.ws.lagunaro.beans.GestionReconocimientoMedicoRequest as GestionReconocimientoMedicoRequestLagunaro
 //PSN
 import com.scortelemed.schemas.psn.ConsultaExpedienteRequest as ConsultaExpedienteRequestPsn
 import com.scortelemed.schemas.psn.ResultadoReconocimientoMedicoRequest as ResultadoReconocimientoMedicoRequestPsn
+import com.scortelemed.schemas.psn.GestionReconocimientoMedicoRequest as GestionReconocimientoMedicoRequestPsn
+
 //NetInsurance
 import com.scortelemed.schemas.netinsurance.NetinsuranteGetDossierRequest
 //CBP Ita
@@ -22,6 +31,61 @@ import hwsol.entities.parser.ValoracionTeleSeleccionResponse
 
 
 class SchemaEntities {
+
+    static String toString(GestionReconocimientoMedicoRequestPsn entrada) {
+        StringBuilder builder = new StringBuilder()
+        builder.append("fiscalIdentificationNumber: ")
+        builder.append(entrada.candidateInformation?.fiscalIdentificationNumber)
+        builder.append(", birthDate: ")
+        builder.append(entrada.candidateInformation?.birthDate)
+        builder.append(", phoneNumber1: ")
+        builder.append(entrada.candidateInformation?.phoneNumber1)
+        return builder.toString()
+    }
+
+    static String toString(MethislabCFUnderwrittingCaseManagementRequest entrada) {
+        StringBuilder builder = new StringBuilder()
+        builder.append("fiscalIdentificationNumber: ")
+        builder.append(entrada.candidateInformation?.fiscalIdentificationNumber)
+        builder.append(", birthDate: ")
+        builder.append(entrada.candidateInformation?.birthDate)
+        builder.append(", phoneNumber1: ")
+        builder.append(entrada.candidateInformation?.phoneNumber1)
+        return builder.toString()
+    }
+
+    static String toString(MethislabUnderwrittingCaseManagementRequest entrada) {
+        StringBuilder builder = new StringBuilder()
+        builder.append("fiscalIdentificationNumber: ")
+        builder.append(entrada.candidateInformation?.fiscalIdentificationNumber)
+        builder.append(", birthDate: ")
+        builder.append(entrada.candidateInformation?.birthDate)
+        builder.append(", phoneNumber1: ")
+        builder.append(entrada.candidateInformation?.phoneNumber1)
+        return builder.toString()
+    }
+
+    static String toString(GestionReconocimientoMedicoRequestLagunaro entrada) {
+        StringBuilder builder = new StringBuilder()
+        builder.append("nombre: ")
+        builder.append(entrada.asegurado?.nombre)
+        builder.append(", apellido1: ")
+        builder.append(entrada.asegurado?.apellido1)
+        builder.append(", apellido2: ")
+        builder.append(entrada.asegurado?.apellido2)
+        return builder.toString()
+    }
+
+    static String toString(AddExp entrada) {
+        StringBuilder builder = new StringBuilder()
+        builder.append("nif: ")
+        builder.append(entrada.d?.nif)
+        builder.append(", policyNumber: ")
+        builder.append(entrada.d?.policyNumber)
+        builder.append(", companyCode: ")
+        builder.append(entrada.gen?.companyCode)
+        return builder.toString()
+    }
 
     static String toString(ConsultaExpedienteRequest entrada) {
         StringBuilder builder = new StringBuilder()
@@ -51,6 +115,16 @@ class SchemaEntities {
         builder.append(entrada.dateEnd)
         return builder.toString()
     }
+
+    static String toString(GestionReconocimientoMedicoRequest entrada) {
+        StringBuilder builder = new StringBuilder()
+        builder.append("productCode: ")
+        builder.append(entrada.candidateInformation?.productCode)
+        builder.append(", fiscalIdentificationNumber: ")
+        builder.append(entrada.candidateInformation?.fiscalIdentificationNumber)
+        return builder.toString()
+    }
+
     static String toString(RegistrarEventoSCOR entrada) {
         StringBuilder builder = new StringBuilder()
         builder.append("fechaCierre: ")
@@ -86,6 +160,13 @@ class SchemaEntities {
         StringBuilder builder = new StringBuilder()
         builder.append("requestNumber: ")
         builder.append(entrada.requestNumber)
+        return builder.toString()
+    }
+
+    static String toString(NetinsuranteUnderwrittingCaseManagementRequest entrada) {
+        StringBuilder builder = new StringBuilder()
+        builder.append("benefictCode: ")
+        builder.append(entrada.benefits?.benefictCode)
         return builder.toString()
     }
 
@@ -144,6 +225,13 @@ class SchemaEntities {
         builder.append(entrada.corta)
         builder.append(", mediana: ")
         builder.append(entrada.mediana)
+        return builder.toString()
+    }
+
+    static String toString(CajamarUnderwrittingCaseManagementRequest entrada) {
+        StringBuilder builder = new StringBuilder()
+        builder.append("numref: ")
+        builder.append(entrada.regScor?.numref)
         return builder.toString()
     }
 

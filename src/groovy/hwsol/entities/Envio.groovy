@@ -1,6 +1,6 @@
 package hwsol.entities
 
-public class Envio {
+class Envio {
 
     Date fecha
     String cia
