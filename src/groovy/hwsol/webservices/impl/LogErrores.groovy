@@ -76,16 +76,18 @@ class LogErrores implements LogService{
 
     List<Error> leerErroresCaser(List<Error> entrada) {
         List<Error> errores = new ArrayList<>()
-        for (Error actual:entrada) {
-            String info = actual.info.trim()
-            if (info != null && !info.isEmpty() && info.charAt(0) == '<') {
-                if (info.contains("GestionReconocimientoMedicoRequest")) {
-                    actual.setInfo(SchemaEntities.toString(parser.jaxbParser(info, GestionReconocimientoMedicoRequest.class)))
-                } else if (info.contains("service_RegistrarEventoSCOR")) {
-                    actual.setInfo(SchemaEntities.toString(parser.registrarEventoSCOR(info)))
+        if (entrada != null && !entrada.isEmpty()) {
+            for (Error actual : entrada) {
+                String info = actual.info.trim()
+                if (info != null && !info.isEmpty() && info.charAt(0) == '<') {
+                    if (info.contains("GestionReconocimientoMedicoRequest")) {
+                        actual.setInfo(SchemaEntities.toString(parser.jaxbParser(info, GestionReconocimientoMedicoRequest.class)))
+                    } else if (info.contains("service_RegistrarEventoSCOR")) {
+                        actual.setInfo(SchemaEntities.toString(parser.registrarEventoSCOR(info)))
+                    }
                 }
+                errores.add(actual)
             }
-            errores.add(actual)
         }
         return errores
     }

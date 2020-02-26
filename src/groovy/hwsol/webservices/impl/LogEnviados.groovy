@@ -100,17 +100,19 @@ class LogEnviados implements LogService{
 
     List<NewEnvio> leerEnvios(List<Envio> entrada, Class<?> myObjectClass) {
         List<NewEnvio> enviados = new ArrayList<>()
-        for (Envio actual:entrada) {
-            NewEnvio salida = new NewEnvio()
-            salida.set(actual)
-            String info = actual.info.trim()
-            if (info != null && !info.isEmpty() && info.charAt(0) == '<') {
-                if (info.contains(myObjectClass.simpleName)) {
-                    Object cases = parser.jaxbParser(info, myObjectClass)
-                    salida.setInfo(SchemaEntities.toString(cases))
+        if (entrada != null && !entrada.isEmpty()) {
+            for (Envio actual:entrada) {
+                NewEnvio salida = new NewEnvio()
+                salida.set(actual)
+                String info = actual.info.trim()
+                if (info != null && !info.isEmpty() && info.charAt(0) == '<') {
+                    if (info.contains(myObjectClass.simpleName)) {
+                        Object cases = parser.jaxbParser(info, myObjectClass)
+                        salida.setInfo(SchemaEntities.toString(cases))
+                    }
                 }
+                enviados.add(salida)
             }
-            enviados.add(salida)
         }
         return enviados
     }

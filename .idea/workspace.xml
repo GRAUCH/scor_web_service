@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2ff4b833-ac99-457b-9225-f9b316241f4d" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/grails-app/domain/com/scortelemed/TipoCompany.groovy" beforeDir="false" afterPath="$PROJECT_DIR$/grails-app/domain/com/scortelemed/TipoCompany.groovy" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/groovy/hwsol/utilities/Parser.groovy" beforeDir="false" afterPath="$PROJECT_DIR$/src/groovy/hwsol/utilities/Parser.groovy" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/groovy/hwsol/webservices/impl/LogEnviados.groovy" beforeDir="false" afterPath="$PROJECT_DIR$/src/groovy/hwsol/webservices/impl/LogEnviados.groovy" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/groovy/hwsol/webservices/impl/LogErrores.groovy" beforeDir="false" afterPath="$PROJECT_DIR$/src/groovy/hwsol/webservices/impl/LogErrores.groovy" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -37,8 +37,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/utilities/Parser.groovy">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="253">
-              <caret line="47" column="51" lean-forward="true" selection-start-line="47" selection-start-column="51" selection-end-line="47" selection-end-column="51" />
+            <state relative-caret-position="181">
+              <caret line="49" column="29" lean-forward="true" selection-start-line="49" selection-end-line="50" />
               <folding>
                 <element signature="e#25#53#0" expanded="true" />
               </folding>
@@ -47,10 +47,22 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/grails-app/controllers/com/scortelemed/DashboardController.groovy">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="597">
+              <caret line="50" column="9" lean-forward="true" selection-start-line="50" selection-start-column="9" selection-end-line="50" selection-end-column="9" />
+              <folding>
+                <element signature="e#25#58#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/webservices/impl/LogEnviados.groovy">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="269">
-              <caret line="119" column="62" lean-forward="true" selection-start-line="119" selection-start-column="62" selection-end-line="119" selection-end-column="62" />
+            <state relative-caret-position="82">
+              <caret line="102" column="30" lean-forward="true" selection-start-line="102" selection-end-line="103" />
               <folding>
                 <element signature="e#32#62#0" expanded="true" />
               </folding>
@@ -59,10 +71,10 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/webservices/impl/LogErrores.groovy">
+        <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/webservices/impl/LogRecibidos.groovy">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="367">
-              <caret line="32" column="56" selection-start-line="32" selection-start-column="56" selection-end-line="32" selection-end-column="56" />
+            <state relative-caret-position="-611">
+              <caret line="40" column="51" selection-start-line="40" selection-start-column="51" selection-end-line="40" selection-end-column="51" />
               <folding>
                 <element signature="e#32#62#0" expanded="true" />
               </folding>
@@ -71,28 +83,22 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/webservices/impl/LogErrores.groovy">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="78">
+              <caret line="74" column="5" lean-forward="true" selection-start-line="74" selection-start-column="5" selection-end-line="74" selection-end-column="5" />
+              <folding>
+                <element signature="e#32#62#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/grails-app/domain/com/scortelemed/TipoCompany.groovy">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="714">
               <caret line="48" column="34" selection-start-line="48" selection-start-column="34" selection-end-line="48" selection-end-column="34" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/entities/EnvioCaser.groovy">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="119">
-              <caret line="8" column="19" lean-forward="true" selection-start-line="8" selection-start-column="19" selection-end-line="8" selection-end-column="19" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/factory/LogFactory.groovy">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="238">
-              <caret line="20" column="31" lean-forward="true" selection-start-line="20" selection-start-column="31" selection-end-line="20" selection-end-column="31" />
             </state>
           </provider>
         </entry>
@@ -238,15 +244,15 @@
         <option value="$PROJECT_DIR$/src/java/com/scortelemed/schemas/caser/CaserUnderwrittingCaseManagementService_CaserUnderwrittingCaseManagementServicePort_Client.java" />
         <option value="$PROJECT_DIR$/src/groovy/hwsol/utilities/LogUtil.groovy" />
         <option value="$PROJECT_DIR$/grails-app/domain/com/scortelemed/Recibido.groovy" />
-        <option value="$PROJECT_DIR$/src/groovy/hwsol/utilities/Parser.groovy" />
         <option value="$PROJECT_DIR$/grails-app/domain/com/scortelemed/Envio.groovy" />
         <option value="$PROJECT_DIR$/src/groovy/hwsol/entities/Envio.groovy" />
         <option value="$PROJECT_DIR$/src/groovy/hwsol/factory/SchemaEntities.groovy" />
         <option value="$PROJECT_DIR$/src/groovy/hwsol/webservices/impl/LogRecibidos.groovy" />
-        <option value="$PROJECT_DIR$/src/groovy/hwsol/webservices/impl/LogEnviados.groovy" />
         <option value="$PROJECT_DIR$/.gitignore" />
-        <option value="$PROJECT_DIR$/src/groovy/hwsol/webservices/impl/LogErrores.groovy" />
         <option value="$PROJECT_DIR$/grails-app/domain/com/scortelemed/TipoCompany.groovy" />
+        <option value="$PROJECT_DIR$/src/groovy/hwsol/utilities/Parser.groovy" />
+        <option value="$PROJECT_DIR$/src/groovy/hwsol/webservices/impl/LogEnviados.groovy" />
+        <option value="$PROJECT_DIR$/src/groovy/hwsol/webservices/impl/LogErrores.groovy" />
       </list>
     </option>
   </component>
@@ -268,7 +274,7 @@
       <path value="$PROJECT_DIR$/target/work/resources/uglifyjs/package.json" />
     </packageJsonPaths>
   </component>
-  <component name="ProjectFrameBounds" extendedState="7">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="382" />
     <option name="y" value="-1028" />
     <option name="width" value="1550" />
@@ -361,7 +367,7 @@
     <property name="DatabaseDriversLRU" value="mysql" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1582735579549" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1582739569082" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.0" />
     <property name="project.structure.side.proportion" value="0.0" />
@@ -420,18 +426,18 @@
       <workItem from="1582621614198" duration="14121000" />
       <workItem from="1582641301203" duration="7476000" />
       <workItem from="1582650772822" duration="15173000" />
-      <workItem from="1582732182684" duration="1166000" />
+      <workItem from="1582732182684" duration="2615000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="71981000" />
+    <option name="totallyTimeSpent" value="73430000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="2" y="-1088" width="1936" height="1056" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49747476" visible="true" weight="0.19349681" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49747476" visible="true" weight="0.19349681" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Persistence" order="2" side_tool="true" weight="0.32995737" />
       <window_info id="Designer" order="3" />
@@ -443,7 +449,7 @@
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.329718" />
       <window_info anchor="bottom" id="Run" order="2" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.43829787" />
+      <window_info active="true" anchor="bottom" id="Debug" order="3" visible="true" weight="0.43817788" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -516,43 +522,43 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/groovy/hwsol/utilities/Parser.groovy</url>
-          <line>496</line>
+          <line>498</line>
           <properties />
           <option name="timeStamp" value="13" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/groovy/hwsol/utilities/Parser.groovy</url>
-          <line>481</line>
+          <line>483</line>
           <properties />
           <option name="timeStamp" value="21" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/groovy/hwsol/utilities/Parser.groovy</url>
-          <line>487</line>
+          <line>489</line>
           <properties />
           <option name="timeStamp" value="25" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/groovy/hwsol/utilities/Parser.groovy</url>
-          <line>508</line>
+          <line>510</line>
           <properties />
           <option name="timeStamp" value="43" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/groovy/hwsol/utilities/Parser.groovy</url>
-          <line>511</line>
+          <line>513</line>
           <properties />
           <option name="timeStamp" value="44" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/groovy/hwsol/webservices/impl/LogEnviados.groovy</url>
-          <line>247</line>
+          <line>249</line>
           <properties />
           <option name="timeStamp" value="85" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/groovy/hwsol/webservices/impl/LogEnviados.groovy</url>
-          <line>265</line>
+          <line>267</line>
           <properties />
           <option name="timeStamp" value="87" />
         </line-breakpoint>
@@ -570,7 +576,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/groovy/hwsol/webservices/impl/LogEnviados.groovy</url>
-          <line>279</line>
+          <line>281</line>
           <properties />
           <option name="timeStamp" value="108" />
         </line-breakpoint>
@@ -878,26 +884,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/webservices/impl/LogRecibidos.groovy">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="327">
-          <caret line="76" column="52" selection-start-line="76" selection-start-column="52" selection-end-line="76" selection-end-column="52" />
-          <folding>
-            <element signature="e#32#62#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/grails-app/controllers/com/scortelemed/DashboardController.groovy">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1003">
-          <caret line="65" selection-start-line="65" selection-end-line="65" />
-          <folding>
-            <element signature="e#25#58#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/java/com/ws/lagunaro/beans/GestionReconocimientoMedicoRequest.java">
       <provider selected="true" editor-type-id="text-editor">
         <state>
@@ -978,13 +964,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/utilities/Parser.groovy">
+    <entry file="file://$PROJECT_DIR$/grails-app/domain/com/scortelemed/TipoCompany.groovy">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="253">
-          <caret line="47" column="51" lean-forward="true" selection-start-line="47" selection-start-column="51" selection-end-line="47" selection-end-column="51" />
-          <folding>
-            <element signature="e#25#53#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="714">
+          <caret line="48" column="34" selection-start-line="48" selection-start-column="34" selection-end-line="48" selection-end-column="34" />
         </state>
       </provider>
     </entry>
@@ -995,10 +978,40 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/grails-app/controllers/com/scortelemed/DashboardController.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="597">
+          <caret line="50" column="9" lean-forward="true" selection-start-line="50" selection-start-column="9" selection-end-line="50" selection-end-column="9" />
+          <folding>
+            <element signature="e#25#58#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/webservices/impl/LogRecibidos.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-611">
+          <caret line="40" column="51" selection-start-line="40" selection-start-column="51" selection-end-line="40" selection-end-column="51" />
+          <folding>
+            <element signature="e#32#62#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/utilities/Parser.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="181">
+          <caret line="49" column="29" lean-forward="true" selection-start-line="49" selection-end-line="50" />
+          <folding>
+            <element signature="e#25#53#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/webservices/impl/LogEnviados.groovy">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="269">
-          <caret line="119" column="62" lean-forward="true" selection-start-line="119" selection-start-column="62" selection-end-line="119" selection-end-column="62" />
+        <state relative-caret-position="82">
+          <caret line="102" column="30" lean-forward="true" selection-start-line="102" selection-end-line="103" />
           <folding>
             <element signature="e#32#62#0" expanded="true" />
           </folding>
@@ -1007,18 +1020,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/webservices/impl/LogErrores.groovy">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="367">
-          <caret line="32" column="56" selection-start-line="32" selection-start-column="56" selection-end-line="32" selection-end-column="56" />
+        <state relative-caret-position="78">
+          <caret line="74" column="5" lean-forward="true" selection-start-line="74" selection-start-column="5" selection-end-line="74" selection-end-column="5" />
           <folding>
             <element signature="e#32#62#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/grails-app/domain/com/scortelemed/TipoCompany.groovy">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="714">
-          <caret line="48" column="34" selection-start-line="48" selection-start-column="34" selection-end-line="48" selection-end-column="34" />
         </state>
       </provider>
     </entry>

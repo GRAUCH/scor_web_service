@@ -46,12 +46,14 @@ import org.xml.sax.InputSource
 class Parser {
 
 	List <?> jaxbListParser(List<Recibido> recibidos, Class<?> myObjectClass) {
-		List<?> objectsList = null
+		List<?> objectsList = new ArrayList<>()
 		if (recibidos != null && !recibidos.isEmpty()) {
-			objectsList = new ArrayList<>(recibidos.size())
+			objectsList = new ArrayList<>()
 			for (Recibido actual : recibidos) {
 				objectsList.add(jaxbParser(actual.info.trim(), myObjectClass))
 			}
+		} else {
+
 		}
 		return objectsList
 	}
