@@ -46,6 +46,7 @@ class CbpitaService {
     def tarificadorService
     TransformacionUtil transformacionUtil = new TransformacionUtil()
     ZipUtils zipUtils = new ZipUtils()
+    CorreoUtil correoUtil = new CorreoUtil()
 
     def marshall(nameSpace, clase) {
 
@@ -102,11 +103,10 @@ class CbpitaService {
         return frontal;
     }
 
-    public List<servicios.Expediente> existeExpediente(String numPoliza, String nombreCia, String companyCodigoSt, String ou) {
+    List<servicios.Expediente> existeExpediente(String numPoliza, String nombreCia, String companyCodigoSt, String ou) {
 
         logginService.putInfoMessage("Buscando si existe expediente con numero de poliza " + numPoliza + " para " + nombreCia)
 
-        CorreoUtil correoUtil = new CorreoUtil()
         servicios.Filtro filtro = new servicios.Filtro()
         List<servicios.Expediente> expedientes = new ArrayList<servicios.Expediente>()
         RespuestaCRM respuestaCrm
@@ -726,7 +726,7 @@ class CbpitaService {
         }
     }
 
-    def busquedaCrm (solicitud, ou, companyCodigoSt, companyId, requestBBDD, String nombrecia) {
+    def busquedaCrm(solicitud, ou, companyCodigoSt, companyId, requestBBDD, String nombrecia) {
 
         task {
 
@@ -738,8 +738,6 @@ class CbpitaService {
 
             servicios.Filtro filtro = new servicios.Filtro()
             SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
-            CorreoUtil correoUtil = new CorreoUtil()
-
             Thread.sleep(90000);
 
 
@@ -1034,8 +1032,14 @@ class CbpitaService {
         logginService.putInfoMessage("Iniciado generacion de zip para expediente " + codigoSt)
 
         if (expedientePoliza.getCodigoEstado() != TipoEstadoExpediente.ANULADO) {
-            byte[] compressedData = zipUtils.generarZips(expedientePoliza, codigoSt, dateString, zipPath, user, password)
-            expediente.setZip(compressedData)
+            try {
+                byte[] compressedData = zipUtils.generarZips(expedientePoliza, codigoSt, dateString, zipPath, user, password)
+                expediente.setZip(compressedData)
+            } catch (Exception e) {
+                logginService.putError("rellenaDatosSalidaConsulta", "Error:  " + e.getMessage())
+                correoUtil.envioEmailErrores("rellenaDatosSalidaConsulta", "COMPRIMIR FICHEROS", e)
+                expediente.setZip(new byte[0])
+            }
             //zipUtils.eraseFiles(expedientePoliza, zipPath)
         } else {
             expediente.setZip(new byte[0])
