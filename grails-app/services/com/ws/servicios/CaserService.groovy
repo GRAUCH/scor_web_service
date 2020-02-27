@@ -285,7 +285,7 @@ class CaserService {
 			DATOS dato = new DATOS()
 
 			dato.registro = rellenaDatos(req, company)
-			//dato.pregunta = rellenaPreguntas(req, company.nombre)
+			dato.pregunta = rellenaPreguntas(req, company.nombre)
 			dato.servicio = rellenaServicios(req, company.nombre)
 			dato.coberturas = rellenaCoberturas(req)
 
