@@ -20,7 +20,7 @@ import com.ws.servicios.AmaService
 import grails.plugin.springsecurity.annotation.Secured
 import grails.util.Environment
 import hwsol.webservices.CorreoUtil
-import hwsol.webservices.EntradaDetalle
+import hwsol.entities.EnvioCaser
 import hwsol.webservices.TransformacionUtil
 import org.springframework.beans.factory.annotation.Autowired
 import servicios.*
@@ -522,7 +522,7 @@ class WsController {
             XSDProcessExecutionPort port = locator.getXSDProcessExecutionPort()
             StringHolder salida = new StringHolder()
             logginService.putInfoMessage(sbInfo.toString())
-            EntradaDetalle entradaDetalle = new EntradaDetalle()
+            EnvioCaser entradaDetalle = new EnvioCaser()
             String stringRequest = null
             expedientes.each { expediente ->
 

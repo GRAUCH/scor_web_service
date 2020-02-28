@@ -81,13 +81,9 @@
 									<td>${elemento?.candidateInformation?.name}</td>
 									<td>${elemento?.candidateInformation?.surname}</td>
 									<td>${elemento?.candidateInformation?.fiscalIdentificationNumber}</td>
-									<td><g:if test="${elemento?.candidateInformation?.birthDate?.value != null}">
-										<g:formatDate date="${Date.parse("YYYY-MM-dd'T'hh:mm:ss", elemento?.candidateInformation?.birthDate?.value?.toString())}" format="yyyy-MM-dd"/>
-									</g:if></td>
+									<td><g:formatDate date="${Date.parse("YYYY-MM-dd'T'hh:mm:ss", elemento?.candidateInformation?.birthDate?.toString())}" format="yyyy-MM-dd"/></td>
 									<td>${elemento?.candidateInformation?.gender}</td>
-									<td><g:if test="${elemento?.policyHolderInformation?.requestDate != null}">
-										<g:formatDate date="${Date.parse("YYYY-MM-dd'T'hh:mm:ss", elemento?.policyHolderInformation?.requestDate.toString())}" format="yyyy-MM-dd"/>
-									</g:if></td>
+									<td><g:formatDate date="${Date.parse("YYYY-MM-dd'T'hh:mm:ss", elemento?.policyHolderInformation?.requestDate?.toString())}" format="yyyy-MM-dd"/></td>
 									<td>${elemento?.candidateInformation?.igp}</td>
 									<td>${elemento?.candidateInformation?.agente}</td>
 									<td>${elemento?.policyHolderInformation?.certificateNumber}</td>

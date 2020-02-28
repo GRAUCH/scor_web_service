@@ -3,7 +3,7 @@
     <head>
         <title>SCOR Telemed - Server error</title>
         
-        <link rel="stylesheet" href="${resource(dir:'css',file:'frontend.css')}" />
+        %{--<link rel="stylesheet" href="${resource(dir:'css',file:'frontend.css')}" />--}%
         <link rel="shortcut icon" href="${resource(dir:'images',file:'hwsol.ico')}" type="image/x-icon" />
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <meta name="layout" content="main" />

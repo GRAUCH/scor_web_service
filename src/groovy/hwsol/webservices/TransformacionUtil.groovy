@@ -1,25 +1,15 @@
 package hwsol.webservices
 
-import com.sun.xml.internal.ws.policy.privateutil.LocalizationMessages
+import hwsol.entities.EnvioCaser
 
 import java.text.DateFormat
-import java.text.DecimalFormat
-import java.text.Format
 import java.text.Normalizer
 import java.text.SimpleDateFormat
 
 import javax.xml.datatype.XMLGregorianCalendar
 import javax.xml.datatype.DatatypeFactory
 
-import org.apache.xmlbeans.XmlCalendar;
-import org.codehaus.groovy.ast.stmt.SwitchStatement;
-import org.joda.time.LocalDate
-import org.joda.time.Period
-import org.joda.time.format.DateTimeFormatter
-
 import servicios.Candidato
-import servicios.TipoCita;
-import servicios.TipoEstadoExpediente
 import servicios.TipoTelefono
 
 import com.scortelemed.Company
@@ -1185,7 +1175,7 @@ class TransformacionUtil {
 		DateFormat formatter = new SimpleDateFormat("yyyy/MM/dd")
 		DateFormat formatterSalida = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss")
 
-		EntradaDetalle entradaDetalle = new EntradaDetalle()
+		EnvioCaser entradaDetalle = new EnvioCaser()
 
 		if (entidad instanceof servicios.Expediente){
 

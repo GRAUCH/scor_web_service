@@ -1,6 +1,5 @@
 package com.scortelemed
 
-import java.util.Date;
 
 class Recibido {
 

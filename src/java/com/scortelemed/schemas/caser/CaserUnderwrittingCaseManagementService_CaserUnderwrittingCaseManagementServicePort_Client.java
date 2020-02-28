@@ -97,8 +97,7 @@ public final class CaserUnderwrittingCaseManagementService_CaserUnderwrittingCas
         _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestCandidateInformation.setIgp("Igp167156298");
         _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestCandidateInformation.setAgente("Agente1318863377");
         _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestCandidateInformation.setProductCode("ProductCode-1726956057");
-        java.lang.Object _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestCandidateInformationBirthDate = null;
-        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestCandidateInformation.setBirthDate(_gestionReconocimientoMedico_gestionReconocimientoMedicoRequestCandidateInformationBirthDate);
+        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestCandidateInformation.setBirthDate(null);
         com.scortelemed.schemas.caser.OperationType _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestCandidateInformationOperationType = com.scortelemed.schemas.caser.OperationType.N;
         _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestCandidateInformation.setOperationType(_gestionReconocimientoMedico_gestionReconocimientoMedicoRequestCandidateInformationOperationType);
         _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest.setCandidateInformation(_gestionReconocimientoMedico_gestionReconocimientoMedicoRequestCandidateInformation);

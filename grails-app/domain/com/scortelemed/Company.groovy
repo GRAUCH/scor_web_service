@@ -1,6 +1,6 @@
 package com.scortelemed
 
-import com.ws.enumeration.UnidadOrganizativa;
+import com.ws.enumeration.UnidadOrganizativa
 
 class Company {
 	
@@ -14,7 +14,6 @@ class Company {
 	String orgName
 	boolean generationAutomatic	
 	boolean ipControl
-	
 	UnidadOrganizativa ou
 	
 	static hasMany = [destinatarios: Destinatario, usuarios: Person, ips: Ipcontrol, requests: Request]
@@ -25,7 +24,7 @@ class Company {
 		ou(blank: false, nullable:false)
     }
 	
-	public String toString() {
+	String toString() {
 	    return nombre;
 	}	
 }

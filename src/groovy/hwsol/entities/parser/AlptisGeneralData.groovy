@@ -1,6 +1,8 @@
-package hwsol.webservices
+package hwsol.entities.parser
 
-class EnvioAlptis {
+import hwsol.entities.Envio
+
+class AlptisGeneralData {
 	
 	String candidateSTCode
 	String name
@@ -14,5 +16,9 @@ class EnvioAlptis {
 	String sumAssured
 	String requestNumber
 	Date requestDate
-	
+
+	AlptisGeneralData() {
+		super()
+	}
+
 }

@@ -1,6 +1,6 @@
-package hwsol.webservices
+package hwsol.entities.parser
 
-class EnvioCajamar {
+class ValoracionTeleSeleccionResponse {
 	
     String causa
 	String motivo
