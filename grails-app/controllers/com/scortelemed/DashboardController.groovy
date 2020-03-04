@@ -21,7 +21,7 @@ class DashboardController {
 
     def index(params) {
 
-        params.max = Math.min(params.max ? params.int('max') : 10, 10)
+        params.max=params.max?:10
         LogUtil logUtil = new LogUtil()
         String ou = session.getAttribute("ou")
         List<CompanyLog> ciasLog = logUtil.obtenerCompanyLogs(ou)
