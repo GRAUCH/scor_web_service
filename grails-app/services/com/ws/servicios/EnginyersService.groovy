@@ -121,7 +121,6 @@ class EnginyersService {
         try {
 
             DATOS dato = new DATOS()
-
             dato.registro = rellenaDatos(req, company)
             //dato.servicio = rellenaServicios(req, company.nombre)
             dato.coberturas = rellenaCoberturas(req)
@@ -326,7 +325,7 @@ class EnginyersService {
 
     }
 
-    public def rellenaDatos(req, company) {
+     def rellenaDatos(req, company) {
 
         def mapDatos = [:]
         def listadoPreguntas = []
