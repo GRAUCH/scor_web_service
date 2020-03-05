@@ -134,9 +134,6 @@ class LogEnviados implements LogService{
 
         hqlQueryBuilder << "ORDER BY fecha DESC"
 
-        System.out.println("idCia ID  -->>" + company.id)
-
-
         Recibido.executeQuery(hqlQueryBuilder.toString(), namedParams, sortParams)
     }
 

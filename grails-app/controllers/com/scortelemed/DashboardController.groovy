@@ -12,16 +12,13 @@ import java.text.SimpleDateFormat
 class DashboardController {
 
     def elementos
-    def nombre
-    def idCia
     def enviados
     def recibidos
     def company
-    def vista
 
     def index(params) {
 
-        params.max=params.max?:10
+        params.max = params.max ?: 10
         LogUtil logUtil = new LogUtil()
         String ou = session.getAttribute("ou")
         List<CompanyLog> ciasLog = logUtil.obtenerCompanyLogs(ou)
@@ -44,26 +41,28 @@ class DashboardController {
 
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy")
 
-        if (params.logs != null) {
-            idCia = params.idCia
-            nombre = Company.findById(idCia).nombre
-            company = Company.findById(idCia)
+        if (params.logs == null) {
+            flash.message = 'Seleccione una acción'
+        } else if (params.idCia == null){
+            flash.message = 'Seleccione una compania'
+        } else {
+            company = Company.findById(params.idCia)
         }
 
         if (params.logs == null) {
-            [ciasLog: ciasLog, company: nombre, elementos: elementos, ou: ou, desde: formatter.format(desde), hasta: formatter.format(hasta), max: params.max, lista: null, idCia: idCia]
+            [ciasLog: ciasLog, company: ' ', elementos: elementos, ou: ou, desde: formatter.format(desde), hasta: formatter.format(hasta), max: params.max, lista: null, idCia: ' ']
         } else if (params.logs == 'recibido') {
             LogService recibidos = LogFactory.newLogService(Recibido.class)
             elementos = recibidos.obtener(company, formatter.parse(params.desde), hasta, params.max)
-            [ciasLog: ciasLog, company: nombre, elementos: elementos, ou: ou, desde: params.desde, hasta: params.hasta, max: params.max, lista: "listaRecibidos" + nombre + ".gsp", idCia: idCia]
+            [ciasLog: ciasLog, company: company.nombre, elementos: elementos, ou: ou, desde: params.desde, hasta: params.hasta, max: params.max, lista: "listaRecibidos" + company.nombre + ".gsp", idCia: company.id]
         } else if (params.logs == 'error') {
             LogService errores = LogFactory.newLogService(Error.class)
             elementos = errores.obtener(company, formatter.parse(params.desde), hasta, params.max)
-            [ciasLog: ciasLog, company: nombre, elementos: elementos, ou: ou, desde: params.desde, hasta: params.hasta, max: params.max, lista: "listaErrores.gsp", idCia: idCia]
+            [ciasLog: ciasLog, company: company.nombre, elementos: elementos, ou: ou, desde: params.desde, hasta: params.hasta, max: params.max, lista: "listaErrores.gsp", idCia: company.id]
         } else {
             LogService enviados = LogFactory.newLogService(Envio.class)
             elementos = enviados.obtener(company, formatter.parse(params.desde), hasta, params.max)
-            [ciasLog: ciasLog, company: nombre, elementos: elementos, ou: ou, desde: params.desde, hasta: params.hasta, max: params.max, lista: "listaEnviados.gsp", idCia: idCia]
+            [ciasLog: ciasLog, company: company.nombre, elementos: elementos, ou: ou, desde: params.desde, hasta: params.hasta, max: params.max, lista: "listaEnviados.gsp", idCia: company.id]
         }
 
 

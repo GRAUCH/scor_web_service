@@ -36,7 +36,9 @@
 
 <g:include view="menu/menu.gsp"/>
 <div id="">
-
+    <g:if test="${flash.message}">
+        <div class="message">${flash.message}</div>
+    </g:if>
     <div id="content">
         <div class="outer" style="padding: 0px !important;">
             <g:form method="post" action="index">
@@ -47,9 +49,7 @@
                         <hr>
                     </div>
                     <g:render template="logos"   model="['hasta': hasta, 'desde': desde, 'ciasLog': ciasLog, 'max': max, 'idCia': idCia]"/>
-
                 </div>
-
             </g:form>
         </div>
     </div>
