@@ -19,6 +19,11 @@ class DashboardController {
     def index(params) {
 
         params.max = params.max ?: 10
+
+        if( params.int('max') >100){
+            params.max =100
+        }
+
         LogUtil logUtil = new LogUtil()
         String ou = session.getAttribute("ou")
         List<CompanyLog> ciasLog = logUtil.obtenerCompanyLogs(ou)
@@ -43,13 +48,13 @@ class DashboardController {
 
         if (params.logs == null) {
             flash.message = 'Seleccione una acción'
-        } else if (params.idCia == null){
+        } else if (params.idCia == null && !params.idCia.toString().isEmpty() ){
             flash.message = 'Seleccione una compania'
         } else {
             company = Company.findById(params.idCia)
         }
 
-        if (params.logs == null) {
+        if (params.logs == null || company == null) {
             [ciasLog: ciasLog, company: ' ', elementos: elementos, ou: ou, desde: formatter.format(desde), hasta: formatter.format(hasta), max: params.max, lista: null, idCia: ' ']
         } else if (params.logs == 'recibido') {
             LogService recibidos = LogFactory.newLogService(Recibido.class)
