@@ -3,7 +3,6 @@
         <p onclick="myFunction(${cia.id});" class="quick-btn "
            style="background: none">
             <i><asset:image style="height: 50px !important;" src="logos/${cia.logo}"/></i>
-            <span class="label label-default">${cia.recibidos.size()}</span>
         </p>
     </tr>
 </g:each>
