@@ -20,15 +20,20 @@ class DashboardController {
 
         params.max = params.max ?: 10
 
-        if( params.int('max') >100){
-            params.max =100
+        if (params.int('max') > 100) {
+            params.max = 100
         }
 
         LogUtil logUtil = new LogUtil()
         String ou = session.getAttribute("ou")
-        List<CompanyLog> ciasLog = logUtil.obtenerCompanyLogs(ou)
-        Company company = null
+        List<CompanyLog> ciasLog = session.getAttribute("ciasLog")
 
+        if (ciasLog == null || ciasLog.isEmpty()) {
+            ciasLog = logUtil.obtenerCompanyLogs(ou)
+            session.setAttribute("ciasLog",ciasLog)
+        }
+
+        Company company = null
         Calendar calHasta = Calendar.getInstance()
         calHasta.set(Calendar.HOUR_OF_DAY, 23)
         calHasta.set(Calendar.MINUTE, 59)
@@ -48,7 +53,7 @@ class DashboardController {
 
         if (params.logs == null) {
             flash.message = 'Seleccione una acción'
-        } else if (params.idCia == null && !params.idCia.toString().isEmpty() ){
+        } else if (params.idCia == null && !params.idCia.toString().isEmpty()) {
             flash.message = 'Seleccione una compania'
         } else {
             company = Company.findById(params.idCia)

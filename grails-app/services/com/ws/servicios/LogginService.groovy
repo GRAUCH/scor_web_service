@@ -1,9 +1,7 @@
 package com.ws.servicios
-import org.apache.commons.logging.*
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder
-import org.codehaus.groovy.grails.web.servlet.mvc.GrailsWebRequest
+
 import org.codehaus.groovy.grails.web.util.WebUtils
+import org.springframework.web.context.request.RequestContextHolder
 
 class LogginService {
 	def authenticateService
