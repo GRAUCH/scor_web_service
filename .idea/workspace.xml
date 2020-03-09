@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
+<<<<<<< HEAD
     <list default="true" id="9c41fe56-bfb8-4969-837e-06aa9dec7d32" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
@@ -11,10 +12,18 @@
       <change beforePath="$PROJECT_DIR$/grails-app/views/dashboard/_logos.gsp" beforeDir="false" afterPath="$PROJECT_DIR$/grails-app/views/dashboard/_logos.gsp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/grails-app/views/dashboard/index.gsp" beforeDir="false" afterPath="$PROJECT_DIR$/grails-app/views/dashboard/index.gsp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/groovy/hwsol/utilities/LogUtil.groovy" beforeDir="false" afterPath="$PROJECT_DIR$/src/groovy/hwsol/utilities/LogUtil.groovy" afterDir="false" />
+=======
+    <list default="true" id="2ff4b833-ac99-457b-9225-f9b316241f4d" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/grails-app/controllers/com/scortelemed/DashboardController.groovy" beforeDir="false" afterPath="$PROJECT_DIR$/grails-app/controllers/com/scortelemed/DashboardController.groovy" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scorWebservices-grailsPlugins.iml" beforeDir="false" afterPath="$PROJECT_DIR$/scorWebservices-grailsPlugins.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scorWebservices.iml" beforeDir="false" afterPath="$PROJECT_DIR$/scorWebservices.iml" afterDir="false" />
+>>>>>>> master
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$USER_HOME$/.grails/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -22,24 +31,56 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+<<<<<<< HEAD
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/grails-app/conf/DataSource.groovy">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="469">
               <caret line="32" column="56" selection-start-line="32" selection-start-column="56" selection-end-line="32" selection-end-column="56" />
+=======
+      <file leaf-file-name="Config.groovy" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/grails-app/conf/Config.groovy">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="459">
+              <caret line="186" selection-start-line="186" selection-end-line="187" />
             </state>
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="DashboardController.groovy" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/grails-app/controllers/com/scortelemed/DashboardController.groovy">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="195">
+              <caret line="23" column="18" lean-forward="true" selection-start-line="23" selection-start-column="18" selection-end-line="23" selection-end-column="18" />
+              <folding>
+                <element signature="e#25#58#0" expanded="true" />
+              </folding>
+>>>>>>> master
+            </state>
+          </provider>
+        </entry>
+      </file>
+<<<<<<< HEAD
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/utilities/LogUtil.groovy">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="314">
               <caret line="37" column="58" selection-start-line="37" selection-start-column="58" selection-end-line="37" selection-end-column="58" />
+=======
+      <file leaf-file-name="LogEnviados.groovy" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/webservices/impl/LogEnviados.groovy">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="157">
+              <caret line="96" selection-start-line="96" selection-end-line="96" />
+              <folding>
+                <element signature="e#32#62#0" expanded="true" />
+              </folding>
+>>>>>>> master
             </state>
           </provider>
         </entry>
       </file>
+<<<<<<< HEAD
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/grails-app/views/dashboard/_logos.gsp">
           <provider selected="true" editor-type-id="text-editor">
@@ -81,15 +122,30 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="90">
               <caret line="10" column="54" selection-start-line="10" selection-start-column="54" selection-end-line="10" selection-end-column="54" />
+=======
+      <file leaf-file-name="LogUtil.groovy" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/utilities/LogUtil.groovy">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="68">
+              <caret line="18" column="6" selection-start-line="18" selection-start-column="6" selection-end-line="18" selection-end-column="6" />
+>>>>>>> master
             </state>
           </provider>
         </entry>
       </file>
+<<<<<<< HEAD
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/grails-app/views/dashboard/index.gsp">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="163">
               <caret line="78" column="60" selection-start-line="78" selection-start-column="60" selection-end-line="78" selection-end-column="60" />
+=======
+      <file leaf-file-name="LogService.groovy" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/webservices/LogService.groovy">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="68">
+              <caret line="4" column="12" selection-start-line="4" selection-start-column="12" selection-end-line="4" selection-end-column="12" />
+>>>>>>> master
             </state>
           </provider>
         </entry>
@@ -98,6 +154,7 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
+<<<<<<< HEAD
       <find>class=&quot;quick-btn</find>
       <find>_logos</find>
       <find>&lt;table</find>
@@ -111,6 +168,38 @@
       <find>role=&quot;grid&quot;</find>
       <find>.jpg</find>
       <find>table table-striped table-bordered dataTable</find>
+=======
+      <find>CbpitaUnderwrittingCaseManagementRequest</find>
+      <find>Methislab</find>
+      <find>EnvioMethislab</find>
+      <find>EnvioCajamar</find>
+      <find>leerEnviosCajamar</find>
+      <find>ValoracionTeleSeleccionResponse</find>
+      <find>EnvioAlptis</find>
+      <find>findRecibidos</find>
+      <find>obtenerCopaniasLog</find>
+      <find>com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest</find>
+      <find>com.scortelemed.schemas.psn.GestionReconocimientoMedicoRequest</find>
+      <find>com.ws.lagunaro.beans.GestionReconocimientoMedicoRequest</find>
+      <find>com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCaseManagementRequest</find>
+      <find>com.scortelemed.schemas.simplefr.</find>
+      <find>com.scortelemed.schemas.societegenerale.</find>
+      <find>com.scortelemed.schemas.enginyers.</find>
+      <find>com.scortelemed.schemas.methislab.</find>
+      <find>com.scortelemed.schemas.cbpita.</find>
+      <find>com.scortelemed.schemas.methislabCF.</find>
+      <find>;</find>
+      <find>jaxbParser(</find>
+      <find>enviadosNet</find>
+      <find>CajamarUnderwrittingCaseManagementRequest</find>
+      <find>import com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest</find>
+      <find>hwsol.entities.Envio</find>
+      <find>CbpitaUnderwrittingCasesResultsRequest</find>
+      <find>app</find>
+      <find>gestionReconocimientoMedicoRequest</find>
+      <find>MethislabUnderwrittingCaseManagementRequest</find>
+      <find>findEnvios</find>
+>>>>>>> master
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -126,6 +215,7 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
+<<<<<<< HEAD
         <option value="$PROJECT_DIR$/grails-app/views/dashboard/index.gsp" />
         <option value="$PROJECT_DIR$/web-app/css/bootstrap.css" />
         <option value="$PROJECT_DIR$/grails-app/assets/stylesheets/bootstrap.css" />
@@ -135,6 +225,47 @@
         <option value="$PROJECT_DIR$/grails-app/views/dashboard/_logos.gsp" />
         <option value="$PROJECT_DIR$/grails-app/views/comunicacion/listaEnviadoslagunaro.gsp" />
         <option value="$PROJECT_DIR$/grails-app/assets/stylesheets/main.min.css" />
+=======
+        <option value="$PROJECT_DIR$/grails-app/services/com/ws/servicios/CajamarService.groovy" />
+        <option value="$PROJECT_DIR$/grails-app/conf/Config.groovy" />
+        <option value="$PROJECT_DIR$/grails-app/conf/DataSource.groovy" />
+        <option value="$PROJECT_DIR$/src/groovy/hwsol/webservices/EnvioCajamar.groovy" />
+        <option value="$PROJECT_DIR$/src/groovy/hwsol/webservices/EnvioCaser.groovy" />
+        <option value="$PROJECT_DIR$/src/groovy/hwsol/webservices/EnvioCompany.groovy" />
+        <option value="$PROJECT_DIR$/src/groovy/hwsol/webservices/EnvioAMA.groovy" />
+        <option value="$PROJECT_DIR$/grails-app/views/comunicacion/listaEnviadosama.gsp" />
+        <option value="$PROJECT_DIR$/src/groovy/hwsol/entities/RegistrarEventoSCOR.groovy" />
+        <option value="$PROJECT_DIR$/src/groovy/hwsol/webservices/LogService.groovy" />
+        <option value="$PROJECT_DIR$/src/groovy/hwsol/entities/EnvioCompany.groovy" />
+        <option value="$PROJECT_DIR$/src/groovy/hwsol/webservices/Parser.groovy" />
+        <option value="$PROJECT_DIR$/src/groovy/hwsol/entities/EnvioCaser.groovy" />
+        <option value="$PROJECT_DIR$/src/groovy/hwsol/entities/EnvioMethislab.groovy" />
+        <option value="$PROJECT_DIR$/src/groovy/hwsol/entities/EnvioNetInsurance.groovy" />
+        <option value="$PROJECT_DIR$/src/groovy/hwsol/entities/EnvioPSN.groovy" />
+        <option value="$PROJECT_DIR$/src/groovy/hwsol/entities/EnvioAMA.groovy" />
+        <option value="$PROJECT_DIR$/src/groovy/hwsol/entities/parser/EnvioCbpIta.groovy" />
+        <option value="$PROJECT_DIR$/src/groovy/hwsol/entities/EnvioCbpIta.groovy" />
+        <option value="$PROJECT_DIR$/src/groovy/hwsol/entities/EnvioMethislabCF.groovy" />
+        <option value="$PROJECT_DIR$/src/groovy/hwsol/entities/EnvioCajamar.groovy" />
+        <option value="$PROJECT_DIR$/src/groovy/hwsol/entities/EnvioAlptis.groovy" />
+        <option value="$PROJECT_DIR$/src/groovy/hwsol/entities/parser/AlptisGeneralData.groovy" />
+        <option value="$PROJECT_DIR$/src/groovy/hwsol/entities/parser/ValoracionTeleSeleccionResponse.groovy" />
+        <option value="$PROJECT_DIR$/src/groovy/hwsol/factory/LogFactory.groovy" />
+        <option value="$PROJECT_DIR$/src/groovy/hwsol/webservices/LogUtil.groovy" />
+        <option value="$PROJECT_DIR$/src/java/com/scortelemed/schemas/caser/CaserUnderwrittingCaseManagementService_CaserUnderwrittingCaseManagementServicePort_Client.java" />
+        <option value="$PROJECT_DIR$/src/groovy/hwsol/utilities/LogUtil.groovy" />
+        <option value="$PROJECT_DIR$/grails-app/domain/com/scortelemed/Recibido.groovy" />
+        <option value="$PROJECT_DIR$/grails-app/domain/com/scortelemed/Envio.groovy" />
+        <option value="$PROJECT_DIR$/src/groovy/hwsol/entities/Envio.groovy" />
+        <option value="$PROJECT_DIR$/src/groovy/hwsol/factory/SchemaEntities.groovy" />
+        <option value="$PROJECT_DIR$/src/groovy/hwsol/webservices/impl/LogRecibidos.groovy" />
+        <option value="$PROJECT_DIR$/.gitignore" />
+        <option value="$PROJECT_DIR$/grails-app/domain/com/scortelemed/TipoCompany.groovy" />
+        <option value="$PROJECT_DIR$/src/groovy/hwsol/utilities/Parser.groovy" />
+        <option value="$PROJECT_DIR$/src/groovy/hwsol/webservices/impl/LogEnviados.groovy" />
+        <option value="$PROJECT_DIR$/src/groovy/hwsol/webservices/impl/LogErrores.groovy" />
+        <option value="$PROJECT_DIR$/grails-app/controllers/com/scortelemed/DashboardController.groovy" />
+>>>>>>> master
       </list>
     </option>
   </component>
@@ -150,10 +281,17 @@
     </packageJsonPaths>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
+<<<<<<< HEAD
     <option name="x" value="-118" />
     <option name="y" value="-18" />
     <option name="width" value="1938" />
     <option name="height" value="873" />
+=======
+    <option name="x" value="-8" />
+    <option name="y" value="-8" />
+    <option name="width" value="1936" />
+    <option name="height" value="1056" />
+>>>>>>> master
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
@@ -173,6 +311,20 @@
               <item name="scorWebservices" type="b2602c69:ProjectViewProjectNode" />
               <item name="scorWebservices" type="462c0819:PsiDirectoryNode" />
               <item name="grails-app" type="462c0819:PsiDirectoryNode" />
+<<<<<<< HEAD
+=======
+            </path>
+            <path>
+              <item name="scorWebservices" type="b2602c69:ProjectViewProjectNode" />
+              <item name="scorWebservices" type="462c0819:PsiDirectoryNode" />
+              <item name="grails-app" type="462c0819:PsiDirectoryNode" />
+              <item name="services" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="scorWebservices" type="b2602c69:ProjectViewProjectNode" />
+              <item name="scorWebservices" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+>>>>>>> master
             </path>
             <path>
               <item name="scorWebservices" type="b2602c69:ProjectViewProjectNode" />
@@ -190,14 +342,46 @@
             <path>
               <item name="scorWebservices" type="b2602c69:ProjectViewProjectNode" />
               <item name="scorWebservices" type="462c0819:PsiDirectoryNode" />
+<<<<<<< HEAD
               <item name="grails-app" type="462c0819:PsiDirectoryNode" />
               <item name="assets" type="462c0819:PsiDirectoryNode" />
               <item name="images" type="462c0819:PsiDirectoryNode" />
               <item name="logos" type="462c0819:PsiDirectoryNode" />
+=======
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="groovy" type="462c0819:PsiDirectoryNode" />
+              <item name="hwsol" type="462c0819:PsiDirectoryNode" />
+              <item name="entities" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="scorWebservices" type="b2602c69:ProjectViewProjectNode" />
               <item name="scorWebservices" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="groovy" type="462c0819:PsiDirectoryNode" />
+              <item name="hwsol" type="462c0819:PsiDirectoryNode" />
+              <item name="factory" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="scorWebservices" type="b2602c69:ProjectViewProjectNode" />
+              <item name="scorWebservices" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="groovy" type="462c0819:PsiDirectoryNode" />
+              <item name="hwsol" type="462c0819:PsiDirectoryNode" />
+              <item name="utilities" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="scorWebservices" type="b2602c69:ProjectViewProjectNode" />
+              <item name="scorWebservices" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="groovy" type="462c0819:PsiDirectoryNode" />
+              <item name="hwsol" type="462c0819:PsiDirectoryNode" />
+              <item name="webservices" type="462c0819:PsiDirectoryNode" />
+>>>>>>> master
+            </path>
+            <path>
+              <item name="scorWebservices" type="b2602c69:ProjectViewProjectNode" />
+              <item name="scorWebservices" type="462c0819:PsiDirectoryNode" />
+<<<<<<< HEAD
               <item name="grails-app" type="462c0819:PsiDirectoryNode" />
               <item name="views" type="462c0819:PsiDirectoryNode" />
             </path>
@@ -207,6 +391,49 @@
               <item name="grails-app" type="462c0819:PsiDirectoryNode" />
               <item name="views" type="462c0819:PsiDirectoryNode" />
               <item name="dashboard" type="462c0819:PsiDirectoryNode" />
+=======
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="groovy" type="462c0819:PsiDirectoryNode" />
+              <item name="hwsol" type="462c0819:PsiDirectoryNode" />
+              <item name="webservices" type="462c0819:PsiDirectoryNode" />
+              <item name="impl" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="scorWebservices" type="b2602c69:ProjectViewProjectNode" />
+              <item name="scorWebservices" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="scorWebservices" type="b2602c69:ProjectViewProjectNode" />
+              <item name="scorWebservices" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+              <item name="com" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+      <pane id="PackagesPane" />
+      <pane id="Scope" />
+      <pane id="Grails">
+        <subPane>
+          <expand>
+            <path>
+              <item name="" type="f1a0d8d8:GrailsRootNode" />
+              <item name="" type="3c7b8529:GrailsApplicationNode" />
+            </path>
+            <path>
+              <item name="" type="f1a0d8d8:GrailsRootNode" />
+              <item name="" type="3c7b8529:GrailsApplicationNode" />
+              <item name="grails-app" type="51fcbf36:OtherGrailsAppSourcesNode" />
+            </path>
+            <path>
+              <item name="" type="f1a0d8d8:GrailsRootNode" />
+              <item name="" type="3c7b8529:GrailsApplicationNode" />
+              <item name="java" type="a8c2cad5:GrailsPsiDirectoryNode" />
+>>>>>>> master
             </path>
           </expand>
           <select />
@@ -216,6 +443,11 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
+<<<<<<< HEAD
+=======
+    <property name="DatabaseDriversLRU" value="mysql" />
+    <property name="SearchEverywhereHistoryKey" value="UnidadOrganizativa&#9;null&#9;null" />
+>>>>>>> master
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1583501693421" />
@@ -244,7 +476,6 @@
       <setting name="launchBrowser" value="true" />
       <setting name="launchBrowserUrl" value="" />
       <setting name="depsClasspath" value="false" />
-      <method v="2" />
     </configuration>
   </component>
   <component name="SvnConfiguration">
@@ -256,15 +487,31 @@
       <created>1582889268805</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
+<<<<<<< HEAD
       <updated>1582889268805</updated>
       <workItem from="1582889272578" duration="509000" />
       <workItem from="1582889845916" duration="6153000" />
       <workItem from="1583308921765" duration="33980000" />
       <workItem from="1583482947770" duration="4654000" />
+=======
+      <updated>1581329249189</updated>
+      <workItem from="1581329251828" duration="724000" />
+      <workItem from="1581337661007" duration="12163000" />
+      <workItem from="1581418977211" duration="647000" />
+      <workItem from="1581420873176" duration="4154000" />
+      <workItem from="1582538306401" duration="2000" />
+      <workItem from="1582538317988" duration="26874000" />
+      <workItem from="1582621614198" duration="14121000" />
+      <workItem from="1582641301203" duration="7476000" />
+      <workItem from="1582650772822" duration="15173000" />
+      <workItem from="1582732182684" duration="2615000" />
+      <workItem from="1583309441311" duration="1779000" />
+>>>>>>> master
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
+<<<<<<< HEAD
     <option name="totallyTimeSpent" value="44845000" />
   </component>
   <component name="ToolWindowManager">
@@ -274,9 +521,37 @@
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.25888667" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Persistence" order="2" side_tool="true" />
+=======
+    <option name="totallyTimeSpent" value="75209000" />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
+    <editor active="true" />
+    <layout>
+      <window_info anchor="right" id="Palette" order="4" />
+      <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="right" id="Palette&#9;" order="7" />
+      <window_info anchor="bottom" id="Java Enterprise" order="11" weight="0.32907802" />
+      <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
+      <window_info anchor="right" id="Maven Projects" order="1" weight="0.26066098" />
+      <window_info anchor="bottom" id="Database Changes" order="12" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Run" order="2" />
+      <window_info anchor="bottom" id="Version Control" order="13" weight="0.14326242" />
+      <window_info anchor="bottom" id="Spring" order="7" />
+      <window_info anchor="bottom" id="Terminal" order="8" weight="0.1716312" />
+      <window_info id="Persistence" order="2" side_tool="true" weight="0.32995737" />
+>>>>>>> master
       <window_info id="Designer" order="3" />
-      <window_info id="Image Layers" order="4" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49747476" visible="true" weight="0.195629" />
+      <window_info anchor="right" id="Bean Validation" order="9" weight="0.32995737" />
+      <window_info id="Web" order="8" side_tool="true" weight="0.32995737" />
+      <window_info anchor="bottom" id="Grails Console" order="10" weight="0.32897604" />
+      <window_info anchor="right" id="Database" order="6" weight="0.13646056" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.32897604" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info anchor="right" id="Ant Build" order="2" weight="0.25" />
       <window_info id="UI Designer" order="5" />
+<<<<<<< HEAD
       <window_info id="Favorites" order="6" side_tool="true" />
       <window_info id="Capture Tool" order="7" />
       <window_info id="Web" order="8" side_tool="true" />
@@ -305,6 +580,59 @@
       <window_info anchor="right" id="Theme Preview" order="8" />
       <window_info anchor="right" id="Bean Validation" order="9" />
     </layout>
+=======
+      <window_info active="true" anchor="bottom" id="Debug" order="3" visible="true" weight="0.40413943" />
+      <window_info id="Favorites" order="6" sideWeight="0.50252527" side_tool="true" weight="0.18255034" />
+      <window_info anchor="right" id="Capture Analysis" order="5" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info id="Image Layers" order="4" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info id="Capture Tool" order="7" />
+      <window_info anchor="bottom" id="Messages" order="14" weight="0.329718" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="right" id="CDI" order="10" weight="0.32995737" />
+      <window_info anchor="right" id="Theme Preview" order="8" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="3" weight="0.25" />
+    </layout>
+    <layout-to-restore>
+      <window_info id="Persistence" order="2" side_tool="true" weight="0.32995737" />
+      <window_info id="Designer" order="3" />
+      <window_info anchor="right" id="Palette" order="4" />
+      <window_info anchor="bottom" id="Spring" order="7" />
+      <window_info id="Image Layers" order="4" />
+      <window_info anchor="bottom" id="Run" order="2" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="right" id="Ant Build" order="2" weight="0.25" />
+      <window_info id="UI Designer" order="5" />
+      <window_info id="Favorites" order="6" sideWeight="0.50252527" side_tool="true" weight="0.18255034" />
+      <window_info anchor="bottom" id="Terminal" order="8" weight="0.1716312" />
+      <window_info id="Capture Tool" order="7" />
+      <window_info anchor="right" id="Capture Analysis" order="5" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
+      <window_info anchor="bottom" id="Messages" order="14" weight="0.329718" />
+      <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="3" weight="0.25" />
+      <window_info anchor="bottom" id="Grails Console" order="10" weight="0.32897604" />
+      <window_info anchor="bottom" id="Java Enterprise" order="11" weight="0.32907802" />
+      <window_info anchor="bottom" id="Database Changes" order="12" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Version Control" order="13" weight="0.14326242" />
+      <window_info anchor="right" id="Maven Projects" order="1" weight="0.26066098" />
+      <window_info active="true" anchor="bottom" id="Find" order="1" visible="true" weight="0.32897604" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49747476" visible="true" weight="0.195629" />
+      <window_info anchor="right" id="Database" order="6" weight="0.13646056" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info id="Web" order="8" side_tool="true" weight="0.32995737" />
+      <window_info anchor="right" id="Palette&#9;" order="7" />
+      <window_info anchor="right" id="Theme Preview" order="8" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info anchor="right" id="CDI" order="10" weight="0.32995737" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.20043573" />
+      <window_info anchor="right" id="Bean Validation" order="9" weight="0.32995737" />
+    </layout-to-restore>
+>>>>>>> master
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
@@ -312,8 +640,310 @@
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
   </component>
+<<<<<<< HEAD
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/src/java/com/scor/global/CompanyLog.java">
+=======
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/groovy/hwsol/webservices/impl/LogEnviados.groovy</url>
+          <line>96</line>
+          <properties />
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/groovy/hwsol/webservices/impl/LogEnviados.groovy</url>
+          <line>139</line>
+          <properties />
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/controllers/com/scortelemed/DashboardController.groovy</url>
+          <line>52</line>
+          <properties />
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/grails-app/controllers/com/scortelemed/DashboardController.groovy</url>
+          <line>23</line>
+          <properties />
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
+      </breakpoints>
+      <breakpoints-dialog>
+        <breakpoints-dialog />
+      </breakpoints-dialog>
+      <option name="time" value="5" />
+    </breakpoint-manager>
+  </component>
+  <component name="debuggerHistoryManager">
+    <expressions id="evaluateCodeFragment">
+      <expression>
+        <expression-string>params.max ?: 10</expression-string>
+        <language-id>Groovy</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>params.max ? null: 10</expression-string>
+        <language-id>Groovy</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>Math.min(params.max ? null, 10)</expression-string>
+        <language-id>Groovy</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>Math.min(params.max ? null: 10)</expression-string>
+        <language-id>Groovy</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>Math.min(params.max ? params.int('max') : 10,0)</expression-string>
+        <language-id>Groovy</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>Math.min(params.max ? params.int('max') : 10,null)</expression-string>
+        <language-id>Groovy</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>Math.min(params.max ? params.int('max') : 10,?)</expression-string>
+        <language-id>Groovy</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>Math.min(params.max ? params.int('max') : 10,)</expression-string>
+        <language-id>Groovy</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>Math.min(params.max ? params.int('max') : null,0)</expression-string>
+        <language-id>Groovy</language-id>
+        <evaluation-mode>CODE_FRAGMENT</evaluation-mode>
+      </expression>
+    </expressions>
+    <expressions id="evaluateExpression">
+      <expression>
+        <expression-string>myObjectClass.simpleName</expression-string>
+        <language-id>Groovy</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>cias.get(i).id</expression-string>
+        <language-id>Groovy</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>cias.get(i)?.nombre</expression-string>
+        <language-id>Groovy</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>cias</expression-string>
+        <language-id>Groovy</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>expediente</expression-string>
+        <language-id>Groovy</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>enviados.get(i)</expression-string>
+        <language-id>Groovy</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>salida.getClass()</expression-string>
+        <language-id>Groovy</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>T</expression-string>
+        <language-id>Groovy</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>&quot;listaEnviados&quot; + nombre + &quot;.gsp&quot;</expression-string>
+        <language-id>Groovy</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+    </expressions>
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/src/java/com/scortelemed/schemas/caser/ResultadoReconocimientoMedicoRequest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="219">
+          <caret line="36" column="13" selection-start-line="36" selection-start-column="13" selection-end-line="36" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/java/com/scortelemed/schemas/nn/ResultadoReconocimientoMedicoResponse.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="1" column="30" selection-start-line="1" selection-end-line="2" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/java/com/scortelemed/schemas/psn/ConsultaExpedienteRequest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="561">
+          <caret line="35" column="13" selection-start-line="35" selection-start-column="13" selection-end-line="35" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/java/com/scortelemed/schemas/psn/ResultadoReconocimientoMedicoRequest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="378">
+          <caret line="31" column="13" selection-start-line="31" selection-start-column="13" selection-end-line="31" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/java/com/scortelemed/schemas/netinsurance/ObjectFactory.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="196">
+          <caret line="120" column="35" selection-start-line="120" selection-start-column="35" selection-end-line="120" selection-end-column="35" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/java/com/scortelemed/schemas/netinsurance/NetinsuranteGetDossierRequest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="239">
+          <caret line="35" column="34" selection-start-line="35" selection-start-column="21" selection-end-line="35" selection-end-column="34" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/entities/EnvioCompany.groovy" />
+    <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/entities/EnvioNetInsurance.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="85">
+          <caret line="5" column="37" selection-start-line="5" selection-start-column="37" selection-end-line="5" selection-end-column="37" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/entities/EnvioPSN.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="6" column="28" selection-start-line="6" selection-start-column="28" selection-end-line="6" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/java/com/scortelemed/schemas/methislab/MethislabUnderwrittingCasesResultsRequest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="36" column="13" selection-start-line="36" selection-start-column="13" selection-end-line="36" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/entities/EnvioMethislab.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="85">
+          <caret line="5" column="6" selection-start-line="5" selection-start-column="6" selection-end-line="5" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/java/com/scortelemed/schemas/cbpita/CbpitaUnderwrittingCaseManagementRequest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="196">
+          <caret line="106" column="53" selection-start-line="106" selection-start-column="13" selection-end-line="106" selection-end-column="53" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/java/com/scortelemed/schemas/cbpita/CbpitaUnderwrittingCasesResultsRequest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="196">
+          <caret line="36" column="13" selection-start-line="36" selection-start-column="13" selection-end-line="36" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/entities/EnvioMethislabCF.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="34">
+          <caret line="2" selection-start-line="2" selection-end-line="2" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/java/com/scortelemed/schemas/methislabCF/MethislabCFUnderwrittingCasesResultsRequest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="196">
+          <caret line="32" column="13" selection-start-line="32" selection-start-column="13" selection-end-line="32" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/entities/EnvioCbpIta.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="85">
+          <caret line="5" column="29" selection-start-line="5" selection-start-column="29" selection-end-line="5" selection-end-column="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/entities/parser/ValoracionTeleSeleccionResponse.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="85">
+          <caret line="5" column="17" lean-forward="true" selection-start-line="5" selection-start-column="17" selection-end-line="5" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/webservices/GenerarZip.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="19" column="6" selection-start-line="19" selection-start-column="6" selection-end-line="19" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/java/com/scortelemed/schemas/caser/CaserUnderwrittingCaseManagementService_CaserUnderwrittingCaseManagementServicePort_Client.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="357">
+          <caret line="99" selection-start-line="99" selection-end-line="99" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grails-app/domain/com/scortelemed/Recibido.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="238">
+          <caret line="14" column="37" lean-forward="true" selection-start-line="14" selection-start-column="37" selection-end-line="14" selection-end-column="37" />
+        </state>
+      </provider>
+      <provider editor-type-id="org.jetbrains.plugins.grails.perspectives.DomainClassesRelationsEditorProvider" />
+    </entry>
+    <entry file="jar://C:/Grails/grails-2.5.0/lib/org.springframework/spring-webmvc/jars/spring-webmvc-4.1.5.RELEASE.jar!/org/springframework/web/servlet/mvc/SimpleControllerHandlerAdapter.class" />
+    <entry file="jar://C:/Grails/grails-2.5.0/lib/org.springframework/spring-webmvc/jars/spring-webmvc-4.1.5.RELEASE.jar!/org/springframework/web/servlet/FrameworkServlet.class" />
+    <entry file="jar://C:/Grails/grails-2.5.0/lib/org.springframework/spring-webmvc/jars/spring-webmvc-4.1.5.RELEASE.jar!/org/springframework/web/servlet/DispatcherServlet.class" />
+    <entry file="file://$PROJECT_DIR$/grails-app/domain/com/scortelemed/Envio.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="34">
+          <caret line="2" selection-start-line="2" selection-end-line="2" />
+        </state>
+      </provider>
+      <provider editor-type-id="org.jetbrains.plugins.grails.perspectives.DomainClassesRelationsEditorProvider" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/java/com/scortelemed/schemas/caser/GestionReconocimientoMedicoRequest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="349">
+          <caret line="113" column="13" selection-start-line="113" selection-start-column="13" selection-end-line="113" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/java/com/scortelemed/schemas/psn/GestionReconocimientoMedicoRequest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="196">
+          <caret line="107" column="13" selection-start-line="107" selection-start-column="13" selection-end-line="107" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/java/com/ws/lagunaro/beans/GestionReconocimientoMedicoRequest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="11" selection-end-line="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/java/com/ws/cajamar/beans/CajamarUnderwrittingCaseManagementRequest.java">
+>>>>>>> master
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="221">
           <caret line="17" column="18" selection-start-line="17" selection-start-column="18" selection-end-line="17" selection-end-column="18" />
@@ -327,6 +957,7 @@
         </state>
       </provider>
     </entry>
+<<<<<<< HEAD
     <entry file="file://$PROJECT_DIR$/grails-app/assets/stylesheets/DT_bootstrap.css">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="333">
@@ -335,6 +966,9 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/grails-app/controllers/com/scortelemed/DashboardController.groovy">
+=======
+    <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/entities/parser/RegistrarEventoSCOR.groovy">
+>>>>>>> master
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="340">
           <caret line="26" column="55" selection-start-line="26" selection-start-column="43" selection-end-line="26" selection-end-column="61" />
@@ -348,6 +982,7 @@
         </state>
       </provider>
     </entry>
+<<<<<<< HEAD
     <entry file="file://$PROJECT_DIR$/web-app/css/bootstrap.css">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="64">
@@ -366,11 +1001,45 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="469">
           <caret line="32" column="56" selection-start-line="32" selection-start-column="56" selection-end-line="32" selection-end-column="56" />
+=======
+    <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/factory/SchemaEntities.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="578">
+          <caret line="34" column="64" selection-start-line="34" selection-start-column="64" selection-end-line="34" selection-end-column="64" />
+          <folding>
+            <element signature="e#29#89#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/utilities/LogUtil.groovy">
+    <entry file="file://$PROJECT_DIR$/src/java/com/scor/global/CompanyLog.java">
       <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="8" column="13" selection-start-line="8" selection-start-column="13" selection-end-line="8" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grails-app/domain/com/scortelemed/TipoCompany.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="816">
+          <caret line="48" column="34" selection-start-line="48" selection-start-column="34" selection-end-line="48" selection-end-column="34" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/webservices/impl/LogRecibidos.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="680">
+          <caret line="40" column="51" selection-start-line="40" selection-start-column="51" selection-end-line="40" selection-end-column="51" />
+          <folding>
+            <element signature="e#32#62#0" expanded="true" />
+          </folding>
+>>>>>>> master
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/utilities/Parser.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
         <state relative-caret-position="314">
           <caret line="37" column="58" selection-start-line="37" selection-start-column="58" selection-end-line="37" selection-end-column="58" />
         </state>
@@ -394,6 +1063,128 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="238">
           <caret line="2004" lean-forward="true" selection-start-line="2004" selection-end-line="2004" />
+=======
+        <state relative-caret-position="833">
+          <caret line="49" column="29" selection-start-line="49" selection-end-line="50" />
+          <folding>
+            <element signature="e#25#53#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/webservices/impl/LogErrores.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="17">
+          <caret line="74" column="5" selection-start-line="74" selection-start-column="5" selection-end-line="74" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/java/com/ws/enumeration/UnidadOrganizativa.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="119">
+          <caret line="7" column="13" selection-start-line="7" selection-start-column="13" selection-end-line="7" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grails-app/views/comunicacion/listaEnviados.gsp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="765">
+          <caret line="45" column="37" lean-forward="true" selection-start-line="45" selection-start-column="37" selection-end-line="45" selection-end-column="37" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/entities/EnvioCaser.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="119">
+          <caret line="8" column="19" lean-forward="true" selection-start-line="8" selection-start-column="19" selection-end-line="8" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/entities/EnvioCajamar.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="85">
+          <caret line="5" column="6" selection-start-line="5" selection-start-column="6" selection-end-line="5" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/entities/EnvioAMA.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="5" column="6" selection-start-line="5" selection-start-column="6" selection-end-line="5" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/entities/EnvioAlptis.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="119">
+          <caret line="7" column="13" selection-start-line="7" selection-start-column="13" selection-end-line="7" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/entities/Envio.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="34">
+          <caret line="2" column="6" selection-start-line="2" selection-start-column="6" selection-end-line="2" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grails-app/conf/Config.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="459">
+          <caret line="186" selection-start-line="186" selection-end-line="187" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/factory/LogFactory.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="119">
+          <caret line="13" column="12" lean-forward="true" selection-start-line="13" selection-start-column="12" selection-end-line="13" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/webservices/LogService.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="4" column="12" selection-start-line="4" selection-start-column="12" selection-end-line="4" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://C:/Program Files/Java/jdk1.8.0_231/src.zip!/java/lang/String.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="236">
+          <caret line="2131" column="19" selection-start-line="2131" selection-start-column="19" selection-end-line="2131" selection-end-column="19" />
+          <folding>
+            <element signature="e#82971#82972#0" expanded="true" />
+            <element signature="e#83020#83021#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/utilities/LogUtil.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="68">
+          <caret line="18" column="6" selection-start-line="18" selection-start-column="6" selection-end-line="18" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/webservices/impl/LogEnviados.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="157">
+          <caret line="96" selection-start-line="96" selection-end-line="96" />
+          <folding>
+            <element signature="e#32#62#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/grails-app/controllers/com/scortelemed/DashboardController.groovy">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="23" column="18" lean-forward="true" selection-start-line="23" selection-start-column="18" selection-end-line="23" selection-end-column="18" />
+          <folding>
+            <element signature="e#25#58#0" expanded="true" />
+          </folding>
+>>>>>>> master
         </state>
       </provider>
     </entry>
@@ -408,12 +1199,20 @@
               <option name="pluginDependenciesCrc" value="450056577" />
               <option name="properties">
                 <map>
+<<<<<<< HEAD
                   <entry key="grails.global.plugins.dir" value="C:\Users\jrdelamaya\.grails\2.5.0\global-plugins" />
+=======
+                  <entry key="grails.global.plugins.dir" value="C:\Users\lolivera\.grails\2.5.0\global-plugins" />
+>>>>>>> master
                   <entry key="grails.project.fork.run" value="true" />
                   <entry key="grails.project.fork.test" value="true" />
                   <entry key="grails.project.plugins.dir" value="target\work\plugins" />
                   <entry key="grails.project.work.dir" value="target\work" />
+<<<<<<< HEAD
                   <entry key="grails.work.dir" value="C:\Users\jrdelamaya\.grails\2.5.0" />
+=======
+                  <entry key="grails.work.dir" value="C:\Users\lolivera\.grails\2.5.0" />
+>>>>>>> master
                 </map>
               </option>
             </GrailsSettings>

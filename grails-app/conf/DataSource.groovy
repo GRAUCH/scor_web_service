@@ -18,17 +18,16 @@ environments {
         dataSource {
             dbCreate = "" // one of 'create', 'create-drop','update'
             username = "root"
-            //password = "Wcbhjfod!"
             password = "root"
             url = "jdbc:mysql://localhost/scorws-prepro"
         }
     }
 
     development {
+        println "COMPILA PARA DEVELOPMENT JDNI : MySqlscorwsDS"
         dataSource {
-            dbCreate = "" // one of 'create', 'create-drop','update'
+            dbCreate = ""
             username = "root"
-            //password = "1FaQ=V:=4yD"
             password = "root"
             url = "jdbc:mysql://localhost/scorws-prepro"
         }
@@ -36,22 +35,16 @@ environments {
 
 
     preproduction_wildfly {
-        println "COMPILA PARA PREPRODUCCION"
+        println "COMPILA PARA PREPRODUCCION con el JNDI : MySqlscorwsDS"
         dataSource {
-            dbCreate = "" // one of 'create', 'create-drop','update'
-            username = "root"
-            password = "1FaQ=V:=4yD"
-            url = "jdbc:mysql://localhost/scorws-prepro"
+            jndiName = "java:jboss/datasources/MySqlscorwsDS"
         }
     }
 
     production_wildfly {
         println "COMPILA PARA PRODUCCION WILDFLY DATA SOURCE"
         dataSource {
-            dbCreate = ""
-            username = "scorws"
-            password = "Sc0rw3bS"
-            url = "jdbc:mysql://localhost/scorws"
+            jndiName = "java:jboss/datasources/MySqlscorwsDS"
         }
     }
 }

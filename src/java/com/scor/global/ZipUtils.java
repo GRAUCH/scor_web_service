@@ -1,25 +1,28 @@
 package com.scor.global;
 
-import java.io.*;
-import java.net.Authenticator;
-import java.net.PasswordAuthentication;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-
-import com.scortelemed.Conf;
-import servicios.*;
-import org.apache.commons.codec.binary.Base64;
-import java.util.ArrayList;
-
-import java.util.zip.ZipOutputStream;
-import java.util.zip.ZipEntry;
-import java.net.URL;
-import org.apache.commons.io.FileUtils;
-import org.alfresco.webservice.util.WebServiceFactory;
 import org.alfresco.webservice.authentication.AuthenticationFault;
 import org.alfresco.webservice.util.AuthenticationUtils;
+import org.alfresco.webservice.util.WebServiceFactory;
+import org.apache.commons.io.FileUtils;
+import servicios.Documentacion;
+import servicios.TipoDocumentacion;
+import servicios.TipoEstadoTUW;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.Authenticator;
+import java.net.PasswordAuthentication;
+import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
 public class ZipUtils {
 
 
@@ -27,7 +30,7 @@ public class ZipUtils {
 
         WebServiceFactory.setEndpointAddress("http://172.17.0.32:8080/alfresco/api");
         try {
-            AuthenticationUtils.startSession("generico","pR8x5hqD");
+            AuthenticationUtils.startSession("generico", "pR8x5hqD");
         } catch (AuthenticationFault e) {
             e.printStackTrace();
         }
@@ -36,84 +39,83 @@ public class ZipUtils {
 
     public void eraseFiles(servicios.ExpedienteInforme expediente, String zipPath) {
 
-        File dir = new File(zipPath+expediente.getNumSolicitud());
+        File dir = new File(zipPath + expediente.getNumSolicitud());
 
         File[] listFiles = dir.listFiles();
-        for(File file : listFiles){
+        for (File file : listFiles) {
             file.delete();
         }
 
         dir.delete();
 
-        File zip = new File(zipPath+expediente.getCandidato().getApellidos()+"_"+expediente.getNumSolicitud()+".zip");
+        File zip = new File(zipPath + expediente.getCandidato().getApellidos() + "_" + expediente.getNumSolicitud() + ".zip");
         zip.delete();
     }
 
-    public byte[] generarZips(servicios.ExpedienteInforme expediente, String codigoStCia, String fecha, String zipPath, String user, String password) throws Exception{
+    public byte[] generarZips(servicios.ExpedienteInforme expediente, String codigoStCia, String fecha, String zipPath, String user, String password) throws Exception {
         startSession();
         List<Documentacion> listaDocumentosPdf = new ArrayList<Documentacion>();
         List<Documentacion> listaDocumentosAudios = new ArrayList<Documentacion>();
         String rutaDocumento = null;
 
 
+        if (expediente != null) {
 
-            if (expediente != null) {
+            if (expediente.getProducto().getCodigoProductoCompanya().equals(codigoStCia)) {
 
-                if (expediente.getProducto().getCodigoProductoCompanya().equals(codigoStCia)) {
+                listaDocumentosPdf = obtenerPdfsTUW(expediente, fecha);
+                listaDocumentosAudios = obtenerAudios(expediente, fecha);
 
-                    listaDocumentosPdf = obtenerPdfsTUW(expediente, fecha);
-                    listaDocumentosAudios = obtenerAudios(expediente, fecha);
+                /**
+                 * Procesamos los pdf
+                 *
+                 */
 
-                    /**
-                     * Procesamos los pdf
-                     *
-                     */
+                for (int k = 0; k < listaDocumentosPdf.size(); k++) {
 
-                    for (int k = 0; k < listaDocumentosPdf.size(); k++) {
+                    if (listaDocumentosPdf.get(k).getUrlAlfresco() != null) {
 
-                        if (listaDocumentosPdf.get(k).getUrlAlfresco() != null) {
-
-                            rutaDocumento = descargarPdf(listaDocumentosPdf.get(k).getUrlAlfresco(), listaDocumentosPdf.get(k).getNombre(), expediente, listaDocumentosPdf.get(k).getTipoDocumentacion(), zipPath, user, password);
-                            System.out.println("Intentando descargar documento: " + listaDocumentosPdf.get(k).getNombre());
-                            if (rutaDocumento != null) {
-                                System.out.println("TUW: Se ha generado el documento " + listaDocumentosPdf.get(k).getNombre() + " para expediente "
-                                        + expediente.getCodigoST() + " en la ruta " + rutaDocumento);
-                            } else {
-                                System.out.println("TUW: No se ha generado el documento " + listaDocumentosPdf.get(k).getNombre());
-                            }
+                        rutaDocumento = descargarPdf(listaDocumentosPdf.get(k).getUrlAlfresco(), listaDocumentosPdf.get(k).getNombre(), expediente, listaDocumentosPdf.get(k).getTipoDocumentacion(), zipPath, user, password);
+                        System.out.println("Intentando descargar documento: " + listaDocumentosPdf.get(k).getNombre());
+                        if (rutaDocumento != null) {
+                            System.out.println("TUW: Se ha generado el documento " + listaDocumentosPdf.get(k).getNombre() + " para expediente "
+                                    + expediente.getCodigoST() + " en la ruta " + rutaDocumento);
+                        } else {
+                            System.out.println("TUW: No se ha generado el documento " + listaDocumentosPdf.get(k).getNombre());
                         }
                     }
-
-                    /**
-                     * Procesamos los audios
-                     *
-                     */
-                    for (int k = 0; k < listaDocumentosAudios.size(); k++) {
-
-                        if (listaDocumentosAudios.get(k).getUrlAlfresco() != null) {
-
-                            rutaDocumento = descargarAudios(listaDocumentosAudios.get(k).getUrlAlfresco(), listaDocumentosAudios.get(k).getNombre(), expediente, listaDocumentosAudios.get(k).getTipoDocumentacion(), k,
-                                    listaDocumentosAudios.size(), zipPath, user, password);
-
-                            System.out.println("Intentando descargar documento: " + listaDocumentosAudios.get(k).getNombre());
-
-                            if (rutaDocumento != null) {
-
-                                System.out.println("TUW: Se ha generado el documento " + listaDocumentosAudios.get(k).getNombre() + " para expediente "
-                                        + expediente.getCodigoST() + " en la ruta " + rutaDocumento);
-                            } else {
-                                System.out.println("TUW: No se ha podido generar el documento " + listaDocumentosAudios.get(k).getNombre() + " para expediente "
-                                        + expediente.getCodigoST() + " porque el nodo de alfresco es nulo");
-                            }
-                        }
-                    }
-
-                    if (listaDocumentosPdf.size() > 0) {
-                        return generarZip(expediente.getNumSolicitud(), expediente.getCandidato().getApellidos(), zipPath);
-                    }
-
                 }
+
+                /**
+                 * Procesamos los audios
+                 *
+                 */
+                for (int k = 0; k < listaDocumentosAudios.size(); k++) {
+
+                    if (listaDocumentosAudios.get(k).getUrlAlfresco() != null) {
+
+                        rutaDocumento = descargarAudios(listaDocumentosAudios.get(k).getUrlAlfresco(), listaDocumentosAudios.get(k).getNombre(), expediente, listaDocumentosAudios.get(k).getTipoDocumentacion(), k,
+                                listaDocumentosAudios.size(), zipPath, user, password);
+
+                        System.out.println("Intentando descargar documento: " + listaDocumentosAudios.get(k).getNombre());
+
+                        if (rutaDocumento != null) {
+
+                            System.out.println("TUW: Se ha generado el documento " + listaDocumentosAudios.get(k).getNombre() + " para expediente "
+                                    + expediente.getCodigoST() + " en la ruta " + rutaDocumento);
+                        } else {
+                            System.out.println("TUW: No se ha podido generar el documento " + listaDocumentosAudios.get(k).getNombre() + " para expediente "
+                                    + expediente.getCodigoST() + " porque el nodo de alfresco es nulo");
+                        }
+                    }
+                }
+
+                if (listaDocumentosPdf.size() > 0) {
+                    return generarZip(expediente.getNumSolicitud(), expediente.getCandidato().getApellidos(), zipPath);
+                }
+
             }
+        }
 
 
         return null;
@@ -181,72 +183,80 @@ public class ZipUtils {
         byte[] arrayOfByte = new byte[1024];
         ZipOutputStream zos = null;
 
-        try{
+        try {
 
-            FileOutputStream fos = new FileOutputStream(zipFile+apellidos+"_"+applicationNumber+".zip");
+            FileOutputStream fos = new FileOutputStream(zipFile + apellidos + "_" + applicationNumber + ".zip");
             zos = new ZipOutputStream(fos);
 
             /**Recorremos los ficheros de la carpeta
              *
              */
-            String[] files = getFiles(zipFile+applicationNumber);
+            String[] files = getFiles(zipFile + applicationNumber);
 
-            if ( files != null ) {
+            if (files != null) {
 
                 int size = files.length;
 
-                for ( int i = 0; i < size; i ++ ) {
-
+                for (int i = 0; i < size; i++) {
                     System.out.println(files[i]);
-                    ZipEntry ze= new ZipEntry(files[i]);
+                    ZipEntry ze = new ZipEntry(splitName(files[i],i));
                     zos.putNextEntry(ze);
                     FileInputStream in = new FileInputStream(files[i]);
                     int len;
                     while ((len = in.read(arrayOfByte)) > 0) {
                         zos.write(arrayOfByte, 0, len);
                     }
-
                     in.close();
                 }
             }
             zos.closeEntry();
             zos.close();
-
-            byte[] bFile = readBytesFromFile(zipFile+apellidos+"_"+applicationNumber+".zip");
-
+            byte[] bFile = readBytesFromFile(zipFile + apellidos + "_" + applicationNumber + ".zip");
             return bFile;
-
-        }catch(IOException ex){
+        } catch (IOException ex) {
             ex.printStackTrace();
         }
 
         return null;
     }
 
-    public static String[] getFiles( String dir_path ) {
+    private static String splitName(String name, int i) {
+        if (name != null && !name.isEmpty()) {
+            String[] namePart  =name.split("/");
+            if(namePart != null && namePart.length >0){
+                return namePart[namePart.length-1];
+            }else{
+                return "file_" + i;
+            }
+        } else {
+            return " ";
+        }
+    }
+
+    public static String[] getFiles(String dir_path) {
 
         String[] arr_res = null;
 
-        File f = new File( dir_path );
+        File f = new File(dir_path);
 
-        if ( f.isDirectory( )) {
+        if (f.isDirectory()) {
 
-            List<String> res   = new ArrayList<String>();
+            List<String> res = new ArrayList<String>();
             File[] arr_content = f.listFiles();
 
             int size = arr_content.length;
 
-            for ( int i = 0; i < size; i ++ ) {
+            for (int i = 0; i < size; i++) {
 
-                if ( arr_content[ i ].isFile( ))
-                    res.add( arr_content[ i ].toString( ));
+                if (arr_content[i].isFile())
+                    res.add(arr_content[i].toString());
             }
 
 
-            arr_res = res.toArray( new String[ 0 ] );
+            arr_res = res.toArray(new String[0]);
 
         } else
-            System.err.println( "¡ Path NO válido !" );
+            System.err.println("¡ Path NO válido !");
         return arr_res;
     }
 
@@ -258,29 +268,29 @@ public class ZipUtils {
         String nombre = null;
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-            /**
-             * • YYYY.MM.DD-PIT-Survey_APPLICATION NUMBER.pdf
-             **/
+        /**
+         * • YYYY.MM.DD-PIT-Survey_APPLICATION NUMBER.pdf
+         **/
 
-            String application_number = expediente.getNumSolicitud() != null ? expediente.getNumSolicitud() : "";
-            String fecha =  dateFormat.format(new Date());
-            String anio = fecha.substring(0, 4);
-            String mes = fecha.substring(5, 7);
-            String dia = fecha.substring(8, 10);
+        String application_number = expediente.getNumSolicitud() != null ? expediente.getNumSolicitud() : "";
+        String fecha = dateFormat.format(new Date());
+        String anio = fecha.substring(0, 4);
+        String mes = fecha.substring(5, 7);
+        String dia = fecha.substring(8, 10);
 
-            nombre = anio + "." + mes + "." + dia + "-PIT-Survey_" + application_number + ".pdf";
+        nombre = anio + "." + mes + "." + dia + "-PIT-Survey_" + application_number + ".pdf";
 
-            ficheroLocal = new File(zipPath+application_number + "/" + nombre);
+        ficheroLocal = new File(zipPath + application_number + "/" + nombre);
 
-            Authenticator.setDefault (new Authenticator() {
-                protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication(user, password.toCharArray());
-                }
-            });
+        Authenticator.setDefault(new Authenticator() {
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(user, password.toCharArray());
+            }
+        });
 
-            FileUtils.copyURLToFile(url, ficheroLocal);
+        FileUtils.copyURLToFile(url, ficheroLocal);
 
-            return ficheroLocal.getPath();
+        return ficheroLocal.getPath();
 
 
     }
@@ -294,36 +304,34 @@ public class ZipUtils {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
 
+        /**
+         * YYYY.MM.DD-PIT-Call_APPLICATION NUMBER.mp3
+         **/
 
-            /**
-             * YYYY.MM.DD-PIT-Call_APPLICATION NUMBER.mp3
-             **/
+        String application_number = expediente.getNumSolicitud() != null ? expediente.getNumSolicitud() : "";
+        String fecha = dateFormat.format(new Date());
+        String anio = fecha.substring(0, 4);
+        String mes = fecha.substring(5, 7);
+        String dia = fecha.substring(8, 10);
 
-            String application_number = expediente.getNumSolicitud() != null ? expediente.getNumSolicitud() : "";
-            String fecha =  dateFormat.format(new Date());
-            String anio = fecha.substring(0, 4);
-            String mes = fecha.substring(5, 7);
-            String dia = fecha.substring(8, 10);
+        if (numeroAudios > 1) {
+            nombre = anio + "." + mes + "." + dia + "-Call_" + application_number + "_" + ordinal + ".mp3";
+        } else {
+            nombre = anio + "." + mes + "." + dia + "-Call_" + application_number + ".mp3";
+        }
 
-            if (numeroAudios > 1) {
-                nombre = anio + "." + mes + "." + dia + "-Call_" + application_number + "_" + ordinal + ".mp3";
-            } else {
-                nombre = anio + "." + mes + "." + dia + "-Call_" + application_number + ".mp3";
+        ficheroLocal = new File(zipPath + application_number + "/" + nombre);
+
+
+        Authenticator.setDefault(new Authenticator() {
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(user, password.toCharArray());
             }
+        });
 
-            ficheroLocal = new File(zipPath+application_number + "/" + nombre);
+        FileUtils.copyURLToFile(url, ficheroLocal);
 
-
-            Authenticator.setDefault (new Authenticator() {
-                protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication(user, password.toCharArray());
-                }
-            });
-
-            FileUtils.copyURLToFile(url, ficheroLocal);
-
-            return ficheroLocal.getPath();
-
+        return ficheroLocal.getPath();
 
 
     }

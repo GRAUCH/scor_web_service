@@ -113,7 +113,7 @@ environments {
     }
 
     development {
-        println "entra a prepro0"
+        println "entra a DEVELOPMENT"
 
         grails.logging.jul.usebridge = true
 
@@ -190,7 +190,7 @@ environments {
     }
 
     production_wildfly{
-        println "entra a produccion_wildfly CONEXIONES WSDL"
+        println "entra a produccion wildfly CONEXIONES WSDL"
         grails.logging.jul.usebridge = false
         cxf {
             client {
