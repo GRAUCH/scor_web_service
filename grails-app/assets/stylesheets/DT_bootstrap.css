@@ -140,7 +140,8 @@ div.DTTT_print_info p {
 }
 
 .dataTables_wrapper .row {
-	margin-left:0px;
+	margin-left:auto;
+	margin-right:auto;
 }
 
 /*

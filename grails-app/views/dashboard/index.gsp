@@ -72,6 +72,33 @@
 
     function myFunction(id) {
         $('#idCia').val(id);
+        // var i;
+        //
+        var elements = document.getElementsByClassName('quick-btn_Selected');
+        while(elements.length > 0){
+            elements[0].classList.remove('quick-btn_Selected');
+        }
+        //  document.getElementById(8).classList.remove('quick-btn_Selected');
+        //
+        // for (i=3; i<20; i++){
+        //     alert(i + " - " + id );
+        //
+        //
+        //     if (document.getElementById(i).classList.contains('quick-btn_Selected')){
+        //         alert("entró" + i);
+        //             if (i!=id){
+        //             document.getElementById(i).classList.remove('quick-btn_Selected');
+        //             //break;
+        //             }
+        //     }
+        //
+        //
+        // }
+        //
+        // //  // document.getElementById(seleccionado).classList.add('quick-btn_Selected');
+        document.getElementById(id).classList.toggle('quick-btn_Selected');
+
+
     }
 
     $.datepicker.regional['es'] = {

@@ -8,7 +8,7 @@
 			${company}
 		</div>
 	</div>
-	<div class="block-content collapse in">
+	<div class="block-content collapse in centrarTabla">
 		<div class="span12">
 			<div id="example_wrapper" class="dataTables_wrapper form-inline"
 				role="grid">

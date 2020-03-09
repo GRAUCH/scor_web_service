@@ -10,7 +10,7 @@
 	</div>
 	<div class="block-content collapse in">
 		<div class="span12">
-			<div id="example_wrapper" class="dataTables_wrapper form-inline"
+			<div id="example_wrapper" class="dataTables_wrapper form-inline" style="text-align:center;"
 				role="grid">
 				<table aria-describedby="example_info"
 					class="table table-striped table-bordered dataTable" id="example"

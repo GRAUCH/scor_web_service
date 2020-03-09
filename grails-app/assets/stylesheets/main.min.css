@@ -1942,8 +1942,12 @@ body:not (.mini-sidebar ) #menu .nav-header {
 
 .quick-btn {
 	background: #EEEEEE;
-	-webkit-box-shadow: 0 0 0 1px #F8F8F8 inset, 0 0 0 1px #CCCCCC;
-	box-shadow: 0 0 0 1px #F8F8F8 inset, 0 0 0 1px #CCCCCC;
+	/*-webkit-box-shadow: 0 0 0 1px #F8F8F8 inset, 0 0 0 1px #CCCCCC;
+	box-shadow: 0 0 0 1px #F8F8F8 inset, 0 0 0 1px #CCCCCC;*/
+	border-style: solid;
+	border-width: 1px;
+	border-radius: 10px;
+	border-color: #ADADAD;
 	color: #444444;
 	display: inline-block;
 	/*height: 80px;*/
@@ -1953,7 +1957,8 @@ body:not (.mini-sidebar ) #menu .nav-header {
 	text-decoration: none;
 	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
 	width: 90px;
-	position: relative
+	position: relative;
+
 }
 
 .quick-btn span {
@@ -1970,12 +1975,41 @@ body:not (.mini-sidebar ) #menu .nav-header {
 	text-decoration: none;
 	color: #fff;
 	background-color: #4d7589;
-	text-shadow: 0 1px 1px #000
+	border-color: rgba(29,180,5,1);
+	text-shadow: 0 1px 1px #000;
+
 }
 
 .quick-btn:active {
-    color: #cc0000;
- background-color: #cc0000;
+	-webkit-box-shadow: 0px 0px 3px 1px rgba(113,230,94,1);
+	-moz-box-shadow: 0px 0px 3px 1px rgba(113,230,94,1);
+	box-shadow: 0px 0px 3px 1px rgba(113,230,94,1);
+}
+
+.quick-btn:focus {
+	box-shadow: 0 0 0 2px white, 0 0 0 4px blue;
+}
+
+.quick-btn_Selected{
+	-webkit-box-shadow: 0px 0px 3px 1px rgba(29,180,5,1);
+	-moz-box-shadow: 0px 0px 3px 1px rgba(29,180,5,1);
+	box-shadow: 0px 0px 3px 1px rgba(29,180,5,1);
+}
+
+.centrarTabla{
+	align-items: center;
+	display: flex;
+	justify-content: center;
+}
+
+
+.centerTable{
+	text-align: center;
+}
+
+.centerTable table {
+	margin: 0 auto;
+	text-align: left;
 }
 
 .quick-btn.small {

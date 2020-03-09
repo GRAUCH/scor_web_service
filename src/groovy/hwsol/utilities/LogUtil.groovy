@@ -35,7 +35,7 @@ class LogUtil {
 
                 CompanyLog ciaLog = new CompanyLog()
 
-                ciaLog.setLogo(cias.get(i)?.nombre + ".jpg")
+                ciaLog.setLogo(cias.get(i)?.nombre + ".png")
                 ciaLog.setRecibidos(Recibido.findAllByCia(cias.get(i).id.toString()))
                 ciaLog.setEnviados(Envio.findAllByCia(cias.get(i).id.toString()))
                 ciaLog.setName(cias.get(i).nombre)
