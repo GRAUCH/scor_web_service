@@ -465,14 +465,12 @@ class WsController {
         //http://localhost:8080/scorWebservices/ws/caseresultCaser?ini=20170519 00:00:00&fin=20170519 23:59:59
 
         TransformacionUtil transformacion = new TransformacionUtil()
-
+        def company = Company.findByNombre('caser')
         try {
 
             def formateador = new java.text.SimpleDateFormat("yyyyMMdd")
             def operacion = Operacion.findByClave('CaserUnderwrittingCasesResultsRequest')
-            def company = Company.findByNombre('caser')
             session.companyST = company.codigoSt
-
             if (params.ini && params.fin) {
                 fechaIni = URLDecoder.decode(params.ini.trim(), "ISO-8859-1")
                 fechaFin = URLDecoder.decode(params.fin.trim(), "ISO-8859-1")
@@ -522,15 +520,10 @@ class WsController {
             RegistrarEventoSCOR entradaDetalle = new RegistrarEventoSCOR()
             String stringRequest = null
             expedientes.each { expediente ->
-
                 entradaDetalle = transformacion.obtenerDetalle(expediente)
-
                 if (entradaDetalle != null) {
-
                     stringRequest = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?><service_RegistrarEventoSCOR><inputMap type='map'><username type='String'><_value_>" + username + "</_value_></username><password type='String'><_value_>" + password + "</_value_></password><idExpediente type='Integer'><_value_>" + entradaDetalle.getIdExpediente() + "</_value_></idExpediente><codigoEvento type='String'><_value_>" + entradaDetalle.getCodigoEvento() + "</_value_></codigoEvento><detalle type='String'><_value_>" + entradaDetalle.getDetalle() + "</_value_></detalle><fecha type='Date'><_value_>" + entradaDetalle.getFecha() + "</_value_></fecha></inputMap></service_RegistrarEventoSCOR>"
-
                     Thread.sleep(6000)
-
                     try {
                         port.doProcessExecution(stringRequest, salida)
                         Envio envio = new Envio()
@@ -565,6 +558,14 @@ class WsController {
             logginService.putInfoMessage("** Se enviaron :" + expedientes.size() + " **")
         } catch (Exception ex) {
             logginService.putErrorMessage("Error: " + opername + ". " + ex.getMessage() + ". Detalles:" + ex.getMessage())
+            com.scortelemed.Error error = new com.scortelemed.Error()
+            error.setFecha(new Date())
+            error.setCia(company.id.toString())
+            error.setIdentificador(" ")
+            error.setInfo("$controllerName")
+            error.setOperacion(opername)
+            error.setError("Peticion no realizada para solicitud: "+ex.getMessage() +". Error: " + ex.getMessage())
+            error.save(flush: true)
             render "KO"
         }
     }
