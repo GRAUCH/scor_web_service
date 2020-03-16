@@ -1,6 +1,7 @@
 package com.scortelemed
 
 import com.scortelemed.schemas.enginyers.AddExp
+import com.ws.servicios.EnginyersService
 import grails.plugin.springsecurity.annotation.Secured
 import grails.util.Holders
 
@@ -44,6 +45,8 @@ class RequestController {
 	private CajamarService cajamarService
 	@Autowired
 	private NetinsuranceService netinsuranceService
+	@Autowired
+	private  EnginyersService enginyersService
 
 
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -578,11 +581,11 @@ class RequestController {
 
 			case "enginyers":
 
-				JAXBContext jaxbContext = JAXBContext.newInstance(AddExp.class);
-				Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-				StringReader reader = new StringReader(requestInstance.getRequest().trim());
-				JAXBElement<AddExp> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), AddExp.class);
-				AddExp addExp = root.getValue();
+				JAXBContext jaxbContext = JAXBContext.newInstance(AddExp.class)
+				Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller()
+				StringReader reader = new StringReader(requestInstance.getRequest().trim())
+				JAXBElement<AddExp> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), AddExp.class)
+				AddExp addExp = root.getValue()
 
 				if (Company.findByNombre(requestInstance.company).generationAutomatic) {
 					def compania=Company.findByNombre(requestInstance.company)

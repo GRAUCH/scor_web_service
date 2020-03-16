@@ -246,13 +246,13 @@ class TarificadorService {
         return response
     }
 
-    def obtenerInformeExpedientes(String arg1, String arg2, int arg3, String arg4, String arg5, String arg6) {
+    def obtenerInformeExpedientes(String codigost, String arg2, int arg3, String fechaIni, String fechaFin, String pais) {
         try {
             //SOBREESCRIBIMOS LA URL A LA QUE TIENE QUE LLAMAR EL WSDL
             def ctx = grailsApplication.mainContext
             def bean = ctx.getBean("soapClientAlptis")
             bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("frontal.wsdl")?.value)
-            def salida = grailsApplication.mainContext.soapClientAlptis.informeExpedientes(obtenerUsuarioFrontal(arg6), arg1, arg2, arg3, arg4, arg5)
+            def salida = grailsApplication.mainContext.soapClientAlptis.informeExpedientes(obtenerUsuarioFrontal(pais), codigost, arg2, arg3, fechaIni, fechaFin)
             return salida.listaExpedientesInforme
         } catch (Throwable e) {
             logginService.putError("obtenerInformeExpedientes", "No se ha podido obtener el informe de expediente : " + e)
@@ -376,28 +376,28 @@ class TarificadorService {
     }
 
     def obtenerXMLExpedientePorZip(resultComprimidos) {
-        StringBuilder sb = new StringBuilder();
-        byte[] decodedBytes = Base64.decodeBase64(resultComprimidos.getBytes("UTF-8"));
-        ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(decodedBytes));
-        ZipEntry entrada;
+        StringBuilder sb = new StringBuilder()
+        byte[] decodedBytes = Base64.decodeBase64(resultComprimidos.getBytes("UTF-8"))
+        ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(decodedBytes))
+        ZipEntry entrada
 
         while ((entrada = zis.getNextEntry()) != null) {
-            String filename = entrada.getName();
+            String filename = entrada.getName()
 
             logginService.putInfoMessage("El nombre del fichero es: " + filename)
 
             if (filename.contains("xml")) {
                 Reader r = new InputStreamReader(zis, "UTF-8");  //or whatever encoding
-                char[] buf = new char[1024];
-                int amt = r.read(buf);
+                char[] buf = new char[1024]
+                int amt = r.read(buf)
                 while (amt > 0) {
-                    sb.append(buf, 0, amt);
-                    amt = r.read(buf);
+                    sb.append(buf, 0, amt)
+                    amt = r.read(buf)
                 }
             }
         }
 
-        zis.close();
+        zis.close()
 
         return sb.toString().replace('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>', "")
     }

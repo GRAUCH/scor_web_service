@@ -92,7 +92,6 @@ class LogRecibidos implements LogService{
 
     private List<Recibido> findRecibidos(desde, hasta, Company company, Map sortParams) {
         StringBuilder hqlQueryBuilder = new StringBuilder(' ')
-
         hqlQueryBuilder << 'FROM Recibido AS recibido  '
         Map namedParams = [idCia: company.id]
         hqlQueryBuilder << 'WHERE cia = :idCia '
@@ -102,13 +101,8 @@ class LogRecibidos implements LogService{
         hqlQueryBuilder << " :endDate "
         namedParams["endDate"] = hasta
         namedParams["iniDate"] = desde
-
-
         hqlQueryBuilder << "ORDER BY fecha DESC"
-
         System.out.println("idCia ID  -->>" + company.id)
-
-
         Recibido.executeQuery(hqlQueryBuilder.toString(), namedParams, sortParams)
     }
 }

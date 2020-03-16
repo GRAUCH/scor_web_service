@@ -136,9 +136,7 @@ class WsController {
                     }
                     envio.setInfo(info)
                     envio.save(flush: true)
-
                     logginService.putInfoMessage("Informacion expediente " + identificador + " enviado a " + company.nombre + " correctamente")
-
                 }
 
 
@@ -195,7 +193,6 @@ class WsController {
             }
         } catch (Exception ex) {
             logginService.putError("Endpoint-" + opername, "Error en al obtener resultados para las fechas " + fechaIni + "-" + fechaFin + ":" + ex)
-
             correoUtil.envioEmail("AlptisUnderwrittingCasesResultsRequest", cases.toString(), ex)
 
             responseRecette = soap.send(connectTimeout: 300000, readTimeout: 300000) {
@@ -455,7 +452,6 @@ class WsController {
         def opername = "caseresultCaser"
         def cases = []
         List<Expediente> expedientes = new ArrayList<Expediente>()
-
         List<Cita> citas = new ArrayList<Cita>()
         List<Actividad> actividades = new ArrayList<Actividad>()
         def estadoCausa = []
@@ -480,7 +476,7 @@ class WsController {
                 fechaIni = URLDecoder.decode(params.ini.trim(), "ISO-8859-1")
                 fechaFin = URLDecoder.decode(params.fin.trim(), "ISO-8859-1")
             } else {
-                Calendar fecha = Calendar.getInstance();
+                Calendar fecha = Calendar.getInstance()
                 fecha.add(Calendar.MINUTE, -60)
                 fechaFin = fecha.getTime().format('yyyyMMdd HH:mm')
                 fechaFin = fechaFin.toString() + ":59"
@@ -536,33 +532,29 @@ class WsController {
 
                     try {
                         port.doProcessExecution(stringRequest, salida)
-
                         Envio envio = new Envio()
                         envio.setFecha(new Date())
                         envio.setCia(company.id.toString())
-                        envio.setIdentificador(entradaDetalle.getIdExpediente())
+                        envio.setIdentificador(entradaDetalle.eventoSCOR.getIdExpediente())
                         envio.setInfo(stringRequest)
                         envio.save(flush: true)
-
-                        logginService.putInfoMessage("Informacion de salida envio de cambios en expedientes " + entradaDetalle.getIdExpediente())
-                        logginService.putInfoMessage("Informacion recibida de cambios en expedientes " + entradaDetalle.getIdExpediente() + ":" + salida.value.trim())
-                        logginService.putInfoMessage("Informacion expedientes " + entradaDetalle.getIdExpediente() + " enviado a " + company.nombre + " correctamente")
+                        logginService.putInfoMessage("Informacion de salida envio de cambios en expedientes " + entradaDetalle.eventoSCOR.getIdExpediente())
+                        logginService.putInfoMessage("Informacion recibida de cambios en expedientes " + entradaDetalle.eventoSCOR.getIdExpediente() + ":" + salida.value.trim())
+                        logginService.putInfoMessage("Informacion expedientes " + entradaDetalle.eventoSCOR.getIdExpediente() + " enviado a " + company.nombre + " correctamente")
 
                     } catch (Exception ex) {
-
                         /**Metemos en errores
                          *
                          */
                         com.scortelemed.Error error = new com.scortelemed.Error()
                         error.setFecha(new Date())
                         error.setCia(company.id.toString())
-                        error.setIdentificador(entradaDetalle.getIdExpediente())
+                        error.setIdentificador(entradaDetalle.eventoSCOR.getIdExpediente())
                         error.setInfo(stringRequest)
                         error.setOperacion("ENVIO ESTADO")
-                        error.setError("Peticion no realizada para solicitud: " + entradaDetalle.getIdExpediente() + ". Error: " + ex.getMessage())
+                        error.setError("Peticion no realizada para solicitud: " + entradaDetalle.eventoSCOR.getIdExpediente() + ". Error: " + ex.getMessage())
                         error.save(flush: true)
                         logginService.putErrorMessage("Error: " + opername + ". No se ha podido mandar el caso a Caser. Detalles:" + ex.getMessage())
-
                     }
 
                 }
