@@ -10,6 +10,7 @@ import com.ws.cajamar.beans.Cobertura
 import com.ws.cajamar.beans.ElementoEntrada
 import com.ws.cajamar.beans.ElementoSalida
 import hwsol.entities.EnvioCaser
+import hwsol.entities.parser.RegistrarEventoSCOR
 import servicios.Candidato
 import servicios.TipoTelefono
 
@@ -1282,104 +1283,103 @@ class TransformacionUtil {
         DateFormat formatter = new SimpleDateFormat("yyyy/MM/dd")
         DateFormat formatterSalida = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss")
 
-        EnvioCaser entradaDetalle = new EnvioCaser()
+        RegistrarEventoSCOR entradaDetalle = new RegistrarEventoSCOR()
 
         if (entidad instanceof servicios.Expediente) {
 
             switch (obtenerValorEstadoExpediente(entidad.getCodigoEstado().toString())) {
                 case "1":
                     Date date = formatter.parse(entidad.getFechaApertura())
-                    entradaDetalle.eventoSCOR.setIdExpediente(entidad.getNumSolicitud())
-                    entradaDetalle.setFecha(formatterSalida.format(date))
-                    entradaDetalle.eventoSCOR.setCodigoEvento(obtenerValorEstadoExpediente(entidad.getCodigoEstado().toString()))
-                    entradaDetalle.eventoSCOR.setDetalle("PENDIENTE_CONTACTO")
+                    entradaDetalle.setIdExpediente(entidad.getNumSolicitud())
+                    entradaDetalle.setFechaCierre(formatterSalida.format(date))
+                    entradaDetalle.setCodigoEvento(obtenerValorEstadoExpediente(entidad.getCodigoEstado().toString()))
+                    entradaDetalle.setDetalle("PENDIENTE_CONTACTO")
                     return entradaDetalle
                 case "4":
                     Date date = formatter.parse(entidad.getFechaApertura())
-                    entradaDetalle.eventoSCOR.setIdExpediente(entidad.getNumSolicitud())
-                    entradaDetalle.setFecha(formatterSalida.format(date))
-                    entradaDetalle.eventoSCOR.setCodigoEvento(obtenerValorEstadoExpediente(entidad.getCodigoEstado().toString()))
-                    entradaDetalle.eventoSCOR.setDetalle("NO_ACUDE_CITA")
+                    entradaDetalle.setIdExpediente(entidad.getNumSolicitud())
+                    entradaDetalle.setFechaCierre(formatterSalida.format(date))
+                    entradaDetalle.setCodigoEvento(obtenerValorEstadoExpediente(entidad.getCodigoEstado().toString()))
+                    entradaDetalle.setDetalle("NO_ACUDE_CITA")
                     return entradaDetalle
                 case "5":
                     Date date = formatter.parse(entidad.getFechaApertura())
-                    entradaDetalle.eventoSCOR.setIdExpediente(entidad.getNumSolicitud())
-                    entradaDetalle.setFecha(formatterSalida.format(date))
-                    entradaDetalle.eventoSCOR.setCodigoEvento(obtenerValorEstadoExpediente(entidad.getCodigoEstado().toString()))
-                    entradaDetalle.eventoSCOR.setDetalle("RECHAZA_PRUEBAS")
+                    entradaDetalle.setIdExpediente(entidad.getNumSolicitud())
+                    entradaDetalle.setFechaCierre(formatterSalida.format(date))
+                    entradaDetalle.setCodigoEvento(obtenerValorEstadoExpediente(entidad.getCodigoEstado().toString()))
+                    entradaDetalle.setDetalle("RECHAZA_PRUEBAS")
                     return entradaDetalle
                 case "6":
                     Date date = formatter.parse(entidad.getFechaApertura())
-                    entradaDetalle.eventoSCOR.setIdExpediente(entidad.getNumSolicitud())
-                    entradaDetalle.setFecha(formatterSalida.format(date))
-                    entradaDetalle.eventoSCOR.setCodigoEvento(obtenerValorEstadoExpediente(entidad.getCodigoEstado().toString()))
-                    entradaDetalle.eventoSCOR.setDetalle("NO_LOCALIZADO")
+                    entradaDetalle.setIdExpediente(entidad.getNumSolicitud())
+                    entradaDetalle.setFechaCierre(formatterSalida.format(date))
+                    entradaDetalle.setCodigoEvento(obtenerValorEstadoExpediente(entidad.getCodigoEstado().toString()))
+                    entradaDetalle.setDetalle("NO_LOCALIZADO")
                     return entradaDetalle
                 case "7":
                     Date date = formatter.parse(entidad.getFechaApertura())
-                    entradaDetalle.eventoSCOR.setIdExpediente(entidad.getNumSolicitud())
-                    entradaDetalle.setFecha(formatterSalida.format(date))
-                    entradaDetalle.eventoSCOR.setCodigoEvento(obtenerValorEstadoExpediente(entidad.getCodigoEstado().toString()))
-                    entradaDetalle.eventoSCOR.setDetalle("CARTA_ILOCALIZABLE_ENVIADA")
+                    entradaDetalle.setIdExpediente(entidad.getNumSolicitud())
+                    entradaDetalle.setFechaCierre(formatterSalida.format(date))
+                    entradaDetalle.setCodigoEvento(obtenerValorEstadoExpediente(entidad.getCodigoEstado().toString()))
+                    entradaDetalle.setDetalle("CARTA_ILOCALIZABLE_ENVIADA")
                     return entradaDetalle
                 case "10":
                     Date date = formatter.parse(entidad.getFechaApertura())
-                    entradaDetalle.eventoSCOR.setIdExpediente(entidad.getNumSolicitud())
-                    entradaDetalle.setFecha(formatterSalida.format(date))
-                    entradaDetalle.eventoSCOR.setCodigoEvento(obtenerValorEstadoExpediente(entidad.getCodigoEstado().toString()))
-                    entradaDetalle.eventoSCOR.setDetalle("CERRADO")
+                    entradaDetalle.setIdExpediente(entidad.getNumSolicitud())
+                    entradaDetalle.setFechaCierre(formatterSalida.format(date))
+                    entradaDetalle.setCodigoEvento(obtenerValorEstadoExpediente(entidad.getCodigoEstado().toString()))
+                    entradaDetalle.setDetalle("CERRADO")
                     return entradaDetalle
                 case "11":
                     Date date = formatter.parse(entidad.getFechaApertura())
-                    entradaDetalle.eventoSCOR.setIdExpediente(entidad.getNumSolicitud())
-                    entradaDetalle.setFecha(formatterSalida.format(date))
-                    entradaDetalle.eventoSCOR.setCodigoEvento(obtenerValorEstadoExpediente(entidad.getCodigoEstado().toString()))
-                    entradaDetalle.eventoSCOR.setDetalle("ANULADO")
+                    entradaDetalle.setIdExpediente(entidad.getNumSolicitud())
+                    entradaDetalle.setFechaCierre(formatterSalida.format(date))
+                    entradaDetalle.setCodigoEvento(obtenerValorEstadoExpediente(entidad.getCodigoEstado().toString()))
+                    entradaDetalle.setDetalle("ANULADO")
                     return entradaDetalle
                 case "17":
                     Date date = formatter.parse(entidad.getFechaApertura())
-                    entradaDetalle.eventoSCOR.setIdExpediente(entidad.getNumSolicitud())
-                    entradaDetalle.setFecha(formatterSalida.format(date))
-                    entradaDetalle.eventoSCOR.setCodigoEvento(obtenerValorEstadoExpediente(entidad.getCodigoEstado().toString()))
-                    entradaDetalle.eventoSCOR.setDetalle("CONTACTO_DIFERIDO")
+                    entradaDetalle.setIdExpediente(entidad.getNumSolicitud())
+                    entradaDetalle.setFechaCierre(formatterSalida.format(date))
+                    entradaDetalle.setCodigoEvento(obtenerValorEstadoExpediente(entidad.getCodigoEstado().toString()))
+                    entradaDetalle.setDetalle("CONTACTO_DIFERIDO")
                     return entradaDetalle
                 case "18":
                     Date date = formatter.parse(entidad.getFechaApertura())
-                    entradaDetalle.eventoSCOR.setIdExpediente(entidad.getNumSolicitud())
-                    entradaDetalle.setFecha(formatterSalida.format(date))
-                    entradaDetalle.eventoSCOR.setCodigoEvento(obtenerValorEstadoExpediente(entidad.getCodigoEstado().toString()))
-                    entradaDetalle.eventoSCOR.setDetalle("RETRASO_CONTACTO")
+                    entradaDetalle.setIdExpediente(entidad.getNumSolicitud())
+                    entradaDetalle.setFechaCierre(formatterSalida.format(date))
+                    entradaDetalle.setCodigoEvento(obtenerValorEstadoExpediente(entidad.getCodigoEstado().toString()))
+                    entradaDetalle.setDetalle("RETRASO_CONTACTO")
                     return entradaDetalle
                 case "19":
                     Date date = formatter.parse(entidad.getFechaApertura())
-                    entradaDetalle.eventoSCOR.setIdExpediente(entidad.getNumSolicitud())
-                    entradaDetalle.setFecha(formatterSalida.format(date))
-                    entradaDetalle.eventoSCOR.setCodigoEvento(obtenerValorEstadoExpediente(entidad.getCodigoEstado().toString()))
-                    entradaDetalle.eventoSCOR.setDetalle("PENDIENTE_CITA")
+                    entradaDetalle.setIdExpediente(entidad.getNumSolicitud())
+                    entradaDetalle.setFechaCierre(formatterSalida.format(date))
+                    entradaDetalle.setCodigoEvento(obtenerValorEstadoExpediente(entidad.getCodigoEstado().toString()))
+                    entradaDetalle.setDetalle("PENDIENTE_CITA")
                     return entradaDetalle
                 case "20":
                     Date date = formatter.parse(entidad.getFechaApertura())
-                    entradaDetalle.eventoSCOR.setIdExpediente(entidad.getNumSolicitud())
-                    entradaDetalle.setFecha(formatterSalida.format(date))
-                    entradaDetalle.eventoSCOR.setCodigoEvento(obtenerValorEstadoExpediente(entidad.getCodigoEstado().toString()))
-                    entradaDetalle.eventoSCOR.setDetalle("PENDIENTE_MENSAJERO")
+                    entradaDetalle.setIdExpediente(entidad.getNumSolicitud())
+                    entradaDetalle.setFechaCierre(formatterSalida.format(date))
+                    entradaDetalle.setCodigoEvento(obtenerValorEstadoExpediente(entidad.getCodigoEstado().toString()))
+                    entradaDetalle.setDetalle("PENDIENTE_MENSAJERO")
                     return entradaDetalle
                 case "21":
                     Date date = formatter.parse(entidad.getFechaApertura())
-                    entradaDetalle.eventoSCOR.setIdExpediente(entidad.getNumSolicitud())
-                    entradaDetalle.setFecha(formatterSalida.format(date))
-                    entradaDetalle.eventoSCOR.setCodigoEvento(obtenerValorEstadoExpediente(entidad.getCodigoEstado().toString()))
-                    entradaDetalle.eventoSCOR.setDetalle("RECEPCION_DOCUMENTACION_RESULTADOS")
+                    entradaDetalle.setIdExpediente(entidad.getNumSolicitud())
+                    entradaDetalle.setFechaCierre(formatterSalida.format(date))
+                    entradaDetalle.setCodigoEvento(obtenerValorEstadoExpediente(entidad.getCodigoEstado().toString()))
+                    entradaDetalle.setDetalle("RECEPCION_DOCUMENTACION_RESULTADOS")
                     return entradaDetalle
                 case "26":
                     Date date = formatter.parse(entidad.getFechaApertura())
-                    entradaDetalle.eventoSCOR.setIdExpediente(entidad.getNumSolicitud())
-                    entradaDetalle.setFecha(formatterSalida.format(date))
-                    entradaDetalle.eventoSCOR.setCodigoEvento(obtenerValorEstadoExpediente(entidad.getCodigoEstado().toString()))
-                    entradaDetalle.eventoSCOR.setDetalle("INFORMES_COMPLEMENTARIOS")
+                    entradaDetalle.setIdExpediente(entidad.getNumSolicitud())
+                    entradaDetalle.setFechaCierre(formatterSalida.format(date))
+                    entradaDetalle.setCodigoEvento(obtenerValorEstadoExpediente(entidad.getCodigoEstado().toString()))
+                    entradaDetalle.setDetalle("INFORMES_COMPLEMENTARIOS")
                     return entradaDetalle
                 default:
-
                     return null
             }
 

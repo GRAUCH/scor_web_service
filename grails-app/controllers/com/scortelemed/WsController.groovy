@@ -19,6 +19,7 @@ import com.ws.cajamar.beans.Cobertura
 import com.ws.servicios.AmaService
 import grails.plugin.springsecurity.annotation.Secured
 import grails.util.Environment
+import hwsol.entities.parser.RegistrarEventoSCOR
 import hwsol.webservices.CorreoUtil
 import hwsol.entities.EnvioCaser
 import hwsol.webservices.TransformacionUtil
@@ -518,7 +519,7 @@ class WsController {
             XSDProcessExecutionPort port = locator.getXSDProcessExecutionPort()
             StringHolder salida = new StringHolder()
             logginService.putInfoMessage(sbInfo.toString())
-            EnvioCaser entradaDetalle = new EnvioCaser()
+            RegistrarEventoSCOR entradaDetalle = new RegistrarEventoSCOR()
             String stringRequest = null
             expedientes.each { expediente ->
 
@@ -535,12 +536,12 @@ class WsController {
                         Envio envio = new Envio()
                         envio.setFecha(new Date())
                         envio.setCia(company.id.toString())
-                        envio.setIdentificador(entradaDetalle.eventoSCOR.getIdExpediente())
+                        envio.setIdentificador(entradaDetalle.getIdExpediente())
                         envio.setInfo(stringRequest)
                         envio.save(flush: true)
-                        logginService.putInfoMessage("Informacion de salida envio de cambios en expedientes " + entradaDetalle.eventoSCOR.getIdExpediente())
-                        logginService.putInfoMessage("Informacion recibida de cambios en expedientes " + entradaDetalle.eventoSCOR.getIdExpediente() + ":" + salida.value.trim())
-                        logginService.putInfoMessage("Informacion expedientes " + entradaDetalle.eventoSCOR.getIdExpediente() + " enviado a " + company.nombre + " correctamente")
+                        logginService.putInfoMessage("Informacion de salida envio de cambios en expedientes " + entradaDetalle.getIdExpediente())
+                        logginService.putInfoMessage("Informacion recibida de cambios en expedientes " + entradaDetalle.getIdExpediente() + ":" + salida.value.trim())
+                        logginService.putInfoMessage("Informacion expedientes " + entradaDetalle.getIdExpediente() + " enviado a " + company.nombre + " correctamente")
 
                     } catch (Exception ex) {
                         /**Metemos en errores
@@ -549,10 +550,10 @@ class WsController {
                         com.scortelemed.Error error = new com.scortelemed.Error()
                         error.setFecha(new Date())
                         error.setCia(company.id.toString())
-                        error.setIdentificador(entradaDetalle.eventoSCOR.getIdExpediente())
+                        error.setIdentificador(entradaDetalle.getIdExpediente())
                         error.setInfo(stringRequest)
                         error.setOperacion("ENVIO ESTADO")
-                        error.setError("Peticion no realizada para solicitud: " + entradaDetalle.eventoSCOR.getIdExpediente() + ". Error: " + ex.getMessage())
+                        error.setError("Peticion no realizada para solicitud: " + entradaDetalle.getIdExpediente() + ". Error: " + ex.getMessage())
                         error.save(flush: true)
                         logginService.putErrorMessage("Error: " + opername + ". No se ha podido mandar el caso a Caser. Detalles:" + ex.getMessage())
                     }
