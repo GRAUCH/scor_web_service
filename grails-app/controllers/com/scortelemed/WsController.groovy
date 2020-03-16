@@ -522,7 +522,7 @@ class WsController {
             expedientes.each { expediente ->
                 entradaDetalle = transformacion.obtenerDetalle(expediente)
                 if (entradaDetalle != null) {
-                    stringRequest = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?><service_RegistrarEventoSCOR><inputMap type='map'><username type='String'><_value_>" + username + "</_value_></username><password type='String'><_value_>" + password + "</_value_></password><idExpediente type='Integer'><_value_>" + entradaDetalle.getIdExpediente() + "</_value_></idExpediente><codigoEvento type='String'><_value_>" + entradaDetalle.getCodigoEvento() + "</_value_></codigoEvento><detalle type='String'><_value_>" + entradaDetalle.getDetalle() + "</_value_></detalle><fecha type='Date'><_value_>" + entradaDetalle.getFecha() + "</_value_></fecha></inputMap></service_RegistrarEventoSCOR>"
+                    stringRequest = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?><service_RegistrarEventoSCOR><inputMap type='map'><username type='String'><_value_>" + username + "</_value_></username><password type='String'><_value_>" + password + "</_value_></password><idExpediente type='Integer'><_value_>" + entradaDetalle.getIdExpediente() + "</_value_></idExpediente><codigoEvento type='String'><_value_>" + entradaDetalle.getCodigoEvento() + "</_value_></codigoEvento><detalle type='String'><_value_>" + entradaDetalle.getDetalle() + "</_value_></detalle><fecha type='Date'><_value_>" + entradaDetalle.getFechaCierre() + "</_value_></fecha></inputMap></service_RegistrarEventoSCOR>"
                     Thread.sleep(6000)
                     try {
                         port.doProcessExecution(stringRequest, salida)
