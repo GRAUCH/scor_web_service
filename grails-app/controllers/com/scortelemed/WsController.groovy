@@ -20,8 +20,8 @@ import com.ws.servicios.AmaService
 import grails.plugin.springsecurity.annotation.Secured
 import grails.util.Environment
 import hwsol.entities.parser.RegistrarEventoSCOR
+import hwsol.utilities.LogUtil
 import hwsol.webservices.CorreoUtil
-import hwsol.entities.EnvioCaser
 import hwsol.webservices.TransformacionUtil
 import org.springframework.beans.factory.annotation.Autowired
 import servicios.*
@@ -57,6 +57,7 @@ class WsController {
     private AmaService amaService
 
     def caseresult = {
+
         def fechaFin
         def fechaIni
         def responseRecette
@@ -76,19 +77,8 @@ class WsController {
 
             //EJEMPLO DE URL:
             //http://192.168.1.188:8080/scorWebservice/ws/caseresult?ini=20150512 00:00:00:00&fin=20150512 23:59:59:59
-            if (params.ini && params.fin) {
-                fechaIni = URLDecoder.decode(params.ini.trim(), "ISO-8859-1")
-                fechaFin = URLDecoder.decode(params.fin.trim(), "ISO-8859-1")
-            } else {
-                Calendar fecha = Calendar.getInstance();
-                fecha.add(Calendar.MINUTE, -11)
-                fechaFin = fecha.getTime().format('yyyyMMdd HH:mm')
-                fechaFin = fechaFin.toString() + ":59"
-
-                fecha.add(Calendar.MINUTE, -9)
-                fechaIni = fecha.getTime().format('yyyyMMdd HH:mm')
-                fechaIni = fechaIni.toString() + ":00"
-            }
+            fechaIni = LogUtil.paramsToDateIni(params)
+            fechaFin = LogUtil.paramsToDateFin(params)
 
             if (!Environment.current.name.equals("production_wildfly")) {
                 resulExpedienteSoap = tarificadorService.obtenerInformeExpedientes("1019", null, 1, fechaIni, fechaFin, "FR")
@@ -184,18 +174,16 @@ class WsController {
                  *
                  */
                 correoUtil.envioEmail("AlptisUnderwrittingCasesResultsRequest", null, contadorResultados)
-
                 logginService.putInfoMessage("proceso envio de informacion para " + company.nombre + " terminado.")
-
             } else {
-
                 logginService.putInfoMessage("No hay resultados para " + company.nombre)
 
             }
+            flash.message = "** Se procesaron :" + resulExpedienteSoap.size() + " **  " + " Compania : " + company.nombre
+            redirect(controller: 'dashboard', action: 'index')
         } catch (Exception ex) {
             logginService.putError("Endpoint-" + opername, "Error en al obtener resultados para las fechas " + fechaIni + "-" + fechaFin + ":" + ex)
             correoUtil.envioEmail("AlptisUnderwrittingCasesResultsRequest", cases.toString(), ex)
-
             responseRecette = soap.send(connectTimeout: 300000, readTimeout: 300000) {
                 body {
                     AlptisUnderwrittingCaseResultsRequest(xmlns: "http://www.scortelemed.com/schemas/alptis") {
@@ -204,7 +192,8 @@ class WsController {
                     }
                 }
             }
-
+            flash.message = "KO - Ver logs"
+            redirect(controller: 'dashboard', action: 'index')
         }
     }
 
@@ -232,19 +221,8 @@ class WsController {
             def company = Company.findByNombre('cajamar')
             session.companyST = company.codigoSt
 
-            if (params.ini && params.fin) {
-                fechaIni = URLDecoder.decode(params.ini.trim(), "ISO-8859-1")
-                fechaFin = URLDecoder.decode(params.fin.trim(), "ISO-8859-1")
-            } else {
-                Calendar fecha = Calendar.getInstance();
-                fecha.add(Calendar.MINUTE, -60)
-                fechaFin = fecha.getTime().format('yyyyMMdd HH:mm')
-                fechaFin = fechaFin.toString() + ":59"
-
-                fecha.add(Calendar.MINUTE, -30)
-                fechaIni = fecha.getTime().format('yyyyMMdd HH:mm')
-                fechaIni = fechaIni.toString() + ":00"
-            }
+            fechaIni = LogUtil.paramsToDateIni(params)
+            fechaFin = LogUtil.paramsToDateFin(params)
 
             if (!Environment.current.name.equals("production_wildfly")) {
                 for (int i = 0; i < 3; i++) {
@@ -436,12 +414,13 @@ class WsController {
             }
 
             logginService.putInfoMessage("proceso envio de informacion para " + company.nombre + " terminado.")
+            flash.message = "** Se procesaron :" + resulExpedienteSoap.size() + " **  " + " Compania : " + company.nombre
+            redirect(controller: 'dashboard', action: 'index')
 
         } catch (Exception ex) {
             logginService.putErrorMessage("Error: " + opername + ". " + ex.getMessage().toString() + ". Detalles:" + ex.printStackTrace())
-            println "Error: " + ex.getMessage()
-            println "Detalles:" + ex.getMessage()
-            render "KO"
+            flash.message = "KO - Ver logs"
+            redirect(controller: 'dashboard', action: 'index')
         }
     }
 
@@ -471,20 +450,9 @@ class WsController {
             def formateador = new java.text.SimpleDateFormat("yyyyMMdd")
             def operacion = Operacion.findByClave('CaserUnderwrittingCasesResultsRequest')
             session.companyST = company.codigoSt
-            if (params.ini && params.fin) {
-                fechaIni = URLDecoder.decode(params.ini.trim(), "ISO-8859-1")
-                fechaFin = URLDecoder.decode(params.fin.trim(), "ISO-8859-1")
-            } else {
-                Calendar fecha = Calendar.getInstance()
-                fecha.add(Calendar.MINUTE, -60)
-                fechaFin = fecha.getTime().format('yyyyMMdd HH:mm')
-                fechaFin = fechaFin.toString() + ":59"
 
-                fecha.add(Calendar.MINUTE, -30)
-                fechaIni = fecha.getTime().format('yyyyMMdd HH:mm')
-                fechaIni = fechaIni.toString() + ":00"
-            }
-
+            fechaIni = LogUtil.paramsToDateIni(params)
+            fechaFin = LogUtil.paramsToDateFin(params)
 
             StringBuilder sbInfo = new StringBuilder("Realizando proceso envio de informacion para  " + company.nombre + " con fecha ")
             if (Environment.current.name.equals("production_wildfly")) {
@@ -556,6 +524,8 @@ class WsController {
 
             logginService.putInfoMessage("proceso envio de informacion para " + company.nombre + " terminado.")
             logginService.putInfoMessage("** Se enviaron :" + expedientes.size() + " **")
+            flash.message = "** Se procesaron :" + expedientes.size() + " **  " + " Compania : " + company.nombre
+            redirect(controller: 'dashboard', action: 'index')
         } catch (Exception ex) {
             logginService.putErrorMessage("Error: " + opername + ". " + ex.getMessage() + ". Detalles:" + ex.getMessage())
             com.scortelemed.Error error = new com.scortelemed.Error()
@@ -564,9 +534,10 @@ class WsController {
             error.setIdentificador(" ")
             error.setInfo("$controllerName")
             error.setOperacion(opername)
-            error.setError("Peticion no realizada para solicitud: "+ex.getMessage() +". Error: " + ex.getMessage())
+            error.setError("Peticion no realizada para solicitud: " + ex.getMessage() + ". Error: " + ex.getMessage())
             error.save(flush: true)
-            render "KO"
+            flash.message = "KO - Ver logs"
+            redirect(controller: 'dashboard', action: 'index')
         }
     }
 
@@ -602,21 +573,11 @@ class WsController {
         Expediente expediente
         try {
 
-            if (params.ini && params.fin) {
-                fechaIni = URLDecoder.decode(params.ini.trim(), "ISO-8859-1")
-                fechaFin = URLDecoder.decode(params.fin.trim(), "ISO-8859-1")
-            } else {
-                Calendar fecha = Calendar.getInstance()
-                fecha.add(Calendar.MINUTE, -60)
-                fechaFin = fecha.getTime().format('yyyyMMdd HH:mm')
-                fechaFin = fechaFin.toString() + ":59"
-
-                fecha.add(Calendar.MINUTE, -30)
-                fechaIni = fecha.getTime().format('yyyyMMdd HH:mm')
-                fechaIni = fechaIni.toString() + ":00"
-            }
+            fechaIni = LogUtil.paramsToDateIni(params)
+            fechaFin = LogUtil.paramsToDateFin(params)
 
             if (Environment.current.name.equals("production_wildfly")) {
+                logginService.putInfoMessage(" ** Codigo ST PRD   1059 y 1065**")
                 for (int i = 1; i < 3; i++) {
                     //Ambas son companias de AMA en Produccion.
                     expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1059", null, i, fechaIni, fechaFin, "ES"))
@@ -637,10 +598,12 @@ class WsController {
             logginService.putInfoMessage(sbInfo.toString())
 
             if (Environment.current.name.equals("production_wildfly")) {
+                logginService.putInfoMessage(" ** end point de PRD**")
                 def usuario = "aplCORWS"
                 def password = "Wh1t3p&&\$"
                 stub = new DossierDataStoreWSStub("https://servicios.amaseguros.com/AmaPublish/ama/amascortelemed-ws/services/DossierDataStoreWS?wsdl", usuario, password)
             } else {
+                logginService.putInfoMessage(" ** end point de PREPRO**")
                 def usuario = "aplCORWSPRE"
                 def password = "IE4tKQA6"
                 stub = new DossierDataStoreWSStub("https://pre-servicios.amaseguros.com/AMAPublish/ama/amascortelemed-ws/services/DossierDataStoreWS?wsdl", usuario, password)
@@ -659,7 +622,7 @@ class WsController {
                     try {
 
                         expediente = expedientes.get(i)
-
+                        logginService.putInfoMessage(" ** Comienzo el proceso para el dossier: ${expediente.getNumSolicitud()} de AMA**")
                         if (!amaService.seExcluyeEnvio(expediente)) {
                             identificadorCaso = expediente.getNumSolicitud()
                             files = new ArrayList<File>()
@@ -709,13 +672,17 @@ class WsController {
                             if (expediente.getProducto() != null) {
                                 if (expediente.getProducto().getCodigoProductoCompanya().toString().equals("P49")) {
                                     producto.setProductCode("0013")
+                                    logginService.putInfoMessage(" ** Producto: 0013 **")
                                 } else {
                                     producto.setProductCode(expediente.getProducto().getCodigoProductoCompanya())
+                                    logginService.putInfoMessage(" ** Producto: ${expediente.getProducto().getCodigoProductoCompanya()} **")
                                 }
                                 producto.setProductDescription(expediente.getProducto().getNombre())
+                                logginService.putInfoMessage(" ** Producto: ${expediente.getProducto().getNombre()} **")
                             } else {
                                 producto.setProductCode("")
                                 producto.setProductDescription("")
+                                logginService.putInfoMessage(" ** Sin producto **")
                             }
 
                             dossier.setProduct(producto)
@@ -726,7 +693,7 @@ class WsController {
 
 
                                     BenefitInformation benefitInformation = new BenefitInformation();
-
+                                    logginService.putInfoMessage(" ** Cobertura ${coberturasPoliza.getCodigoCobertura()} **")
                                     benefitInformation.setBenefitName(coberturasPoliza.getNombreCobertura());
                                     benefitInformation.setBenefitCode(coberturasPoliza.getCodigoCobertura());
 
@@ -883,7 +850,7 @@ class WsController {
                                 file.setTypeFile("zip")
 
                                 files.add(file)
-
+                                logginService.putInfoMessage("Termino de agregar el ZIP")
 
                                 saveResultIN.setListFiles((File[]) files.toArray())
                                 saveResultIN.setBenefitsInformationsList((BenefitInformation[]) listaBenefitInformation.toArray());
@@ -892,9 +859,9 @@ class WsController {
                                 saveResultIN.getDossier().setState((short) 1);
                                 saveResult.setDossierResultsIN(saveResultIN)
                                 resultsE.setSaveDossierResults(saveResult)
-
+                                logginService.putInfoMessage("Listo para enviar a AMA")
                                 respuestaCRM = stub.saveDossierResults(resultsE);
-
+                                logginService.putInfoMessage("** El resultado fue : **")
                                 if (respuestaCRM != null && respuestaCRM.localSaveDossierResultsResponse != null && respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT() != null && respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localTypeResult.equals("OK")) {
 
                                     com.scortelemed.Envio envio = new com.scortelemed.Envio()
@@ -939,56 +906,49 @@ class WsController {
                                     logginService.putInfoMessage("IInformacion expediente " + expediente.getCodigoST() + " no enviado a " + company.nombre + " correctamente")
 
                                 }
+                                logginService.putInfoMessage("** TERMINO PROCESO **")
+                            } else {
+                                logginService.putInfoMessage(" ** SIN COBERTURA -- NO SE ENVIA -- **")
                             }
                         }
 
-                    } catch (Exception ex) {
 
+                    } catch (Exception ex) {
                         com.scortelemed.Error error = new com.scortelemed.Error()
                         error.setFecha(new Date())
                         error.setCia(company.id.toString())
                         error.setIdentificador(identificadorCaso)
                         error.setInfo("Error en el envio")
                         error.setOperacion("ENVIO")
-
                         if (respuestaCRM != null && respuestaCRM.localSaveDossierResultsResponse != null && respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT() != null && respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localTypeResult.equals("ERROR")) {
-
                             error.setError("Peticion no realizada para solicitud: " + identificadorCaso + ". Error: " + respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localDescriptionResultList[0])
-
                             logginService.putInfoMessage("Informacion de salida de expediente " + expediente.getCodigoST() + ". Codigo AMA: " + expediente.getNumSolicitud())
                             logginService.putInfoMessage("Respuesta desde AMA al envio de informacion para expediente " + expediente.getCodigoST() + ". ERROR: " + respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localDescriptionResultList[0])
                             logginService.putInfoMessage("Informacion expediente " + expediente.getCodigoST() + " no enviado a " + company.nombre)
-
                         } else {
-
                             error.setError("Peticion no realizada para solicitud: " + identificadorCaso + ". Error: " + ex.getMessage())
-
                             logginService.putInfoMessage("Informacion de salida de expediente " + expediente.getCodigoST() + ". Codigo AMA: " + expediente.getNumSolicitud())
                             logginService.putInfoMessage("Respuesta desde AMA al envio de informacion para expediente " + expediente.getCodigoST() + ". ERROR: " + ex.getMessage())
                             logginService.putInfoMessage("Informacion expediente " + expediente.getCodigoST() + " no enviado a " + company.nombre)
                         }
-
-
-
                         error.save(flush: true)
-
-
+                        flash.message = "KO - Ver logs"
+                        redirect(controller: 'dashboard', action: 'index')
                     }
                 }
             }
 
 
-            logginService.putInfoMessage("proceso envio de informacion para " + company.nombre + " terminado.")
-
+            logginService.putInfoMessage("Proceso envio de informacion para " + company.nombre + " terminado.")
+            logginService.putInfoMessage("** Se enviaron :" + expedientes.size() + " **")
+            flash.message = "** Se procesaron :" + expedientes.size() + " **  " + " Compania : " + company.nombre
+            redirect(controller: 'dashboard', action: 'index')
         } catch (Exception ex) {
 
             logginService.putErrorMessage("Error: " + opername + ". No se ha podido mandar el caso a Ama. Detalles:" + ex.getMessage())
-
+            flash.message = "KO - Ver logs"
+            redirect(controller: 'dashboard', action: 'index')
         }
-    }
-
-    def test() {
-        crearExpedienteService.crearExpediente()
     }
 
 

@@ -30,7 +30,7 @@ class DashboardController {
 
         if (ciasLog == null || ciasLog.isEmpty()) {
             ciasLog = logUtil.obtenerCompanyLogs(ou)
-            session.setAttribute("ciasLog",ciasLog)
+            session.setAttribute("ciasLog", ciasLog)
         }
 
         Company company = null
@@ -51,7 +51,9 @@ class DashboardController {
 
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy")
 
-        if (params.logs == null) {
+        if (flash.message != null) {
+            flash.message = flash.message
+        } else if (params.logs == null) {
             flash.message = 'Seleccione una acción'
         } else if (params.idCia == null && !params.idCia.toString().isEmpty()) {
             flash.message = 'Seleccione una compania'

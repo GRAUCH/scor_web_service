@@ -2,19 +2,6 @@ package hwsol.utilities
 
 import com.scor.global.CompanyLog
 import com.scortelemed.Company
-import com.scortelemed.Envio
-import com.scortelemed.Error
-import com.scortelemed.Recibido
-import com.scortelemed.TipoCompany
-import com.ws.afiesca.beans.AfiEscaUnderwrittingCaseManagementRequest
-import com.ws.alptis.beans.AlptisUnderwrittingCaseManagementRequest
-import com.ws.cajamar.beans.CajamarUnderwrittingCaseManagementRequest
-import com.ws.lifesquare.beans.LifesquareUnderwrittingCaseManagementRequest
-
-import javax.xml.bind.JAXBContext
-import javax.xml.bind.JAXBElement
-import javax.xml.bind.Unmarshaller
-import javax.xml.transform.stream.StreamSource
 
 class LogUtil {
 
@@ -41,5 +28,56 @@ class LogUtil {
         }
         return ciasLog
     }
+
+
+    static Calendar dateToCalendar(Date date) {
+        Calendar calendar = Calendar.getInstance()
+        calendar.setTime(date)
+        return calendar
+    }
+
+
+    static def paramsToDateIni(params) {
+        def fechaIni
+        if (params.ini && params.fin) {
+            try {
+                if ((Date) params.fin && (Date) params.ini) {
+                    fechaIni = LogUtil.dateToCalendar(params.ini)
+                    fechaIni = fechaIni.getTime().format('yyyyMMdd HH:mm')
+                }
+            } catch (Exception e) {
+                fechaIni = URLDecoder.decode(params.ini.trim(), "ISO-8859-1")
+
+            }
+        } else {
+            Calendar fecha = Calendar.getInstance()
+            fecha.add(Calendar.MINUTE, -30)
+            fechaIni = fecha.getTime().format('yyyyMMdd HH:mm')
+            fechaIni = fechaIni.toString() + ":00"
+        }
+        return fechaIni
+    }
+
+
+    static def paramsToDateFin(params) {
+        def fechaFin
+        if (params.ini && params.fin) {
+            try {
+                if ((Date) params.fin && (Date) params.ini) {
+                    fechaFin = LogUtil.dateToCalendar(params.fin)
+                    fechaFin = fechaFin.getTime().format('yyyyMMdd HH:mm')
+                }
+            } catch (Exception e) {
+                fechaFin = URLDecoder.decode(params.fin.trim(), "ISO-8859-1")
+            }
+        } else {
+            Calendar fecha = Calendar.getInstance()
+            fecha.add(Calendar.MINUTE, -60)
+            fechaFin = fecha.getTime().format('yyyyMMdd HH:mm')
+            fechaFin = fechaFin.toString() + ":59"
+        }
+        return fechaFin
+    }
+
 
 }
