@@ -210,7 +210,7 @@ class WsController {
         def coberturas = []
 
         //EJEMPLO DE URL:
-        //http://localhost:8080/scorWebservice/ws/caseresultCM?ini=20160720 00:00:00:00&fin=20160720 23:59:59:59
+        //http://localhost:8080/scorWebservices/ws/caseresultCM?ini=20160720 00:00:00:00&fin=20160720 23:59:59:59
 
         TransformacionUtil transformacion = new TransformacionUtil()
 
