@@ -314,7 +314,7 @@ class TarificadorService {
         }
     }
 
-    def consultaExpedienteNumSolicitud(String arg1, String arg2, String arg3) {
+    def consultaExpedienteNumSolicitud(String requestNumber, String pais, String codigoST) {
 
         try {
 
@@ -322,17 +322,36 @@ class TarificadorService {
             def bean = ctx.getBean("soapClientAlptis")
             bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("frontal.wsdl")?.value)
 
-            Filtro filtro = new Filtro();
-            filtro.setClave(ClaveFiltro.CLIENTE);
-            filtro.setValor(arg3);
+            Filtro filtro = new Filtro()
+            filtro.setClave(ClaveFiltro.CLIENTE)
+            filtro.setValor(codigoST)
             Filtro filtroRelacionado = new Filtro()
             filtroRelacionado.setClave(ClaveFiltro.NUM_SOLICITUD)
-            filtroRelacionado.setValor(arg1)
+            filtroRelacionado.setValor(requestNumber)
             filtro.setFiltroRelacionado(filtroRelacionado)
 
-            def salida = grailsApplication.mainContext.soapClientAlptis.consultaExpediente(obtenerUsuarioFrontal(arg2), filtro)
+            def salida = grailsApplication.mainContext.soapClientAlptis.consultaExpediente(obtenerUsuarioFrontal(pais), filtro)
 
             return salida
+        } catch (Exception e) {
+            logginService.putError("consultaExpedienteNumSolicitud de Caser", "No se ha podido obtener el informe de expediente : " + e)
+            return null
+        }
+    }
+    def consultaExpedienteCodigoST(String codigoST, String pais) {
+
+        try {
+
+            def ctx = grailsApplication.mainContext
+            def bean = ctx.getBean("soapClientAlptis")
+            bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("frontal.wsdl")?.value)
+
+            Filtro filtro = new Filtro()
+            filtro.setClave(ClaveFiltro.EXPEDIENTE)
+            filtro.setValor(codigoST)
+
+
+            return grailsApplication.mainContext.soapClientAlptis.consultaExpediente(obtenerUsuarioFrontal(pais), filtro)?.listaExpedientes
         } catch (Exception e) {
             logginService.putError("consultaExpedienteNumSolicitud de Caser", "No se ha podido obtener el informe de expediente : " + e)
             return null

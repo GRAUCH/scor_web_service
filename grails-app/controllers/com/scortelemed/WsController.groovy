@@ -46,12 +46,11 @@ class WsController {
     def soapCajamarRecetteWSPRO
     def soapCaserRecetteWS
     def soapCaserRecetteWSPRO
-
-    def correoUtil
+    CorreoUtil correoUtil = new CorreoUtil()
     def requestService
     def tarificadorService
-
     def crearExpedienteService
+
 
     @Autowired
     private AmaService amaService
@@ -65,36 +64,33 @@ class WsController {
         def opername = "caseresult"
         def cases = []
         def resulExpedienteSoap
-        CorreoUtil correoUtil = new CorreoUtil()
+
 
         try {
-            def formateador = new java.text.SimpleDateFormat("yyyyMMdd")
-            def operacion = Operacion.findByClave('AlptisUnderwrittingCasesResultsRequest')
             def company = Company.findByNombre('alptis')
-            session.companyST = company.codigoSt
-
-            def fechaHoy = new Date().format('yyyyMMdd')
-
-            //EJEMPLO DE URL:
-            //http://192.168.1.188:8080/scorWebservice/ws/caseresult?ini=20150512 00:00:00:00&fin=20150512 23:59:59:59
-            fechaIni = LogUtil.paramsToDateIni(params)
-            fechaFin = LogUtil.paramsToDateFin(params)
-
-            if (!Environment.current.name.equals("production_wildfly")) {
-                resulExpedienteSoap = tarificadorService.obtenerInformeExpedientes("1019", null, 1, fechaIni, fechaFin, "FR")
-                soap = soapAlptisRecetteWS
+            StringBuilder sbInfo = new StringBuilder("Realizando proceso envio de informacion para " + company.nombre)
+            if (params.myGroup != null && params.myGroup == 'codigoST' && params.codigoST) {
+                sbInfo.append(" al expediente con codigo ST ${params.codigoST}")
+                resulExpedienteSoap = tarificadorService.consultaExpedienteCodigoST(params.codigoST, "FR")
             } else {
+                //EJEMPLO DE URL:
+                //http://192.168.1.188:8080/scorWebservice/ws/caseresult?ini=20150512 00:00:00:00&fin=20150512 23:59:59:59
+                fechaIni = LogUtil.paramsToDateIni(params)
+                fechaFin = LogUtil.paramsToDateFin(params)
+                sbInfo.append(" con fecha").append(fechaIni).append("-").append(fechaIni)
                 resulExpedienteSoap = tarificadorService.obtenerInformeExpedientes("1019", null, 1, fechaIni, fechaFin, "FR")
-                soap = soapAlptisRecetteWSPRO
             }
-
+            if (Environment.current.name.equals("production_wildfly")) {
+                logginService.putInfoMessage("WS PRD")
+                soap = soapAlptisRecetteWSPRO
+            } else {
+                logginService.putInfoMessage("WS PREPRO")
+                soap = soapAlptisRecetteWS
+            }
             def resulComprimidos = []
             def i = 0
             def contadorResultados = 0
             def x = 0
-
-            StringBuilder sbInfo = new StringBuilder("Realizando proceso envio de informacion para " + company.nombre + " con fecha ")
-            sbInfo.append(fechaIni).append("-").append(fechaIni)
 
             logginService.putInfoMessage(sbInfo.toString())
 
@@ -184,15 +180,16 @@ class WsController {
         } catch (Exception ex) {
             logginService.putError("Endpoint-" + opername, "Error en al obtener resultados para las fechas " + fechaIni + "-" + fechaFin + ":" + ex)
             correoUtil.envioEmail("AlptisUnderwrittingCasesResultsRequest", cases.toString(), ex)
-            responseRecette = soap.send(connectTimeout: 300000, readTimeout: 300000) {
-                body {
-                    AlptisUnderwrittingCaseResultsRequest(xmlns: "http://www.scortelemed.com/schemas/alptis") {
-                        dateRequested(params.date.toString())
-                        comments(ex)
-                    }
-                }
-            }
             flash.message = "KO - Ver logs"
+//            responseRecette = soap.send(connectTimeout: 300000, readTimeout: 300000) {
+//                body {
+//                    AlptisUnderwrittingCaseResultsRequest(xmlns: "http://www.scortelemed.com/schemas/alptis") {
+//                        dateRequested(params.date.toString())
+//                        comments(ex)
+//                    }
+//                }
+//            }
+
             redirect(controller: 'dashboard', action: 'index')
         }
     }
@@ -216,33 +213,32 @@ class WsController {
 
         try {
 
-            def formateador = new java.text.SimpleDateFormat("yyyyMMdd")
-            def operacion = Operacion.findByClave('CajamarUnderwrittingCasesResultsRequest')
             def company = Company.findByNombre('cajamar')
-            session.companyST = company.codigoSt
-
-            fechaIni = LogUtil.paramsToDateIni(params)
-            fechaFin = LogUtil.paramsToDateFin(params)
-
-            if (!Environment.current.name.equals("production_wildfly")) {
-                for (int i = 0; i < 3; i++) {
-                    resulExpedienteSoap.addAll(tarificadorService.obtenerInformeExpedientes("1035", null, i, fechaIni, fechaFin, "ES"))
-                }
+            StringBuilder sbInfo = new StringBuilder("Realizando proceso envio de informacion para " + company.nombre)
+            sbInfo.append("\n")
+            if (params.myGroup != null && params.myGroup == 'codigoST' && params.codigoST) {
+                sbInfo.append(" al expediente con codigo ST ${params.codigoST}")
+                resulExpedienteSoap.addAll(tarificadorService.consultaExpedienteCodigoST(params.codigoST, "ES"))
             } else {
-                for (int i = 0; i < 3; i++) {
-                    resulExpedienteSoap.addAll(tarificadorService.obtenerInformeExpedientes("1018", null, i, fechaIni, fechaFin, "ES"))
+                fechaIni = LogUtil.paramsToDateIni(params)
+                fechaFin = LogUtil.paramsToDateFin(params)
+                sbInfo.append(" con fecha").append(fechaIni).append("-").append(fechaIni)
+                if (!Environment.current.name.equals("production_wildfly")) {
+                    for (int i = 0; i < 3; i++) {
+                        resulExpedienteSoap.addAll(tarificadorService.obtenerInformeExpedientes("1035", null, i, fechaIni, fechaFin, "ES"))
+                    }
+                } else {
+                    for (int i = 0; i < 3; i++) {
+                        resulExpedienteSoap.addAll(tarificadorService.obtenerInformeExpedientes("1018", null, i, fechaIni, fechaFin, "ES"))
+                    }
                 }
             }
-
 
             def client = new SOAPClient('https://www.generali.es/evi_vidaEmissioServWeb/services/TeleSeleccionHandlerService?Company=M')
             client.authorization = new HTTPBasicAuthorization("vevisct", "21yb51gs")
             Calendar cal = Calendar.getInstance()
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd")
             Date fechaSalida = sdf.parse("2016/07/26")
-
-            StringBuilder sbInfo = new StringBuilder("Realizando proceso envio de informacion para  " + company.nombre + " con fecha ")
-            sbInfo.append(fechaIni).append("-").append(fechaFin)
 
             logginService.putInfoMessage(sbInfo.toString())
 
@@ -412,9 +408,10 @@ class WsController {
                     }
                 }
             }
-
+            sbInfo.append("\n")
+            sbInfo.append(" se procesaron cantidad : ${resulExpedienteSoap.size()}")
             logginService.putInfoMessage("proceso envio de informacion para " + company.nombre + " terminado.")
-            flash.message = "** Se procesaron :" + resulExpedienteSoap.size() + " **  " + " Compania : " + company.nombre
+            flash.message = sbInfo.toString()
             redirect(controller: 'dashboard', action: 'index')
 
         } catch (Exception ex) {
@@ -438,7 +435,7 @@ class WsController {
         def coberturas = []
         def password
         def username
-        List<RespuestaCRMInforme> expedientesInforme = new ArrayList<RespuestaCRMInforme>();
+        List<RespuestaCRMInforme> expedientesInforme = new ArrayList<RespuestaCRMInforme>()
 
         //EJEMPLO DE URL:
         //http://localhost:8080/scorWebservices/ws/caseresultCaser?ini=20170519 00:00:00&fin=20170519 23:59:59
@@ -446,27 +443,28 @@ class WsController {
         TransformacionUtil transformacion = new TransformacionUtil()
         def company = Company.findByNombre('caser')
         try {
-
-            def formateador = new java.text.SimpleDateFormat("yyyyMMdd")
-            def operacion = Operacion.findByClave('CaserUnderwrittingCasesResultsRequest')
-            session.companyST = company.codigoSt
-
-            fechaIni = LogUtil.paramsToDateIni(params)
-            fechaFin = LogUtil.paramsToDateFin(params)
-
-            StringBuilder sbInfo = new StringBuilder("Realizando proceso envio de informacion para  " + company.nombre + " con fecha ")
-            if (Environment.current.name.equals("production_wildfly")) {
-                sbInfo.append("** compania 1061 **")
-                for (int i = 0; i < 3; i++) {
-                    expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1061", null, i, fechaIni, fechaFin, "ES"))
-                }
+            StringBuilder sbInfo = new StringBuilder("Realizando proceso envio de informacion para " + company.nombre)
+            sbInfo.append("\n")
+            if (params.myGroup != null && params.myGroup == 'codigoST' && params.codigoST) {
+                sbInfo.append(" al expediente con codigo ST ${params.codigoST}")
+                expedientes.addAll(tarificadorService.consultaExpedienteCodigoST(params.codigoST, "ES"))
             } else {
-                sbInfo.append("** compania 1062 **")
-                for (int i = 0; i < 3; i++) {
-                    expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1062", null, i, fechaIni, fechaFin, "ES"))
+                fechaIni = LogUtil.paramsToDateIni(params)
+                fechaFin = LogUtil.paramsToDateFin(params)
+                sbInfo.append(" con fecha").append(fechaIni).append("-").append(fechaIni)
+                if (Environment.current.name.equals("production_wildfly")) {
+                    sbInfo.append("** compania 1061 **")
+                    for (int i = 0; i < 3; i++) {
+                        expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1061", null, i, fechaIni, fechaFin, "ES"))
+                    }
+                } else {
+                    sbInfo.append("** compania 1062 **")
+                    for (int i = 0; i < 3; i++) {
+                        expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1062", null, i, fechaIni, fechaFin, "ES"))
+                    }
                 }
             }
-            sbInfo.append(fechaIni).append("-").append(fechaFin)
+
             XSDProcessExecutionServiceLocator locator = new XSDProcessExecutionServiceLocator()
 
             if (Environment.current.name.equals("production_wildfly")) {
@@ -524,7 +522,9 @@ class WsController {
 
             logginService.putInfoMessage("proceso envio de informacion para " + company.nombre + " terminado.")
             logginService.putInfoMessage("** Se enviaron :" + expedientes.size() + " **")
-            flash.message = "** Se procesaron :" + expedientes.size() + " **  " + " Compania : " + company.nombre
+            sbInfo.append("\n")
+            sbInfo.append(" se procesaron cantidad : ${expedientes.size()}")
+            flash.message = sbInfo.toString()
             redirect(controller: 'dashboard', action: 'index')
         } catch (Exception ex) {
             logginService.putErrorMessage("Error: " + opername + ". " + ex.getMessage() + ". Detalles:" + ex.getMessage())
@@ -561,42 +561,41 @@ class WsController {
         DossierDataStoreWSStub stub
         SaveDossierResultsResponseE respuestaCRM = new SaveDossierResultsResponseE()
         List<BenefitInformation> listaBenefitInformation = new ArrayList<BenefitInformation>()
-
+        TransformacionUtil transformacion = new TransformacionUtil()
         //EJEMPLO DE URL:
         //http://localhost:8080/scorWebservice/ws/caseresultAma?ini=20171107 00:00:00&fin=20171107 23:59:59
 
-        TransformacionUtil transformacion = new TransformacionUtil()
-        def formateador = new java.text.SimpleDateFormat("yyyyMMdd")
-        def operacion = Operacion.findByClave('AmaUnderwrittingCasesResultsRequest')
-        def company = Company.findByNombre('ama')
-        def identificadorCaso
-        Expediente expediente
         try {
 
-            fechaIni = LogUtil.paramsToDateIni(params)
-            fechaFin = LogUtil.paramsToDateFin(params)
-
-            if (Environment.current.name.equals("production_wildfly")) {
-                logginService.putInfoMessage(" ** Codigo ST PRD   1059 y 1065**")
-                for (int i = 1; i < 3; i++) {
-                    //Ambas son companias de AMA en Produccion.
-                    expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1059", null, i, fechaIni, fechaFin, "ES"))
-                    expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1065", null, i, fechaIni, fechaFin, "ES"))
-                }
+            def company = Company.findByNombre('ama')
+            def identificadorCaso
+            Expediente expediente
+            StringBuilder sbInfo = new StringBuilder("Realizando proceso envio de informacion para " + company.nombre)
+            sbInfo.append("\n")
+            if (params.myGroup != null && params.myGroup == 'codigoST' && params.codigoST) {
+                sbInfo.append(" al expediente con codigo ST ${params.codigoST}")
+                expedientes.addAll(tarificadorService.consultaExpedienteCodigoST(params.codigoST, "ES"))
             } else {
-                for (int i = 1; i < 3; i++) {
-                    //Ambas son companias de AMA en PRE PRODUCCION.
-                    expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1059", null, i, fechaIni, fechaFin, "ES"))
-                    expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1064", null, i, fechaIni, fechaFin, "ES"))
+                fechaIni = LogUtil.paramsToDateIni(params)
+                fechaFin = LogUtil.paramsToDateFin(params)
+                sbInfo.append(" con fecha").append(fechaIni).append("-").append(fechaIni)
+                if (Environment.current.name.equals("production_wildfly")) {
+                    logginService.putInfoMessage(" ** Codigo ST PRD   1059 y 1065**")
+                    for (int i = 1; i < 3; i++) {
+                        //Ambas son companias de AMA en PRODUCCION.
+                        expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1059", null, i, fechaIni, fechaFin, "ES"))
+                        expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1065", null, i, fechaIni, fechaFin, "ES"))
+                    }
+                } else {
+                    for (int i = 1; i < 3; i++) {
+                        //Ambas son companias de AMA en PRE PRODUCCION.
+                        expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1059", null, i, fechaIni, fechaFin, "ES"))
+                        expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1064", null, i, fechaIni, fechaFin, "ES"))
+                    }
                 }
             }
 
-
-            StringBuilder sbInfo = new StringBuilder("Realizando proceso envio de informacion para  " + company.nombre + " con fecha ")
-            sbInfo.append(fechaIni).append("-").append(fechaFin)
-
             logginService.putInfoMessage(sbInfo.toString())
-
             if (Environment.current.name.equals("production_wildfly")) {
                 logginService.putInfoMessage(" ** end point de PRD**")
                 def usuario = "aplCORWS"
@@ -941,7 +940,9 @@ class WsController {
 
             logginService.putInfoMessage("Proceso envio de informacion para " + company.nombre + " terminado.")
             logginService.putInfoMessage("** Se enviaron :" + expedientes.size() + " **")
-            flash.message = "** Se procesaron :" + expedientes.size() + " **  " + " Compania : " + company.nombre
+            sbInfo.append("\n")
+            sbInfo.append(" se procesaron cantidad : ${expedientes.size()}")
+            flash.message = sbInfo.toString()
             redirect(controller: 'dashboard', action: 'index')
         } catch (Exception ex) {
 
