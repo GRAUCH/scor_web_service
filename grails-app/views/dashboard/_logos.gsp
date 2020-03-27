@@ -4,7 +4,7 @@
             <% def variable = 0 %>
             <g:each in="${ciasLog}" status="i" var="cia">
                 <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-                    <div id=${cia.id} onclick="myFunction(${cia.id});" class="quick-btn " style="background: none">
+                    <div id="${cia.id}-${cia.name}" onclick="myFunction(this);" class="quick-btn " style="background: none">
                         <i><asset:image style="height: 70px !important; width: 70px !important;"
                                         src="logos/${cia.logo}"/></i>
                         %{--<span class="label label-default">${cia.recibidos.size()}</span>--}%
@@ -69,7 +69,7 @@
 </div>
 <div class="contenedor" style="background-color: #F0F0F0;">
     <div class="contenido">
-<div id="panelForzarEnvio" style="padding-bottom: 70px;  display:none; ">
+<div id="panelForzarEnvio" style="display: none;  padding-bottom: 70px;  display:block; ">
 
     <g:render template="enviosWS" model="['cia': cia]"/>
 </div>

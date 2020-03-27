@@ -48,7 +48,8 @@
                         <h3>Log de control de los casos recibidos por SCOR Telemed</h3>
                         <hr>
                     </div>
-                    <g:render template="logos"   model="['hasta': hasta, 'desde': desde, 'ciasLog': ciasLog, 'max': max, 'idCia': idCia]"/>
+                    <g:render template="logos"
+                              model="['hasta': hasta, 'desde': desde, 'ciasLog': ciasLog, 'max': max, 'idCia': idCia]"/>
                 </div>
             </g:form>
         </div>
@@ -70,56 +71,38 @@
 
 <script>
 
-    function myFunction(id) {
-        $('#idCia').val(id);
+    function myFunction(cia) {
 
         var elements = document.getElementsByClassName('quick-btn_Selected');
-        while(elements.length > 0){
+        while (elements.length > 0) {
             elements[0].classList.remove('quick-btn_Selected');
         }
-        document.getElementById(id).classList.toggle('quick-btn_Selected');
+        document.getElementById(cia.id).classList.toggle('quick-btn_Selected');
 
-        document.getElementById('panelForzarEnvio').style.display = 'none';
-        document.getElementById('panelAlptis').style.display = 'none';
-        document.getElementById('panelAma').style.display = 'none';
-        document.getElementById('panelCajamar').style.display = 'none';
-        document.getElementById('panelCaser').style.display = 'none';
+        <g:each in="${ciasLog}" status="i" var="cia">
+        var element = document.getElementById('panel${cia.name}');
+        if (element != null)
+            element.style.display = 'none';
+        </g:each>
 
-
-        if (id == 5){
-            document.getElementById('panelForzarEnvio').style.display = 'block';
-            document.getElementById('panelAlptis').style.display = 'inline';
-        }
-
-        if (id == 9){
-            document.getElementById('panelForzarEnvio').style.display = 'block';
-            document.getElementById('panelAma').style.display = 'inline';
-        }
-
-        if (id == 8){
-            document.getElementById('panelForzarEnvio').style.display = 'block';
-            document.getElementById('panelCajamar').style.display = 'inline';
-        }
-
-        if (id == 11){
-            document.getElementById('panelForzarEnvio').style.display = 'block';
-            document.getElementById('panelCaser').style.display = 'inline';
-        }
+        var ciaattr = cia.id.split('-')
+        document.getElementById('panel' + ciaattr[1]).style.display = 'inline';
 
     }
 
-    function busquedaPor(id){
-      var ultimoCaracter =  id.charAt(id.length-1);
-      var panelOculto = "busqFecha"+ultimoCaracter;
+    function busquedaPor(id) {
+        var ultimoCaracter = id.charAt(id.length - 1);
+        var panelOculto = "busqFecha" + ultimoCaracter;
 
-        if ((id == "codigoST0")||(id == "codigoST1")||(id == "codigoST2")||(id == "codigoST3")){
+        if ((id == "codigoST0") || (id == "codigoST1") || (id == "codigoST2") || (id == "codigoST3")) {
             document.getElementById(id).style.display = 'inline';
             document.getElementById(panelOculto).style.display = 'none';
         }
     }
-    function busquedaPorF(id){
-        if ((id == "busqFecha0")||(id == "busqFecha1")||(id == "busqFecha2")||(id == "busqFecha3")) {
-            document.getElementById('codigoST'+id.charAt(id.length - 1)).style.display = 'none';
+
+    function busquedaPorF(id) {
+        if ((id == "busqFecha0") || (id == "busqFecha1") || (id == "busqFecha2") || (id == "busqFecha3")) {
+            document.getElementById('codigoST' + id.charAt(id.length - 1)).style.display = 'none';
             document.getElementById(id).style.display = 'inline';
         }
 
