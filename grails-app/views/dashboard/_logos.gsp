@@ -1,5 +1,5 @@
 <div style="display: flex;align-items: center; background-color: #F0F0F0; ">
-    <div style="display: flex;align-items: center; margin-left: auto; margin-right: auto; padding-top: 20px; padding-bottom: 20px;">
+    <div style="display: flex;align-items: center; margin-left: auto; margin-right: auto; padding-top: 20px; ">
         <div style="padding: 20px; float: left; ">
             <% def variable = 0 %>
             <g:each in="${ciasLog}" status="i" var="cia">
@@ -67,10 +67,11 @@
         </div>
     </div>
 </div>
-
-<g:each in="${ciasLog}" status="i" var="cia">
+<div class="contenedor" style="background-color: #F0F0F0;">
+    <div class="contenido">
+<div id="panelForzarEnvio" style="padding-bottom: 70px;  display:none; ">
 
     <g:render template="enviosWS" model="['cia': cia]"/>
-
-</g:each>
-
+</div>
+</div>
+</div>

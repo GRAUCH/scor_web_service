@@ -2,3 +2,19 @@
 	background-color: white !important;
 	width: 130px;
 }
+
+.fechaLogo{
+	width: 90px; margin-bottom: -0.08px;
+}
+
+select{
+	width: 80px;
+}
+
+.contenedor {
+	display: flex;
+	align-items: center;
+}
+.contenido {
+	margin: 0 auto; /* requerido para alineación horizontal */
+}
