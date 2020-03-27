@@ -53,9 +53,11 @@ class DashboardController {
 
         if (flash.message != null) {
             flash.message = flash.message
-        } else if (params.logs == null) {
+        }
+        if (params.logs == null) {
             flash.message = 'Seleccione una acción'
-        } else if (params.idCia == null && !params.idCia.toString().isEmpty()) {
+        }
+        if (params.idCia == null && !params.idCia.toString().isEmpty()) {
             flash.message = 'Seleccione una compania'
         } else {
             company = Company.findById(params.idCia)

@@ -72,19 +72,20 @@
 <script>
 
     function myFunction(cia) {
-
+        // Con esto le enviamos al controllador la CIA que queremos consultar
+        $('#idCia').val(cia.id);
+        //Con esto dejamos el efecto de que se hizo click en la compania
         var elements = document.getElementsByClassName('quick-btn_Selected');
         while (elements.length > 0) {
             elements[0].classList.remove('quick-btn_Selected');
         }
         document.getElementById(cia.id).classList.toggle('quick-btn_Selected');
-
+        //Con esto mostramos o no el panel de envios
         <g:each in="${ciasLog}" status="i" var="cia">
         var element = document.getElementById('panel${cia.name}');
         if (element != null)
             element.style.display = 'none';
         </g:each>
-
         var ciaattr = cia.id.split('-')
         document.getElementById('panel' + ciaattr[1]).style.display = 'inline';
 
