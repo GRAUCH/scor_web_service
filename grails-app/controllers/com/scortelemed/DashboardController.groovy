@@ -51,13 +51,11 @@ class DashboardController {
 
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy")
 
-        if (flash.message != null) {
+        if (flash.message != null && params.idCia != null && params.idCia.toString().isEmpty()) {
             flash.message = flash.message
-        }
-        if (params.logs == null) {
+        }else  if (params.logs == null) {
             flash.message = 'Seleccione una acción'
-        }
-        if (params.idCia == null && !params.idCia.toString().isEmpty()) {
+        }else  if (params.idCia == null && params.idCia.toString().isEmpty()) {
             flash.message = 'Seleccione una compania'
         } else {
             company = Company.findById(params.idCia)

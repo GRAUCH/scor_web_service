@@ -68,11 +68,11 @@ class WsController {
 
         try {
             def company = Company.findByNombre('alptis')
-            StringBuilder sbInfo = new StringBuilder("Realizando proceso envio de informacion para " + company.nombre)
+            StringBuilder sbInfo = new StringBuilder("* Realizando proceso envio de informacion para " + company.nombre + " *")
             if (params.myGroup != null && params.myGroup == 'codigoST' && params.codigoST) {
                 sbInfo.append(" al expediente con codigo ST ${params.codigoST}")
                 resulExpedienteSoap = tarificadorService.consultaExpedienteCodigoST(params.codigoST, "FR")
-                sbInfo.append("se encontraron :  ${resulExpedienteSoap.size()}  expedientes con el codigo ST")
+                sbInfo.append(" * se encontraron :  ${resulExpedienteSoap.size()}  expedientes con el codigo ST *")
             } else {
                 //EJEMPLO DE URL:
                 //http://192.168.1.188:8080/scorWebservice/ws/caseresult?ini=20150512 00:00:00:00&fin=20150512 23:59:59:59
@@ -176,8 +176,8 @@ class WsController {
                 logginService.putInfoMessage("No hay resultados para " + company.nombre)
 
             }
-            flash.message = "** Se procesaron :" + resulExpedienteSoap.size() + " **  " + " Compania : " + company.nombre
-            redirect(controller: 'dashboard', action: 'index')
+            flash.message = "** Se procesaron :" + resulExpedienteSoap.size() + " **  " + " Compania : " + company.nombre + " *"
+            redirect(controller: 'dashboard', action: 'index',params: [idCia: ''])
         } catch (Exception ex) {
             logginService.putError("Endpoint-" + opername, "Error en al obtener resultados para las fechas " + fechaIni + "-" + fechaFin + ":" + ex)
             correoUtil.envioEmail("AlptisUnderwrittingCasesResultsRequest", cases.toString(), ex)
@@ -191,7 +191,7 @@ class WsController {
 //                }
 //            }
 
-            redirect(controller: 'dashboard', action: 'index')
+
         }
     }
 
@@ -215,7 +215,7 @@ class WsController {
         try {
 
             def company = Company.findByNombre('cajamar')
-            StringBuilder sbInfo = new StringBuilder("Realizando proceso envio de informacion para " + company.nombre)
+            StringBuilder sbInfo = new StringBuilder(" * Realizando proceso envio de informacion para " + company.nombre + " *")
             sbInfo.append("\n")
             if (params.myGroup != null && params.myGroup == 'codigoST' && params.codigoST) {
                 sbInfo.append(" al expediente con codigo ST ${params.codigoST}")
@@ -412,9 +412,9 @@ class WsController {
             }
             sbInfo.append("\n")
             sbInfo.append(" se procesaron cantidad : ${resulExpedienteSoap.size()}")
-            logginService.putInfoMessage("proceso envio de informacion para " + company.nombre + " terminado.")
+            logginService.putInfoMessage(" * proceso envio de informacion para " + company.nombre + " terminado. *")
             flash.message = sbInfo.toString()
-            redirect(controller: 'dashboard', action: 'index')
+            redirect(controller: 'dashboard', action: 'index',params: [idCia: ''])
 
         } catch (Exception ex) {
             logginService.putErrorMessage("Error: " + opername + ". " + ex.getMessage().toString() + ". Detalles:" + ex.printStackTrace())
@@ -445,12 +445,12 @@ class WsController {
         TransformacionUtil transformacion = new TransformacionUtil()
         def company = Company.findByNombre('caser')
         try {
-            StringBuilder sbInfo = new StringBuilder("Realizando proceso envio de informacion para " + company.nombre)
+            StringBuilder sbInfo = new StringBuilder(" * Realizando proceso envio de informacion para " + company.nombre+" *")
             sbInfo.append("\n")
             if (params.myGroup != null && params.myGroup == 'codigoST' && params.codigoST) {
                 sbInfo.append(" al expediente con codigo ST ${params.codigoST}")
                 expedientes.addAll(tarificadorService.consultaExpedienteCodigoST(params.codigoST, "ES"))
-                sbInfo.append("se encontraron :  ${expedientes.size()}  expedientes con el codigo ST")
+                sbInfo.append(" * se encontraron :  ${expedientes.size()}  expedientes con el codigo ST *")
             } else {
                 fechaIni = LogUtil.paramsToDateIni(params)
                 fechaFin = LogUtil.paramsToDateFin(params)
@@ -526,9 +526,9 @@ class WsController {
             logginService.putInfoMessage("proceso envio de informacion para " + company.nombre + " terminado.")
             logginService.putInfoMessage("** Se enviaron :" + expedientes.size() + " **")
             sbInfo.append("\n")
-            sbInfo.append(" se procesaron cantidad : ${expedientes.size()}")
+            sbInfo.append("* se procesaron cantidad : ${expedientes.size()} *")
             flash.message = sbInfo.toString()
-            redirect(controller: 'dashboard', action: 'index')
+            redirect(controller: 'dashboard', action: 'index',params: [idCia: ''])
         } catch (Exception ex) {
             logginService.putErrorMessage("Error: " + opername + ". " + ex.getMessage() + ". Detalles:" + ex.getMessage())
             com.scortelemed.Error error = new com.scortelemed.Error()
@@ -573,12 +573,12 @@ class WsController {
             def company = Company.findByNombre('ama')
             def identificadorCaso
             Expediente expediente
-            StringBuilder sbInfo = new StringBuilder("Realizando proceso envio de informacion para " + company.nombre)
+            StringBuilder sbInfo = new StringBuilder(" *Realizando proceso envio de informacion para " + company.nombre +" *")
             sbInfo.append("\n")
             if (params.myGroup != null && params.myGroup == 'codigoST' && params.codigoST) {
                 sbInfo.append(" al expediente con codigo ST ${params.codigoST}")
                 expedientes.addAll(tarificadorService.consultaExpedienteCodigoST(params.codigoST, "ES"))
-                sbInfo.append("se encontraron :  ${expedientes.size()}  expedientes con el codigo ST")
+                sbInfo.append(" * se encontraron :  ${expedientes.size()}  expedientes con el codigo ST *")
             } else {
                 fechaIni = LogUtil.paramsToDateIni(params)
                 fechaFin = LogUtil.paramsToDateFin(params)
@@ -945,9 +945,9 @@ class WsController {
             logginService.putInfoMessage("Proceso envio de informacion para " + company.nombre + " terminado.")
             logginService.putInfoMessage("** Se enviaron :" + expedientes.size() + " **")
             sbInfo.append("\n")
-            sbInfo.append(" se procesaron cantidad : ${expedientes.size()}")
+            sbInfo.append("*  se procesaron cantidad : ${expedientes.size()} *")
             flash.message = sbInfo.toString()
-            redirect(controller: 'dashboard', action: 'index')
+            redirect(controller: 'dashboard', action: 'index',params: [idCia: ''])
         } catch (Exception ex) {
 
             logginService.putErrorMessage("Error: " + opername + ". No se ha podido mandar el caso a Ama. Detalles:" + ex.getMessage())
