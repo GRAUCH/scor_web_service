@@ -72,6 +72,7 @@ class WsController {
             if (params.myGroup != null && params.myGroup == 'codigoST' && params.codigoST) {
                 sbInfo.append(" al expediente con codigo ST ${params.codigoST}")
                 resulExpedienteSoap = tarificadorService.consultaExpedienteCodigoST(params.codigoST, "FR")
+                sbInfo.append("se encontraron :  ${resulExpedienteSoap.size()}  expedientes con el codigo ST")
             } else {
                 //EJEMPLO DE URL:
                 //http://192.168.1.188:8080/scorWebservice/ws/caseresult?ini=20150512 00:00:00:00&fin=20150512 23:59:59:59
@@ -219,6 +220,7 @@ class WsController {
             if (params.myGroup != null && params.myGroup == 'codigoST' && params.codigoST) {
                 sbInfo.append(" al expediente con codigo ST ${params.codigoST}")
                 resulExpedienteSoap.addAll(tarificadorService.consultaExpedienteCodigoST(params.codigoST, "ES"))
+                sbInfo.append("se encontraron :  ${resulExpedienteSoap.size()}  expedientes con el codigo ST")
             } else {
                 fechaIni = LogUtil.paramsToDateIni(params)
                 fechaFin = LogUtil.paramsToDateFin(params)
@@ -448,6 +450,7 @@ class WsController {
             if (params.myGroup != null && params.myGroup == 'codigoST' && params.codigoST) {
                 sbInfo.append(" al expediente con codigo ST ${params.codigoST}")
                 expedientes.addAll(tarificadorService.consultaExpedienteCodigoST(params.codigoST, "ES"))
+                sbInfo.append("se encontraron :  ${expedientes.size()}  expedientes con el codigo ST")
             } else {
                 fechaIni = LogUtil.paramsToDateIni(params)
                 fechaFin = LogUtil.paramsToDateFin(params)
@@ -575,6 +578,7 @@ class WsController {
             if (params.myGroup != null && params.myGroup == 'codigoST' && params.codigoST) {
                 sbInfo.append(" al expediente con codigo ST ${params.codigoST}")
                 expedientes.addAll(tarificadorService.consultaExpedienteCodigoST(params.codigoST, "ES"))
+                sbInfo.append("se encontraron :  ${expedientes.size()}  expedientes con el codigo ST")
             } else {
                 fechaIni = LogUtil.paramsToDateIni(params)
                 fechaFin = LogUtil.paramsToDateFin(params)

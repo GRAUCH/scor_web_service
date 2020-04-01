@@ -17,9 +17,9 @@
                 <g:radio onclick="busquedaPor('codigoST0')" name="myGroup" value="codigoST"/>
             </div>
             <div style=" margin-left: 15px; padding-bottom: 10px;"  >
-                <label for="codigotST">Envio por Numero de Caso</label>
+                <label for="codigoST">Envio por Numero de Caso</label>
                 <div id = "codigoST0" style="display:none;">
-                    <g:textField style="width: 100px;" name="codigotST" placeholder="Codigot ST"/>
+                    <g:textField style="width: 100px;" name="codigoST" placeholder="Codigo ST"/>
                 </div>
             </div>
 
@@ -52,9 +52,9 @@
                 <g:radio onclick="busquedaPor('codigoST1')" name="myGroup" value="codigoST"/>
             </div>
             <div style=" margin-left: 15px; padding-bottom: 10px;"  >
-                <label for="codigotST">Envio por Numero de Caso</label>
+                <label for="codigoST">Envio por Numero de Caso</label>
                 <div id = "codigoST1" style="display:none;">
-                    <g:textField style="width: 100px;" name="codigotST" placeholder="Codigot ST"/>
+                    <g:textField style="width: 100px;" name="codigoST" placeholder="Codigo ST"/>
                 </div>
             </div>
             <div id="busqFecha1">
@@ -87,9 +87,9 @@
                 <g:radio onclick="busquedaPor('codigoST2')" name="myGroup" value="codigoST"/>
             </div>
             <div style=" margin-left: 15px; padding-bottom: 10px;"  >
-                <label for="codigotST">Envio por Numero de Caso</label>
+                <label for="codigoST">Envio por Numero de Caso</label>
                 <div id = "codigoST2" style="display:none;">
-                    <g:textField style="width: 100px;" name="codigotST" placeholder="Codigot ST"/>
+                    <g:textField style="width: 100px;" name="codigoST" placeholder="Codigo ST"/>
                 </div>
             </div>
             <div id="busqFecha2">
@@ -124,9 +124,9 @@
                     <g:radio onclick="busquedaPor('codigoST3')" name="myGroup" value="codigoST"/>
                 </div>
                 <div style=" margin-left: 15px; padding-bottom: 10px;"  >
-                    <label for="codigotST">Envio por Numero de Caso</label>
+                    <label for="codigoST">Envio por Numero de Caso</label>
                     <div id = "codigoST3" style="display:none;">
-                        <g:textField style="width: 100px;" name="codigotST" placeholder="Codigot ST"/>
+                        <g:textField style="width: 100px;" name="codigoST" placeholder="Codigo ST"/>
                     </div>
                 </div>
                 <div id="busqFecha3">

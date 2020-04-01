@@ -35,7 +35,7 @@
 			
 			<li><a class="stat" href="${createLinkTo(dir:'/request')}"><img src="${createLinkTo(dir:'images',file:'statsicon.png')}" />&nbsp;Estadisticas</a></li>
 			
-			<li><g:link controller="dashboard" action="index"><img src="${createLinkTo(dir:'images',file:'helpicon.png')}" />&nbsp;Logs</g:link></li>
+			<li><g:link controller="dashboard" action="index"><img src="${createLinkTo(dir:'images',file:'helpicon.png')}" />&nbsp;Dashboard</g:link></li>
 			
 		</ul>
 </div>
