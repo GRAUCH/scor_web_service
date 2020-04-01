@@ -43,7 +43,7 @@ class LogUtil {
             try {
                 if ((Date) params.fin && (Date) params.ini) {
                     fechaIni = LogUtil.dateToCalendar(params.ini)
-                    fechaIni = fechaIni.getTime().format('yyyyMMdd HH:mm')
+                    fechaIni = fechaIni.getTime().format('yyyyMMdd HH:mm:ss')
                 }
             } catch (Exception e) {
                 fechaIni = URLDecoder.decode(params.ini.trim(), "ISO-8859-1")
@@ -51,7 +51,7 @@ class LogUtil {
             }
         } else {
             Calendar fecha = Calendar.getInstance()
-            fecha.add(Calendar.MINUTE, -30)
+            fecha.add(Calendar.MINUTE, -60)
             fechaIni = fecha.getTime().format('yyyyMMdd HH:mm')
             fechaIni = fechaIni.toString() + ":00"
         }
@@ -65,16 +65,16 @@ class LogUtil {
             try {
                 if ((Date) params.fin && (Date) params.ini) {
                     fechaFin = LogUtil.dateToCalendar(params.fin)
-                    fechaFin = fechaFin.getTime().format('yyyyMMdd HH:mm')
+                    fechaFin = fechaFin.getTime().format('yyyyMMdd HH:mm:ss')
                 }
             } catch (Exception e) {
                 fechaFin = URLDecoder.decode(params.fin.trim(), "ISO-8859-1")
             }
         } else {
             Calendar fecha = Calendar.getInstance()
-            fecha.add(Calendar.MINUTE, -60)
+            fecha.add(Calendar.MINUTE, -30)
             fechaFin = fecha.getTime().format('yyyyMMdd HH:mm')
-            fechaFin = fechaFin.toString() + ":59"
+            fechaFin = fechaFin.toString() + ":00"
         }
         return fechaFin
     }

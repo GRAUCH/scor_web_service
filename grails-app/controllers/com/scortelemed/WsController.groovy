@@ -78,7 +78,7 @@ class WsController {
                 //http://192.168.1.188:8080/scorWebservice/ws/caseresult?ini=20150512 00:00:00:00&fin=20150512 23:59:59:59
                 fechaIni = LogUtil.paramsToDateIni(params)
                 fechaFin = LogUtil.paramsToDateFin(params)
-                sbInfo.append(" con fecha").append(fechaIni).append("-").append(fechaIni)
+                sbInfo.append(" con fecha inicio ").append(fechaIni).append("-").append(" con fecha fin ").append(fechaFin)
                 resulExpedienteSoap = tarificadorService.obtenerInformeExpedientes("1019", null, 1, fechaIni, fechaFin, "FR")
             }
             if (Environment.current.name.equals("production_wildfly")) {
@@ -224,7 +224,7 @@ class WsController {
             } else {
                 fechaIni = LogUtil.paramsToDateIni(params)
                 fechaFin = LogUtil.paramsToDateFin(params)
-                sbInfo.append(" con fecha").append(fechaIni).append("-").append(fechaIni)
+                sbInfo.append(" con fecha inicio ").append(fechaIni).append("-").append(" con fecha fin ").append(fechaFin)
                 if (!Environment.current.name.equals("production_wildfly")) {
                     for (int i = 0; i < 3; i++) {
                         resulExpedienteSoap.addAll(tarificadorService.obtenerInformeExpedientes("1035", null, i, fechaIni, fechaFin, "ES"))
@@ -419,7 +419,7 @@ class WsController {
         } catch (Exception ex) {
             logginService.putErrorMessage("Error: " + opername + ". " + ex.getMessage().toString() + ". Detalles:" + ex.printStackTrace())
             flash.message = "KO - Ver logs"
-            redirect(controller: 'dashboard', action: 'index')
+            redirect(controller: 'dashboard', action: 'index',params: [idCia: ''])
         }
     }
 
@@ -454,7 +454,7 @@ class WsController {
             } else {
                 fechaIni = LogUtil.paramsToDateIni(params)
                 fechaFin = LogUtil.paramsToDateFin(params)
-                sbInfo.append(" con fecha").append(fechaIni).append("-").append(fechaIni)
+                sbInfo.append(" con fecha inicio ").append(fechaIni).append("-").append(" con fecha fin ").append(fechaFin)
                 if (Environment.current.name.equals("production_wildfly")) {
                     sbInfo.append("** compania 1061 **")
                     for (int i = 0; i < 3; i++) {
@@ -540,7 +540,7 @@ class WsController {
             error.setError("Peticion no realizada para solicitud: " + ex.getMessage() + ". Error: " + ex.getMessage())
             error.save(flush: true)
             flash.message = "KO - Ver logs"
-            redirect(controller: 'dashboard', action: 'index')
+            redirect(controller: 'dashboard', action: 'index',params: [idCia: ''])
         }
     }
 
@@ -582,7 +582,7 @@ class WsController {
             } else {
                 fechaIni = LogUtil.paramsToDateIni(params)
                 fechaFin = LogUtil.paramsToDateFin(params)
-                sbInfo.append(" con fecha").append(fechaIni).append("-").append(fechaIni)
+                sbInfo.append(" con fecha inicio ").append(fechaIni).append("-").append(" con fecha fin ").append(fechaFin)
                 if (Environment.current.name.equals("production_wildfly")) {
                     logginService.putInfoMessage(" ** Codigo ST PRD   1059 y 1065**")
                     for (int i = 1; i < 3; i++) {
@@ -629,7 +629,7 @@ class WsController {
                         if (!amaService.seExcluyeEnvio(expediente)) {
                             identificadorCaso = expediente.getNumSolicitud()
                             files = new ArrayList<File>()
-                            listaBenefitInformation = new ArrayList<BenefitInformation>();
+                            listaBenefitInformation = new ArrayList<BenefitInformation>()
                             dossier.setDossierCode(expediente.getNumSolicitud())
                             dossier.setResultsCode("OK")
                             dossier.setState((short) 1)
@@ -915,7 +915,12 @@ class WsController {
                             }
                         }
 
-
+                        logginService.putInfoMessage("Proceso envio de informacion para " + company.nombre + " terminado.")
+                        logginService.putInfoMessage("** Se enviaron :" + expedientes.size() + " **")
+                        sbInfo.append("\n")
+                        sbInfo.append("*  se procesaron cantidad : ${expedientes.size()} *")
+                        flash.message = sbInfo.toString()
+                        redirect(controller: 'dashboard', action: 'index',params: [idCia: ''])
                     } catch (Exception ex) {
                         com.scortelemed.Error error = new com.scortelemed.Error()
                         error.setFecha(new Date())
@@ -936,23 +941,18 @@ class WsController {
                         }
                         error.save(flush: true)
                         flash.message = "KO - Ver logs"
-                        redirect(controller: 'dashboard', action: 'index')
+                        redirect(controller: 'dashboard', action: 'index',params: [idCia: ''])
                     }
                 }
             }
 
 
-            logginService.putInfoMessage("Proceso envio de informacion para " + company.nombre + " terminado.")
-            logginService.putInfoMessage("** Se enviaron :" + expedientes.size() + " **")
-            sbInfo.append("\n")
-            sbInfo.append("*  se procesaron cantidad : ${expedientes.size()} *")
-            flash.message = sbInfo.toString()
-            redirect(controller: 'dashboard', action: 'index',params: [idCia: ''])
+
         } catch (Exception ex) {
 
             logginService.putErrorMessage("Error: " + opername + ". No se ha podido mandar el caso a Ama. Detalles:" + ex.getMessage())
             flash.message = "KO - Ver logs"
-            redirect(controller: 'dashboard', action: 'index')
+            redirect(controller: 'dashboard', action: 'index',params: [idCia: ''])
         }
     }
 

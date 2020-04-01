@@ -1708,11 +1708,11 @@ class AmaService {
 		}
 	}
 	
-	public boolean seExcluyeEnvio(servicios.Expediente expediente){
+	 boolean seExcluyeEnvio(servicios.Expediente expediente){
 		
 		if (expediente != null && expediente.getServicios() != null && expediente.getServicios().size() > 0 && expediente.getServicios().size() == 1){
 		
-			return expediente.getServicios().get(0).getCompanyaServicio().getCodigoST().equals("002561")
+			return expediente.getServicios()?.get(0)?.getCompanyaServicio()?.getCodigoST().equals("002561")
 				
 		}
 		
