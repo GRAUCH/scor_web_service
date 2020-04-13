@@ -17,7 +17,6 @@ class DashboardController {
     def company
 
     def index(params) {
-
         params.max = params.max ?: 10
 
         if (params.int('max') > 100) {
@@ -39,7 +38,6 @@ class DashboardController {
         calHasta.set(Calendar.MINUTE, 59)
         calHasta.set(Calendar.SECOND, 59)
         calHasta.set(Calendar.MILLISECOND, 0)
-
         Date hasta = calHasta.getTime()
 
         Calendar calDesde = Calendar.getInstance()
@@ -52,7 +50,7 @@ class DashboardController {
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy")
 
         if (flash.message != null && params.idCia != null && params.idCia.toString().isEmpty()) {
-            flash.message = flash.message
+            //Aquí introduciremos la lógica para dejar marcado el botón de la compañía en un futuro
         }else  if (params.logs == null) {
             flash.message = 'Seleccione una acción'
         }else  if (params.idCia == null && params.idCia.toString().isEmpty()) {
@@ -76,8 +74,5 @@ class DashboardController {
             elementos = enviados.obtener(company, formatter.parse(params.desde), hasta, params.max)
             [ciasLog: ciasLog, company: company.nombre, elementos: elementos, ou: ou, desde: params.desde, hasta: params.hasta, max: params.max, lista: "listaEnviados.gsp", idCia: company.id]
         }
-
-
     }
-
 }

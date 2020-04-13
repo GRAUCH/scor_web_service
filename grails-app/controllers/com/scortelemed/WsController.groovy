@@ -182,6 +182,7 @@ class WsController {
             logginService.putError("Endpoint-" + opername, "Error en al obtener resultados para las fechas " + fechaIni + "-" + fechaFin + ":" + ex)
             correoUtil.envioEmail("AlptisUnderwrittingCasesResultsRequest", cases.toString(), ex)
             flash.message = "KO - Ver logs"
+            redirect(controller: 'dashboard', action: 'index',params: [idCia: ''])
 //            responseRecette = soap.send(connectTimeout: 300000, readTimeout: 300000) {
 //                body {
 //                    AlptisUnderwrittingCaseResultsRequest(xmlns: "http://www.scortelemed.com/schemas/alptis") {
@@ -914,13 +915,6 @@ class WsController {
                                 logginService.putInfoMessage(" ** SIN COBERTURA -- NO SE ENVIA -- **")
                             }
                         }
-
-                        logginService.putInfoMessage("Proceso envio de informacion para " + company.nombre + " terminado.")
-                        logginService.putInfoMessage("** Se enviaron :" + expedientes.size() + " **")
-                        sbInfo.append("\n")
-                        sbInfo.append("*  se procesaron cantidad : ${expedientes.size()} *")
-                        flash.message = sbInfo.toString()
-                        redirect(controller: 'dashboard', action: 'index',params: [idCia: ''])
                     } catch (Exception ex) {
                         com.scortelemed.Error error = new com.scortelemed.Error()
                         error.setFecha(new Date())
@@ -941,13 +935,18 @@ class WsController {
                         }
                         error.save(flush: true)
                         flash.message = "KO - Ver logs"
-                        redirect(controller: 'dashboard', action: 'index',params: [idCia: ''])
+                        return redirect(controller: 'dashboard', action: 'index', params: [idCia: ''])
                     }
                 }
+                logginService.putInfoMessage("Proceso envio de informacion para " + company.nombre + " terminado.")
+                logginService.putInfoMessage("** Se enviaron :" + expedientes.size() + " **")
+                sbInfo.append("\n")
+                sbInfo.append("*  se procesaron cantidad : ${expedientes.size()} *")
+                flash.message = sbInfo.toString()
+            } else {
+                flash.message = "No hay expedientes disponibles bajo esos criterios de busqueda"
             }
-
-
-
+            redirect(controller: 'dashboard', action: 'index', params: [idCia: ''])
         } catch (Exception ex) {
 
             logginService.putErrorMessage("Error: " + opername + ". No se ha podido mandar el caso a Ama. Detalles:" + ex.getMessage())
