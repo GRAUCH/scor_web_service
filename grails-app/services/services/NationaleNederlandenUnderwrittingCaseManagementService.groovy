@@ -154,7 +154,7 @@ class NationaleNederlandenUnderwrittingCaseManagementService {
 
 		def opername="NnResultadoReconocimientoMedicoResponse"
 		def requestXML = ""
-		List<RespuestaCRMInforme> expedientes = new ArrayList<RespuestaCRMInforme>();
+		List<RespuestaCRMInforme> expedientes = new ArrayList<RespuestaCRMInforme>()
 		TransformacionUtil util = new TransformacionUtil()
 		CorreoUtil correoUtil = new CorreoUtil()
 		RespuestaCRM respuestaCRM = new RespuestaCRM()
