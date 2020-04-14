@@ -340,19 +340,18 @@ class CaserService {
                     List<DATOS.Coberturas> coberturasList = coberturas
                     for (int i = 0; i < coberturasList.size(); i++) {
 
-                        if (coberturasList.get(i).getCodigoCobertura().equalsIgnoreCase('Cob5')) {
-                            if (grails.util.Environment.current.name == "production_wildfly") {
-                                logginService.putInfo("rellenaDatos", "Vino cob5 ** pongo producto 5441")
-                                datosRegistro.codigoProducto = "5441" //REAL
-                            } else {
-                                logginService.putInfo("rellenaDatos", "Vino cob5 ** pongo producto 3635 para prepro")
-                                datosRegistro.codigoProducto = "3635" //PREPRO
-                            }
-                            break
-                        } else if (coberturasList.get(i).getCodigoCobertura().equalsIgnoreCase('Cob1')) {
-                            logginService.putInfo("rellenaDatos", "Vino cob1 ** pongo producto SRP")
+                        if (coberturasList.get(i).getCodigoCobertura().equalsIgnoreCase('Cob5') || coberturasList.get(i).getCodigoCobertura().equalsIgnoreCase('Cob05')) {
+                            logginService.putInfo("rellenaDatos", "Vino ${coberturasList.get(i).getCodigoCobertura()} ** pongo producto SRP")
                             datosRegistro.codigoProducto = "SRP"
                             break
+                        } else if (coberturasList.get(i).getCodigoCobertura().equalsIgnoreCase('Cob1') || coberturasList.get(i).getCodigoCobertura().equalsIgnoreCase('Cob01')) {
+                            if (grails.util.Environment.current.name == "production_wildfly") {
+                                logginService.putInfo("rellenaDatos", "Vino  ${coberturasList.get(i).getCodigoCobertura()} ** pongo producto 5441")
+                                datosRegistro.codigoProducto = "5441" //REAL
+                            } else {
+                                logginService.putInfo("rellenaDatos", "Vino  ${coberturasList.get(i).getCodigoCobertura()} ** pongo producto 3635 para prepro")
+                                datosRegistro.codigoProducto = "3635" //PREPRO
+                            }
                         } else {
                             logginService.putError("rellenaDatos", "    *****    ")
                             logginService.putError("rellenaDatos", "El expediente trajo la cobertura : ${coberturasList.get(i).getCodigoCobertura()}, pero no se usa para seleccionar el producto.")
