@@ -355,7 +355,7 @@ class CaserService {
                             break
                         } else {
                             logginService.putError("rellenaDatos", "    *****    ")
-                            logginService.putError("rellenaDatos", "El expediente trajo la cobertura : ${it.getCodigoCobertura()}, pero no se usa para seleccionar el producto.")
+                            logginService.putError("rellenaDatos", "El expediente trajo la cobertura : ${coberturasList.get(i).getCodigoCobertura()}, pero no se usa para seleccionar el producto.")
                             logginService.putError("rellenaDatos", "    *****    ")
                         }
                     }
