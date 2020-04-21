@@ -177,12 +177,12 @@ class WsController {
 
             }
             flash.message = "** Se procesaron :" + resulExpedienteSoap.size() + " **  " + " Compania : " + company.nombre + " *"
-            redirect(controller: 'dashboard', action: 'index',params: [idCia: ''])
+            return redirect(controller: 'dashboard', action: 'index',params: [idCia: ''])
         } catch (Exception ex) {
             logginService.putError("Endpoint-" + opername, "Error en al obtener resultados para las fechas " + fechaIni + "-" + fechaFin + ":" + ex)
             correoUtil.envioEmail("AlptisUnderwrittingCasesResultsRequest", cases.toString(), ex)
             flash.message = "KO - Ver logs"
-            redirect(controller: 'dashboard', action: 'index',params: [idCia: ''])
+            return redirect(controller: 'dashboard', action: 'index',params: [idCia: ''])
 //            responseRecette = soap.send(connectTimeout: 300000, readTimeout: 300000) {
 //                body {
 //                    AlptisUnderwrittingCaseResultsRequest(xmlns: "http://www.scortelemed.com/schemas/alptis") {
@@ -415,12 +415,11 @@ class WsController {
             sbInfo.append(" se procesaron cantidad : ${resulExpedienteSoap.size()}")
             logginService.putInfoMessage(" * proceso envio de informacion para " + company.nombre + " terminado. *")
             flash.message = sbInfo.toString()
-            redirect(controller: 'dashboard', action: 'index',params: [idCia: ''])
-
+            return redirect(controller: 'dashboard', action: 'index',params: [idCia: ''])
         } catch (Exception ex) {
             logginService.putErrorMessage("Error: " + opername + ". " + ex.getMessage().toString() + ". Detalles:" + ex.printStackTrace())
             flash.message = "KO - Ver logs"
-            redirect(controller: 'dashboard', action: 'index',params: [idCia: ''])
+            return redirect(controller: 'dashboard', action: 'index',params: [idCia: ''])
         }
     }
 
@@ -529,7 +528,7 @@ class WsController {
             sbInfo.append("\n")
             sbInfo.append("* se procesaron cantidad : ${expedientes.size()} *")
             flash.message = sbInfo.toString()
-            redirect(controller: 'dashboard', action: 'index',params: [idCia: ''])
+            return redirect(controller: 'dashboard', action: 'index',params: [idCia: ''])
         } catch (Exception ex) {
             logginService.putErrorMessage("Error: " + opername + ". " + ex.getMessage() + ". Detalles:" + ex.getMessage())
             com.scortelemed.Error error = new com.scortelemed.Error()
@@ -541,7 +540,7 @@ class WsController {
             error.setError("Peticion no realizada para solicitud: " + ex.getMessage() + ". Error: " + ex.getMessage())
             error.save(flush: true)
             flash.message = "KO - Ver logs"
-            redirect(controller: 'dashboard', action: 'index',params: [idCia: ''])
+            return redirect(controller: 'dashboard', action: 'index',params: [idCia: ''])
         }
     }
 
@@ -946,12 +945,12 @@ class WsController {
             } else {
                 flash.message = "No hay expedientes disponibles bajo esos criterios de busqueda"
             }
-            redirect(controller: 'dashboard', action: 'index', params: [idCia: ''])
+            return redirect(controller: 'dashboard', action: 'index', params: [idCia: ''])
         } catch (Exception ex) {
 
             logginService.putErrorMessage("Error: " + opername + ". No se ha podido mandar el caso a Ama. Detalles:" + ex.getMessage())
             flash.message = "KO - Ver logs"
-            redirect(controller: 'dashboard', action: 'index',params: [idCia: ''])
+            return redirect(controller: 'dashboard', action: 'index',params: [idCia: ''])
         }
     }
 
