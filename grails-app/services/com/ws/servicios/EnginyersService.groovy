@@ -325,7 +325,7 @@ class EnginyersService {
 
     }
 
-     def rellenaDatos(req, company) {
+    def rellenaDatos(req, company) {
 
         def mapDatos = [:]
         def listadoPreguntas = []
@@ -365,14 +365,14 @@ class EnginyersService {
                     /**NUMERO DE PRODUCTO
                      *
                      */
+// comento el codigo: porque estan llegando coberturas que no estan contepladas y esta fallado la carga.
+//                    if (existeDependencia(req)) {
+//                        datosRegistro.codigoProducto = "DEPENDENCIA"
+//                    }
 
-                    if (existeDependencia(req)) {
-                        datosRegistro.codigoProducto = "DEPENDENCIA"
-                    }
-
-                    if (existeVida(req)) {
-                        datosRegistro.codigoProducto = "PENGINYERS"
-                    }
+//                    if (existeVida(req)) {
+                    datosRegistro.codigoProducto = "PENGINYERS"
+//                    }
 
                     /**NOMBRE DE CANDIDATO
                      *
