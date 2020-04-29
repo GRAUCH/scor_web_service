@@ -594,7 +594,7 @@ class RequestController {
 					requestXML=enginyersService.marshall("http://www.scortelemed.com/schemas/enginyers",addExp)
 					requestBBDD = requestService.crear("EnginyersResultadoReconocimientoMedicoRequest",requestXML)
 					logginService.putInfoMessage("Se ha procesado una request namnualmente para: " + requestInstance.company)
-					netinsuranceService.crearExpediente(requestBBDD)
+					enginyersService.crearExpediente(requestBBDD)
 					flash.message = "${message(code: 'default.processed.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
 				}
 				break
