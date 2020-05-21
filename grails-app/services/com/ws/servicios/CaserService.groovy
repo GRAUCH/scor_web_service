@@ -20,6 +20,7 @@ import org.w3c.dom.Element
 import org.w3c.dom.Node
 import org.w3c.dom.NodeList
 import org.xml.sax.InputSource
+import servicios.RespuestaCRM
 
 import javax.xml.bind.JAXBContext
 import javax.xml.bind.JAXBElement
@@ -39,6 +40,7 @@ class CaserService {
     GenerarZip generarZip = new GenerarZip()
     def tarificadorService
     TransformacionUtil transformacionUtil = new TransformacionUtil()
+    CorreoUtil correoUtil = new CorreoUtil()
 
     def rellenaDatosSalida(expedientePoliza, requestDate, logginService) {
 
@@ -57,11 +59,19 @@ class CaserService {
             expediente.setMobilePhone(util.devolverTelefonoMovil(expedientePoliza.getCandidato()))
             expediente.setPhoneNumber1(util.devolverTelefono1(expedientePoliza.getCandidato()))
             expediente.setPhoneNumber2(util.devolverTelefono2(expedientePoliza.getCandidato()))
+            expediente.setDomicilio(expedientePoliza?.getCandidato()?.getDireccion())
+            expediente.setCodPostal(expedientePoliza?.getCandidato()?.getCodigoPostal())
+            expediente.setLocalidad(expedientePoliza?.getCandidato()?.getLocalidad())
+            expediente.setProvincia(expedientePoliza?.getCandidato()?.getProvincia())
         } else {
             expediente.setFiscalIdentificationNumber("")
             expediente.setMobilePhone("")
             expediente.setPhoneNumber1("")
             expediente.setPhoneNumber2("")
+            expediente.setDomicilio("")
+            expediente.setCodPostal("")
+            expediente.setLocalidad("")
+            expediente.setProvincia("")
         }
 
         byte[] compressedData = tarificadorService.obtenerZip(expedientePoliza.getNodoAlfresco())
@@ -121,11 +131,19 @@ class CaserService {
             expediente.setMobilePhone(util.devolverTelefonoMovil(expedientePoliza.getCandidato()))
             expediente.setPhoneNumber1(util.devolverTelefono1(expedientePoliza.getCandidato()))
             expediente.setPhoneNumber2(util.devolverTelefono2(expedientePoliza.getCandidato()))
+            expediente.setDomicilio(expedientePoliza?.getCandidato()?.getDireccion())
+            expediente.setCodPostal(expedientePoliza?.getCandidato()?.getCodigoPostal())
+            expediente.setLocalidad(expedientePoliza?.getCandidato()?.getLocalidad())
+            expediente.setProvincia(expedientePoliza?.getCandidato()?.getProvincia())
         } else {
             expediente.setFiscalIdentificationNumber("")
             expediente.setMobilePhone("")
             expediente.setPhoneNumber1("")
             expediente.setPhoneNumber2("")
+            expediente.setDomicilio("")
+            expediente.setCodPostal("")
+            expediente.setLocalidad("")
+            expediente.setProvincia("")
         }
 
         byte[] compressedData = tarificadorService.obtenerZip(expedientePoliza.getNodoAlfresco())
@@ -256,7 +274,7 @@ class CaserService {
     }
 
     private def buildCabecera = { req ->
-        def formato = new SimpleDateFormat("yyyyMMdd");
+        def formato = new SimpleDateFormat("yyyyMMdd")
         RootElement.CABECERA cabecera = new RootElement.CABECERA()
         cabecera.setCodigoCia(req.company.codigoSt)
         cabecera.setContadorSecuencial("1")
@@ -297,6 +315,65 @@ class CaserService {
         }
     }
 
+
+    def envioEmail(req) {
+
+        def datosEmail = rellenoDatosEmail(req)
+
+        StringBuilder sb = new StringBuilder()
+
+        sb.append("El Dossier del cliente ${datosEmail.get('nombre')}, ${datosEmail.get('apellido')} con DNI  ${datosEmail.get('dni')}")
+        sb.append("\n")
+        sb.append("El request number es : ${datosEmail.get('requestNumber')}")
+        sb.append("\n")
+        sb.append("La modificacion es la siguiente :  ${datosEmail.get('comments')}")
+
+        correoUtil.envioEmail('Modificacion caso', sb.toString(), 0)
+    }
+
+    def rellenoDatosEmail(req) {
+
+        def datosEmail = [:]
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
+        DocumentBuilder builder = factory.newDocumentBuilder()
+
+        InputSource is = new InputSource(new StringReader(req.request))
+        is.setEncoding("UTF-8")
+        Document doc = builder.parse(is)
+
+        doc.getDocumentElement().normalize()
+
+        NodeList nList = doc.getElementsByTagName("CandidateInformation")
+        def nombre, apellido, dni, requestNumber, comments
+        for (int temp = 0; temp < nList.getLength(); temp++) {
+            Node nNode = nList.item(temp)
+            if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+                Element eElement = (Element) nNode
+                nombre = eElement.getElementsByTagName("name").item(0).getTextContent()
+                apellido = eElement.getElementsByTagName("surname").item(0).getTextContent()
+                dni = eElement.getElementsByTagName("fiscalIdentificationNumber").item(0).getTextContent()
+            }
+        }
+        nList = doc.getElementsByTagName("PolicyHolderInformation")
+
+        for (int temp = 0; temp < nList.getLength(); temp++) {
+            Node nNode = nList.item(temp)
+            if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+                Element eElement = (Element) nNode
+                requestNumber = eElement.getElementsByTagName("requestNumber").item(0).getTextContent()
+                comments = eElement.getElementsByTagName("comments").item(0).getTextContent()
+            }
+        }
+
+        datosEmail.put('nombre', nombre)
+        datosEmail.put('apellido', apellido)
+        datosEmail.put('dni', dni)
+        datosEmail.put('requestNumber', requestNumber)
+        datosEmail.put('comments', comments)
+
+        return datosEmail
+
+    }
 
     def rellenaDatos(req, company, coberturas) {
 
@@ -832,38 +909,74 @@ class CaserService {
         }
     }
 
+    List<servicios.Expediente> existeExpediente(String numeroSolicitud, String nombreCia, String companyCodigoSt, String unidadOrganizativa) {
+
+        logginService.putInfoMessage("Buscando si existe expediente con numero de solicitud " + numeroSolicitud + " para " + nombreCia)
+
+        servicios.Filtro filtro = new servicios.Filtro()
+        List<servicios.Expediente> expedientes = new ArrayList<servicios.Expediente>()
+        RespuestaCRM respuestaCrm
+
+        try {
+
+            filtro.setClave(servicios.ClaveFiltro.CLIENTE)
+            filtro.setValor(companyCodigoSt)
+
+            servicios.Filtro filtroRelacionado1 = new servicios.Filtro()
+            filtroRelacionado1.setClave(servicios.ClaveFiltro.NUM_SOLICITUD)
+            filtroRelacionado1.setValor(numeroSolicitud)
+            filtro.setFiltroRelacionado(filtroRelacionado1)
+
+            respuestaCrm = consultaExpediente(unidadOrganizativa.toString(), filtro)
+
+            if (respuestaCrm != null && respuestaCrm.getListaExpedientes() != null && respuestaCrm.getListaExpedientes().size() > 0) {
+
+                for (int i = 0; i < respuestaCrm.getListaExpedientes().size(); i++) {
+
+                    servicios.Expediente exp = respuestaCrm.getListaExpedientes().get(i)
+
+                    if (exp.getCandidato() != null && exp.getCandidato().getCompanya() != null && exp.getCandidato().getCompanya().getCodigoST().equals(companyCodigoSt) && exp.getNumSolicitud() != null && exp.getNumSolicitud().equals(numeroSolicitud)) {
+
+                        logginService.putInfoMessage("Expediente con número de poliza " + numeroSolicitud + " y expediente " + exp.getCodigoST() + " para " + nombreCia + " ya existe en el sistema")
+                        expedientes.add(respuestaCrm.getListaExpedientes().get(i))
+                    }
+                }
+            } else {
+                logginService.putInfoMessage("Expediente con número de poliza " + numeroSolicitud + " para " + nombreCia + " no se existe en el sistema")
+            }
+
+        } catch (Exception e) {
+            logginService.putInfoMessage("Buscando si existe expediente con numero de poliza " + numeroSolicitud + " para " + nombreCia + " . Error: " + +e.getMessage())
+            correoUtil.envioEmailErrores("ERROR en búsqueda de duplicados para " + nombreCia, "Buscando si existe expediente con numero de poliza " + numeroSolicitud + " para " + nombreCia, e)
+        }
+
+        return expedientes
+    }
+
     def busquedaCrm(policyNumber, ou, requestNumber, opername, companyCodigoSt, companyId, requestBBDD, certificateNumber, companyName) {
-
         task {
-
             logginService.putInfoMessage("BusquedaExpedienteCrm - Buscando en CRM solicitud de " + companyName + " con numSolicitud: " + policyNumber.toString() + ", referencia: " + certificateNumber)
-
-
             def respuestaCrm
-            int limite = 0;
-            boolean encontrado = false;
+            int limite = 0
+            boolean encontrado = false
 
             servicios.Filtro filtro = new servicios.Filtro()
             SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
             CorreoUtil correoUtil = new CorreoUtil()
-
-            Thread.sleep(90000);
-
-
+            Thread.sleep(90000)
             try {
-
 
                 while (!encontrado && limite < 10) {
 
-                    filtro.setClave(servicios.ClaveFiltro.CLIENTE);
-                    filtro.setValor(companyCodigoSt.toString());
+                    filtro.setClave(servicios.ClaveFiltro.CLIENTE)
+                    filtro.setValor(companyCodigoSt.toString())
 
                     servicios.Filtro filtroRelacionado1 = new servicios.Filtro()
                     filtroRelacionado1.setClave(servicios.ClaveFiltro.NUM_SOLICITUD)
                     filtroRelacionado1.setValor(requestNumber.toString())
 
                     servicios.Filtro filtroRelacionado2 = new servicios.Filtro()
-                    filtroRelacionado2.setClave(servicios.ClaveFiltro.NUM_CERTIFICADO);
+                    filtroRelacionado2.setClave(servicios.ClaveFiltro.NUM_CERTIFICADO)
                     filtroRelacionado2.setValor(certificateNumber.toString())
                     filtroRelacionado1.setFiltroRelacionado(filtroRelacionado2)
 
@@ -933,7 +1046,7 @@ class CaserService {
         return null
     }
 
-    public void insertarRecibido(Company company, String identificador, String info, String operacion) {
+    void insertarRecibido(Company company, String identificador, String info, String operacion) {
 
         Recibido recibido = new Recibido()
         recibido.setFecha(new Date())
@@ -944,7 +1057,7 @@ class CaserService {
         recibido.save(flush: true)
     }
 
-    public void insertarError(Company company, String identificador, String info, String operacion, String detalleError) {
+    void insertarError(Company company, String identificador, String info, String operacion, String detalleError) {
 
         com.scortelemed.Error error = new com.scortelemed.Error()
         error.setFecha(new Date())
@@ -957,7 +1070,7 @@ class CaserService {
 
     }
 
-    public void insertarEnvio(Company company, String identificador, String info) {
+    void insertarEnvio(Company company, String identificador, String info) {
 
         Envio envio = new Envio()
         envio.setFecha(new Date())

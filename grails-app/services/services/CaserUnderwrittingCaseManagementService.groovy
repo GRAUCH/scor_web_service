@@ -1,483 +1,472 @@
 package services
 
+import com.scortelemed.Company
+import com.scortelemed.Operacion
+import com.scortelemed.schemas.caser.*
+import com.ws.servicios.*
 import grails.util.Environment
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
-
-import java.text.SimpleDateFormat
-
-import javax.jws.WebParam
-import javax.jws.WebResult
-import javax.jws.WebService
-import javax.jws.soap.SOAPBinding
-
 import org.apache.cxf.annotations.SchemaValidation
 import org.grails.cxf.utils.EndpointType
 import org.grails.cxf.utils.GrailsCxfEndpoint
 import org.grails.cxf.utils.GrailsCxfEndpointProperty
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.context.request.RequestContextHolder
-
 import servicios.Expediente
-import servicios.Filtro
+import servicios.RespuestaCRM
 import servicios.RespuestaCRMInforme
 
-import com.scortelemed.Company
-import com.scortelemed.Envio
-import com.scortelemed.Operacion
-import com.scortelemed.Recibido
-import com.scortelemed.schemas.caser.ConsolidacionPolizaRequest;
-import com.scortelemed.schemas.caser.ConsolidacionPolizaResponse;
-import com.scortelemed.schemas.caser.ConsultaExpedienteRequest
-import com.scortelemed.schemas.caser.ConsultaExpedienteResponse
-import com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest
-import com.scortelemed.schemas.caser.GestionReconocimientoMedicoResponse
-import com.scortelemed.schemas.caser.ResultadoReconocimientoMedicoRequest
-import com.scortelemed.schemas.caser.ResultadoReconocimientoMedicoResponse
-import com.scortelemed.schemas.caser.StatusType
-
-import servicios.RespuestaCRM
-
-import com.ws.servicios.CaserService
-import com.ws.servicios.EstadisticasService
-import com.ws.servicios.LogginService
-import com.ws.servicios.RequestService
-import com.ws.servicios.TarificadorService
+import javax.jws.WebParam
+import javax.jws.WebResult
+import javax.jws.WebService
+import javax.jws.soap.SOAPBinding
+import java.text.SimpleDateFormat
 
 @WebService(targetNamespace = "http://www.scortelemed.com/schemas/caser")
 @SchemaValidation
-@GrailsCxfEndpoint(address='/caser/CaserUnderwrittingCaseManagement',
-expose = EndpointType.JAX_WS,properties = [@GrailsCxfEndpointProperty(name = "ws-security.enable.nonce.cache", value = "false"), @GrailsCxfEndpointProperty(name = "ws-security.enable.timestamp.cache", value = "false")])
+@GrailsCxfEndpoint(address = '/caser/CaserUnderwrittingCaseManagement',
+        expose = EndpointType.JAX_WS, properties = [@GrailsCxfEndpointProperty(name = "ws-security.enable.nonce.cache", value = "false"), @GrailsCxfEndpointProperty(name = "ws-security.enable.timestamp.cache", value = "false")])
 @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
-class CaserUnderwrittingCaseManagementService	 {
+class CaserUnderwrittingCaseManagementService {
+
+    @Autowired
+    private CaserService caserService
+    @Autowired
+    private EstadisticasService estadisticasService
+    @Autowired
+    private RequestService requestService
+    @Autowired
+    private LogginService logginService
+    @Autowired
+    private TarificadorService tarificadorService
+
+    @WebResult(name = "GestionReconocimientoMedicoResponse")
+    GestionReconocimientoMedicoResponse gestionReconocimientoMedico(
+            @WebParam(partName = "GestionReconocimientoMedicoRequest", name = "GestionReconocimientoMedicoRequest")
+                    GestionReconocimientoMedicoRequest gestionReconocimientoMedico) {
+
+        GestionReconocimientoMedicoResponse resultado = new GestionReconocimientoMedicoResponse()
+        TransformacionUtil util = new TransformacionUtil()
+        CorreoUtil correoUtil = new CorreoUtil()
+
+        def opername = "CaserResultadoReconocimientoMedicoRequest"
+        def requestXML = ""
+        def requestBBDD
+        String notes = null
+        StatusType status = null
 
-	@Autowired
-	private CaserService caserService
-	@Autowired
-	private EstadisticasService estadisticasService
-	@Autowired
-	private RequestService requestService
-	@Autowired
-	private LogginService logginService
-	@Autowired
-	private TarificadorService tarificadorService
+        RespuestaCRM respuestaCRM = new RespuestaCRM();
 
-	@WebResult(name = "GestionReconocimientoMedicoResponse")
-	GestionReconocimientoMedicoResponse gestionReconocimientoMedico(@WebParam(partName = "GestionReconocimientoMedicoRequest",name = "GestionReconocimientoMedicoRequest")
-			GestionReconocimientoMedicoRequest gestionReconocimientoMedico) {
+        def company = Company.findByNombre('caser')
+        List<servicios.Expediente> expedientes = new ArrayList<servicios.Expediente>()
+        logginService.putInfoMessage("Realizando peticion de informacion de servicio GestionReconocimientoMedico para la cia " + company.nombre)
 
-		GestionReconocimientoMedicoResponse resultado = new GestionReconocimientoMedicoResponse()
-		TransformacionUtil util = new TransformacionUtil()
-		CorreoUtil correoUtil = new CorreoUtil()
+        try {
 
-		def opername="CaserResultadoReconocimientoMedicoRequest"
-		def requestXML = ""
-		def requestBBDD
-		String notes = null
-		StatusType status = null
+            def operacion = estadisticasService.obtenerObjetoOperacion(opername)
 
-		RespuestaCRM respuestaCRM = new RespuestaCRM();
+            if (operacion && operacion.activo) {
 
-		def company = Company.findByNombre('caser')
+                if (Company.findByNombre("caser").generationAutomatic) {
 
-		logginService.putInfoMessage("Realizando peticion de informacion de servicio GestionReconocimientoMedico para la cia " + company.nombre)
+                    requestXML = caserService.marshall("http://www.scortelemed.com/schemas/caser", gestionReconocimientoMedico)
+                    requestBBDD = requestService.crear(opername, requestXML)
+                    requestBBDD.fecha_procesado = new Date()
+                    requestBBDD.save(flush: true)
 
-		try{
+                    notes = "El caso se ha procesado correctamente"
+                    status = StatusType.OK
 
-			def operacion = estadisticasService.obtenerObjetoOperacion(opername)
+                    logginService.putInfoMessage("Se procede el alta automatica de " + company.nombre + " con numero de solicitud " + gestionReconocimientoMedico.policyHolderInformation.requestNumber)
 
-			if (operacion && operacion.activo){
+//Chequeo si existe el expediente.
 
-				if (Company.findByNombre("caser").generationAutomatic) {
+                    expedientes = caserService.existeExpediente(gestionReconocimientoMedico.policyHolderInformation.requestNumber, company.nombre, company.codigoSt, company.ou.toString())
+                    if(expedientes != null)
+                    logginService.putInfoMessage("Exisiten ${expedientes.size()}  con numero de solicitud " + gestionReconocimientoMedico.policyHolderInformation.requestNumber)
+                    if (expedientes != null && expedientes.size() == 0) {
+                        caserService.crearExpediente(requestBBDD)
+                        caserService.insertarRecibido(company, gestionReconocimientoMedico.policyHolderInformation.requestNumber, requestXML.toString(), "ALTA")
+                        /**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
+                         *
+                         */
+                        caserService.busquedaCrm(gestionReconocimientoMedico.policyHolderInformation.policyNumber, company.ou, gestionReconocimientoMedico.policyHolderInformation.requestNumber, opername, company.codigoSt, company.id, requestBBDD, gestionReconocimientoMedico.policyHolderInformation.certificateNumber, company.nombre)
+                    } else {
+                        logginService.putInfoMessage("Se procede al envio del email para notificar del cambio  Ref: ${gestionReconocimientoMedico.policyHolderInformation.requestNumber}")
+                        //el expediente existe, le envio un email a quien este configurado en la compania.
+                        caserService.envioEmail(requestBBDD)
+                    }
+                }
+            } else {
 
-					requestXML=caserService.marshall("http://www.scortelemed.com/schemas/caser",gestionReconocimientoMedico)
-					requestBBDD = requestService.crear(opername,requestXML)
-					requestBBDD.fecha_procesado = new Date()
-					requestBBDD.save(flush:true)
+                notes = "Esta operacion esta desactivada temporalmente"
+                status = StatusType.OK
+                logginService.putInfoEndpoint("GestionReconocimientoMedico", "Esta operacion para " + company.nombre + " esta desactivada temporalmente")
+                correoUtil.envioEmail("GestionReconocimientoMedico", "Peticion de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.policyHolderInformation.requestNumber + ". Esta operacion para " + company.nombre + " esta desactivada temporalmente", 0)
+            }
+        } catch (Exception e) {
 
-					notes = "El caso se ha procesado correctamente"
-					status = StatusType.OK
+            notes = "Error: " + e.getMessage()
+            status = StatusType.ERROR
 
-					logginService.putInfoMessage("Se procede el alta automatica de " + company.nombre + " con numero de solicitud " + gestionReconocimientoMedico.policyHolderInformation.requestNumber)
+            caserService.insertarError(company, gestionReconocimientoMedico.policyHolderInformation.requestNumber, requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + gestionReconocimientoMedico.policyHolderInformation.requestNumber + ". Error: " + e.getMessage())
 
-					caserService.crearExpediente(requestBBDD)
-					caserService.insertarRecibido(company, gestionReconocimientoMedico.policyHolderInformation.requestNumber, requestXML.toString(), "ALTA")
+            logginService.putErrorEndpoint("GestionReconocimientoMedico", "Peticion no realizada de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.policyHolderInformation.requestNumber + ". Error: " + e.getMessage())
+            correoUtil.envioEmailErrores("GestionReconocimientoMedico", "Peticion de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.policyHolderInformation.requestNumber, e)
+        } finally {
 
-					/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
-					 *
-					 */
-					caserService.busquedaCrm(gestionReconocimientoMedico.policyHolderInformation.policyNumber, company.ou, gestionReconocimientoMedico.policyHolderInformation.requestNumber, opername, company.codigoSt, company.id, requestBBDD, gestionReconocimientoMedico.policyHolderInformation.certificateNumber, company.nombre)
-				}
-			} else {
+            def sesion = RequestContextHolder.currentRequestAttributes().getSession()
+            sesion.removeAttribute("userEndPoint")
+            sesion.removeAttribute("companyST")
+        }
 
-				notes = "Esta operacion esta desactivada temporalmente"
-				status = StatusType.OK
+        resultado.setNotes(notes)
+        resultado.setDate(util.fromDateToXmlCalendar(new Date()))
+        resultado.setStatus(status)
 
-				logginService.putInfoEndpoint("GestionReconocimientoMedico","Esta operacion para " + company.nombre + " esta desactivada temporalmente")
-				correoUtil.envioEmail("GestionReconocimientoMedico","Peticion de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.policyHolderInformation.requestNumber + ". Esta operacion para " + company.nombre + " esta desactivada temporalmente",0)
-			}
-		} catch (Exception e){
+        return resultado
+    }
 
-			notes = "Error: " + e.getMessage()
-			status = StatusType.ERROR
+    @WebResult(name = "ResultadoReconocimientoMedicoResponse")
+    ResultadoReconocimientoMedicoResponse resultadoReconocimientoMedico(
+            @WebParam(partName = "ResultadoReconocimientoMedicoRequest", name = "ResultadoReconocimientoMedicoRequest")
+                    ResultadoReconocimientoMedicoRequest resultadoReconocimientoMedico) {
 
-			caserService.insertarError(company, gestionReconocimientoMedico.policyHolderInformation.requestNumber, requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + gestionReconocimientoMedico.policyHolderInformation.requestNumber + ". Error: " + e.getMessage())
+        ResultadoReconocimientoMedicoResponse resultado = new ResultadoReconocimientoMedicoResponse()
 
-			logginService.putErrorEndpoint("GestionReconocimientoMedico","Peticion no realizada de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.policyHolderInformation.requestNumber + ". Error: " + e.getMessage())
-			correoUtil.envioEmailErrores("GestionReconocimientoMedico","Peticion de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.policyHolderInformation.requestNumber, e)
-		}finally{
+        def opername = "CaserResultadoReconocimientoMedicoResponse"
+        def requestXML = ""
 
-			def sesion=RequestContextHolder.currentRequestAttributes().getSession()
-			sesion.removeAttribute("userEndPoint")
-			sesion.removeAttribute("companyST")
-		}
+        String notes = null
+        StatusType status = null
 
-		resultado.setNotes(notes)
-		resultado.setDate(util.fromDateToXmlCalendar(new Date()))
-		resultado.setStatus(status)
+        List<RespuestaCRMInforme> expedientes = new ArrayList<RespuestaCRMInforme>();
+        TransformacionUtil util = new TransformacionUtil()
+        CorreoUtil correoUtil = new CorreoUtil()
 
-		return resultado
-	}
+        Company company = Company.findByNombre("caser")
 
-	@WebResult(name = "ResultadoReconocimientoMedicoResponse")
-	ResultadoReconocimientoMedicoResponse resultadoReconocimientoMedico(
-			@WebParam(partName = "ResultadoReconocimientoMedicoRequest", name = "ResultadoReconocimientoMedicoRequest")
-			ResultadoReconocimientoMedicoRequest resultadoReconocimientoMedico) {
+        logginService.putInfoMessage("Realizando peticion de informacion de servicio ResultadoReconocimientoMedico para la cia " + company.nombre)
 
-		ResultadoReconocimientoMedicoResponse resultado = new ResultadoReconocimientoMedicoResponse()
+        try {
 
-		def opername="CaserResultadoReconocimientoMedicoResponse"
-		def requestXML = ""
+            Operacion operacion = estadisticasService.obtenerObjetoOperacion(opername)
 
-		String notes = null
-		StatusType status = null
+            if (operacion && operacion.activo) {
 
-		List<RespuestaCRMInforme> expedientes = new ArrayList<RespuestaCRMInforme>();
-		TransformacionUtil util = new TransformacionUtil()
-		CorreoUtil correoUtil = new CorreoUtil()
+                if (resultadoReconocimientoMedico && resultadoReconocimientoMedico.dateStart && resultadoReconocimientoMedico.dateEnd) {
 
-		Company company = Company.findByNombre("caser")
+                    requestXML = caserService.marshall("http://www.scortelemed.com/schemas/caser", resultadoReconocimientoMedico)
 
-		logginService.putInfoMessage("Realizando peticion de informacion de servicio ResultadoReconocimientoMedico para la cia " + company.nombre)
+                    requestService.crear(opername, requestXML)
 
-		try{
+                    Date date = resultadoReconocimientoMedico.dateStart.toGregorianCalendar().getTime()
+                    SimpleDateFormat sdfr = new SimpleDateFormat("yyyyMMdd HH:mm:ss")
+                    String fechaIni = sdfr.format(date);
+                    date = resultadoReconocimientoMedico.dateEnd.toGregorianCalendar().getTime()
+                    String fechaFin = sdfr.format(date);
 
-			Operacion operacion = estadisticasService.obtenerObjetoOperacion(opername)
+                    logginService.putInfoEndpoint("ResultadoReconocimientoMedico", "Realizando peticion para " + company.nombre + " con fecha: " + resultadoReconocimientoMedico.dateStart.toString() + "-" + resultadoReconocimientoMedico.dateEnd.toString())
 
-			if(operacion && operacion.activo){
+                    caserService.insertarEnvio(company, resultadoReconocimientoMedico.dateStart.toString().substring(0, 10) + "-" + resultadoReconocimientoMedico.dateEnd.toString().substring(0, 10), requestXML.toString())
 
-				if (resultadoReconocimientoMedico && resultadoReconocimientoMedico.dateStart && resultadoReconocimientoMedico.dateEnd) {
+                    for (int i = 1; i < 3; i++) {
 
-					requestXML=caserService.marshall("http://www.scortelemed.com/schemas/caser",resultadoReconocimientoMedico)
+                        if (Environment.current.name.equals("production_wildfly")) {
+                            expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1061", null, i, fechaIni, fechaFin, "ES"))
+                        } else {
+                            expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1062", null, i, fechaIni, fechaFin, "ES"))
+                        }
+                    }
 
-					requestService.crear(opername,requestXML)
+                    if (expedientes) {
 
-					Date date = resultadoReconocimientoMedico.dateStart.toGregorianCalendar().getTime()
-					SimpleDateFormat sdfr = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
-					String fechaIni = sdfr.format(date);
-					date = resultadoReconocimientoMedico.dateEnd.toGregorianCalendar().getTime()
-					String fechaFin = sdfr.format(date);
+                        expedientes.each { expedientePoliza ->
 
-					logginService.putInfoEndpoint("ResultadoReconocimientoMedico","Realizando peticion para " + company.nombre + " con fecha: " + resultadoReconocimientoMedico.dateStart.toString() + "-" + resultadoReconocimientoMedico.dateEnd.toString())
+                            resultado.getExpediente().add(caserService.rellenaDatosSalida(expedientePoliza, resultadoReconocimientoMedico.dateStart, logginService))
+                        }
 
-					caserService.insertarEnvio (company, resultadoReconocimientoMedico.dateStart.toString().substring(0,10) + "-" + resultadoReconocimientoMedico.dateEnd.toString().substring(0,10), requestXML.toString())
+                        notes = "Resultados devueltos"
+                        status = StatusType.OK
 
-					for (int i = 1; i < 3; i++){
+                        logginService.putInfoEndpoint("ResultadoReconocimientoMedico", "Peticion realizada correctamente para " + company.nombre + " con fecha: " + resultadoReconocimientoMedico.dateStart.toString() + "-" + resultadoReconocimientoMedico.dateEnd.toString())
+                    } else {
 
-						if (Environment.current.name.equals("production_wildfly")) {
-							expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1061",null,i,fechaIni,fechaFin,"ES"))
-						} else {
-							expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1062",null,i,fechaIni,fechaFin,"ES"))
-						}
-					}
+                        notes = "No hay resultados para las fechas indicadas"
+                        status = StatusType.OK
 
-					if(expedientes){
+                        logginService.putInfoEndpoint("ResultadoReconocimientoMedico", "No hay resultados para " + company.nombre)
+                    }
+                } else {
 
-						expedientes.each { expedientePoliza ->
+                    notes = "No se han introducido fechas para la consulta"
+                    status = StatusType.ERROR
 
-							resultado.getExpediente().add(caserService.rellenaDatosSalida(expedientePoliza, resultadoReconocimientoMedico.dateStart, logginService))
-						}
+                    logginService.putInfoEndpoint("ResultadoReconocimientoMedico", "No se han introducido fechas para la consulta " + company.nombre)
+                }
+            } else {
 
-						notes = "Resultados devueltos"
-						status = StatusType.OK
+                notes = "Esta operacion esta desactivada temporalmente"
+                status = StatusType.OK
 
-						logginService.putInfoEndpoint("ResultadoReconocimientoMedico","Peticion realizada correctamente para " + company.nombre + " con fecha: " + resultadoReconocimientoMedico.dateStart.toString() + "-" + resultadoReconocimientoMedico.dateEnd.toString())
-					}else{
+                logginService.putInfoEndpoint("ResultadoReconocimientoMedico", "Esta operacion para " + company.nombre + " esta desactivada temporalmente")
+                correoUtil.envioEmail("ResultadoReconocimientoMedico", "Peticion de " + company.nombre + " con fecha: " + resultadoReconocimientoMedico.dateStart.toString() + "-" + resultadoReconocimientoMedico.dateEnd.toString() + ". Esta operacion para " + company.nombre + " esta desactivada temporalmente", 0)
+            }
+        } catch (Exception e) {
 
-						notes = "No hay resultados para las fechas indicadas"
-						status = StatusType.OK
+            logginService.putErrorEndpoint("ResultadoReconocimientoMedico", "Peticion realizada para " + company.nombre + " con fecha: " + resultadoReconocimientoMedico.dateStart.toString() + "-" + resultadoReconocimientoMedico.dateEnd.toString() + ". Error: " + e.getMessage())
+            correoUtil.envioEmailErrores("ResultadoReconocimientoMedico", "Peticion realizada para " + company.nombre + " con fecha: " + resultadoReconocimientoMedico.dateStart.toString(), e)
 
-						logginService.putInfoEndpoint("ResultadoReconocimientoMedico","No hay resultados para " + company.nombre)
-					}
-				} else {
+            notes = "Error en resultadoReconocimientoMedico: " + e.getMessage()
+            status = StatusType.ERROR
 
-					notes = "No se han introducido fechas para la consulta"
-					status = StatusType.ERROR
+            caserService.insertarError(company, resultadoReconocimientoMedico.dateStart.toString().substring(0, 10) + "-" + resultadoReconocimientoMedico.dateEnd.toString().substring(0, 10), requestXML.toString(), "CONSULTA", "Peticion no realizada para solicitud: " + resultadoReconocimientoMedico.dateStart.toString() + "-" + resultadoReconocimientoMedico.dateEnd.toString() + ". Error: " + e.getMessage())
+        } finally {
 
-					logginService.putInfoEndpoint("ResultadoReconocimientoMedico","No se han introducido fechas para la consulta " + company.nombre)
-				}
-			} else {
+            def sesion = RequestContextHolder.currentRequestAttributes().getSession()
+            sesion.removeAttribute("userEndPoint")
+            sesion.removeAttribute("companyST")
+        }
 
-				notes = "Esta operacion esta desactivada temporalmente"
-				status = StatusType.OK
+        resultado.setNotes(notes)
+        resultado.setDate(util.fromDateToXmlCalendar(new Date()))
+        resultado.setStatus(status)
 
-				logginService.putInfoEndpoint("ResultadoReconocimientoMedico","Esta operacion para " + company.nombre + " esta desactivada temporalmente")
-				correoUtil.envioEmail("ResultadoReconocimientoMedico","Peticion de " + company.nombre + " con fecha: " + resultadoReconocimientoMedico.dateStart.toString() + "-" + resultadoReconocimientoMedico.dateEnd.toString() + ". Esta operacion para " + company.nombre + " esta desactivada temporalmente",0)
-			}
-		}catch (Exception e){
+        return resultado
+    }
 
-			logginService.putErrorEndpoint("ResultadoReconocimientoMedico","Peticion realizada para " + company.nombre + " con fecha: " + resultadoReconocimientoMedico.dateStart.toString() + "-" + resultadoReconocimientoMedico.dateEnd.toString() + ". Error: " + e.getMessage())
-			correoUtil.envioEmailErrores("ResultadoReconocimientoMedico","Peticion realizada para " + company.nombre + " con fecha: " + resultadoReconocimientoMedico.dateStart.toString(), e)
+    @WebResult(name = "ConsultaExpedienteResponse")
+    ConsultaExpedienteResponse consultaExpedienteResponse(
+            @WebParam(partName = "ConsultaExpedienteRequest", name = "ConsultaExpedienteRequest")
+                    ConsultaExpedienteRequest consultaExpediente) {
 
-			notes = "Error en resultadoReconocimientoMedico: " + e.getMessage()
-			status = StatusType.ERROR
+        ConsultaExpedienteResponse resultado = new ConsultaExpedienteResponse()
 
-			caserService.insertarError(company, resultadoReconocimientoMedico.dateStart.toString().substring(0,10) + "-" + resultadoReconocimientoMedico.dateEnd.toString().substring(0,10), requestXML.toString(), "CONSULTA", "Peticion no realizada para solicitud: " +resultadoReconocimientoMedico.dateStart.toString() + "-" + resultadoReconocimientoMedico.dateEnd.toString() + ". Error: " + e.getMessage())
-		}finally{
+        def opername = "CaserConsultaExpedienteResponse"
+        def requestXML = ""
 
-			def sesion=RequestContextHolder.currentRequestAttributes().getSession()
-			sesion.removeAttribute("userEndPoint")
-			sesion.removeAttribute("companyST")
-		}
+        String notes = null
+        StatusType status = null
 
-		resultado.setNotes(notes)
-		resultado.setDate(util.fromDateToXmlCalendar(new Date()))
-		resultado.setStatus(status)
+        RespuestaCRM respuestaCRM = new RespuestaCRM()
+        TransformacionUtil util = new TransformacionUtil()
+        CorreoUtil correoUtil = new CorreoUtil()
 
-		return resultado
-	}
+        Company company = Company.findByNombre("caser")
 
-	@WebResult(name = "ConsultaExpedienteResponse")
-	ConsultaExpedienteResponse consultaExpedienteResponse(
-			@WebParam(partName = "ConsultaExpedienteRequest", name = "ConsultaExpedienteRequest")
-			ConsultaExpedienteRequest consultaExpediente) {
+        logginService.putInfoMessage("Realizando peticion de informacion de servicio ConsultaExpediente para la cia " + company.nombre)
 
-		ConsultaExpedienteResponse resultado = new ConsultaExpedienteResponse()
+        try {
 
-		def opername="CaserConsultaExpedienteResponse"
-		def requestXML = ""
+            Operacion operacion = estadisticasService.obtenerObjetoOperacion(opername)
 
-		String notes = null
-		StatusType status = null
+            if (operacion && operacion.activo) {
 
-		RespuestaCRM respuestaCRM = new RespuestaCRM();
-		TransformacionUtil util = new TransformacionUtil()
-		CorreoUtil correoUtil = new CorreoUtil()
+                if (consultaExpediente && consultaExpediente.codExpediente) {
 
-		Company company = Company.findByNombre("caser")
+                    requestXML = caserService.marshall("http://www.scortelemed.com/schemas/caser", consultaExpediente)
 
-		logginService.putInfoMessage("Realizando peticion de informacion de servicio ConsultaExpediente para la cia " + company.nombre)
+                    requestService.crear(opername, requestXML)
 
-		try{
+                    logginService.putInfoEndpoint("ConsultaExpediente", "Realizando peticion para " + company.nombre + " con numero de expiente: " + consultaExpediente.codExpediente)
 
-			Operacion operacion = estadisticasService.obtenerObjetoOperacion(opername)
+                    respuestaCRM = tarificadorService.consultaExpedienteNumSolicitud(consultaExpediente.codExpediente, "ES", company.codigoSt)
 
-			if(operacion && operacion.activo) {
+                    caserService.insertarEnvio(company, consultaExpediente.codExpediente, requestXML.toString())
 
-				if (consultaExpediente && consultaExpediente.codExpediente) {
+                    if (respuestaCRM != null && respuestaCRM.getListaExpedientes() != null) {
 
-					requestXML=caserService.marshall("http://www.scortelemed.com/schemas/caser",consultaExpediente)
+                        for (int i = 0; i < respuestaCRM.getListaExpedientes().size(); i++) {
 
-					requestService.crear(opername,requestXML)
+                            Expediente expediente = respuestaCRM.getListaExpedientes().get(i)
 
-					logginService.putInfoEndpoint("ConsultaExpediente","Realizando peticion para " + company.nombre + " con numero de expiente: " + consultaExpediente.codExpediente)
+                            /**PARA EVITAR CONSULTAR DATOS DE OTRAS COMPA�IAS
+                             *
+                             */
 
-					respuestaCRM = tarificadorService.consultaExpedienteNumSolicitud(consultaExpediente.codExpediente,"ES",company.codigoSt)
+                            if (expediente.getCandidato().getCompanya().getCodigoST().equals(company.getCodigoSt())) {
+                                resultado.getExpedienteConsulta().add(caserService.rellenaDatosSalidaConsulta(expediente, util.fromDateToXmlCalendar(new Date()), logginService))
+                            }
+                        }
+                    }
 
-					caserService.insertarEnvio (company, consultaExpediente.codExpediente, requestXML.toString())
+                    if (resultado.getExpedienteConsulta() != null && resultado.getExpedienteConsulta().size() > 0) {
 
-					if(respuestaCRM != null && respuestaCRM.getListaExpedientes() != null){
+                        notes = "Resultados devueltos"
+                        status = StatusType.OK
 
-						for (int i = 0; i < respuestaCRM.getListaExpedientes().size(); i++){
+                        logginService.putInfoEndpoint("ConsultaExpediente", "Peticion realizada correctamente para " + company.nombre + " con numero de expiente: " + consultaExpediente.codExpediente)
+                    } else {
 
-							Expediente expediente = respuestaCRM.getListaExpedientes().get(i)
+                        resultado.expedienteConsulta = null
+                        notes = "No hay resultados para el expediente indicado"
+                        status = StatusType.OK
 
-							/**PARA EVITAR CONSULTAR DATOS DE OTRAS COMPA�IAS
-							 *
-							 */
+                        logginService.putInfoEndpoint("ConsultaExpediente", "No hay resultados para " + company.nombre)
+                    }
+                } else {
 
-							if (expediente.getCandidato().getCompanya().getCodigoST().equals(company.getCodigoSt())) {
-								resultado.getExpedienteConsulta().add(caserService.rellenaDatosSalidaConsulta(expediente, util.fromDateToXmlCalendar(new Date()), logginService))
-							}
-						}
-					}
+                    notes = "No se ha introducido un expediente"
+                    status = StatusType.ERROR
 
-					if (resultado.getExpedienteConsulta() != null && resultado.getExpedienteConsulta().size() > 0) {
+                    logginService.putInfoEndpoint("ConsultaExpediente", "No se han introducido expediente para la consulta de " + company.nombre)
+                }
+            } else {
 
-						notes = "Resultados devueltos"
-						status = StatusType.OK
+                notes = "Esta operacion esta desactivada temporalmente"
+                status = StatusType.OK
 
-						logginService.putInfoEndpoint("ConsultaExpediente","Peticion realizada correctamente para " + company.nombre + " con numero de expiente: " + consultaExpediente.codExpediente)
-					} else {
+                logginService.putInfoEndpoint("ConsultaExpediente", "Esta operacion para " + company.nombre + " esta desactivada temporalmente")
+                correoUtil.envioEmail("ConsultaExpediente", "Peticion de " + company.nombre + " con numero de expiente: " + consultaExpediente.codExpediente + ". Esta operacion para " + company.nombre + " esta desactivada temporalmente", 0)
+            }
+        } catch (Exception e) {
 
-						resultado.expedienteConsulta = null
-						notes = "No hay resultados para el expediente indicado"
-						status = StatusType.OK
+            logginService.putErrorEndpoint("ConsultaExpediente", "Peticion realizada para " + company.nombre + " con con numero de expiente: " + consultaExpediente.codExpediente + ". Error: " + e.getMessage())
+            correoUtil.envioEmailErrores("ConsultaExpediente", "Peticion realizada para " + company.nombre + " con numero de expiente: " + consultaExpediente.codExpediente, e)
 
-						logginService.putInfoEndpoint("ConsultaExpediente","No hay resultados para " + company.nombre)
-					}
-				} else {
+            notes = "Error en ConsultaExpediente: " + e.getMessage()
+            status = StatusType.ERROR
 
-					notes = "No se ha introducido un expediente"
-					status = StatusType.ERROR
+            caserService.insertarError(company, consultaExpediente.codExpediente, requestXML.toString(), "CONSULTA", "Peticion no realizada para solicitud: " + consultaExpediente.codExpediente + ". Error: " + e.getMessage())
+        } finally {
+            //BORRAMOS VARIABLES DE SESION
+            def sesion = RequestContextHolder.currentRequestAttributes().getSession()
+            sesion.removeAttribute("userEndPoint")
+            sesion.removeAttribute("companyST")
+        }
 
-					logginService.putInfoEndpoint("ConsultaExpediente","No se han introducido expediente para la consulta de " + company.nombre)
-				}
-			} else {
+        resultado.setNotes(notes)
+        resultado.setDate(util.fromDateToXmlCalendar(new Date()))
+        resultado.setStatus(status)
 
-				notes = "Esta operacion esta desactivada temporalmente"
-				status = StatusType.OK
+        return resultado
+    }
 
-				logginService.putInfoEndpoint("ConsultaExpediente","Esta operacion para " + company.nombre + " esta desactivada temporalmente")
-				correoUtil.envioEmail("ConsultaExpediente","Peticion de " + company.nombre + " con numero de expiente: " + consultaExpediente.codExpediente + ". Esta operacion para " + company.nombre + " esta desactivada temporalmente", 0)
-			}
-		}catch (Exception e){
+    @WebResult(name = "ConsolidacionPolizaResponse")
+    ConsolidacionPolizaResponse consolidacionPoliza(
+            @WebParam(partName = "ConsolidacionPolizaRequest", name = "ConsolidacionPolizaRequest")
+                    ConsolidacionPolizaRequest consolidacionPoliza) {
 
-			logginService.putErrorEndpoint("ConsultaExpediente","Peticion realizada para " + company.nombre + " con con numero de expiente: " + consultaExpediente.codExpediente + ". Error: " + e.getMessage())
-			correoUtil.envioEmailErrores("ConsultaExpediente","Peticion realizada para " + company.nombre + " con numero de expiente: " + consultaExpediente.codExpediente, e)
+        def opername = "CaserConsolidacionPolizaResponse"
+        def correoUtil = new CorreoUtil()
+        def requestXML = ""
+        def crearExpedienteService
+        def requestBBDD
+        def codigoSt
 
-			notes = "Error en ConsultaExpediente: " + e.getMessage()
-			status = StatusType.ERROR
+        String notes = null
+        StatusType status = null
+        int codigo = 0
 
-			caserService.insertarError(company, consultaExpediente.codExpediente, requestXML.toString(), "CONSULTA", "Peticion no realizada para solicitud: " + consultaExpediente.codExpediente + ". Error: " + e.getMessage())
-		}finally{
-			//BORRAMOS VARIABLES DE SESION
-			def sesion=RequestContextHolder.currentRequestAttributes().getSession()
-			sesion.removeAttribute("userEndPoint")
-			sesion.removeAttribute("companyST")
-		}
+        Company company = Company.findByNombre("caser")
+        RespuestaCRM expediente = new RespuestaCRM();
+        TransformacionUtil util = new TransformacionUtil()
+        ConsolidacionPolizaResponse resultado = new ConsolidacionPolizaResponse()
 
-		resultado.setNotes(notes)
-		resultado.setDate(util.fromDateToXmlCalendar(new Date()))
-		resultado.setStatus(status)
+        logginService.putInfoMessage("Realizando peticion de informacion de servicio ConsolidacionPoliza para la cia " + company.nombre)
 
-		return resultado
-	}
+        try {
 
-	@WebResult(name = "ConsolidacionPolizaResponse")
-	ConsolidacionPolizaResponse consolidacionPoliza(
-			@WebParam(partName = "ConsolidacionPolizaRequest", name = "ConsolidacionPolizaRequest")
-			ConsolidacionPolizaRequest consolidacionPoliza) {
+            def operacion = estadisticasService.obtenerObjetoOperacion(opername)
 
-		def opername="CaserConsolidacionPolizaResponse"
-		def correoUtil = new CorreoUtil()
-		def requestXML = ""
-		def crearExpedienteService
-		def requestBBDD
-		def codigoSt
+            if (operacion && operacion.activo) {
 
-		String notes = null
-		StatusType status = null
-		int codigo = 0
+                requestXML = caserService.marshall("http://www.scortelemed.com/schemas/caser", consolidacionPoliza)
+                requestBBDD = requestService.crear(opername, requestXML)
+                requestBBDD.fecha_procesado = new Date()
+                requestBBDD.save(flush: true)
 
-		Company company = Company.findByNombre("caser")
-		RespuestaCRM expediente = new RespuestaCRM();
-		TransformacionUtil util = new TransformacionUtil()
-		ConsolidacionPolizaResponse resultado=new ConsolidacionPolizaResponse()
+                if (consolidacionPoliza.requestNumber != null && !consolidacionPoliza.requestNumber.isEmpty() != null && consolidacionPoliza.ciaCode != null && !consolidacionPoliza.ciaCode.isEmpty() && consolidacionPoliza.policyNumber != null && !consolidacionPoliza.policyNumber.isEmpty()) {
 
-		logginService.putInfoMessage("Realizando peticion de informacion de servicio ConsolidacionPoliza para la cia " + company.nombre)
+                    caserService.insertarRecibido(company, consolidacionPoliza.requestNumber, requestXML.toString(), "CONSOLIDACION")
 
-		try{
+                    expediente = tarificadorService.consultaExpedienteNumSolicitud(consolidacionPoliza.requestNumber, "ES", codigoSt)
 
-			def operacion = estadisticasService.obtenerObjetoOperacion(opername)
+                    if (expediente != null && expediente.getErrorCRM() == null && expediente.getListaExpedientes() != null && expediente.getListaExpedientes().size() > 0) {
 
-			if (operacion && operacion.activo){
+                        if (expediente.getListaExpedientes().size() == 1) {
 
-				requestXML=caserService.marshall("http://www.scortelemed.com/schemas/caser",consolidacionPoliza)
-				requestBBDD = requestService.crear(opername,requestXML)
-				requestBBDD.fecha_procesado = new Date()
-				requestBBDD.save(flush:true)
+                            logginService.putInfoEndpoint("ConsolidacionPoliza", "Se procede a la modificacion de " + company.nombre + " con numero de solicitud " + consolidacionPoliza.requestNumber)
 
-				if (consolidacionPoliza.requestNumber != null && !consolidacionPoliza.requestNumber.isEmpty() != null && consolidacionPoliza.ciaCode !=null && !consolidacionPoliza.ciaCode.isEmpty() && consolidacionPoliza.policyNumber != null && !consolidacionPoliza.policyNumber.isEmpty()){
+                            Expediente eModificado = expediente.getListaExpedientes().get(0)
+                            eModificado.setNumPoliza(consolidacionPoliza.policyNumber.toString())
 
-					caserService.insertarRecibido(company, consolidacionPoliza.requestNumber, requestXML.toString(), "CONSOLIDACION")
+                            RespuestaCRM respuestaCrmExpediente = tarificadorService.modificaExpediente("ES", eModificado, null, null)
 
-					expediente = tarificadorService.consultaExpedienteNumSolicitud(consolidacionPoliza.requestNumber,"ES",codigoSt )
+                            if (respuestaCrmExpediente.getErrorCRM() != null && respuestaCrmExpediente.getErrorCRM().getDetalle() != null && !respuestaCrmExpediente.getErrorCRM().getDetalle().isEmpty()) {
 
-					if (expediente != null && expediente.getErrorCRM() == null && expediente.getListaExpedientes() != null && expediente.getListaExpedientes().size() > 0){
+                                notes = "Error en modificacion poliza. " + respuestaCrmExpediente.getErrorCRM().getDetalle()
+                                status = StatusType.ERROR
+                                codigo = 1
 
-						if (expediente.getListaExpedientes().size() == 1) {
+                                correoUtil.envioEmail("ConsolidacionPoliza", "Error en la modificacion de " + company.nombre + " con numero de solicitud: " + consolidacionPoliza.requestNumber + ". Error: " + respuestaCrmExpediente.getErrorCRM().getDetalle(), null)
+                                logginService.putInfoEndpoint("ConsolidacionPoliza", "Error en la modificacion de " + company.nombre + " con numero de solicitud: " + consolidacionPoliza.requestNumber + ". Error: " + respuestaCrmExpediente.getErrorCRM().getDetalle())
 
-							logginService.putInfoEndpoint("ConsolidacionPoliza","Se procede a la modificacion de " + company.nombre + " con numero de solicitud " + consolidacionPoliza.requestNumber)
+                                caserService.insertarError(company, consolidacionPoliza.requestNumber, requestXML.toString(), "CONSOLIDACION", "Peticion no realizada para solicitud: " + consolidacionPoliza.requestNumber + ". Error: " + respuestaCrmExpediente.getErrorCRM().getDetalle())
+                            } else {
 
-							Expediente eModificado = expediente.getListaExpedientes().get(0)
-							eModificado.setNumPoliza(consolidacionPoliza.policyNumber.toString())
+                                notes = "El caso se ha procesado correctamente"
+                                status = StatusType.OK
+                                codigo = 0
 
-							RespuestaCRM respuestaCrmExpediente = tarificadorService.modificaExpediente("ES",eModificado,null,null)
+                                logginService.putInfoEndpoint("ConsolidacionPoliza", "Peticion realizada correctamente para " + company.nombre + " con numero de expiente: " + consolidacionPoliza.requestNumber)
+                            }
+                        } else {
 
-							if (respuestaCrmExpediente.getErrorCRM() != null && respuestaCrmExpediente.getErrorCRM().getDetalle() != null && !respuestaCrmExpediente.getErrorCRM().getDetalle().isEmpty()){
+                            notes = "Se ha encontrado mas de un expediente"
+                            status = StatusType.OK
+                            codigo = 2
 
-								notes = "Error en modificacion poliza. " + respuestaCrmExpediente.getErrorCRM().getDetalle()
-								status = StatusType.ERROR
-								codigo = 1
+                            logginService.putInfoEndpoint("ConsolidacionPoliza", "Peticion no realizada para " + company.nombre + " con numero de expiente: " + consolidacionPoliza.requestNumber + " porque hay mas de un resultado")
+                        }
+                    } else {
 
-								correoUtil.envioEmail("ConsolidacionPoliza","Error en la modificacion de " + company.nombre + " con numero de solicitud: " + consolidacionPoliza.requestNumber + ". Error: " + respuestaCrmExpediente.getErrorCRM().getDetalle(), null)
-								logginService.putInfoEndpoint("ConsolidacionPoliza","Error en la modificacion de " + company.nombre + " con numero de solicitud: " + consolidacionPoliza.requestNumber + ". Error: " + respuestaCrmExpediente.getErrorCRM().getDetalle())
+                        notes = "Poliza no encontrada"
+                        status = StatusType.OK
+                        codigo = 3
 
-								caserService.insertarError(company, consolidacionPoliza.requestNumber, requestXML.toString(), "CONSOLIDACION", "Peticion no realizada para solicitud: " + consolidacionPoliza.requestNumber + ". Error: " + respuestaCrmExpediente.getErrorCRM().getDetalle())
-							} else {
+                        logginService.putInfoEndpoint("ConsolidacionPoliza", "No hay resultados para " + company.nombre)
+                    }
+                } else {
 
-								notes = "El caso se ha procesado correctamente"
-								status = StatusType.OK
-								codigo = 0
+                    notes = "Datos obligatorios incompletos (ciaCode, requestNumber, policyNumber)"
+                    status = StatusType.ERROR
+                    codigo = 3
 
-								logginService.putInfoEndpoint("ConsolidacionPoliza","Peticion realizada correctamente para " + company.nombre + " con numero de expiente: " + consolidacionPoliza.requestNumber)
-							}
-						} else {
+                    logginService.putInfoEndpoint("ConsolidacionPoliza", "Peticion no realizada para " + company.nombre + " por falta de datos de entrada")
+                }
+            } else {
 
-							notes = "Se ha encontrado mas de un expediente"
-							status = StatusType.OK
-							codigo = 2
+                notes = "Esta operacion esta desactivada temporalmente"
+                status = StatusType.OK
+                codigo = 4
 
-							logginService.putInfoEndpoint("ConsolidacionPoliza","Peticion no realizada para " + company.nombre + " con numero de expiente: " + consolidacionPoliza.requestNumber + " porque hay mas de un resultado")
-						}
-					} else {
+                logginService.putInfoEndpoint("ConsolidacionPoliza", "Esta operacion para " + company.nombre + " esta desactivada temporalmente")
+                correoUtil.envioEmail("ConsolidacionPoliza", "Peticion de " + company.nombre + " con numero de expiente: " + consolidacionPoliza.requestNumber + ". Esta operacion para " + company.nombre + " esta desactivada temporalmente", 0)
+            }
+        } catch (Exception e) {
 
-						notes = "Poliza no encontrada"
-						status = StatusType.OK
-						codigo = 3
+            notes = "Error: " + e.getMessage()()
+            status = StatusType.ERROR
+            codigo = 5
 
-						logginService.putInfoEndpoint("ConsolidacionPoliza","No hay resultados para " + company.nombre)
-					}
-				} else {
+            logginService.putErrorEndpoint("ConsolidacionPoliza", "Peticion realizada para " + company.nombre + " con con numero de expiente: " + consolidacionPoliza.requestNumber + ". Error: " + e.getMessage())
+            correoUtil.envioEmailErrores("ConsolidacionPoliza", "Peticion realizada para " + company.nombre + " con numero de expiente: " + consolidacionPoliza.requestNumber, e)
 
-					notes = "Datos obligatorios incompletos (ciaCode, requestNumber, policyNumber)"
-					status = StatusType.ERROR
-					codigo = 3
+            caserService.insertarError(company, consolidacionPoliza.requestNumber, requestXML.toString(), "CONSOLIDACION", "Peticion no realizada para solicitud: " + consolidacionPoliza.requestNumber + ". Error: " + e.getMessage())
+        } finally {
 
-					logginService.putInfoEndpoint("ConsolidacionPoliza","Peticion no realizada para " + company.nombre + " por falta de datos de entrada")
-				}
-			} else {
+            def sesion = RequestContextHolder.currentRequestAttributes().getSession()
+            sesion.removeAttribute("userEndPoint")
+            sesion.removeAttribute("companyST")
+        }
 
-				notes = "Esta operacion esta desactivada temporalmente"
-				status = StatusType.OK
-				codigo = 4
+        resultado.setMessage(notes)
+        resultado.setDate(util.fromDateToXmlCalendar(new Date()))
+        resultado.setStatus(status)
+        resultado.setCodigo(codigo)
 
-				logginService.putInfoEndpoint("ConsolidacionPoliza","Esta operacion para " + company.nombre + " esta desactivada temporalmente")
-				correoUtil.envioEmail("ConsolidacionPoliza","Peticion de " + company.nombre + " con numero de expiente: " + consolidacionPoliza.requestNumber + ". Esta operacion para " + company.nombre + " esta desactivada temporalmente",0)
-			}
-		} catch (Exception e){
-
-			notes = "Error: " + e.getMessage()()
-			status = StatusType.ERROR
-			codigo = 5
-
-			logginService.putErrorEndpoint("ConsolidacionPoliza","Peticion realizada para " + company.nombre + " con con numero de expiente: " + consolidacionPoliza.requestNumber + ". Error: " + e.getMessage())
-			correoUtil.envioEmailErrores("ConsolidacionPoliza","Peticion realizada para " + company.nombre + " con numero de expiente: " + consolidacionPoliza.requestNumber, e)
-
-			caserService.insertarError(company, consolidacionPoliza.requestNumber, requestXML.toString(), "CONSOLIDACION", "Peticion no realizada para solicitud: " + consolidacionPoliza.requestNumber + ". Error: " + e.getMessage())
-		}finally{
-
-			def sesion=RequestContextHolder.currentRequestAttributes().getSession()
-			sesion.removeAttribute("userEndPoint")
-			sesion.removeAttribute("companyST")
-		}
-
-		resultado.setMessage(notes)
-		resultado.setDate(util.fromDateToXmlCalendar(new Date()))
-		resultado.setStatus(status)
-		resultado.setCodigo(codigo)
-
-		return resultado
-	}
+        return resultado
+    }
 }

@@ -1,21 +1,17 @@
 
 package com.scortelemed.schemas.caser;
 
+import javax.xml.bind.annotation.*;
+import javax.xml.datatype.XMLGregorianCalendar;
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.datatype.XMLGregorianCalendar;
 
 
 /**
  * <p>Java class for resultadoReconocimientoMedicoResponse complex type.
- * 
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType name="resultadoReconocimientoMedicoResponse">
  *   &lt;complexContent>
@@ -52,15 +48,13 @@ import javax.xml.datatype.XMLGregorianCalendar;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "resultadoReconocimientoMedicoResponse", propOrder = {
-    "date",
-    "status",
-    "notes",
-    "expediente"
+        "date",
+        "status",
+        "notes",
+        "expediente"
 })
 public class ResultadoReconocimientoMedicoResponse {
 
@@ -76,11 +70,9 @@ public class ResultadoReconocimientoMedicoResponse {
 
     /**
      * Gets the value of the date property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link XMLGregorianCalendar }
-     *     
+     *
+     * @return possible object is
+     * {@link XMLGregorianCalendar }
      */
     public XMLGregorianCalendar getDate() {
         return date;
@@ -88,11 +80,9 @@ public class ResultadoReconocimientoMedicoResponse {
 
     /**
      * Sets the value of the date property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link XMLGregorianCalendar }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link XMLGregorianCalendar }
      */
     public void setDate(XMLGregorianCalendar value) {
         this.date = value;
@@ -100,11 +90,9 @@ public class ResultadoReconocimientoMedicoResponse {
 
     /**
      * Gets the value of the status property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link StatusType }
-     *     
+     *
+     * @return possible object is
+     * {@link StatusType }
      */
     public StatusType getStatus() {
         return status;
@@ -112,11 +100,9 @@ public class ResultadoReconocimientoMedicoResponse {
 
     /**
      * Sets the value of the status property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link StatusType }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link StatusType }
      */
     public void setStatus(StatusType value) {
         this.status = value;
@@ -124,11 +110,9 @@ public class ResultadoReconocimientoMedicoResponse {
 
     /**
      * Gets the value of the notes property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is
+     * {@link String }
      */
     public String getNotes() {
         return notes;
@@ -136,11 +120,9 @@ public class ResultadoReconocimientoMedicoResponse {
 
     /**
      * Sets the value of the notes property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link String }
      */
     public void setNotes(String value) {
         this.notes = value;
@@ -148,25 +130,23 @@ public class ResultadoReconocimientoMedicoResponse {
 
     /**
      * Gets the value of the expediente property.
-     * 
+     *
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the expediente property.
-     * 
+     *
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getExpediente().add(newItem);
      * </pre>
-     * 
-     * 
+     *
+     *
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link ResultadoReconocimientoMedicoResponse.Expediente }
-     * 
-     * 
      */
     public List<ResultadoReconocimientoMedicoResponse.Expediente> getExpediente() {
         if (expediente == null) {
@@ -178,9 +158,9 @@ public class ResultadoReconocimientoMedicoResponse {
 
     /**
      * <p>Java class for anonymous complex type.
-     * 
+     *
      * <p>The following schema fragment specifies the expected content contained within this class.
-     * 
+     *
      * <pre>
      * &lt;complexType>
      *   &lt;complexContent>
@@ -204,24 +184,26 @@ public class ResultadoReconocimientoMedicoResponse {
      *   &lt;/complexContent>
      * &lt;/complexType>
      * </pre>
-     * 
-     * 
      */
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
-        "requestDate",
-        "requestNumber",
-        "requestState",
-        "productCode",
-        "policyNumber",
-        "certificateNumber",
-        "fiscalIdentificationNumber",
-        "mobilePhone",
-        "phoneNumber1",
-        "phoneNumber2",
-        "benefitsList",
-        "zip",
-        "notes"
+            "requestDate",
+            "requestNumber",
+            "requestState",
+            "productCode",
+            "policyNumber",
+            "certificateNumber",
+            "fiscalIdentificationNumber",
+            "mobilePhone",
+            "phoneNumber1",
+            "phoneNumber2",
+            "benefitsList",
+            "zip",
+            "notes",
+            "domicilio",
+            "codPostal",
+            "localidad",
+            "provincia"
     })
     public static class Expediente {
 
@@ -252,14 +234,53 @@ public class ResultadoReconocimientoMedicoResponse {
         protected byte[] zip;
         @XmlElement(required = true)
         protected String notes;
+        @XmlElement(nillable = true)
+        protected String domicilio;
+        @XmlElement(nillable = true)
+        protected String codPostal;
+        @XmlElement(nillable = true)
+        protected String localidad;
+        @XmlElement(nillable = true)
+        protected String provincia;
+
+
+        public String getDomicilio() {
+            return domicilio;
+        }
+
+        public void setDomicilio(String domicilio) {
+            this.domicilio = domicilio;
+        }
+
+        public String getCodPostal() {
+            return codPostal;
+        }
+
+        public void setCodPostal(String codPostal) {
+            this.codPostal = codPostal;
+        }
+
+        public String getLocalidad() {
+            return localidad;
+        }
+
+        public void setLocalidad(String localidad) {
+            this.localidad = localidad;
+        }
+
+        public String getProvincia() {
+            return provincia;
+        }
+
+        public void setProvincia(String provincia) {
+            this.provincia = provincia;
+        }
 
         /**
          * Gets the value of the requestDate property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link XMLGregorianCalendar }
-         *     
+         *
+         * @return possible object is
+         * {@link XMLGregorianCalendar }
          */
         public XMLGregorianCalendar getRequestDate() {
             return requestDate;
@@ -267,11 +288,9 @@ public class ResultadoReconocimientoMedicoResponse {
 
         /**
          * Sets the value of the requestDate property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link XMLGregorianCalendar }
-         *     
+         *
+         * @param value allowed object is
+         *              {@link XMLGregorianCalendar }
          */
         public void setRequestDate(XMLGregorianCalendar value) {
             this.requestDate = value;
@@ -279,11 +298,9 @@ public class ResultadoReconocimientoMedicoResponse {
 
         /**
          * Gets the value of the requestNumber property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link String }
-         *     
+         *
+         * @return possible object is
+         * {@link String }
          */
         public String getRequestNumber() {
             return requestNumber;
@@ -291,11 +308,9 @@ public class ResultadoReconocimientoMedicoResponse {
 
         /**
          * Sets the value of the requestNumber property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *     
+         *
+         * @param value allowed object is
+         *              {@link String }
          */
         public void setRequestNumber(String value) {
             this.requestNumber = value;
@@ -303,11 +318,9 @@ public class ResultadoReconocimientoMedicoResponse {
 
         /**
          * Gets the value of the requestState property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link RequestStateType }
-         *     
+         *
+         * @return possible object is
+         * {@link RequestStateType }
          */
         public RequestStateType getRequestState() {
             return requestState;
@@ -315,11 +328,9 @@ public class ResultadoReconocimientoMedicoResponse {
 
         /**
          * Sets the value of the requestState property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link RequestStateType }
-         *     
+         *
+         * @param value allowed object is
+         *              {@link RequestStateType }
          */
         public void setRequestState(RequestStateType value) {
             this.requestState = value;
@@ -327,11 +338,9 @@ public class ResultadoReconocimientoMedicoResponse {
 
         /**
          * Gets the value of the productCode property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link String }
-         *     
+         *
+         * @return possible object is
+         * {@link String }
          */
         public String getProductCode() {
             return productCode;
@@ -339,11 +348,9 @@ public class ResultadoReconocimientoMedicoResponse {
 
         /**
          * Sets the value of the productCode property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *     
+         *
+         * @param value allowed object is
+         *              {@link String }
          */
         public void setProductCode(String value) {
             this.productCode = value;
@@ -351,11 +358,9 @@ public class ResultadoReconocimientoMedicoResponse {
 
         /**
          * Gets the value of the policyNumber property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link String }
-         *     
+         *
+         * @return possible object is
+         * {@link String }
          */
         public String getPolicyNumber() {
             return policyNumber;
@@ -363,11 +368,9 @@ public class ResultadoReconocimientoMedicoResponse {
 
         /**
          * Sets the value of the policyNumber property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *     
+         *
+         * @param value allowed object is
+         *              {@link String }
          */
         public void setPolicyNumber(String value) {
             this.policyNumber = value;
@@ -375,11 +378,9 @@ public class ResultadoReconocimientoMedicoResponse {
 
         /**
          * Gets the value of the certificateNumber property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link String }
-         *     
+         *
+         * @return possible object is
+         * {@link String }
          */
         public String getCertificateNumber() {
             return certificateNumber;
@@ -387,11 +388,9 @@ public class ResultadoReconocimientoMedicoResponse {
 
         /**
          * Sets the value of the certificateNumber property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *     
+         *
+         * @param value allowed object is
+         *              {@link String }
          */
         public void setCertificateNumber(String value) {
             this.certificateNumber = value;
@@ -399,11 +398,9 @@ public class ResultadoReconocimientoMedicoResponse {
 
         /**
          * Gets the value of the fiscalIdentificationNumber property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link String }
-         *     
+         *
+         * @return possible object is
+         * {@link String }
          */
         public String getFiscalIdentificationNumber() {
             return fiscalIdentificationNumber;
@@ -411,11 +408,9 @@ public class ResultadoReconocimientoMedicoResponse {
 
         /**
          * Sets the value of the fiscalIdentificationNumber property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *     
+         *
+         * @param value allowed object is
+         *              {@link String }
          */
         public void setFiscalIdentificationNumber(String value) {
             this.fiscalIdentificationNumber = value;
@@ -423,11 +418,9 @@ public class ResultadoReconocimientoMedicoResponse {
 
         /**
          * Gets the value of the mobilePhone property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link String }
-         *     
+         *
+         * @return possible object is
+         * {@link String }
          */
         public String getMobilePhone() {
             return mobilePhone;
@@ -435,11 +428,9 @@ public class ResultadoReconocimientoMedicoResponse {
 
         /**
          * Sets the value of the mobilePhone property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *     
+         *
+         * @param value allowed object is
+         *              {@link String }
          */
         public void setMobilePhone(String value) {
             this.mobilePhone = value;
@@ -447,11 +438,9 @@ public class ResultadoReconocimientoMedicoResponse {
 
         /**
          * Gets the value of the phoneNumber1 property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link String }
-         *     
+         *
+         * @return possible object is
+         * {@link String }
          */
         public String getPhoneNumber1() {
             return phoneNumber1;
@@ -459,11 +448,9 @@ public class ResultadoReconocimientoMedicoResponse {
 
         /**
          * Sets the value of the phoneNumber1 property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *     
+         *
+         * @param value allowed object is
+         *              {@link String }
          */
         public void setPhoneNumber1(String value) {
             this.phoneNumber1 = value;
@@ -471,11 +458,9 @@ public class ResultadoReconocimientoMedicoResponse {
 
         /**
          * Gets the value of the phoneNumber2 property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link String }
-         *     
+         *
+         * @return possible object is
+         * {@link String }
          */
         public String getPhoneNumber2() {
             return phoneNumber2;
@@ -483,11 +468,9 @@ public class ResultadoReconocimientoMedicoResponse {
 
         /**
          * Sets the value of the phoneNumber2 property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *     
+         *
+         * @param value allowed object is
+         *              {@link String }
          */
         public void setPhoneNumber2(String value) {
             this.phoneNumber2 = value;
@@ -495,25 +478,23 @@ public class ResultadoReconocimientoMedicoResponse {
 
         /**
          * Gets the value of the benefitsList property.
-         * 
+         *
          * <p>
          * This accessor method returns a reference to the live list,
          * not a snapshot. Therefore any modification you make to the
          * returned list will be present inside the JAXB object.
          * This is why there is not a <CODE>set</CODE> method for the benefitsList property.
-         * 
+         *
          * <p>
          * For example, to add a new item, do as follows:
          * <pre>
          *    getBenefitsList().add(newItem);
          * </pre>
-         * 
-         * 
+         *
+         *
          * <p>
          * Objects of the following type(s) are allowed in the list
          * {@link BenefitsType }
-         * 
-         * 
          */
         public List<BenefitsType> getBenefitsList() {
             if (benefitsList == null) {
@@ -524,10 +505,9 @@ public class ResultadoReconocimientoMedicoResponse {
 
         /**
          * Gets the value of the zip property.
-         * 
-         * @return
-         *     possible object is
-         *     byte[]
+         *
+         * @return possible object is
+         * byte[]
          */
         public byte[] getZip() {
             return zip;
@@ -535,10 +515,9 @@ public class ResultadoReconocimientoMedicoResponse {
 
         /**
          * Sets the value of the zip property.
-         * 
-         * @param value
-         *     allowed object is
-         *     byte[]
+         *
+         * @param value allowed object is
+         *              byte[]
          */
         public void setZip(byte[] value) {
             this.zip = ((byte[]) value);
@@ -546,11 +525,9 @@ public class ResultadoReconocimientoMedicoResponse {
 
         /**
          * Gets the value of the notes property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link String }
-         *     
+         *
+         * @return possible object is
+         * {@link String }
          */
         public String getNotes() {
             return notes;
@@ -558,11 +535,9 @@ public class ResultadoReconocimientoMedicoResponse {
 
         /**
          * Sets the value of the notes property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *     
+         *
+         * @param value allowed object is
+         *              {@link String }
          */
         public void setNotes(String value) {
             this.notes = value;
