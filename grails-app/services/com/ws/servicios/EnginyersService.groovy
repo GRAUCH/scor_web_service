@@ -122,7 +122,7 @@ class EnginyersService {
 
             DATOS dato = new DATOS()
             dato.registro = rellenaDatos(req, company)
-            //dato.servicio = rellenaServicios(req, company.nombre)
+            dato.servicio = rellenaServicios(req)
             dato.coberturas = rellenaCoberturas(req)
 
             return dato
@@ -175,20 +175,38 @@ class EnginyersService {
         }
     }
 
-    private def rellenaServicios(req, nameCompany) {
-
+    private def rellenaServicios(req) {
+        log.info("Agrego servicios a Enginyers")
         def listadoServicios = []
+        DATOS.Servicio servicio = null
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
+        DocumentBuilder builder = factory.newDocumentBuilder()
 
+        InputSource is = new InputSource(new StringReader(req.request))
+        is.setEncoding("UTF-8")
+        Document doc = builder.parse(is)
+        doc.getDocumentElement().normalize()
         try {
-
-            DATOS.Servicio servicio = new DATOS.Servicio()
-            servicio.tipoServicios = "S"
-            servicio.descripcionServicio = "Teleseleccion Mediana"
-            servicio.filler = ""
-            servicio.codigoServicio = "TM"
-
-            listadoServicios.add(servicio)
-
+            NodeList nList = doc.getElementsByTagName("additional")
+            for (int temp = 0; temp < nList.getLength(); temp++) {
+                Node nNode = nList.item(temp)
+                if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+                    Element eElement = (Element) nNode
+                    if (eElement.getElementsByTagName("additionalField") != null) {
+                        NodeList nListAdditional = doc.getElementsByTagName("additionalField")
+                        log.info("Tengo ${nListAdditional.getLength()} servicios para agregar en Enginyers")
+                        for (int serv = 0; serv < nListAdditional.getLength(); serv++) {
+                            servicio = new DATOS.Servicio()
+                            servicio.tipoServicios = eElement.getElementsByTagName("name").item(serv).getTextContent()
+                            servicio.descripcionServicio = " "
+                            servicio.filler = " "
+                            servicio.codigoServicio = eElement.getElementsByTagName("value").item(serv).getTextContent()
+                            listadoServicios.add(servicio)
+                        }
+                    }
+                }
+            }
+            log.info("${listadoServicios.size()} servicios agregados en Enginyers")
             return listadoServicios
         } catch (Exception e) {
             throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
@@ -360,7 +378,7 @@ class EnginyersService {
 
                 if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-                    Element eElement = (Element) nNode;
+                    Element eElement = (Element) nNode
 
                     /**NUMERO DE PRODUCTO
                      *

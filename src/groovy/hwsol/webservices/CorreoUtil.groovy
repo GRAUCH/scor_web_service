@@ -47,9 +47,7 @@ class CorreoUtil {
 
                 if (!Environment.current.name.equals("production_wildfly")) {
                     subject = "Webservices Test PREPRO: " + operacion;
-                    //				addressTo = new InternetAddress[1];
-                    //				addressTo[0] = new InternetAddress("javier.rodriguez@scortelemed.com");
-                }
+                 }
 
                 if (destinatarios) {
                     addressTo = new InternetAddress[destinatarios.size()];
@@ -80,52 +78,50 @@ class CorreoUtil {
 
     private String envioEmail(String operacion, String mensaje, int numRegistros) {
 
-        if (Environment.current != Environment.DEVELOPMENT) {
+
 
             //Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
             String message
 
             def destinatarios = dameDestinatariosCompania()
-            String subject = "Webservices: " + operacion;
+            String subject = "Webservices: " + operacion
 
             if (!mensaje) {
-                message = "Número de Registros: " + numRegistros;
+                message = "Número de Registros: " + numRegistros
             } else {
                 message = mensaje
             }
 
-            boolean debug = false;
-            Session sessionMail = Session.getDefaultInstance(propertiesMail());
+            boolean debug = false
+            Session sessionMail = Session.getDefaultInstance(propertiesMail())
 
             try {
-                sessionMail.setDebug(debug);
-                Message msg = new MimeMessage(sessionMail);
-                InternetAddress addressFrom = new InternetAddress(remitente);
-                msg.setFrom(addressFrom);
+                sessionMail.setDebug(debug)
+                Message msg = new MimeMessage(sessionMail)
+                InternetAddress addressFrom = new InternetAddress(remitente)
+                msg.setFrom(addressFrom)
 
-                InternetAddress[] addressTo = null;
+                InternetAddress[] addressTo = null
 
                 if (!Environment.current.name.equals("production_wildfly")) {
-                    subject = "Webservices Test PREPRO: " + operacion;
-                    //				addressTo = new InternetAddress[1];
-                    //				addressTo[0] = new InternetAddress("javier.rodriguez@scortelemed.com");
+                    subject = "Webservices Test PREPRO: " + operacion
                 }
 
                 if (destinatarios) {
-                    addressTo = new InternetAddress[destinatarios.size()];
+                    addressTo = new InternetAddress[destinatarios.size()]
                     def cont = 0
                     destinatarios.each {
-                        addressTo[cont] = new InternetAddress(it.trim());
+                        addressTo[cont] = new InternetAddress(it.trim())
                         cont++
                     }
 
-                    msg.setRecipients(Message.RecipientType.TO, addressTo);
-                    msg.setSubject(subject);
-                    msg.setContent(message, "text/plain");
-                    Transport t = sessionMail.getTransport("smtp");
-                    t.connect(usuarioConexion, passConexion);
-                    t.sendMessage(msg, msg.getAllRecipients());
-                    t.close();
+                    msg.setRecipients(Message.RecipientType.TO, addressTo)
+                    msg.setSubject(subject)
+                    msg.setContent(message, "text/plain")
+                    Transport t = sessionMail.getTransport("smtp")
+                    t.connect(usuarioConexion, passConexion)
+                    t.sendMessage(msg, msg.getAllRecipients())
+                    t.close()
 
                     logginService.putInfo("CorreoUtil", "EL correo se ha enviado correctamente a : " + destinatarios)
 
@@ -135,7 +131,7 @@ class CorreoUtil {
             } catch (Exception e) {
                 logginService.putErrorEndpoint("Method envioEmail", "Ha ocurrido un error en envio de email: " + e)
             }
-        }
+
     }
 
     private String envioEmailErrores(String operacion, String request, Exception error) {
