@@ -319,18 +319,25 @@ class CaserService {
     def envioEmail(req) {
 
         def datosEmail = rellenoDatosEmail(req)
+        def textEmail = compongoText(datosEmail)
 
-        StringBuilder sb = new StringBuilder()
-
-        sb.append("El Dossier del cliente ${datosEmail.get('nombre')}, ${datosEmail.get('apellido')} con DNI  ${datosEmail.get('dni')}")
-        sb.append("\n")
-        sb.append("El request number es : ${datosEmail.get('requestNumber')}")
-        sb.append("\n")
-        sb.append("La modificacion es la siguiente :  ${datosEmail.get('comments')}")
-
-        correoUtil.envioEmail('Modificacion caso', sb.toString(), 0)
+        logginService.putInfo('Envio email modificacion Caser', textEmail)
+        correoUtil.envioEmail('Modificacion caso', textEmail, 0)
     }
 
+    String compongoText(datosEmail){
+        StringBuilder sb = new StringBuilder()
+        sb.append("El Dossier del cliente ${datosEmail.get('nombre')}, ${datosEmail.get('apellido')} con DNI  ${datosEmail.get('dni')}")
+        sb.append("\n")
+        sb.append("Request Number es : ${datosEmail.get('requestNumber')}")
+        sb.append("\n")
+        sb.append("Policy Number number es : ${datosEmail.get('policyNumber')}")
+        sb.append("\n")
+        sb.append("Certificate Number es : ${datosEmail.get('certificateNumber')}")
+        sb.append("\n")
+        sb.append("La modificacion es la siguiente :  ${datosEmail.get('comments')}")
+        return sb.toString()
+    }
     def rellenoDatosEmail(req) {
 
         def datosEmail = [:]
@@ -344,7 +351,7 @@ class CaserService {
         doc.getDocumentElement().normalize()
 
         NodeList nList = doc.getElementsByTagName("CandidateInformation")
-        def nombre, apellido, dni, requestNumber, comments
+        def nombre, apellido, dni, requestNumber, policyNumber, certificateNumber, comments
         for (int temp = 0; temp < nList.getLength(); temp++) {
             Node nNode = nList.item(temp)
             if (nNode.getNodeType() == Node.ELEMENT_NODE) {
@@ -361,6 +368,8 @@ class CaserService {
             if (nNode.getNodeType() == Node.ELEMENT_NODE) {
                 Element eElement = (Element) nNode
                 requestNumber = eElement.getElementsByTagName("requestNumber").item(0).getTextContent()
+                policyNumber = eElement.getElementsByTagName("policyNumber").item(0).getTextContent()
+                certificateNumber = eElement.getElementsByTagName("certificateNumber").item(0).getTextContent()
                 comments = eElement.getElementsByTagName("comments").item(0).getTextContent()
             }
         }
@@ -369,6 +378,8 @@ class CaserService {
         datosEmail.put('apellido', apellido)
         datosEmail.put('dni', dni)
         datosEmail.put('requestNumber', requestNumber)
+        datosEmail.put('policyNumber', policyNumber)
+        datosEmail.put('certificateNumber', certificateNumber)
         datosEmail.put('comments', comments)
 
         return datosEmail

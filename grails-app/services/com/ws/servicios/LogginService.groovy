@@ -14,8 +14,7 @@ class LogginService {
 	
 	def putInfo= { operacion, mensaje->
 		def datosConexion=dameDatosSession()
-			
-		log.info ("["+operacion+"]: "+mensaje)
+		log.info ("["+operacion+"] ("+datosConexion.user+"-"+datosConexion.ip+"): "+mensaje)
 	}
 	
 	def putInfoMessage= { mensaje->	
