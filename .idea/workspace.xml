@@ -1,24 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-<<<<<<< HEAD
-    <list default="true" id="9c41fe56-bfb8-4969-837e-06aa9dec7d32" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/grails-app/assets/stylesheets/DT_bootstrap.css" beforeDir="false" afterPath="$PROJECT_DIR$/grails-app/assets/stylesheets/DT_bootstrap.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/grails-app/assets/stylesheets/main.min.css" beforeDir="false" afterPath="$PROJECT_DIR$/grails-app/assets/stylesheets/main.min.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/grails-app/views/comunicacion/listaEnviadoslagunaro.gsp" beforeDir="false" afterPath="$PROJECT_DIR$/grails-app/views/comunicacion/listaEnviadoslagunaro.gsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/grails-app/views/comunicacion/listaRecibidosama.gsp" beforeDir="false" afterPath="$PROJECT_DIR$/grails-app/views/comunicacion/listaRecibidosama.gsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/grails-app/views/dashboard/_logos.gsp" beforeDir="false" afterPath="$PROJECT_DIR$/grails-app/views/dashboard/_logos.gsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/grails-app/views/dashboard/index.gsp" beforeDir="false" afterPath="$PROJECT_DIR$/grails-app/views/dashboard/index.gsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/groovy/hwsol/utilities/LogUtil.groovy" beforeDir="false" afterPath="$PROJECT_DIR$/src/groovy/hwsol/utilities/LogUtil.groovy" afterDir="false" />
-=======
     <list default="true" id="2ff4b833-ac99-457b-9225-f9b316241f4d" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/grails-app/controllers/com/scortelemed/DashboardController.groovy" beforeDir="false" afterPath="$PROJECT_DIR$/grails-app/controllers/com/scortelemed/DashboardController.groovy" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scorWebservices-grailsPlugins.iml" beforeDir="false" afterPath="$PROJECT_DIR$/scorWebservices-grailsPlugins.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scorWebservices.iml" beforeDir="false" afterPath="$PROJECT_DIR$/scorWebservices.iml" afterDir="false" />
->>>>>>> master
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$USER_HOME$/.grails/" />
@@ -29,15 +16,26 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="DatabaseView">
+    <option name="SHOW_INTERMEDIATE" value="true" />
+    <option name="GROUP_DATA_SOURCES" value="true" />
+    <option name="GROUP_SCHEMA" value="true" />
+    <option name="GROUP_CONTENTS" value="false" />
+    <option name="SORT_POSITIONED" value="false" />
+    <option name="SHOW_EMPTY_GROUPS" value="false" />
+    <option name="AUTO_SCROLL_FROM_SOURCE" value="false" />
+    <option name="HIDDEN_KINDS">
+      <set />
+    </option>
+    <expand />
+    <select />
+  </component>
+  <component name="FavoritesManager">
+    <favorites_list name="scorWebservices" />
+    <favorites_list name="Variables" />
+  </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-<<<<<<< HEAD
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/grails-app/conf/DataSource.groovy">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="469">
-              <caret line="32" column="56" selection-start-line="32" selection-start-column="56" selection-end-line="32" selection-end-column="56" />
-=======
       <file leaf-file-name="Config.groovy" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/grails-app/conf/Config.groovy">
           <provider selected="true" editor-type-id="text-editor">
@@ -55,18 +53,10 @@
               <folding>
                 <element signature="e#25#58#0" expanded="true" />
               </folding>
->>>>>>> master
             </state>
           </provider>
         </entry>
       </file>
-<<<<<<< HEAD
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/utilities/LogUtil.groovy">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="314">
-              <caret line="37" column="58" selection-start-line="37" selection-start-column="58" selection-end-line="37" selection-end-column="58" />
-=======
       <file leaf-file-name="LogEnviados.groovy" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/webservices/impl/LogEnviados.groovy">
           <provider selected="true" editor-type-id="text-editor">
@@ -75,77 +65,24 @@
               <folding>
                 <element signature="e#32#62#0" expanded="true" />
               </folding>
->>>>>>> master
             </state>
           </provider>
         </entry>
       </file>
-<<<<<<< HEAD
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/grails-app/views/dashboard/_logos.gsp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="170">
-              <caret line="10" column="27" lean-forward="true" selection-start-line="10" selection-start-column="27" selection-end-line="10" selection-end-column="27" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/grails-app/views/comunicacion/listaRecibidosama.gsp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="333">
-              <caret line="20" column="97" selection-start-line="20" selection-start-column="97" selection-end-line="20" selection-end-column="97" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/web-app/css/bootstrap.css">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="64">
-              <caret line="2851" column="43" selection-start-line="2851" selection-start-column="43" selection-end-line="2851" selection-end-column="43" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/grails-app/assets/stylesheets/main.min.css">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="238">
-              <caret line="2004" lean-forward="true" selection-start-line="2004" selection-end-line="2004" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/grails-app/views/comunicacion/listaEnviadoslagunaro.gsp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="90">
-              <caret line="10" column="54" selection-start-line="10" selection-start-column="54" selection-end-line="10" selection-end-column="54" />
-=======
       <file leaf-file-name="LogUtil.groovy" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/utilities/LogUtil.groovy">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="68">
               <caret line="18" column="6" selection-start-line="18" selection-start-column="6" selection-end-line="18" selection-end-column="6" />
->>>>>>> master
             </state>
           </provider>
         </entry>
       </file>
-<<<<<<< HEAD
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/grails-app/views/dashboard/index.gsp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="163">
-              <caret line="78" column="60" selection-start-line="78" selection-start-column="60" selection-end-line="78" selection-end-column="60" />
-=======
       <file leaf-file-name="LogService.groovy" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/webservices/LogService.groovy">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="68">
               <caret line="4" column="12" selection-start-line="4" selection-start-column="12" selection-end-line="4" selection-end-column="12" />
->>>>>>> master
             </state>
           </provider>
         </entry>
@@ -154,21 +91,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-<<<<<<< HEAD
-      <find>class=&quot;quick-btn</find>
-      <find>_logos</find>
-      <find>&lt;table</find>
-      <find>logos.gsp</find>
-      <find>.quick-btn</find>
-      <find>lagunaro</find>
-      <find>class=&quot;span12&quot;</find>
-      <find>myFunction</find>
-      <find>span12</find>
-      <find>dataTables_wrapper</find>
-      <find>role=&quot;grid&quot;</find>
-      <find>.jpg</find>
-      <find>table table-striped table-bordered dataTable</find>
-=======
       <find>CbpitaUnderwrittingCaseManagementRequest</find>
       <find>Methislab</find>
       <find>EnvioMethislab</find>
@@ -199,8 +121,30 @@
       <find>gestionReconocimientoMedicoRequest</find>
       <find>MethislabUnderwrittingCaseManagementRequest</find>
       <find>findEnvios</find>
->>>>>>> master
     </findStrings>
+    <replaceStrings>
+      <replace>currentClass</replace>
+      <replace>T</replace>
+      <replace>.</replace>
+      <replace>NetInsurance</replace>
+      <replace>Methislab</replace>
+      <replace>CbpIta</replace>
+      <replace>CbpitaUnderwrittingCaseResultsRequest</replace>
+      <replace>MethislabCF</replace>
+      <replace>EnvioMethislabCF</replace>
+      <replace>Cajamar</replace>
+      <replace>AlptisGeneralData</replace>
+      <replace>Alptis</replace>
+      <replace>GestionReconocimientoMedicoRequestAma</replace>
+      <replace>GestionReconocimientoMedicoRequestPsn</replace>
+      <replace>GestionReconocimientoMedicoRequestLagunaro</replace>
+      <replace>parser.jaxbListParser(</replace>
+      <replace>errores</replace>
+      <replace>Error</replace>
+    </replaceStrings>
+    <dirStrings>
+      <dir>C:\git\scorWebservices</dir>
+    </dirStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -215,17 +159,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-<<<<<<< HEAD
-        <option value="$PROJECT_DIR$/grails-app/views/dashboard/index.gsp" />
-        <option value="$PROJECT_DIR$/web-app/css/bootstrap.css" />
-        <option value="$PROJECT_DIR$/grails-app/assets/stylesheets/bootstrap.css" />
-        <option value="$PROJECT_DIR$/grails-app/assets/stylesheets/DT_bootstrap.css" />
-        <option value="$PROJECT_DIR$/grails-app/views/comunicacion/listaRecibidosama.gsp" />
-        <option value="$PROJECT_DIR$/src/groovy/hwsol/utilities/LogUtil.groovy" />
-        <option value="$PROJECT_DIR$/grails-app/views/dashboard/_logos.gsp" />
-        <option value="$PROJECT_DIR$/grails-app/views/comunicacion/listaEnviadoslagunaro.gsp" />
-        <option value="$PROJECT_DIR$/grails-app/assets/stylesheets/main.min.css" />
-=======
         <option value="$PROJECT_DIR$/grails-app/services/com/ws/servicios/CajamarService.groovy" />
         <option value="$PROJECT_DIR$/grails-app/conf/Config.groovy" />
         <option value="$PROJECT_DIR$/grails-app/conf/DataSource.groovy" />
@@ -265,7 +198,6 @@
         <option value="$PROJECT_DIR$/src/groovy/hwsol/webservices/impl/LogEnviados.groovy" />
         <option value="$PROJECT_DIR$/src/groovy/hwsol/webservices/impl/LogErrores.groovy" />
         <option value="$PROJECT_DIR$/grails-app/controllers/com/scortelemed/DashboardController.groovy" />
->>>>>>> master
       </list>
     </option>
   </component>
@@ -275,31 +207,29 @@
     <detection-done>true</detection-done>
     <sorting>DEFINITION_ORDER</sorting>
   </component>
+  <component name="MavenProjectNavigator">
+    <treeState>
+      <expand />
+      <select />
+    </treeState>
+  </component>
   <component name="NodePackageJsonFileManager">
     <packageJsonPaths>
       <path value="$PROJECT_DIR$/target/work/plugins/asset-pipeline-1.9.6/src/groovy/uglifyjs/package.json" />
     </packageJsonPaths>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-<<<<<<< HEAD
-    <option name="x" value="-118" />
-    <option name="y" value="-18" />
-    <option name="width" value="1938" />
-    <option name="height" value="873" />
-=======
-    <option name="x" value="-8" />
-    <option name="y" value="-8" />
-    <option name="width" value="1936" />
-    <option name="height" value="1056" />
->>>>>>> master
+    <option name="x" value="-9" />
+    <option name="y" value="-9" />
+    <option name="width" value="1937" />
+    <option name="height" value="1057" />
   </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
     <navigator proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="PackagesPane" />
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -311,8 +241,6 @@
               <item name="scorWebservices" type="b2602c69:ProjectViewProjectNode" />
               <item name="scorWebservices" type="462c0819:PsiDirectoryNode" />
               <item name="grails-app" type="462c0819:PsiDirectoryNode" />
-<<<<<<< HEAD
-=======
             </path>
             <path>
               <item name="scorWebservices" type="b2602c69:ProjectViewProjectNode" />
@@ -324,30 +252,23 @@
               <item name="scorWebservices" type="b2602c69:ProjectViewProjectNode" />
               <item name="scorWebservices" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
->>>>>>> master
             </path>
             <path>
               <item name="scorWebservices" type="b2602c69:ProjectViewProjectNode" />
               <item name="scorWebservices" type="462c0819:PsiDirectoryNode" />
-              <item name="grails-app" type="462c0819:PsiDirectoryNode" />
-              <item name="assets" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="groovy" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="scorWebservices" type="b2602c69:ProjectViewProjectNode" />
               <item name="scorWebservices" type="462c0819:PsiDirectoryNode" />
-              <item name="grails-app" type="462c0819:PsiDirectoryNode" />
-              <item name="assets" type="462c0819:PsiDirectoryNode" />
-              <item name="images" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="groovy" type="462c0819:PsiDirectoryNode" />
+              <item name="hwsol" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="scorWebservices" type="b2602c69:ProjectViewProjectNode" />
               <item name="scorWebservices" type="462c0819:PsiDirectoryNode" />
-<<<<<<< HEAD
-              <item name="grails-app" type="462c0819:PsiDirectoryNode" />
-              <item name="assets" type="462c0819:PsiDirectoryNode" />
-              <item name="images" type="462c0819:PsiDirectoryNode" />
-              <item name="logos" type="462c0819:PsiDirectoryNode" />
-=======
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="groovy" type="462c0819:PsiDirectoryNode" />
               <item name="hwsol" type="462c0819:PsiDirectoryNode" />
@@ -376,22 +297,10 @@
               <item name="groovy" type="462c0819:PsiDirectoryNode" />
               <item name="hwsol" type="462c0819:PsiDirectoryNode" />
               <item name="webservices" type="462c0819:PsiDirectoryNode" />
->>>>>>> master
             </path>
             <path>
               <item name="scorWebservices" type="b2602c69:ProjectViewProjectNode" />
               <item name="scorWebservices" type="462c0819:PsiDirectoryNode" />
-<<<<<<< HEAD
-              <item name="grails-app" type="462c0819:PsiDirectoryNode" />
-              <item name="views" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="scorWebservices" type="b2602c69:ProjectViewProjectNode" />
-              <item name="scorWebservices" type="462c0819:PsiDirectoryNode" />
-              <item name="grails-app" type="462c0819:PsiDirectoryNode" />
-              <item name="views" type="462c0819:PsiDirectoryNode" />
-              <item name="dashboard" type="462c0819:PsiDirectoryNode" />
-=======
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="groovy" type="462c0819:PsiDirectoryNode" />
               <item name="hwsol" type="462c0819:PsiDirectoryNode" />
@@ -433,27 +342,33 @@
               <item name="" type="f1a0d8d8:GrailsRootNode" />
               <item name="" type="3c7b8529:GrailsApplicationNode" />
               <item name="java" type="a8c2cad5:GrailsPsiDirectoryNode" />
->>>>>>> master
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="Grails" />
     </panes>
   </component>
   <component name="PropertiesComponent">
-<<<<<<< HEAD
-=======
     <property name="DatabaseDriversLRU" value="mysql" />
     <property name="SearchEverywhereHistoryKey" value="UnidadOrganizativa&#9;null&#9;null" />
->>>>>>> master
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1583501693421" />
-    <property name="grails.last.selected.app.url" value="file://$PROJECT_DIR$" />
-    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
-    <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1582739569082" />
+    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.proportion" value="0.0" />
+    <property name="project.structure.side.proportion" value="0.0" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="hwsol.webservices.impl" />
+      <recent name="hwsol.entities" />
+      <recent name="hwsol.entities.parser" />
+      <recent name="hwsol.webservices" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\git\scorWebservices\grails-app\views\comunicacion" />
+    </key>
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -476,6 +391,7 @@
       <setting name="launchBrowser" value="true" />
       <setting name="launchBrowserUrl" value="" />
       <setting name="depsClasspath" value="false" />
+      <method v="2" />
     </configuration>
   </component>
   <component name="SvnConfiguration">
@@ -483,17 +399,10 @@
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="9c41fe56-bfb8-4969-837e-06aa9dec7d32" name="Default Changelist" comment="" />
-      <created>1582889268805</created>
+      <changelist id="2ff4b833-ac99-457b-9225-f9b316241f4d" name="Default Changelist" comment="" />
+      <created>1581329249189</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-<<<<<<< HEAD
-      <updated>1582889268805</updated>
-      <workItem from="1582889272578" duration="509000" />
-      <workItem from="1582889845916" duration="6153000" />
-      <workItem from="1583308921765" duration="33980000" />
-      <workItem from="1583482947770" duration="4654000" />
-=======
       <updated>1581329249189</updated>
       <workItem from="1581329251828" duration="724000" />
       <workItem from="1581337661007" duration="12163000" />
@@ -506,22 +415,10 @@
       <workItem from="1582650772822" duration="15173000" />
       <workItem from="1582732182684" duration="2615000" />
       <workItem from="1583309441311" duration="1779000" />
->>>>>>> master
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-<<<<<<< HEAD
-    <option name="totallyTimeSpent" value="44845000" />
-  </component>
-  <component name="ToolWindowManager">
-    <frame x="-6" y="-6" width="1549" height="837" extended-state="6" />
-    <editor active="true" />
-    <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.25888667" />
-      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info id="Persistence" order="2" side_tool="true" />
-=======
     <option name="totallyTimeSpent" value="75209000" />
   </component>
   <component name="ToolWindowManager">
@@ -540,7 +437,6 @@
       <window_info anchor="bottom" id="Spring" order="7" />
       <window_info anchor="bottom" id="Terminal" order="8" weight="0.1716312" />
       <window_info id="Persistence" order="2" side_tool="true" weight="0.32995737" />
->>>>>>> master
       <window_info id="Designer" order="3" />
       <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49747476" visible="true" weight="0.195629" />
       <window_info anchor="right" id="Bean Validation" order="9" weight="0.32995737" />
@@ -551,36 +447,6 @@
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="right" id="Ant Build" order="2" weight="0.25" />
       <window_info id="UI Designer" order="5" />
-<<<<<<< HEAD
-      <window_info id="Favorites" order="6" side_tool="true" />
-      <window_info id="Capture Tool" order="7" />
-      <window_info id="Web" order="8" side_tool="true" />
-      <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" />
-      <window_info active="true" anchor="bottom" id="Debug" order="3" visible="true" weight="0.21954674" />
-      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
-      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Spring" order="7" />
-      <window_info anchor="bottom" id="Terminal" order="8" />
-      <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
-      <window_info anchor="bottom" id="Grails Console" order="10" weight="0.7418655" />
-      <window_info anchor="bottom" id="Java Enterprise" order="11" />
-      <window_info anchor="bottom" id="Database Changes" order="12" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Version Control" order="13" />
-      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
-      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
-      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" id="Palette" order="3" />
-      <window_info anchor="right" id="Capture Analysis" order="4" />
-      <window_info anchor="right" id="Maven Projects" order="5" />
-      <window_info anchor="right" id="Database" order="6" />
-      <window_info anchor="right" id="Palette&#9;" order="7" />
-      <window_info anchor="right" id="Theme Preview" order="8" />
-      <window_info anchor="right" id="Bean Validation" order="9" />
-    </layout>
-=======
       <window_info active="true" anchor="bottom" id="Debug" order="3" visible="true" weight="0.40413943" />
       <window_info id="Favorites" order="6" sideWeight="0.50252527" side_tool="true" weight="0.18255034" />
       <window_info anchor="right" id="Capture Analysis" order="5" />
@@ -632,7 +498,6 @@
       <window_info anchor="bottom" id="Debug" order="3" weight="0.20043573" />
       <window_info anchor="right" id="Bean Validation" order="9" weight="0.32995737" />
     </layout-to-restore>
->>>>>>> master
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
@@ -640,10 +505,6 @@
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
   </component>
-<<<<<<< HEAD
-  <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/java/com/scor/global/CompanyLog.java">
-=======
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
@@ -943,65 +804,33 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/java/com/ws/cajamar/beans/CajamarUnderwrittingCaseManagementRequest.java">
->>>>>>> master
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="17" column="18" selection-start-line="17" selection-start-column="18" selection-end-line="17" selection-end-column="18" />
+        <state relative-caret-position="17">
+          <caret line="1" column="13" selection-start-line="1" selection-end-line="2" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/grails-app/assets/stylesheets/bootstrap.css">
+    <entry file="file://$PROJECT_DIR$/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="95">
-          <caret line="215" lean-forward="true" selection-start-line="215" selection-end-line="215" />
+        <state relative-caret-position="102">
+          <caret line="6" column="6" selection-start-line="6" selection-start-column="6" selection-end-line="6" selection-end-column="6" />
         </state>
       </provider>
     </entry>
-<<<<<<< HEAD
-    <entry file="file://$PROJECT_DIR$/grails-app/assets/stylesheets/DT_bootstrap.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="333">
-          <caret line="147" column="22" lean-forward="true" selection-start-line="147" selection-start-column="22" selection-end-line="147" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/grails-app/controllers/com/scortelemed/DashboardController.groovy">
-=======
     <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/entities/parser/RegistrarEventoSCOR.groovy">
->>>>>>> master
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="340">
-          <caret line="26" column="55" selection-start-line="26" selection-start-column="43" selection-end-line="26" selection-end-column="61" />
+        <state relative-caret-position="34">
+          <caret line="2" column="6" selection-start-line="2" selection-start-column="6" selection-end-line="2" selection-end-column="6" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/grails-app/views/dashboard/index.gsp">
+    <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/entities/parser/AlptisGeneralData.groovy">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="163">
-          <caret line="78" column="60" selection-start-line="78" selection-start-column="60" selection-end-line="78" selection-end-column="60" />
+        <state relative-caret-position="85">
+          <caret line="5" column="4" lean-forward="true" selection-start-line="5" selection-start-column="4" selection-end-line="5" selection-end-column="4" />
         </state>
       </provider>
     </entry>
-<<<<<<< HEAD
-    <entry file="file://$PROJECT_DIR$/web-app/css/bootstrap.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="64">
-          <caret line="2851" column="43" selection-start-line="2851" selection-start-column="43" selection-end-line="2851" selection-end-column="43" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/grails-app/views/comunicacion/listaRecibidosama.gsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="333">
-          <caret line="20" column="97" selection-start-line="20" selection-start-column="97" selection-end-line="20" selection-end-column="97" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/grails-app/conf/DataSource.groovy">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="469">
-          <caret line="32" column="56" selection-start-line="32" selection-start-column="56" selection-end-line="32" selection-end-column="56" />
-=======
     <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/factory/SchemaEntities.groovy">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="578">
@@ -1033,37 +862,11 @@
           <folding>
             <element signature="e#32#62#0" expanded="true" />
           </folding>
->>>>>>> master
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/groovy/hwsol/utilities/Parser.groovy">
       <provider selected="true" editor-type-id="text-editor">
-<<<<<<< HEAD
-        <state relative-caret-position="314">
-          <caret line="37" column="58" selection-start-line="37" selection-start-column="58" selection-end-line="37" selection-end-column="58" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/grails-app/views/dashboard/_logos.gsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="170">
-          <caret line="10" column="27" lean-forward="true" selection-start-line="10" selection-start-column="27" selection-end-line="10" selection-end-column="27" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/grails-app/views/comunicacion/listaEnviadoslagunaro.gsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
-          <caret line="10" column="54" selection-start-line="10" selection-start-column="54" selection-end-line="10" selection-end-column="54" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/grails-app/assets/stylesheets/main.min.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="238">
-          <caret line="2004" lean-forward="true" selection-start-line="2004" selection-end-line="2004" />
-=======
         <state relative-caret-position="833">
           <caret line="49" column="29" selection-start-line="49" selection-end-line="50" />
           <folding>
@@ -1184,7 +987,6 @@
           <folding>
             <element signature="e#25#58#0" expanded="true" />
           </folding>
->>>>>>> master
         </state>
       </provider>
     </entry>
@@ -1199,20 +1001,12 @@
               <option name="pluginDependenciesCrc" value="450056577" />
               <option name="properties">
                 <map>
-<<<<<<< HEAD
-                  <entry key="grails.global.plugins.dir" value="C:\Users\jrdelamaya\.grails\2.5.0\global-plugins" />
-=======
                   <entry key="grails.global.plugins.dir" value="C:\Users\lolivera\.grails\2.5.0\global-plugins" />
->>>>>>> master
                   <entry key="grails.project.fork.run" value="true" />
                   <entry key="grails.project.fork.test" value="true" />
                   <entry key="grails.project.plugins.dir" value="target\work\plugins" />
                   <entry key="grails.project.work.dir" value="target\work" />
-<<<<<<< HEAD
-                  <entry key="grails.work.dir" value="C:\Users\jrdelamaya\.grails\2.5.0" />
-=======
                   <entry key="grails.work.dir" value="C:\Users\lolivera\.grails\2.5.0" />
->>>>>>> master
                 </map>
               </option>
             </GrailsSettings>
@@ -1225,5 +1019,81 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="masterDetails">
+    <states>
+      <state key="ArtifactsStructureConfigurable.UI">
+        <settings>
+          <artifact-editor />
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="FacetStructureConfigurable.UI">
+        <settings>
+          <last-edited>Hibernate</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="GlobalLibrariesConfigurable.UI">
+        <settings>
+          <last-edited>grails-2.5.0</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="JdkListConfigurable.UI">
+        <settings>
+          <last-edited>1.8</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ModuleStructureConfigurable.UI">
+        <settings>
+          <last-edited>scorWebservices</last-edited>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+                <option value="0.6" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+      <state key="ProjectLibrariesConfigurable.UI">
+        <settings>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+    </states>
   </component>
 </project>
