@@ -3,20 +3,37 @@ package com.ws.servicios.impl
 import com.scortelemed.Company
 import com.scortelemed.Request
 import com.ws.servicios.EstadisticasService
+import com.ws.servicios.IRequestService
 import com.ws.servicios.LogginService
 import org.springframework.web.context.request.RequestContextHolder
 
 import javax.xml.bind.JAXBContext
+import javax.xml.bind.JAXBElement
 import javax.xml.bind.Marshaller
 import javax.xml.bind.Unmarshaller
+import javax.xml.transform.stream.StreamSource
 import java.text.Normalizer
 import java.util.regex.Pattern
 
-class RequestService {
+class RequestService implements IRequestService{
     def avisosService
     def serverPasswordCallbackHandlerService
     def logginService = new LogginService()
     def estadisticasService = new EstadisticasService()
+
+    def jaxbParser(String entrada, Class<?> myObjectClass) {
+        def objectsList = null
+        if (entrada!= null && !entrada.trim().isEmpty()) {
+            JAXBContext jaxbContext = JAXBContext.newInstance(myObjectClass)
+            Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller()
+
+            StringReader reader = new StringReader(entrada)
+
+            JAXBElement<?> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), myObjectClass)
+            objectsList = root.getValue()
+        }
+        return  objectsList
+    }
 
     def crear(message, requestXML, opera = false, company = false) {
         def result
