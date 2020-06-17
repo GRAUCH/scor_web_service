@@ -55,7 +55,7 @@ class RequestController {
 	@Autowired
 	private NetinsuranceService netinsuranceService
 	@Autowired
-	private  EnginyersService enginyersService
+	private EnginyersService enginyersService
 
 
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -399,24 +399,14 @@ class RequestController {
 		def requestBBDD
 
 		def requestInstance = Request.get(params.id)
+		TipoCompany filtro = TipoCompany.fromNombre(requestInstance.company.nombre)
 
-		def cia = requestInstance.company
+		switch (filtro) {
 
-		switch (cia) {
-
-			case "lagunaro":
-
-				JAXBContext jaxbContext = JAXBContext.newInstance(com.ws.lagunaro.beans.GestionReconocimientoMedicoRequest.class);
-				Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-
-				StringReader reader = new StringReader(requestInstance.getRequest().trim());
-
-				JAXBElement<com.ws.lagunaro.beans.GestionReconocimientoMedicoRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), com.ws.lagunaro.beans.GestionReconocimientoMedicoRequest.class);
-				com.ws.lagunaro.beans.GestionReconocimientoMedicoRequest gestionReconocimientoMedicoRequest = root.getValue();
-
+			case TipoCompany.LAGUN_ARO:
 				def opername="GestionReconocimientoMedicoRequest"
-
 				if (Company.findByNombre(requestInstance.company).generationAutomatic) {
+					com.ws.lagunaro.beans.GestionReconocimientoMedicoRequest gestionReconocimientoMedicoRequest = requestService.jaxbParser(requestInstance.getRequest(),com.ws.lagunaro.beans.GestionReconocimientoMedicoRequest.class)
 					def compania=Company.findByNombre(requestInstance.company)
 					session.companyST=compania.codigoSt
 					requestXML=requestService.marshall(gestionReconocimientoMedicoRequest,com.ws.lagunaro.beans.GestionReconocimientoMedicoRequest.class)
@@ -424,11 +414,10 @@ class RequestController {
 					logginService.putInfoMessage("Se ha procesado una request namnualmente para: " + requestInstance.company)
 					lagunaroService.crearExpediente(requestBBDD)
 					flash.message = "${message(code: 'default.processed.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
-
 				}
-
 				break
-			case "ama":
+
+			case TipoCompany.AMA:
 
 				JAXBContext jaxbContext = JAXBContext.newInstance(com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest.class);
 				Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
@@ -452,7 +441,7 @@ class RequestController {
 				}
 
 				break
-			case "caser":
+			case TipoCompany.CASER:
 
 				JAXBContext jaxbContext = JAXBContext.newInstance(GestionReconocimientoMedicoRequest.class);
 				Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
@@ -476,7 +465,7 @@ class RequestController {
 				}
 
 				break
-			case "cajamar":
+			case TipoCompany.CAJAMAR:
 
 				JAXBContext jaxbContext = JAXBContext.newInstance(CajamarUnderwrittingCaseManagementRequest.class);
 				Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
@@ -502,7 +491,7 @@ class RequestController {
 				}
 
 				break
-			case "afiesca":
+			case TipoCompany.AFI_ESCA:
 
 				JAXBContext jaxbContext = JAXBContext.newInstance(AfiEscaUnderwrittingCaseManagementRequest.class);
 				Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
@@ -523,7 +512,8 @@ class RequestController {
 					flash.error = "${message(code: 'default.invalid.type.operation.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
 				}
 				break
-			case "alptis":
+
+			case TipoCompany.ALPTIS:
 
 				JAXBContext jaxbContext = JAXBContext.newInstance(AlptisUnderwrittingCaseManagementRequest.class);
 				Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
@@ -545,7 +535,7 @@ class RequestController {
 				}
 
 				break
-			case "lifesquare":
+			case TipoCompany.ZEN_UP:
 
 				JAXBContext jaxbContext = JAXBContext.newInstance(LifesquareUnderwrittingCaseManagementRequest.class);
 				Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
@@ -568,7 +558,7 @@ class RequestController {
 
 				break
 
-			case "methislab":
+			case TipoCompany.METHIS_LAB:
 
 				JAXBContext jaxbContext = JAXBContext.newInstance(MethislabUnderwrittingCaseManagementRequest.class);
 				Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
@@ -589,7 +579,7 @@ class RequestController {
 				}
 				break
 
-			case "methislabCF":
+			case TipoCompany.CF_LIFE:
 
 				JAXBContext jaxbContext = JAXBContext.newInstance(MethislabCFUnderwrittingCaseManagementRequest.class);
 				Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
@@ -610,7 +600,7 @@ class RequestController {
 				}
 				break
 
-			case "netinsurance":
+			case TipoCompany.NET_INSURANCE:
 
 				JAXBContext jaxbContext = JAXBContext.newInstance(NetinsuranteUnderwrittingCaseManagementRequest.class);
 				Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
@@ -631,7 +621,7 @@ class RequestController {
 				}
 				break
 
-			case "enginyers":
+			case TipoCompany.ENGINYERS:
 
 				JAXBContext jaxbContext = JAXBContext.newInstance(AddExp.class)
 				Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller()
@@ -649,7 +639,6 @@ class RequestController {
 					flash.message = "${message(code: 'default.processed.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
 				}
 				break
-
 
 			default:
 				break

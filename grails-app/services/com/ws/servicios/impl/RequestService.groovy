@@ -27,7 +27,7 @@ class RequestService implements IRequestService{
             JAXBContext jaxbContext = JAXBContext.newInstance(myObjectClass)
             Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller()
 
-            StringReader reader = new StringReader(entrada)
+            StringReader reader = new StringReader(entrada.trim())
 
             JAXBElement<?> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), myObjectClass)
             objectsList = root.getValue()
