@@ -4,6 +4,7 @@ import com.scortelemed.Company
 import com.scortelemed.Operacion
 import com.scortelemed.schemas.methislabCF.*
 import com.ws.servicios.*
+import com.ws.servicios.impl.RequestService
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
 import hwsol.webservices.WsError

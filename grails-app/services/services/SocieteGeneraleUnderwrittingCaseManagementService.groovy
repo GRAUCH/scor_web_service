@@ -31,7 +31,7 @@ import com.scortelemed.schemas.societegenerale.SocieteGeneraleUnderwrittingCases
 import com.scortelemed.schemas.societegenerale.StatusType
 import com.ws.servicios.EstadisticasService
 import com.ws.servicios.LogginService
-import com.ws.servicios.RequestService
+import com.ws.servicios.impl.RequestService
 import com.ws.servicios.SocieteGeneraleService
 import com.ws.servicios.TarificadorService
 

@@ -1,6 +1,6 @@
 package services
 
-import com.scor.global.WSException
+
 import grails.util.Environment
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
@@ -18,31 +18,24 @@ import org.grails.cxf.utils.GrailsCxfEndpoint
 import org.grails.cxf.utils.GrailsCxfEndpointProperty
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.context.request.RequestContextHolder
-
-import servicios.ClaveFiltro
 import servicios.Expediente
 import servicios.Filtro
 import servicios.RespuestaCRM
 import servicios.RespuestaCRMInforme
 
 import com.scortelemed.Company
-import com.scortelemed.Envio
 import com.scortelemed.Operacion
-import com.scortelemed.Recibido
-import com.scortelemed.schemas.caser.ConsultaExpedienteRequest;
-import com.scortelemed.schemas.caser.ConsultaExpedienteResponse;
 import com.scortelemed.schemas.netinsurance.NetinsuranteGetDossierRequest
 import com.scortelemed.schemas.netinsurance.NetinsuranteGetDossierResponse
 import com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCaseManagementRequest
 import com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCaseManagementResponse
 import com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCasesResultsRequest
 import com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCasesResultsResponse
-import com.scortelemed.schemas.netinsurance.ResultsBasicType
 import com.scortelemed.schemas.netinsurance.StatusType
 import com.ws.servicios.EstadisticasService
 import com.ws.servicios.LogginService
 import com.ws.servicios.NetinsuranceService
-import com.ws.servicios.RequestService
+import com.ws.servicios.impl.RequestService
 import com.ws.servicios.TarificadorService
 
 @WebService(targetNamespace = "http://www.scortelemed.com/schemas/netinsurance")

@@ -6,6 +6,7 @@ import com.scortelemed.Conf
 import com.scortelemed.Operacion
 import com.scortelemed.schemas.cbpita.*
 import com.ws.servicios.*
+import com.ws.servicios.impl.RequestService
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
 import hwsol.webservices.WsError

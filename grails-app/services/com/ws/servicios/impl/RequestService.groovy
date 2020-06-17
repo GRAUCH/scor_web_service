@@ -1,7 +1,9 @@
-package com.ws.servicios
+package com.ws.servicios.impl
 
 import com.scortelemed.Company
 import com.scortelemed.Request
+import com.ws.servicios.EstadisticasService
+import com.ws.servicios.LogginService
 import org.springframework.web.context.request.RequestContextHolder
 
 import javax.xml.bind.JAXBContext

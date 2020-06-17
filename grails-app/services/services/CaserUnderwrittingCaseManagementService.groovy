@@ -4,6 +4,7 @@ import com.scortelemed.Company
 import com.scortelemed.Operacion
 import com.scortelemed.schemas.caser.*
 import com.ws.servicios.*
+import com.ws.servicios.impl.RequestService
 import grails.util.Environment
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil

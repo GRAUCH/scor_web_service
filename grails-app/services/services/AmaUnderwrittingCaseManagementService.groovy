@@ -27,7 +27,6 @@ import servicios.RespuestaCRMInforme
 import com.scortelemed.Company
 import com.scortelemed.Envio
 import com.scortelemed.Operacion
-import com.scortelemed.Recibido
 import com.scortelemed.schemas.ama.ConsolidacionPolizaRequest
 import com.scortelemed.schemas.ama.ConsolidacionPolizaResponse
 import com.scortelemed.schemas.ama.ConsultaDocumentoRequest
@@ -42,7 +41,7 @@ import com.scortelemed.schemas.ama.StatusType
 import com.ws.servicios.AmaService
 import com.ws.servicios.EstadisticasService
 import com.ws.servicios.LogginService
-import com.ws.servicios.RequestService
+import com.ws.servicios.impl.RequestService
 import com.ws.servicios.TarificadorService
 
 @WebService(targetNamespace = "http://www.scortelemed.com/schemas/ama")

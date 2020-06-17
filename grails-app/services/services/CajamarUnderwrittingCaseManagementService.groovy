@@ -11,7 +11,6 @@ import javax.jws.WebResult
 import javax.jws.WebService
 import javax.jws.soap.SOAPBinding
 
-import org.apache.cxf.annotations.SchemaValidation
 import org.grails.cxf.utils.EndpointType
 import org.grails.cxf.utils.GrailsCxfEndpoint
 import org.grails.cxf.utils.GrailsCxfEndpointProperty
@@ -32,7 +31,7 @@ import com.ws.cajamar.beans.StatusType
 import com.ws.servicios.CajamarService
 import com.ws.servicios.EstadisticasService
 import com.ws.servicios.LogginService
-import com.ws.servicios.RequestService
+import com.ws.servicios.impl.RequestService
 import com.ws.servicios.TarificadorService
 
 @WebService(targetNamespace = "http://www.scortelemed.com/schemas/cajamar")
@@ -126,7 +125,7 @@ class CajamarUnderwrittingCaseManagementService {
 				 */
 				if (cajamarUnderwrittingCaseManagementRequest.getRegScor().getYtipo().toString().equals("3")){
 
-					def msg = "Ha llegado una anulación de " + company.nombre + " con número de referencia: " + cajamarUnderwrittingCaseManagementRequest.getRegScor().getNumref()
+					def msg = "Ha llegado una anulaciï¿½n de " + company.nombre + " con nï¿½mero de referencia: " + cajamarUnderwrittingCaseManagementRequest.getRegScor().getNumref()
 
 					requestXML=cajamarService.marshall("http://www.scortelemed.com/schemas/cajamar",cajamarUnderwrittingCaseManagementRequest)
 					requestBBDD = requestService.crear(opername,requestXML)
@@ -144,7 +143,7 @@ class CajamarUnderwrittingCaseManagementService {
 					resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 
 
-					logginService.putInfoMessage("Ha llegado una anulación de " + company.nombre + " con número de referencia: " + cajamarUnderwrittingCaseManagementRequest.getRegScor().getNumref())
+					logginService.putInfoMessage("Ha llegado una anulaciï¿½n de " + company.nombre + " con nï¿½mero de referencia: " + cajamarUnderwrittingCaseManagementRequest.getRegScor().getNumref())
 
 					correoUtil.envioEmailNoTratados("CajamarUnderwrittingCaseManagementRequest",msg)
 
@@ -155,7 +154,7 @@ class CajamarUnderwrittingCaseManagementService {
 				 */
 				if (cajamarUnderwrittingCaseManagementRequest.getRegScor().getYtipo().toString().equals("2")){
 
-					def msg = "Ha llegado una modificación de " + company.nombre + " con número de referencia: " + cajamarUnderwrittingCaseManagementRequest.getRegScor().getNumref()
+					def msg = "Ha llegado una modificaciï¿½n de " + company.nombre + " con nï¿½mero de referencia: " + cajamarUnderwrittingCaseManagementRequest.getRegScor().getNumref()
 
 					requestXML=cajamarService.marshall("http://www.scortelemed.com/schemas/cajamar",cajamarUnderwrittingCaseManagementRequest)
 					requestBBDD = requestService.crear(opername,requestXML)
@@ -173,7 +172,7 @@ class CajamarUnderwrittingCaseManagementService {
 					resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 
 
-					logginService.putInfoMessage("Ha llegado una modificación " + company.nombre + " con número de referencia: " + cajamarUnderwrittingCaseManagementRequest.getRegScor().getNumref())
+					logginService.putInfoMessage("Ha llegado una modificaciï¿½n " + company.nombre + " con nï¿½mero de referencia: " + cajamarUnderwrittingCaseManagementRequest.getRegScor().getNumref())
 
 					correoUtil.envioEmailNoTratados("CajamarUnderwrittingCaseManagementRequest",msg)
 				}

@@ -7,10 +7,8 @@ import hwsol.webservices.WsError
 import org.springframework.web.context.request.RequestContextHolder
 
 import java.text.SimpleDateFormat
-import java.util.List;
 
 import org.apache.cxf.annotations.SchemaValidation
-import org.apache.jasper.tagplugins.jstl.core.Catch;
 import org.grails.cxf.utils.EndpointType
 import org.grails.cxf.utils.GrailsCxfEndpoint
 import org.grails.cxf.utils.GrailsCxfEndpointProperty
@@ -32,7 +30,7 @@ import com.scortelemed.schemas.enginyers.FaultElement;
 import com.ws.servicios.EnginyersService
 import com.ws.servicios.EstadisticasService
 import com.ws.servicios.LogginService;
-import com.ws.servicios.RequestService
+import com.ws.servicios.impl.RequestService
 import com.ws.servicios.TarificadorService
 
 

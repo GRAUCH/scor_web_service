@@ -34,7 +34,7 @@ import com.scortelemed.schemas.psn.StatusType
 import com.ws.servicios.EstadisticasService
 import com.ws.servicios.LogginService
 import com.ws.servicios.PsnService
-import com.ws.servicios.RequestService
+import com.ws.servicios.impl.RequestService
 import com.ws.servicios.TarificadorService
 
 import servicios.Expediente

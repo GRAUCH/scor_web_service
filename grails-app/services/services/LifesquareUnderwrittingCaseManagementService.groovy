@@ -15,9 +15,6 @@ import org.grails.cxf.utils.EndpointType
 import org.grails.cxf.utils.GrailsCxfEndpoint
 import org.grails.cxf.utils.GrailsCxfEndpointProperty
 import org.springframework.web.context.request.RequestContextHolder
-
-import servicios.ClaveFiltro
-import servicios.Expediente
 import servicios.Filtro
 
 import com.scortelemed.Company
@@ -27,7 +24,7 @@ import com.ws.lifesquare.beans.LifesquareUnderwrittingCaseManagementRequest
 import com.ws.lifesquare.beans.LifesquareUnderwrittingCaseManagementResponse
 import com.ws.servicios.EstadisticasService
 import com.ws.servicios.LogginService
-import com.ws.servicios.RequestService
+import com.ws.servicios.impl.RequestService
 
 @WebService(targetNamespace = "http://www.scortelemed.com/schemas/lifesquare")
 @SchemaValidation

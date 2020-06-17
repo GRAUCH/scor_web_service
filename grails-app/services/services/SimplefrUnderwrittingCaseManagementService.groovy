@@ -17,9 +17,6 @@ import org.grails.cxf.utils.GrailsCxfEndpoint
 import org.grails.cxf.utils.GrailsCxfEndpointProperty
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.context.request.RequestContextHolder
-
-import servicios.ClaveFiltro
-import servicios.Expediente
 import servicios.Filtro
 
 import com.scortelemed.Company
@@ -33,7 +30,7 @@ import com.scortelemed.schemas.simplefr.SimplefrUnderwrittingCasesResultsRequest
 import com.scortelemed.schemas.simplefr.SimplefrUnderwrittingCasesResultsResponse
 import com.ws.servicios.EstadisticasService
 import com.ws.servicios.LogginService
-import com.ws.servicios.RequestService
+import com.ws.servicios.impl.RequestService
 import com.ws.servicios.SimplefrService
 import com.ws.servicios.TarificadorService
 
