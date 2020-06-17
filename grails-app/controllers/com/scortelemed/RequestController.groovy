@@ -1,7 +1,11 @@
 package com.scortelemed
 
 import com.scortelemed.schemas.enginyers.AddExp
+import com.scortelemed.schemas.methislab.MethislabUnderwrittingCaseManagementRequest
+import com.scortelemed.schemas.methislabCF.MethislabCFUnderwrittingCaseManagementRequest
 import com.ws.servicios.EnginyersService
+import com.ws.servicios.MethislabCFService
+import com.ws.servicios.MethislabService
 import grails.plugin.springsecurity.annotation.Secured
 import grails.util.Holders
 
@@ -44,6 +48,10 @@ class RequestController {
 	private LagunaroService lagunaroService
 	@Autowired
 	private CajamarService cajamarService
+	@Autowired
+	private MethislabService methislabService
+	@Autowired
+	private MethislabCFService methislabCFService
 	@Autowired
 	private NetinsuranceService netinsuranceService
 	@Autowired
@@ -559,6 +567,49 @@ class RequestController {
 				}
 
 				break
+
+			case "methislab":
+
+				JAXBContext jaxbContext = JAXBContext.newInstance(MethislabUnderwrittingCaseManagementRequest.class);
+				Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+
+				StringReader reader = new StringReader(requestInstance.getRequest().trim());
+
+				JAXBElement<MethislabUnderwrittingCaseManagementRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), MethislabUnderwrittingCaseManagementRequest.class);
+				MethislabUnderwrittingCaseManagementRequest methislabUnderwrittingCaseManagementRequest = root.getValue();
+
+				if (Company.findByNombre(requestInstance.company).generationAutomatic) {
+					def compania=Company.findByNombre(requestInstance.company)
+					session.companyST=compania.codigoSt
+					requestXML=methislabService.marshall("http://www.scortelemed.com/schemas/methislab",methislabUnderwrittingCaseManagementRequest)
+					requestBBDD = requestService.crear("MethislabUnderwrittingCaseManagementRequest",requestXML)
+					logginService.putInfoMessage("Se ha procesado una request namnualmente para: " + requestInstance.company)
+					methislabService.crearExpediente(requestBBDD)
+					flash.message = "${message(code: 'default.processed.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
+				}
+				break
+
+			case "methislabCF":
+
+				JAXBContext jaxbContext = JAXBContext.newInstance(MethislabCFUnderwrittingCaseManagementRequest.class);
+				Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+
+				StringReader reader = new StringReader(requestInstance.getRequest().trim());
+
+				JAXBElement<MethislabCFUnderwrittingCaseManagementRequest> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), MethislabCFUnderwrittingCaseManagementRequest.class);
+				MethislabCFUnderwrittingCaseManagementRequest methislabCFUnderwrittingCaseManagementRequest = root.getValue();
+
+				if (Company.findByNombre(requestInstance.company).generationAutomatic) {
+					def compania=Company.findByNombre(requestInstance.company)
+					session.companyST=compania.codigoSt
+					requestXML=methislabCFService.marshall("http://www.scortelemed.com/schemas/methislabCF",methislabCFUnderwrittingCaseManagementRequest)
+					requestBBDD = requestService.crear("MethislabCFUnderwrittingCaseManagementRequest",requestXML)
+					logginService.putInfoMessage("Se ha procesado una request namnualmente para: " + requestInstance.company)
+					methislabCFService.crearExpediente(requestBBDD)
+					flash.message = "${message(code: 'default.processed.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
+				}
+				break
+
 			case "netinsurance":
 
 				JAXBContext jaxbContext = JAXBContext.newInstance(NetinsuranteUnderwrittingCaseManagementRequest.class);
