@@ -585,7 +585,13 @@ class NetinsuranceService {
 							datosRegistro.telefono1 = "999999999"
 						}
 					}
-
+                    log.info("***         Netinsurance           ***")
+					log.info("** Los telefonos que quedaron fueron: ")
+					log.info("Telefono1 :  ${datosRegistro.telefono1}")
+					log.info("Telefono2 :  ${datosRegistro.telefono2}")
+					log.info("Telefono3 :  ${datosRegistro.telefono3}")
+					log.info("***      Fin de los telefonos       ***")
+                    log.info("***         Netinsurance           ***")
 					/**CODIGO CIA
 					 *
 					 */
