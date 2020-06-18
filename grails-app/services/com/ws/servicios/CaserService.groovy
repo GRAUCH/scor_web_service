@@ -742,14 +742,14 @@ class CaserService {
 
                 if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-                    Element eElement = (Element) nNode;
+                    Element eElement = (Element) nNode
 
                     if (eElement.getElementsByTagName("serviceCode").item(0) != null) {
 
                         DATOS.Servicio servicio = new DATOS.Servicio()
 
                         servicio.codigoServicio = eElement.getElementsByTagName("serviceCode").item(0).getTextContent()
-                        servicio.tipoServicios = "S"
+                        servicio.tipoServicios = eElement.getElementsByTagName("serviceType").item(0).getTextContent()
                         if (eElement.getElementsByTagName("serviceDescription").item(0) != null) {
                             servicio.descripcionServicio = eElement.getElementsByTagName("serviceDescription").item(0).getTextContent()
                         }
