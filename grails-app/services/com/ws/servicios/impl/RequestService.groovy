@@ -16,9 +16,11 @@ import javax.xml.transform.stream.StreamSource
 import java.text.Normalizer
 import java.util.regex.Pattern
 
+import grails.transaction.Transactional
+
+@Transactional
 class RequestService implements IRequestService{
-    def avisosService
-    def serverPasswordCallbackHandlerService
+
     def logginService = new LogginService()
     def estadisticasService = new EstadisticasService()
 

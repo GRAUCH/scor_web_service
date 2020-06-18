@@ -98,7 +98,7 @@ class CrearExpedienteService {
 		}
 	}
 
-	private def rellenaDatos = { req, company ->
+	def rellenaDatos = { req, company ->
 		def mapDatos = [:]
 		def formato = new SimpleDateFormat("yyyyMMdd");
 
@@ -235,7 +235,7 @@ class CrearExpedienteService {
 		}
 	}
 
-	private def rellenaPreguntas = { req, nameCompany ->
+	def rellenaPreguntas = { req, nameCompany ->
 		def listadoPreguntas = []
 		def mapDatos = [:]
 
@@ -292,14 +292,14 @@ class CrearExpedienteService {
 		}
 	}
 
-	private def rellenaServicio = { req, nombre ->
+	def rellenaServicio = { req, nombre ->
 		def listadoServicios = []
-		listadoServicios.add(obtenerSerivicioPorNombreCompania(req, nombre))
+		listadoServicios.add(obtenerServicioPorNombreCompania(req, nombre))
 
 		return listadoServicios
 	}
 
-	private def rellenaCoberturas = { req ->
+	def rellenaCoberturas = { req ->
 		
 		def listadoCoberturas = []
 		def capital = 0
@@ -378,7 +378,7 @@ class CrearExpedienteService {
 		return result
 	}
 
-	private def obtenerSerivicioPorNombreCompania = { req, nombre ->
+	private def obtenerServicioPorNombreCompania = { req, nombre ->
 		def mapDatos = [:]
 
 		DATOS.Servicio servicio = new DATOS.Servicio()
