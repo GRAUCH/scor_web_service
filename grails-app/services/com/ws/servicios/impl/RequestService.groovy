@@ -22,16 +22,29 @@ class RequestService implements IRequestService{
     def logginService = new LogginService()
     def estadisticasService = new EstadisticasService()
 
+    def getBBDDRequest(Request requestInstance, String opername, String schema, Class<?> myObjectClass) {
+        def object = jaxbParser(requestInstance.getRequest(),myObjectClass)
+        def requestXML
+        if(schema) {
+            requestXML = marshall(schema,object,myObjectClass)
+        } else {
+            requestXML = marshall(object,myObjectClass)
+        }
+        def requestBBDD = crear(opername,requestXML)
+        logginService.putInfoMessage("Se ha procesado una request manualmente para: " + requestInstance.company)
+        return requestBBDD
+    }
+
     def jaxbParser(String entrada, Class<?> myObjectClass) {
-        def objectsList = null
+        def object = null
         if (entrada!= null && !entrada.trim().isEmpty()) {
             JAXBContext jaxbContext = JAXBContext.newInstance(myObjectClass)
             Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller()
             StringReader reader = new StringReader(entrada.trim())
             JAXBElement<?> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), myObjectClass)
-            objectsList = root.getValue()
+            object = root.getValue()
         }
-        return  objectsList
+        return  object
     }
 
     def marshall(def objetoRelleno, Class<?> clase) {
@@ -64,7 +77,7 @@ class RequestService implements IRequestService{
         return result
     }
 
-    def crear(message, requestXML, opera = false, company = false) {
+    def crear(message, requestXML) {
         def result
         def operacion = estadisticasService.obtenerObjetoOperacion(message)
         def sesion = RequestContextHolder.currentRequestAttributes().getSession()
@@ -106,10 +119,6 @@ class RequestService implements IRequestService{
         }
 
         return result
-    }
-
-    def createString = { node ->
-        return groovy.xml.XmlUtil.serialize(node)
     }
 
     /**

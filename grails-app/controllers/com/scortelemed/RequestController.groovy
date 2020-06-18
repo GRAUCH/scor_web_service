@@ -397,133 +397,96 @@ class RequestController {
 
 	def procesarRequest = {
 
-
-		def requestXML
 		def requestBBDD
-
 		Request requestInstance = Request.get(params.id)
-		Company compania=Company.findByNombre(requestInstance.company)
-		session.companyST=compania.codigoSt
-		TipoCompany filtro = TipoCompany.fromNombre(compania.nombre)
 
-		switch (filtro) {
-			case TipoCompany.LAGUN_ARO:
-				def opername="GestionReconocimientoMedicoRequest"
-				GestionReconocimientoMedicoRequestLagunaro gestionReconocimientoMedicoRequest = requestService.jaxbParser(requestInstance.getRequest(),GestionReconocimientoMedicoRequestLagunaro.class)
-				requestXML = requestService.marshall(gestionReconocimientoMedicoRequest,GestionReconocimientoMedicoRequestLagunaro.class)
-				requestBBDD = requestService.crear(opername,requestXML)
-				logginService.putInfoMessage("Se ha procesado una request manualmente para: " + requestInstance.company)
-				lagunaroService.crearExpediente(requestBBDD)
-				flash.message = "${message(code: 'default.processed.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
-				break
-			case TipoCompany.AMA:
-				def opername="AmaResultadoReconocimientoMedicoRequest"
-				GestionReconocimientoMedicoRequestAma gestionReconocimientoMedicoRequest = requestService.jaxbParser(requestInstance.getRequest(),GestionReconocimientoMedicoRequestAma.class)
-				requestXML = requestService.marshall("http://www.scortelemed.com/schemas/ama",gestionReconocimientoMedicoRequest,GestionReconocimientoMedicoRequestAma.class)
-				requestBBDD = requestService.crear(opername,requestXML)
-				logginService.putInfoMessage("Se ha procesado una request manualmente para: " + requestInstance.company)
-				amaService.crearExpediente(requestBBDD)
-				flash.message = "${message(code: 'default.processed.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
-				break
-			case TipoCompany.CASER:
-				def opername="CaserResultadoReconocimientoMedicoRequest"
-				GestionReconocimientoMedicoRequestCaser gestionReconocimientoMedicoRequest = requestService.jaxbParser(requestInstance.getRequest(),GestionReconocimientoMedicoRequestCaser.class)
-				requestXML = requestService.marshall("http://www.scortelemed.com/schemas/caser",gestionReconocimientoMedicoRequest,GestionReconocimientoMedicoRequestCaser.class)
-				requestBBDD = requestService.crear(opername,requestXML)
-				logginService.putInfoMessage("Se ha procesado una request manualmente para: " + requestInstance.company)
-				caserService.crearExpediente(requestBBDD)
-				flash.message = "${message(code: 'default.processed.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
-				break
-			case TipoCompany.CAJAMAR:
-				CajamarUnderwrittingCaseManagementRequest cajamarUnderwrittingCaseManagementRequest = requestService.jaxbParser(requestInstance.getRequest(),CajamarUnderwrittingCaseManagementRequest.class)
-				if (cajamarUnderwrittingCaseManagementRequest.getRegScor().getYtipo().toString().equals("1")) {
-					def opername="CajamarUnderwrittingCaseManagementRequest"
-					requestXML = requestService.marshall("http://www.scortelemed.com/schemas/cajamar",cajamarUnderwrittingCaseManagementRequest,CajamarUnderwrittingCaseManagementRequest.class)
-					requestBBDD = requestService.crear(opername,requestXML)
-					logginService.putInfoMessage("Se ha procesado una request manualmente para: " + requestInstance.company)
-					crearExpedienteService.crearExpediente(requestBBDD)
+		if(Company.findByNombre(requestInstance.company).generationAutomatic) {
+			Company compania = Company.findByNombre(requestInstance.company)
+			session.companyST = compania.codigoSt
+			TipoCompany filtro = TipoCompany.fromNombre(compania.nombre)
+
+			switch (filtro) {
+				case TipoCompany.LAGUN_ARO:
+					requestBBDD = requestService.getBBDDRequest(requestInstance, "GestionReconocimientoMedicoRequest", null, GestionReconocimientoMedicoRequestLagunaro.class)
+					lagunaroService.crearExpediente(requestBBDD)
 					flash.message = "${message(code: 'default.processed.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
-				} else {
-					flash.error = "${message(code: 'default.invalid.type.operation.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
-				}
-				break
-			case TipoCompany.AFI_ESCA:
-				AfiEscaUnderwrittingCaseManagementRequest afiEscaUnderwrittingCaseManagementRequest = requestService.jaxbParser(requestInstance.getRequest(),AfiEscaUnderwrittingCaseManagementRequest.class)
-				if (afiEscaUnderwrittingCaseManagementRequest.getRequest_Data().getRecord().getNombre().equals("A")) {
-					def opername="AfiEscaUnderwrittingCaseManagementRequest"
-					requestXML = requestService.marshall(afiEscaUnderwrittingCaseManagementRequest,AfiEscaUnderwrittingCaseManagementRequest.class)
-					requestBBDD = requestService.crear(opername,requestXML)
-					logginService.putInfoMessage("Se ha procesado una request manualmente para: " + requestInstance.company)
-					crearExpedienteService.crearExpediente(requestBBDD)
+					break
+				case TipoCompany.AMA:
+					requestBBDD = requestService.getBBDDRequest(requestInstance, "AmaResultadoReconocimientoMedicoRequest", "http://www.scortelemed.com/schemas/ama", GestionReconocimientoMedicoRequestAma.class)
+					amaService.crearExpediente(requestBBDD)
 					flash.message = "${message(code: 'default.processed.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
-				} else {
-					flash.error = "${message(code: 'default.invalid.type.operation.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
-				}
-				break
-			case TipoCompany.ALPTIS:
-				AlptisUnderwrittingCaseManagementRequest alptisUnderwrittingCaseManagementRequest = requestService.jaxbParser(requestInstance.getRequest(),AlptisUnderwrittingCaseManagementRequest.class)
-				if (alptisUnderwrittingCaseManagementRequest.getRequest_Data().getRecord().getNombre().equals("A")) {
-					def opername="AlptisUnderwrittingCaseManagementRequest"
-					requestXML = requestService.marshall(alptisUnderwrittingCaseManagementRequest,AlptisUnderwrittingCaseManagementRequest.class)
-					requestBBDD = requestService.crear(opername,requestXML)
-					logginService.putInfoMessage("Se ha procesado una request manualmente para: " + requestInstance.company)
-					crearExpedienteService.crearExpediente(requestBBDD)
+					break
+				case TipoCompany.CASER:
+					requestBBDD = requestService.getBBDDRequest(requestInstance, "CaserResultadoReconocimientoMedicoRequest", "http://www.scortelemed.com/schemas/caser", GestionReconocimientoMedicoRequestCaser.class)
+					caserService.crearExpediente(requestBBDD)
 					flash.message = "${message(code: 'default.processed.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
-				} else {
-					flash.error = "${message(code: 'default.invalid.type.operation.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
-				}
-				break
-			case TipoCompany.ZEN_UP:
-				LifesquareUnderwrittingCaseManagementRequest lifesquareUnderwrittingCaseManagementRequest = requestService.jaxbParser(requestInstance.getRequest(),LifesquareUnderwrittingCaseManagementRequest.class)
-				if (lifesquareUnderwrittingCaseManagementRequest.getRequest_Data().getRecord().getNombre().equals("A")) {
-					def opername="LifesquareUnderwrittingCaseManagementRequest"
-					requestXML = requestService.marshall(lifesquareUnderwrittingCaseManagementRequest,LifesquareUnderwrittingCaseManagementRequest.class)
-					requestBBDD = requestService.crear(opername,requestXML)
-					logginService.putInfoMessage("Se ha procesado una request manualmente para: " + requestInstance.company)
-					crearExpedienteService.crearExpediente(requestBBDD)
+					break
+				case TipoCompany.CAJAMAR:
+					CajamarUnderwrittingCaseManagementRequest cajamarUnderwrittingCaseManagementRequest = requestService.jaxbParser(requestInstance.getRequest(), CajamarUnderwrittingCaseManagementRequest.class)
+					if (cajamarUnderwrittingCaseManagementRequest.getRegScor().getYtipo().toString().equals("1")) {
+						requestBBDD = requestService.getBBDDRequest(requestInstance, "CajamarUnderwrittingCaseManagementRequest", "http://www.scortelemed.com/schemas/cajamar", CajamarUnderwrittingCaseManagementRequest.class)
+						crearExpedienteService.crearExpediente(requestBBDD)
+						flash.message = "${message(code: 'default.processed.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
+					} else {
+						flash.error = "${message(code: 'default.invalid.type.operation.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
+					}
+					break
+				case TipoCompany.AFI_ESCA:
+					AfiEscaUnderwrittingCaseManagementRequest afiEscaUnderwrittingCaseManagementRequest = requestService.jaxbParser(requestInstance.getRequest(), AfiEscaUnderwrittingCaseManagementRequest.class)
+					if (afiEscaUnderwrittingCaseManagementRequest.getRequest_Data().getRecord().getNombre().equals("A")) {
+						requestBBDD = requestService.getBBDDRequest(requestInstance, "AfiEscaUnderwrittingCaseManagementRequest", null, AfiEscaUnderwrittingCaseManagementRequest.class)
+						crearExpedienteService.crearExpediente(requestBBDD)
+						flash.message = "${message(code: 'default.processed.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
+					} else {
+						flash.error = "${message(code: 'default.invalid.type.operation.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
+					}
+					break
+				case TipoCompany.ALPTIS:
+					AlptisUnderwrittingCaseManagementRequest alptisUnderwrittingCaseManagementRequest = requestService.jaxbParser(requestInstance.getRequest(), AlptisUnderwrittingCaseManagementRequest.class)
+					if (alptisUnderwrittingCaseManagementRequest.getRequest_Data().getRecord().getNombre().equals("A")) {
+						requestBBDD = requestService.getBBDDRequest(requestInstance, "AlptisUnderwrittingCaseManagementRequest", null, AlptisUnderwrittingCaseManagementRequest.class)
+						crearExpedienteService.crearExpediente(requestBBDD)
+						flash.message = "${message(code: 'default.processed.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
+					} else {
+						flash.error = "${message(code: 'default.invalid.type.operation.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
+					}
+					break
+				case TipoCompany.ZEN_UP:
+					LifesquareUnderwrittingCaseManagementRequest lifesquareUnderwrittingCaseManagementRequest = requestService.jaxbParser(requestInstance.getRequest(), LifesquareUnderwrittingCaseManagementRequest.class)
+					if (lifesquareUnderwrittingCaseManagementRequest.getRequest_Data().getRecord().getNombre().equals("A")) {
+						requestBBDD = requestService.getBBDDRequest(requestInstance, "LifesquareUnderwrittingCaseManagementRequest", null, LifesquareUnderwrittingCaseManagementRequest.class)
+						crearExpedienteService.crearExpediente(requestBBDD)
+						flash.message = "${message(code: 'default.processed.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
+					} else {
+						flash.error = "${message(code: 'default.invalid.type.operation.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
+					}
+					break
+				case TipoCompany.METHIS_LAB:
+					requestBBDD = requestService.getBBDDRequest(requestInstance, "MethislabUnderwrittingCaseManagementRequest", "http://www.scortelemed.com/schemas/methislab", MethislabUnderwrittingCaseManagementRequest.class)
+					methislabService.crearExpediente(requestBBDD)
 					flash.message = "${message(code: 'default.processed.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
-				} else {
-					flash.error = "${message(code: 'default.invalid.type.operation.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
-				}
-				break
-			case TipoCompany.METHIS_LAB:
-				def opername = "MethislabUnderwrittingCaseManagementRequest"
-				MethislabUnderwrittingCaseManagementRequest methislabUnderwrittingCaseManagementRequest = requestService.jaxbParser(requestInstance.getRequest(),MethislabUnderwrittingCaseManagementRequest.class)
-				requestXML = requestService.marshall("http://www.scortelemed.com/schemas/methislab",methislabUnderwrittingCaseManagementRequest,MethislabUnderwrittingCaseManagementRequest.class)
-				requestBBDD = requestService.crear(opername,requestXML)
-				logginService.putInfoMessage("Se ha procesado una request manualmente para: " + requestInstance.company)
-				methislabService.crearExpediente(requestBBDD)
-				flash.message = "${message(code: 'default.processed.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
-				break
-			case TipoCompany.CF_LIFE:
-				def opername = "MethislabCFUnderwrittingCaseManagementRequest"
-				MethislabCFUnderwrittingCaseManagementRequest methislabCFUnderwrittingCaseManagementRequest = requestService.jaxbParser(requestInstance.getRequest(),MethislabCFUnderwrittingCaseManagementRequest.class)
-				requestXML = requestService.marshall("http://www.scortelemed.com/schemas/methislabCF",methislabCFUnderwrittingCaseManagementRequest,MethislabCFUnderwrittingCaseManagementRequest.class)
-				requestBBDD = requestService.crear(opername,requestXML)
-				logginService.putInfoMessage("Se ha procesado una request manualmente para: " + requestInstance.company)
-				methislabCFService.crearExpediente(requestBBDD)
-				flash.message = "${message(code: 'default.processed.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
-				break
-			case TipoCompany.NET_INSURANCE:
-				def opername = "NetinsuranceUnderwrittingCaseManagementRequest"
-				NetinsuranteUnderwrittingCaseManagementRequest netinsuranteUnderwrittingCaseManagementRequest = requestService.jaxbParser(requestInstance.getRequest(),NetinsuranteUnderwrittingCaseManagementRequest.class)
-				requestXML = requestService.marshall("http://www.scortelemed.com/schemas/netinsurance",netinsuranteUnderwrittingCaseManagementRequest,NetinsuranteUnderwrittingCaseManagementRequest.class)
-				requestBBDD = requestService.crear(opername,requestXML)
-				logginService.putInfoMessage("Se ha procesado una request manualmente para: " + requestInstance.company)
-				netinsuranceService.crearExpediente(requestBBDD)
-				flash.message = "${message(code: 'default.processed.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
-				break
-			case TipoCompany.ENGINYERS:
-				def opername = "EnginyersResultadoReconocimientoMedicoRequest"
-				AddExp addExp = requestService.jaxbParser(requestInstance.getRequest(),AddExp.class)
-				requestXML = requestService.marshall("http://www.scortelemed.com/schemas/enginyers",addExp,AddExp.class)
-				requestBBDD = requestService.crear(opername,requestXML)
-				logginService.putInfoMessage("Se ha procesado una request manualmente para: " + requestInstance.company)
-				enginyersService.crearExpediente(requestBBDD)
-				flash.message = "${message(code: 'default.processed.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
-				break
-			default:
-				break
+					break
+				case TipoCompany.CF_LIFE:
+					requestBBDD = requestService.getBBDDRequest(requestInstance, "MethislabCFUnderwrittingCaseManagementRequest", "http://www.scortelemed.com/schemas/methislabCF", MethislabCFUnderwrittingCaseManagementRequest.class)
+					methislabCFService.crearExpediente(requestBBDD)
+					flash.message = "${message(code: 'default.processed.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
+					break
+				case TipoCompany.NET_INSURANCE:
+					requestBBDD = requestService.getBBDDRequest(requestInstance, "NetinsuranceUnderwrittingCaseManagementRequest", "http://www.scortelemed.com/schemas/netinsurance", NetinsuranteUnderwrittingCaseManagementRequest.class)
+					netinsuranceService.crearExpediente(requestBBDD)
+					flash.message = "${message(code: 'default.processed.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
+					break
+				case TipoCompany.ENGINYERS:
+					requestBBDD = requestService.getBBDDRequest(requestInstance, "EnginyersResultadoReconocimientoMedicoRequest", "http://www.scortelemed.com/schemas/enginyers", AddExp.class)
+					enginyersService.crearExpediente(requestBBDD)
+					flash.message = "${message(code: 'default.processed.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
+					break
+				default:
+					break
+			}
+		} else {
+			logginService.putInfoMessage("Fallo al procesar una request manualmente para: " + requestInstance.company)
+			flash.error = "${message(code: 'default.invalid.type.operation.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
 		}
 		redirect(action: show, id: params.id)
 	}
