@@ -11,6 +11,7 @@ import javax.xml.bind.JAXBContext
 import javax.xml.bind.JAXBElement
 import javax.xml.bind.Marshaller
 import javax.xml.bind.Unmarshaller
+import javax.xml.namespace.QName
 import javax.xml.transform.stream.StreamSource
 import java.text.Normalizer
 import java.util.regex.Pattern
@@ -26,13 +27,41 @@ class RequestService implements IRequestService{
         if (entrada!= null && !entrada.trim().isEmpty()) {
             JAXBContext jaxbContext = JAXBContext.newInstance(myObjectClass)
             Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller()
-
             StringReader reader = new StringReader(entrada.trim())
-
             JAXBElement<?> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), myObjectClass)
             objectsList = root.getValue()
         }
         return  objectsList
+    }
+
+    def marshall(def objetoRelleno, Class<?> clase) {
+        StringWriter writer = new StringWriter()
+        try {
+            JAXBContext jaxbContext = JAXBContext.newInstance(clase)
+            Marshaller jaxbMarshaller = jaxbContext.createMarshaller()
+            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true)
+            jaxbMarshaller.marshal(objetoRelleno, writer)
+        } finally {
+            writer.close()
+        }
+        return writer
+    }
+
+    def marshall(String nameSpace, def objetoRelleno, Class<?> clase) {
+        StringWriter writer = new StringWriter()
+        String result
+        try {
+            JAXBContext jaxbContext = JAXBContext.newInstance(clase)
+            Marshaller jaxbMarshaller = jaxbContext.createMarshaller()
+            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true)
+            QName qName = new QName(nameSpace, clase.simpleName)
+            def root = new JAXBElement<?>(qName, clase, objetoRelleno)
+            jaxbMarshaller.marshal(root, writer)
+            result = writer.toString()
+        } finally {
+            writer.close()
+        }
+        return result
     }
 
     def crear(message, requestXML, opera = false, company = false) {
@@ -83,25 +112,8 @@ class RequestService implements IRequestService{
         return groovy.xml.XmlUtil.serialize(node)
     }
 
-    def marshall = { objetoRelleno, clase ->
-
-        StringWriter writer = new StringWriter();
-
-        try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(clase);
-            Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-
-            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-//			jaxbMarshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
-
-            jaxbMarshaller.marshal(objetoRelleno, writer);
-        } finally {
-            writer.close();
-        }
-
-        return writer
-    }
-
+    /**
+     * No utilizado
 
     def unmarshall = { objetoRelleno, clase ->
 
@@ -121,6 +133,7 @@ class RequestService implements IRequestService{
 
         return writer
     }
+     */
 
     def convertir(cadena) {
         String original = "áàäéèëíìïóòöúùüñÁÀÄÉÈËÍÌÏÓÒÖÚÙÜÑçÇ";
