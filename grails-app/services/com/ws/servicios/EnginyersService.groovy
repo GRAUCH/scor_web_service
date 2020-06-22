@@ -31,8 +31,9 @@ import static grails.async.Promises.task
 class EnginyersService {
 
     def grailsApplication
-    def logginService = new LogginService()
-    def tarificadorService = new TarificadorService()
+    def expedienteService
+    def logginService
+    def tarificadorService
     TransformacionUtil util = new TransformacionUtil()
 
     /**
@@ -85,35 +86,18 @@ class EnginyersService {
     private def crearExpedienteBPM = { req ->
         def listadoFinal = []
         RootElement payload = new RootElement()
-
-        listadoFinal.add(buildCabecera(req))
+        //TODO ESTO TIENE SENTIDO?
+        if (Environment.current.name.equals("production_wildfly")) {
+            listadoFinal.add(expedienteService.buildCabecera(req, "1071"))
+        } else {
+            listadoFinal.add(expedienteService.buildCabecera(req, "1072"))
+        }
         listadoFinal.add(buildDatos(req, req.company))
-        listadoFinal.add(buildPie())
+        listadoFinal.add(expedienteService.buildPie(null))
 
         payload.cabeceraOrDATOSOrPIE = listadoFinal
 
         return payload
-    }
-
-    private def buildCabecera = { req ->
-
-        def formato = new SimpleDateFormat("yyyyMMdd");
-
-        RootElement.CABECERA cabecera = new RootElement.CABECERA()
-
-        if (Environment.current.name.equals("production_wildfly")) {
-            cabecera.setCodigoCia("1071")
-        } else {
-            cabecera.setCodigoCia("1072")
-        }
-
-        cabecera.setContadorSecuencial("1")
-        cabecera.setFechaGeneracion(formato.format(new Date()))
-        cabecera.setFiller("")
-        cabecera.setTipoFichero("1")
-
-        return cabecera
-
     }
 
     private def buildDatos = { req, company ->
@@ -627,17 +611,6 @@ class EnginyersService {
         datos.campo20 = ""
     }
 
-    private def buildPie = {
-
-        RootElement.PIE pie = new RootElement.PIE()
-        pie.setFiller("")
-        pie.setNumFilasFichero(100)
-
-        pie.setNumRegistros(1)
-
-        return pie
-    }
-
     def busquedaCrm(policyNumber, ou, opername, companyCodigoSt, companyId, requestBBDD, companyName) {
 
         task {
@@ -741,7 +714,7 @@ class EnginyersService {
         }
     }
 
-    public void insertarRecibido(Company company, String identificador, String info, String operacion) {
+    void insertarRecibido(Company company, String identificador, String info, String operacion) {
 
         Recibido recibido = new Recibido()
         recibido.setFecha(new Date())
@@ -752,7 +725,7 @@ class EnginyersService {
         recibido.save(flush: true)
     }
 
-    public void insertarError(Company company, String identificador, String info, String operacion, String detalleError) {
+    void insertarError(Company company, String identificador, String info, String operacion, String detalleError) {
 
         com.scortelemed.Error error = new com.scortelemed.Error()
         error.setFecha(new Date())
@@ -769,7 +742,7 @@ class EnginyersService {
      * @param requestBBDD
      * @return
      */
-    public List<WsError> validarDatosObligatorios(requestBBDD) {
+    List<WsError> validarDatosObligatorios(requestBBDD) {
 
         List<WsError> wsErrors = new ArrayList<WsError>()
         SimpleDateFormat formato = new SimpleDateFormat("yyyyMMdd");

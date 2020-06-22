@@ -33,7 +33,8 @@ import static grails.async.Promises.task
 @Transactional
 class NnService {
 
-    def logginService = new LogginService()
+    def logginService
+    def expedienteService
     def grailsApplication
 
     /**
@@ -73,7 +74,7 @@ class NnService {
         return writer
     }
 
-    public void insertarRecibido(Company company, String identificador, String info, String operacion) {
+    void insertarRecibido(Company company, String identificador, String info, String operacion) {
 
         Recibido recibido = new Recibido()
         recibido.setFecha(new Date())
@@ -84,7 +85,7 @@ class NnService {
         recibido.save(flush:true)
     }
 
-    public void insertarError(Company company, String identificador, String info, String operacion, String detalleError) {
+    void insertarError(Company company, String identificador, String info, String operacion, String detalleError) {
 
         com.scortelemed.Error error = new com.scortelemed.Error()
         error.setFecha(new Date())
@@ -96,7 +97,7 @@ class NnService {
         error.save(flush:true)
     }
 
-    public void insertarEnvio (Company company, String identificador, String info) {
+    void insertarEnvio (Company company, String identificador, String info) {
 
         Envio envio = new Envio()
         envio.setFecha(new Date())
@@ -112,7 +113,7 @@ class NnService {
      * @param requestBBDD
      * @return
      */
-    public List<WsError> validarDatosObligatorios(requestBBDD) {
+    List<WsError> validarDatosObligatorios(requestBBDD) {
 
         List<WsError> wsErrors = new ArrayList<WsError>()
         SimpleDateFormat formato = new SimpleDateFormat("yyyyMMdd");
@@ -342,37 +343,13 @@ class NnService {
         def listadoFinal = []
         RootElement payload = new RootElement()
 
-        listadoFinal.add(buildCabecera(req))
+        listadoFinal.add(expedienteService.buildCabecera(req, null))
         listadoFinal.add(buildDatos(req, req.company))
-        listadoFinal.add(buildPie())
+        listadoFinal.add(expedienteService.buildPie(null))
 
         payload.cabeceraOrDATOSOrPIE = listadoFinal
 
         return payload
-    }
-
-    private def buildCabecera = { req ->
-
-        def formato = new SimpleDateFormat("yyyyMMdd");
-        RootElement.CABECERA cabecera = new RootElement.CABECERA()
-        cabecera.setCodigoCia(req.company.codigoSt)
-        cabecera.setContadorSecuencial("1")
-        cabecera.setFechaGeneracion(formato.format(new Date()))
-        cabecera.setFiller("")
-        cabecera.setTipoFichero("1")
-
-        return cabecera
-    }
-
-    private def buildPie = {
-
-        RootElement.PIE pie = new RootElement.PIE()
-        pie.setFiller("")
-        pie.setNumFilasFichero(100)
-
-        pie.setNumRegistros(1)
-
-        return pie
     }
 
     private def buildDatos = { req, company ->
@@ -395,7 +372,7 @@ class NnService {
         }
     }
 
-    public def rellenaDatos (req, company) {
+    def rellenaDatos (req, company) {
 
         def mapDatos = [:]
         def listadoPreguntas = []

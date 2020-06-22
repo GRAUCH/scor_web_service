@@ -1,5 +1,6 @@
 package com.ws.servicios
 
+import com.ws.servicios.impl.ExpedienteService
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.GenerarZip
 import hwsol.webservices.TransformacionUtil
@@ -72,8 +73,9 @@ import static grails.async.Promises.*
 class AmaService {
 
 	TransformacionUtil util = new TransformacionUtil()
-	def logginService = new LogginService()
-	def tarificadorService = new TarificadorService()
+	def expedienteService
+	def logginService
+	def tarificadorService
 	GenerarZip generarZip = new GenerarZip()
 	def grailsApplication
 	ContentResult contentResult = new ContentResult()
@@ -677,39 +679,13 @@ class AmaService {
 		def listadoFinal = []
 		RootElement payload = new RootElement()
 
-		listadoFinal.add(buildCabecera(req, codigoCia))
+		listadoFinal.add(expedienteService.buildCabecera(req, codigoCia))
 		listadoFinal.add(buildDatos(req, codigoCia))
-		listadoFinal.add(buildPie())
+		listadoFinal.add(expedienteService.buildPie(null))
 
 		payload.cabeceraOrDATOSOrPIE = listadoFinal
 
 		return payload
-	}
-
-	private def buildCabecera = { req, codigoCia ->
-
-		def formato = new SimpleDateFormat("yyyyMMdd");
-
-		RootElement.CABECERA cabecera = new RootElement.CABECERA()
-
-		cabecera.setCodigoCia(codigoCia)
-		cabecera.setContadorSecuencial("1")
-		cabecera.setFechaGeneracion(formato.format(new Date()))
-		cabecera.setFiller("")
-		cabecera.setTipoFichero("1")
-
-		return cabecera
-	}
-
-	private def buildPie = {
-
-		RootElement.PIE pie = new RootElement.PIE()
-		pie.setFiller("")
-		pie.setNumFilasFichero(100)
-
-		pie.setNumRegistros(1)
-
-		return pie
 	}
 
 	private def buildDatos = { req, codigoCia ->
@@ -729,7 +705,7 @@ class AmaService {
 		}
 	}
 
-	public def rellenaDatos (req, codigoCia) {
+	def rellenaDatos (req, codigoCia) {
 
 		def mapDatos = [:]
 		def listadoPreguntas = []
@@ -1208,7 +1184,7 @@ class AmaService {
 		}
 	}
 
-	public static String getCodeResult(String code) {
+	static String getCodeResult(String code) {
 
 		String result = null;
 
@@ -1249,7 +1225,7 @@ class AmaService {
 	 * @param expediente
 	 * @return
 	 */
-	public boolean expedienteGestionado(servicios.Expediente expediente, CorreoUtil correoUtil, String opername){
+	boolean expedienteGestionado(servicios.Expediente expediente, CorreoUtil correoUtil, String opername){
 
 		String codError = null
 
@@ -1324,7 +1300,7 @@ class AmaService {
 	 * @param expediente
 	 * @return
 	 */
-	public boolean cumpleRequisitosVisualizacion(servicios.Expediente expediente, CorreoUtil correoUtil, String opername){
+	boolean cumpleRequisitosVisualizacion(servicios.Expediente expediente, CorreoUtil correoUtil, String opername){
 
 		if (expediente != null && expediente.getListaSiniestros() != null && expediente.getListaSiniestros().size() > 0 && tienePago(expediente, correoUtil, opername)){
 			return !existePagoColaboradorSinTipoImpuesto(expediente.getListaSiniestros().get(0).getPagos(), correoUtil, opername, expediente) && !existePagoAseguradoSinNumeroCuenta(expediente.getListaSiniestros().get(0).getPagos(), expediente, correoUtil, opername)
@@ -1333,7 +1309,7 @@ class AmaService {
 		return true
 	}
 
-	public boolean tienePago(servicios.Expediente expediente, CorreoUtil correoUtil, String opername){
+	boolean tienePago(servicios.Expediente expediente, CorreoUtil correoUtil, String opername){
 
 		if (expediente.getListaSiniestros().get(0).getPagos() != null && expediente.getListaSiniestros().get(0).getPagos().size() > 0) {
 			logginService.putInfoMessage("Expediente: " + expediente.getCodigoST() + " no tiene pago. Esto esta impidiendo a AMA ver la gesti�n del siniestro.")
@@ -1345,7 +1321,7 @@ class AmaService {
 
 	}
 
-	public boolean existePagoColaboradorSinTipoImpuesto(List<servicios.Pago> pagos, CorreoUtil correoUtil, String opername, servicios.Expediente expediente){
+	boolean existePagoColaboradorSinTipoImpuesto(List<servicios.Pago> pagos, CorreoUtil correoUtil, String opername, servicios.Expediente expediente){
 
 		if (pagos != null && pagos.size() > 0){
 			for (int i = 0; i < pagos.size(); i++){
@@ -1361,7 +1337,7 @@ class AmaService {
 
 	}
 
-	public boolean existePagoAseguradoSinNumeroCuenta(List<servicios.Pago> pagos, servicios.Expediente expediente, CorreoUtil correoUtil, String opername){
+	boolean existePagoAseguradoSinNumeroCuenta(List<servicios.Pago> pagos, servicios.Expediente expediente, CorreoUtil correoUtil, String opername){
 
 
 		if (pagos != null && pagos.size() > 0){
@@ -1578,7 +1554,7 @@ class AmaService {
 		return existeDocumento
 	}
 
-	public def rellenaDatosSalidaDocumentoNodo(nodoAlfresco, requestDate, logginService, String codigoSt) {
+	def rellenaDatosSalidaDocumentoNodo(nodoAlfresco, requestDate, logginService, String codigoSt) {
 
 		byte[] compressedData=contentResult.obtenerFichero(nodoAlfresco)
 
@@ -1592,7 +1568,7 @@ class AmaService {
 		return documento
 	}
 
-	public def rellenaDatosSalidaDocumentoId(documentoId, requestDate, logginService, String codigoSt) {
+	def rellenaDatosSalidaDocumentoId(documentoId, requestDate, logginService, String codigoSt) {
 
 		byte[] compressedData=contentResult.obtenerFichero(documentoId)
 
@@ -1606,7 +1582,7 @@ class AmaService {
 		return documento
 	}
 
-	public boolean excluirDelEnvio(BenefitInformation[] benefitInformation){
+	boolean excluirDelEnvio(BenefitInformation[] benefitInformation){
 
 		for (int i = 0; i < benefitInformation.length; i++) {
 
@@ -1619,7 +1595,7 @@ class AmaService {
 
 	}
 
-	public void insertarRecibido(Company company, String identificador, String info, String operacion) {
+	void insertarRecibido(Company company, String identificador, String info, String operacion) {
 
 		Recibido recibido = new Recibido()
 		recibido.setFecha(new Date())
@@ -1630,7 +1606,7 @@ class AmaService {
 		recibido.save(flush:true)
 	}
 
-	public void insertarError(Company company, String identificador, String info, String operacion, String detalleError) {
+	void insertarError(Company company, String identificador, String info, String operacion, String detalleError) {
 
 		com.scortelemed.Error error = new com.scortelemed.Error()
 		error.setFecha(new Date())
@@ -1643,7 +1619,7 @@ class AmaService {
 
 	}
 
-	public void insertarEnvio (Company company, String identificador, String info) {
+	void insertarEnvio (Company company, String identificador, String info) {
 
 		Envio envio = new Envio()
 		envio.setFecha(new Date())
@@ -1653,7 +1629,7 @@ class AmaService {
 		envio.save(flush:true)
 	}
 
-	public String devolverLiteralCobertura (String code) {
+	String devolverLiteralCobertura (String code) {
 
 		def literal
 

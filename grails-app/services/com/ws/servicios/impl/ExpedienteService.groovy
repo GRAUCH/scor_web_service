@@ -59,10 +59,14 @@ class ExpedienteService implements IExpedienteService {
         }
     }
 
-    private def buildCabecera(Request req) {
+    def buildCabecera(Request req, String codigoSt) {
         def formato = new SimpleDateFormat("yyyyMMdd");
         RootElement.CABECERA cabecera = new RootElement.CABECERA()
-        cabecera.setCodigoCia(req.company.codigoSt)
+        if(codigoSt) {
+            cabecera.setCodigoCia(codigoSt)
+        } else {
+            cabecera.setCodigoCia(req.company.codigoSt)
+        }
         cabecera.setContadorSecuencial("1")
         cabecera.setFechaGeneracion(formato.format(new Date()))
         cabecera.setFiller("")
@@ -70,7 +74,7 @@ class ExpedienteService implements IExpedienteService {
         return cabecera
     }
 
-    private def buildPie(Request req) {
+    def buildPie(Request req) {
         RootElement.PIE pie = new RootElement.PIE()
         pie.setFiller("")
         pie.setNumFilasFichero(100)

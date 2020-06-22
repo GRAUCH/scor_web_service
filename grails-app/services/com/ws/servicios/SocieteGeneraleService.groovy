@@ -31,8 +31,9 @@ import org.w3c.dom.Element
 class SocieteGeneraleService {
 
 	TransformacionUtil util = new TransformacionUtil()
-	def logginService = new LogginService()
-	def tarificadorService = new TarificadorService()
+	def logginService
+	def expedienteService
+	def tarificadorService
 	GenerarZip generarZip = new GenerarZip()
 	def grailsApplication
 
@@ -103,36 +104,13 @@ class SocieteGeneraleService {
 		def listadoFinal = []
 		RootElement payload = new RootElement()
 
-		listadoFinal.add(buildCabecera(req))
+		listadoFinal.add(expedienteService.buildCabecera(req, null))
 		listadoFinal.add(buildDatos(req, req.company))
-		listadoFinal.add(buildPie())
+		listadoFinal.add(expedienteService.buildPie(null))
 
 		payload.cabeceraOrDATOSOrPIE = listadoFinal
 
 		return payload
-	}
-
-	private def buildCabecera = { req ->
-		def formato = new SimpleDateFormat("yyyyMMdd");
-		RootElement.CABECERA cabecera = new RootElement.CABECERA()
-		cabecera.setCodigoCia(req.company.codigoSt)
-		cabecera.setContadorSecuencial("1")
-		cabecera.setFechaGeneracion(formato.format(new Date()))
-		cabecera.setFiller("")
-		cabecera.setTipoFichero("1")
-
-		return cabecera
-	}
-
-	private def buildPie = {
-
-		RootElement.PIE pie = new RootElement.PIE()
-		pie.setFiller("")
-		pie.setNumFilasFichero(100)
-
-		pie.setNumRegistros(1)
-
-		return pie
 	}
 
 	private def buildDatos = { req, company ->

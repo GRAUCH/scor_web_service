@@ -1,5 +1,6 @@
 package com.ws.servicios
 
+import com.scortelemed.Request
 import hwsol.webservices.WsError
 
 import static grails.async.Promises.*
@@ -66,14 +67,15 @@ import com.scortelemed.servicios.TipoSexo;
 class PsnService {
 
 	TransformacionUtil util = new TransformacionUtil()
-	def logginService = new LogginService()
-	def tarificadorService = new TarificadorService()
+	def logginService
+	def expedienteService
+	def tarificadorService
 	GenerarZip generarZip = new GenerarZip()
 	def grailsApplication
 	ContentResult contentResult = new ContentResult()
 
 
-	public def rellenaDatosSalidaDocumentoNodo(nodoAlfresco, requestDate, logginService, String codigoSt) {
+	def rellenaDatosSalidaDocumentoNodo(nodoAlfresco, requestDate, logginService, String codigoSt) {
 
 		byte[] compressedData=contentResult.obtenerFichero(nodoAlfresco)
 
@@ -87,7 +89,7 @@ class PsnService {
 		return documento
 	}
 
-	public def rellenaDatosSalidaConsultaExpediente(servicios.Expediente expedientePoliza, String requestDate, RespuestaCRM respuestaCRM) {
+	def rellenaDatosSalidaConsultaExpediente(servicios.Expediente expedientePoliza, String requestDate, RespuestaCRM respuestaCRM) {
 
 		ConsultaExpedienteResponse.Expediente expediente = new ConsultaExpedienteResponse.Expediente()
 
@@ -224,7 +226,7 @@ class PsnService {
 		return expediente
 	}
 
-	public def rellenaDatosSalidaConsulta(servicios.Expediente expedientePoliza, String numSolicitud) {
+	def rellenaDatosSalidaConsulta(servicios.Expediente expedientePoliza, String numSolicitud) {
 
 		Expediente expediente = new Expediente()
 
@@ -388,22 +390,18 @@ class PsnService {
 		def listadoFinal = []
 		RootElement payload = new RootElement()
 
-		listadoFinal.add(buildCabecera(req))
+		listadoFinal.add(expedienteService.buildCabecera(req, getCodigoSt(req)))
 		listadoFinal.add(buildDatos(req, req.company))
-		listadoFinal.add(buildPie())
+		listadoFinal.add(expedienteService.buildPie(null))
 
 		payload.cabeceraOrDATOSOrPIE = listadoFinal
 
 		return payload
 	}
 
-	private def buildCabecera = { req ->
-
-		def formato = new SimpleDateFormat("yyyyMMdd");
+	private String getCodigoSt(Request req) {
 		def pais
 		def codigoCia
-
-		RootElement.CABECERA cabecera = new RootElement.CABECERA()
 
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
 		DocumentBuilder builder = factory.newDocumentBuilder()
@@ -445,25 +443,7 @@ class PsnService {
 
 			codigoCia = "1058"
 		}
-
-		cabecera.setCodigoCia(codigoCia)
-		cabecera.setContadorSecuencial("1")
-		cabecera.setFechaGeneracion(formato.format(new Date()))
-		cabecera.setFiller("")
-		cabecera.setTipoFichero("1")
-
-		return cabecera
-	}
-
-	private def buildPie = {
-
-		RootElement.PIE pie = new RootElement.PIE()
-		pie.setFiller("")
-		pie.setNumFilasFichero(100)
-
-		pie.setNumRegistros(1)
-
-		return pie
+		return codigoCia
 	}
 
 	private def buildDatos = { req, company ->
@@ -486,7 +466,7 @@ class PsnService {
 		}
 	}
 
-	public def rellenaDatos (req, company) {
+	def rellenaDatos (req, company) {
 
 		def mapDatos = [:]
 		def listadoPreguntas = []
@@ -1152,7 +1132,7 @@ class PsnService {
 		return existeDocumento
 	}
 
-	public void insertarRecibido(Company company, String identificador, String info, String operacion) {
+	void insertarRecibido(Company company, String identificador, String info, String operacion) {
 
 		Recibido recibido = new Recibido()
 		recibido.setFecha(new Date())
@@ -1163,7 +1143,7 @@ class PsnService {
 		recibido.save(flush:true)
 	}
 
-	public void insertarError(Company company, String identificador, String info, String operacion, String detalleError) {
+	void insertarError(Company company, String identificador, String info, String operacion, String detalleError) {
 
 		com.scortelemed.Error error = new com.scortelemed.Error()
 		error.setFecha(new Date())
@@ -1175,7 +1155,7 @@ class PsnService {
 		error.save(flush:true)
 	}
 
-	public void insertarEnvio (Company company, String identificador, String info) {
+	void insertarEnvio (Company company, String identificador, String info) {
 
 		Envio envio = new Envio()
 		envio.setFecha(new Date())
@@ -1190,7 +1170,7 @@ class PsnService {
 	 * @param requestBBDD
 	 * @return
 	 */
-	public List<WsError> validarDatosObligatorios(requestBBDD) {
+	List<WsError> validarDatosObligatorios(requestBBDD) {
 
 		List<WsError> wsErrors = new ArrayList<WsError>()
 		SimpleDateFormat formato = new SimpleDateFormat("yyyyMMdd");
