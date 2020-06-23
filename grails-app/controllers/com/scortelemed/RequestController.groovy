@@ -34,6 +34,7 @@ class RequestController {
 	def logginService = new LogginService()
 	def francesasService
 	def requestService
+	def expedienteService
 
 	@Autowired
 	private CaserService caserService
@@ -405,7 +406,7 @@ class RequestController {
 					break
 				case TipoCompany.AMA:
 					requestBBDD = requestService.getBBDDRequest(requestInstance, "AmaResultadoReconocimientoMedicoRequest", "http://www.scortelemed.com/schemas/ama", GestionReconocimientoMedicoRequestAma.class)
-					amaService.crearExpediente(requestBBDD)
+					expedienteService.crearExpediente(requestBBDD, TipoCompany.AMA)
 					flash.message = "${message(code: 'default.processed.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
 					break
 				case TipoCompany.CASER:

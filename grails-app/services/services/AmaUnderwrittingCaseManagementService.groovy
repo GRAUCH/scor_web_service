@@ -1,5 +1,7 @@
 package services
 
+import com.scortelemed.TipoCompany
+import com.ws.servicios.impl.ExpedienteService
 import grails.util.Environment
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
@@ -70,7 +72,7 @@ class AmaUnderwrittingCaseManagementService	 {
 		def opername="AmaResultadoReconocimientoMedicoRequest"
 		def correoUtil = new CorreoUtil()
 		def requestXML = ""
-		def crearExpedienteService
+		def expedienteService = new ExpedienteService()
 		def requestBBDD
 		def respuestaCrm
 
@@ -104,7 +106,7 @@ class AmaUnderwrittingCaseManagementService	 {
 
 							logginService.putInfoMessage("Se procede el alta automatica de " + company.nombre + " con numero de solicitud " + gestionReconocimientoMedico.candidateInformation.requestNumber)
 
-							amaService.crearExpediente(requestBBDD)
+							expedienteService.crearExpediente(requestBBDD, TipoCompany.AMA)
 
 							amaService.insertarRecibido(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), "ALTA")
 

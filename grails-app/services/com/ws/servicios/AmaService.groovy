@@ -1,5 +1,6 @@
 package com.ws.servicios
 
+import com.scortelemed.Request
 import com.ws.servicios.impl.ExpedienteService
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.GenerarZip
@@ -70,7 +71,7 @@ import com.scortelemed.schemas.ama.TipoCitaType
 
 import static grails.async.Promises.*
 
-class AmaService {
+class AmaService implements ICompanyService{
 
 	TransformacionUtil util = new TransformacionUtil()
 	def expedienteService
@@ -80,7 +81,7 @@ class AmaService {
 	def grailsApplication
 	ContentResult contentResult = new ContentResult()
 
-	public def rellenaDatosSalidaConsultaExpediente(servicios.Expediente expedientePoliza, String requestDate, RespuestaCRM respuestaCRM) {
+	def rellenaDatosSalidaConsultaExpediente(servicios.Expediente expedientePoliza, String requestDate, RespuestaCRM respuestaCRM) {
 
 		ConsultaExpedienteResponse.Expediente expediente = new ConsultaExpedienteResponse.Expediente()
 
@@ -99,8 +100,8 @@ class AmaService {
 
 		if (expedientePoliza.getCandidato() != null) {
 
-			SimpleDateFormat myFormat = new SimpleDateFormat("yyyyMMdd");
-			SimpleDateFormat fromUser = new SimpleDateFormat("yyyy/MM/dd");
+			SimpleDateFormat myFormat = new SimpleDateFormat("yyyyMMdd")
+			SimpleDateFormat fromUser = new SimpleDateFormat("yyyy/MM/dd")
 
 			candidateInformation.setCodigoSt(expedientePoliza.getCandidato().getCodigoST())
 			candidateInformation.setFiscalIdentificationNumber(expedientePoliza.getCandidato().getNumeroDocumento())
@@ -216,7 +217,7 @@ class AmaService {
 		return expediente
 	}
 
-	public def rellenaDatosSalidaSRP(expedientePoliza, requestDate, logginService) {
+	def rellenaDatosSalidaSRP(expedientePoliza, requestDate, logginService) {
 
 		Resultado expediente = new Resultado()
 
@@ -279,7 +280,7 @@ class AmaService {
 		return expediente
 	}
 
-	public def rellenaDatosSalidaSiniestro(expedientePoliza) {
+	def rellenaDatosSalidaSiniestro(expedientePoliza) {
 
 		List<Interviniente> listaIntervinientes = new ArrayList<Interviniente>();
 		List<Pago> listaPagos = new ArrayList<Pago>();
@@ -603,19 +604,6 @@ class AmaService {
 		return writer
 	}
 
-	def crearExpediente = { req ->
-		try {
-			//SOBREESCRIBIMOS LA URL A LA QUE TIENE QUE LLAMAR EL WSDL
-			def ctx = grailsApplication.mainContext
-			def bean = ctx.getBean("soapClientCrearOrabpel")
-			bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("orabpelCreacion.wsdl")?.value)
-			def salida = grailsApplication.mainContext.soapClientCrearOrabpel.initiate(crearExpedienteBPM(req))
-			return "OK"
-		} catch (Exception e) {
-			throw new WSException(this.getClass(), "crearExpediente", ExceptionUtils.composeMessage(null, e));
-		}
-	}
-
 	def consultaExpediente = { ou, filtro ->
 
 		try {
@@ -633,10 +621,13 @@ class AmaService {
 		}
 	}
 
-	private def crearExpedienteBPM = { req ->
+	/**
+	 * MÉTODOS DE CREACIÓN DE EXPEDIENTES
+	 */
 
+	def getCodigoStManual(Request req) {
 		/**Ama usa el mismo wb para dos cias distintas, asi que tenemos que sacar el id del campo ciaCode del xml
-		 * 
+		 *
 		 */
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
 		DocumentBuilder builder = factory.newDocumentBuilder()
@@ -675,20 +666,11 @@ class AmaService {
 				}
 			}
 		}
-
-		def listadoFinal = []
-		RootElement payload = new RootElement()
-
-		listadoFinal.add(expedienteService.buildCabecera(req, codigoCia))
-		listadoFinal.add(buildDatos(req, codigoCia))
-		listadoFinal.add(expedienteService.buildPie(null))
-
-		payload.cabeceraOrDATOSOrPIE = listadoFinal
-
-		return payload
+		return codigoCia
 	}
 
-	private def buildDatos = { req, codigoCia ->
+
+	def buildDatos(Request req, String codigoCia) {
 
 		try {
 
@@ -705,7 +687,7 @@ class AmaService {
 		}
 	}
 
-	def rellenaDatos (req, codigoCia) {
+	private def rellenaDatos (req, codigoCia) {
 
 		def mapDatos = [:]
 		def listadoPreguntas = []

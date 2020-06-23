@@ -7,6 +7,7 @@ import com.scor.srpfileinbound.RootElement
 import com.scortelemed.Company
 import com.scortelemed.Conf
 import com.scortelemed.Request
+import com.scortelemed.TipoCompany
 import com.ws.servicios.IExpedienteService
 import com.ws.servicios.LogginService
 import grails.transaction.Transactional
@@ -18,26 +19,28 @@ class ExpedienteService implements IExpedienteService {
 
     def logginService = new LogginService()
     def grailsApplication
+    //Servicios Compañías
+    def amaService
 
-    def crearExpediente(Request req) {
+    def crearExpediente(Request req, TipoCompany comp) {
         try {
             //SOBREESCRIBIMOS LA URL A LA QUE TIENE QUE LLAMAR EL WSDL
             def ctx = grailsApplication.mainContext
             def bean = ctx.getBean("soapClientCrearOrabpel")
             bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("orabpelCreacion.wsdl")?.value)
-            def salida = grailsApplication.mainContext.soapClientCrearOrabpel.initiate(crearExpedienteBPM(req))
+            def salida = grailsApplication.mainContext.soapClientCrearOrabpel.initiate(crearExpedienteBPM(req, comp))
             return "OK"
         } catch (Exception e) {
             throw new WSException(this.getClass(), "crearExpediente", ExceptionUtils.composeMessage(null, e));
         }
     }
 
-    private def crearExpedienteBPM(Request req) {
+    private def crearExpedienteBPM(Request req, TipoCompany comp) {
         def listadoFinal = []
         RootElement payload = new RootElement()
-
-        listadoFinal.add(buildCabecera(req,null))
-        listadoFinal.add(buildDatos(req, req.company))
+        String codigoSt = getCodigoStManual(req, comp)
+        listadoFinal.add(buildCabecera(req, codigoSt))
+        listadoFinal.add(buildDatos(req, codigoSt, comp))
         listadoFinal.add(buildPie(null))
 
         payload.cabeceraOrDATOSOrPIE = listadoFinal
@@ -45,10 +48,28 @@ class ExpedienteService implements IExpedienteService {
         return payload
     }
 
-    private def buildDatos(Request req, Company company) {
+    private def getCodigoStManual(Request req, TipoCompany comp) {
+        String codigoSt = null
+        switch(comp) {
+            case TipoCompany.AMA:
+                amaService.getCodigoStManual(req)
+                break
+            case TipoCompany.PSN:
+                break
+            default:
+                break
+        }
+        return codigoSt
+    }
+
+    private def buildDatos(Request req, String codigoSt, TipoCompany tipo) {
         try {
             DATOS dato = new DATOS()
-            //TODO IMPLEMENTAR SWITCH
+            switch(tipo) {
+                case TipoCompany.AMA:
+                    amaService.buildDatos(req, codigoSt)
+                    break
+            }
             return dato
         } catch (Exception e) {
             logginService.putError(e.toString())
