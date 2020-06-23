@@ -37,9 +37,9 @@ class ExpedienteService implements IExpedienteService {
         def listadoFinal = []
         RootElement payload = new RootElement()
 
-        listadoFinal.add(buildCabecera(req))
+        listadoFinal.add(buildCabecera(req,null))
         listadoFinal.add(buildDatos(req, req.company))
-        listadoFinal.add(buildPie())
+        listadoFinal.add(buildPie(null))
 
         payload.cabeceraOrDATOSOrPIE = listadoFinal
 

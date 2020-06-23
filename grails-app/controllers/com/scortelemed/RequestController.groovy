@@ -425,7 +425,7 @@ class RequestController {
 					CajamarUnderwrittingCaseManagementRequest cajamarUnderwrittingCaseManagementRequest = requestService.jaxbParser(requestInstance.getRequest(), CajamarUnderwrittingCaseManagementRequest.class)
 					if (cajamarUnderwrittingCaseManagementRequest.getRegScor().getYtipo().toString().equals("1")) {
 						requestBBDD = requestService.getBBDDRequest(requestInstance, "CajamarUnderwrittingCaseManagementRequest", "http://www.scortelemed.com/schemas/cajamar", CajamarUnderwrittingCaseManagementRequest.class)
-						crearExpedienteService.crearExpediente(requestBBDD)
+						cajamarService.crearExpediente(requestBBDD)
 						flash.message = "${message(code: 'default.processed.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
 					} else {
 						flash.error = "${message(code: 'default.invalid.type.operation.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
