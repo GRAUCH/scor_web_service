@@ -390,7 +390,7 @@ class RequestController {
 
 	def procesarRequest = {
 
-		def requestBBDD
+		Request requestBBDD
 		Request requestInstance = Request.get(params.id)
 
 		if(Company.findByNombre(requestInstance.company).generationAutomatic) {
@@ -466,7 +466,7 @@ class RequestController {
 					break
 				case TipoCompany.NET_INSURANCE:
 					requestBBDD = requestService.getBBDDRequest(requestInstance, "NetinsuranceUnderwrittingCaseManagementRequest", "http://www.scortelemed.com/schemas/netinsurance", NetinsuranteUnderwrittingCaseManagementRequest.class)
-					netinsuranceService.crearExpediente(requestBBDD)
+					expedienteService.crearExpediente(requestBBDD, TipoCompany.NET_INSURANCE)
 					flash.message = "${message(code: 'default.processed.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
 					break
 				case TipoCompany.ENGINYERS:
