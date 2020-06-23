@@ -9,6 +9,7 @@ import com.scortelemed.Company
 import com.scortelemed.Conf
 import com.scortelemed.Envio
 import com.scortelemed.Recibido
+import com.scortelemed.Request
 import com.scortelemed.schemas.caser.*
 import com.scortelemed.schemas.caser.ConsultaExpedienteResponse.ExpedienteConsulta
 import com.scortelemed.schemas.caser.ResultadoReconocimientoMedicoResponse.Expediente
@@ -32,7 +33,7 @@ import java.text.SimpleDateFormat
 
 import static grails.async.Promises.task
 
-class CaserService {
+class CaserService implements ICompanyService{
 
     TransformacionUtil util = new TransformacionUtil()
     def grailsApplication
@@ -42,6 +43,27 @@ class CaserService {
     def tarificadorService
     TransformacionUtil transformacionUtil = new TransformacionUtil()
     CorreoUtil correoUtil = new CorreoUtil()
+
+
+    @Override
+    def getCodigoStManual(Request req) {
+        return null
+    }
+
+    @Override
+    def buildDatos(Request req, String codigoSt) {
+        try {
+            DATOS dato = new DATOS()
+            Company company = req.company
+            dato.coberturas = rellenaCoberturas(req)
+            dato.registro = rellenaDatos(req, company, dato.coberturas)
+            dato.pregunta = rellenaPreguntas(req, company.nombre)
+            dato.servicio = rellenaServicios(req)
+            return dato
+        } catch (Exception e) {
+            logginService.putError(e.toString())
+        }
+    }
 
     def rellenaDatosSalida(expedientePoliza, requestDate, logginService) {
 
@@ -231,19 +253,6 @@ class CaserService {
         return writer
     }
 
-    def crearExpediente = { req ->
-        try {
-            //SOBREESCRIBIMOS LA URL A LA QUE TIENE QUE LLAMAR EL WSDL
-            def ctx = grailsApplication.mainContext
-            def bean = ctx.getBean("soapClientCrearOrabpel")
-            bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("orabpelCreacion.wsdl")?.value)
-            def salida = grailsApplication.mainContext.soapClientCrearOrabpel.initiate(crearExpedienteBPM(req))
-            return "OK"
-        } catch (Exception e) {
-            throw new WSException(this.getClass(), "crearExpediente", ExceptionUtils.composeMessage(null, e));
-        }
-    }
-
     def consultaExpediente = { ou, filtro ->
 
         try {
@@ -260,39 +269,6 @@ class CaserService {
             return null
         }
     }
-
-    private def crearExpedienteBPM = { req ->
-        def listadoFinal = []
-        RootElement payload = new RootElement()
-
-        listadoFinal.add(expedienteService.buildCabecera(req, null))
-        listadoFinal.add(buildDatos(req, req.company))
-        listadoFinal.add(expedienteService.buildPie(null))
-
-        payload.cabeceraOrDATOSOrPIE = listadoFinal
-
-        return payload
-    }
-
-    private def buildDatos = { req, company ->
-
-        try {
-
-            DATOS dato = new DATOS()
-
-
-            dato.coberturas = rellenaCoberturas(req)
-            dato.registro = rellenaDatos(req, company, dato.coberturas)
-            dato.pregunta = rellenaPreguntas(req, company.nombre)
-            dato.servicio = rellenaServicios(req)
-
-
-            return dato
-        } catch (Exception e) {
-            logginService.putError(e.toString())
-        }
-    }
-
 
     def envioEmail(req) {
 

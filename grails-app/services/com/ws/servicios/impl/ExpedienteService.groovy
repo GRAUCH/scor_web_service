@@ -22,6 +22,7 @@ class ExpedienteService implements IExpedienteService {
     //Servicios Compañías
     def amaService
     def cajamarService
+    def caserService
 
     def crearExpediente(Request req, TipoCompany comp) {
         try {
@@ -72,6 +73,10 @@ class ExpedienteService implements IExpedienteService {
                     break
                 case TipoCompany.CAJAMAR:
                     cajamarService.buildDatos(req, codigoSt)
+                    break
+                case TipoCompany.CASER:
+                    caserService.buildDatos(req, codigoSt)
+                    break
             }
             return dato
         } catch (Exception e) {

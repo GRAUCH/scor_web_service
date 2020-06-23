@@ -2,8 +2,10 @@ package services
 
 import com.scortelemed.Company
 import com.scortelemed.Operacion
+import com.scortelemed.TipoCompany
 import com.scortelemed.schemas.caser.*
 import com.ws.servicios.*
+import com.ws.servicios.impl.ExpedienteService
 import com.ws.servicios.impl.RequestService
 import grails.util.Environment
 import hwsol.webservices.CorreoUtil
@@ -31,6 +33,7 @@ import java.text.SimpleDateFormat
 @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
 class CaserUnderwrittingCaseManagementService {
 
+    def expedienteService = new ExpedienteService()
     @Autowired
     private CaserService caserService
     @Autowired
@@ -87,7 +90,7 @@ class CaserUnderwrittingCaseManagementService {
                     if(expedientes != null)
                     logginService.putInfoMessage("Exisiten ${expedientes.size()}  con numero de solicitud " + gestionReconocimientoMedico.policyHolderInformation.requestNumber)
                     if (expedientes != null && expedientes.size() == 0) {
-                        caserService.crearExpediente(requestBBDD)
+                        expedienteService.crearExpediente(requestBBDD, TipoCompany.CASER)
                         caserService.insertarRecibido(company, gestionReconocimientoMedico.policyHolderInformation.requestNumber, requestXML.toString(), "ALTA")
                         /**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
                          *
