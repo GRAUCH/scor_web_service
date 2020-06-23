@@ -1,6 +1,7 @@
 package services
 
 import com.scortelemed.Recibido
+import com.scortelemed.TipoCompany
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
 import hwsol.webservices.WsError
@@ -50,6 +51,7 @@ expose = EndpointType.JAX_WS,properties = [@GrailsCxfEndpointProperty(name = "ws
 @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
 class PsnUnderwrittingCaseManagementService	 {
 
+	def expedienteService
 	@Autowired
 	private PsnService psnService
 	@Autowired
@@ -107,7 +109,7 @@ class PsnUnderwrittingCaseManagementService	 {
 						if (gestionReconocimientoMedico.getCandidateInformation().getOperation().toString().equals("A")) {
 
 
-							psnService.crearExpediente(requestBBDD)
+							expedienteService.crearExpediente(requestBBDD, TipoCompany.PSN)
 
 							message = "El caso se ha procesado correctamente"
 							status = StatusType.OK
