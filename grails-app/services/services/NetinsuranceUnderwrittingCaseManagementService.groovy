@@ -1,6 +1,6 @@
 package services
 
-
+import com.scortelemed.TipoCompany
 import grails.util.Environment
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
@@ -45,6 +45,7 @@ expose = EndpointType.JAX_WS,properties = [@GrailsCxfEndpointProperty(name = "ws
 @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
 class NetinsuranceUnderwrittingCaseManagementService	 {
 
+	def expedienteService
 	@Autowired
 	private NetinsuranceService netinsuranceService
 	@Autowired
@@ -91,7 +92,7 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 					requestBBDD = requestService.crear(opername,requestXML)
 					requestBBDD.fecha_procesado = new Date()
 					requestBBDD.save(flush:true)
-					netinsuranceService.crearExpediente(requestBBDD)
+					expedienteService.crearExpediente(requestBBDD, TipoCompany.NET_INSURANCE)
 
 					message = "Il caso � stato elaborato correttamente";
 					status = StatusType.OK
