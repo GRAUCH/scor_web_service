@@ -21,6 +21,7 @@ class ExpedienteService implements IExpedienteService {
     def grailsApplication
     //Servicios Compañías
     def amaService
+    def cajamarService
 
     def crearExpediente(Request req, TipoCompany comp) {
         try {
@@ -69,6 +70,8 @@ class ExpedienteService implements IExpedienteService {
                 case TipoCompany.AMA:
                     amaService.buildDatos(req, codigoSt)
                     break
+                case TipoCompany.CAJAMAR:
+                    cajamarService.buildDatos(req, codigoSt)
             }
             return dato
         } catch (Exception e) {

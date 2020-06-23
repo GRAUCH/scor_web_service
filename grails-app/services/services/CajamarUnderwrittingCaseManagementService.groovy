@@ -1,5 +1,6 @@
 package services
 
+import com.scortelemed.TipoCompany
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
 
@@ -45,6 +46,8 @@ properties = [@GrailsCxfEndpointProperty(name = "ws-security.enable.nonce.cache"
 ])
 @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
 class CajamarUnderwrittingCaseManagementService {
+
+	def expedienteService
 
 	@Autowired
 	private CajamarService cajamarService
@@ -94,7 +97,7 @@ class CajamarUnderwrittingCaseManagementService {
 					requestBBDD = requestService.crear(opername,requestXML)
 					requestBBDD.fecha_procesado = new Date()
 					requestBBDD.save(flush:true)
-					cajamarService.crearExpediente(requestBBDD)
+					expedienteService.crearExpediente(requestBBDD, TipoCompany.CAJAMAR)
 					resultado.setComments("El caso se ha procesado correctamente")
 					resultado.setStatus(StatusType.OK)
 					resultado.setDate(util.fromDateToXmlCalendar(new Date()))
