@@ -4,8 +4,10 @@ import com.scor.global.ZipUtils
 import com.scortelemed.Company
 import com.scortelemed.Conf
 import com.scortelemed.Operacion
+import com.scortelemed.TipoCompany
 import com.scortelemed.schemas.cbpita.*
 import com.ws.servicios.*
+import com.ws.servicios.impl.ExpedienteService
 import com.ws.servicios.impl.RequestService
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
@@ -32,6 +34,7 @@ import java.text.SimpleDateFormat
 @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
 class CbpitaUnderwrittingCaseManagementService {
 
+    def expedienteService = new ExpedienteService()
     @Autowired
     private CbpitaService cbpitaService
     @Autowired
@@ -92,7 +95,7 @@ class CbpitaUnderwrittingCaseManagementService {
                             status = StatusType.OK
                             code = 0
 
-                            cbpitaService.crearExpediente(requestBBDD)
+                            expedienteService.crearExpediente(requestBBDD, TipoCompany.CBP_ITALIA)
 
                             logginService.putInfoMessage("Se procede el alta automatica de " + company.nombre + " con numero de solicitud " + cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber)
                             cbpitaService.insertarRecibido(company, cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, requestXML.toString(), "ALTA")
