@@ -5,6 +5,8 @@ import com.scor.global.ExceptionUtils
 import com.scor.srpfileinbound.DATOS
 import com.scor.srpfileinbound.REGISTRODATOS
 import com.scor.srpfileinbound.RootElement
+import com.scortelemed.Company
+import com.scortelemed.Request
 import com.scortelemed.servicios.Filtro
 import com.scortelemed.Estadistica
 import com.scortelemed.Conf
@@ -45,7 +47,7 @@ import org.xml.sax.InputSource
 import static grails.async.Promises.*
 import org.apache.commons.codec.binary.Base64;
 
-class LagunaroService {
+class LagunaroService implements ICompanyService{
 
 	TransformacionUtil util = new TransformacionUtil()
 	def grailsApplication
@@ -83,18 +85,6 @@ class LagunaroService {
 		return writer
 	}
 
-	def crearExpediente = { req ->
-		try {
-			//SOBREESCRIBIMOS LA URL A LA QUE TIENE QUE LLAMAR EL WSDL
-			def ctx = grailsApplication.mainContext
-			def bean = ctx.getBean("soapClientCrearOrabpel")
-			bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("orabpelCreacion.wsdl")?.value)
-			def salida = grailsApplication.mainContext.soapClientCrearOrabpel.initiate(crearExpedienteBPM(req))
-			return "OK"
-		} catch (Exception e) {
-			throw new WSException(this.getClass(), "crearExpediente", ExceptionUtils.composeMessage(null, e));
-		}
-	}
 
 	def consultaExpediente = { ou, filtro ->
 
@@ -113,29 +103,19 @@ class LagunaroService {
 		}
 	}
 
-	private def crearExpedienteBPM = { req ->
-		def listadoFinal = []
-		RootElement payload = new RootElement()
-
-		listadoFinal.add(expedienteService.buildCabecera(req, null))
-		listadoFinal.add(buildDatos(req, req.company))
-		listadoFinal.add(expedienteService.buildPie(null))
-
-		payload.cabeceraOrDATOSOrPIE = listadoFinal
-
-		return payload
+	@Override
+	def getCodigoStManual(Request req) {
+		return null
 	}
 
-	private def buildDatos = { req, company ->
-
+	@Override
+	def buildDatos(Request req, String codigoSt) {
 		try {
-
 			DATOS dato = new DATOS()
-
+			Company company = req.company
 			dato.registro = rellenaDatos(req, company)
 			dato.servicio = rellenaServicios(req, company.nombre)
 			dato.coberturas = rellenaCoberturas(req)
-
 			return dato
 		} catch (Exception e) {
 			logginService.putError(e.toString())

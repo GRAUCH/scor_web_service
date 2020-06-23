@@ -3,6 +3,7 @@ package services
 import com.scortelemed.Company
 import com.scortelemed.Envio
 import com.scortelemed.Recibido
+import com.scortelemed.TipoCompany
 import com.ws.enumeration.StatusType
 import com.ws.enumeration.TipoDictamenType
 import com.ws.enumeration.TipoDocumentoType
@@ -40,6 +41,7 @@ class GestionReconocimientosMedicosService {
     def estadisticasService
     def requestService
     def logginService
+    def expedienteService
     def tarificadorService
 
     @Autowired
@@ -80,7 +82,7 @@ class GestionReconocimientosMedicosService {
                     requestBBDD.fecha_procesado = new Date()
                     requestBBDD.save(flush: true)
 
-                    lagunaroService.crearExpediente(requestBBDD)
+                    expedienteService.crearExpediente(requestBBDD, TipoCompany.LAGUN_ARO)
 
                     resultado.setMensaje("El caso se ha procesado correctamente")
                     resultado.setFecha(new Date())
