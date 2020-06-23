@@ -1,5 +1,6 @@
 package services
 
+import com.scortelemed.TipoCompany
 import hwsol.webservices.CorreoUtil
 
 import java.text.SimpleDateFormat
@@ -36,6 +37,7 @@ class LifesquareUnderwrittingCaseManagementService {
 	def protected estadisticasService = new EstadisticasService()
 	def protected requestService = new RequestService()
 	def protected logginService = new LogginService()
+	def expedienteService
 	def francesasService
 	def tarificadorService
 	
@@ -76,7 +78,7 @@ class LifesquareUnderwrittingCaseManagementService {
 					if (Company.findByNombre("lifesquare").generationAutomatic) {
 
 						logginService.putInfoMessage("Se procede el alta automatica de Lifesquare con numero de solicitud " + lifesquareUnderwrittingCaseManagementRequest.policy.policy_number)
-						francesasService.crearExpediente(requestBBDD)
+						expedienteService.crearExpediente(requestBBDD, TipoCompany.ZEN_UP)
 
 
 						/**Metemos en recibidos

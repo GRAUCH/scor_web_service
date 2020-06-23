@@ -428,7 +428,7 @@ class RequestController {
 					AfiEscaUnderwrittingCaseManagementRequest afiEscaUnderwrittingCaseManagementRequest = requestService.jaxbParser(requestInstance.getRequest(), AfiEscaUnderwrittingCaseManagementRequest.class)
 					if (afiEscaUnderwrittingCaseManagementRequest.getRequest_Data().getRecord().getNombre().equals("A")) {
 						requestBBDD = requestService.getBBDDRequest(requestInstance, "AfiEscaUnderwrittingCaseManagementRequest", null, AfiEscaUnderwrittingCaseManagementRequest.class)
-						francesasService.crearExpediente(requestBBDD)
+						expedienteService.crearExpediente(requestBBDD, TipoCompany.AFI_ESCA)
 						flash.message = "${message(code: 'default.processed.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
 					} else {
 						flash.error = "${message(code: 'default.invalid.type.operation.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
@@ -438,7 +438,7 @@ class RequestController {
 					AlptisUnderwrittingCaseManagementRequest alptisUnderwrittingCaseManagementRequest = requestService.jaxbParser(requestInstance.getRequest(), AlptisUnderwrittingCaseManagementRequest.class)
 					if (alptisUnderwrittingCaseManagementRequest.getRequest_Data().getRecord().getNombre().equals("A")) {
 						requestBBDD = requestService.getBBDDRequest(requestInstance, "AlptisUnderwrittingCaseManagementRequest", null, AlptisUnderwrittingCaseManagementRequest.class)
-						francesasService.crearExpediente(requestBBDD)
+						expedienteService.crearExpediente(requestBBDD, TipoCompany.ALPTIS)
 						flash.message = "${message(code: 'default.processed.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
 					} else {
 						flash.error = "${message(code: 'default.invalid.type.operation.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
@@ -448,7 +448,7 @@ class RequestController {
 					LifesquareUnderwrittingCaseManagementRequest lifesquareUnderwrittingCaseManagementRequest = requestService.jaxbParser(requestInstance.getRequest(), LifesquareUnderwrittingCaseManagementRequest.class)
 					if (lifesquareUnderwrittingCaseManagementRequest.getRequest_Data().getRecord().getNombre().equals("A")) {
 						requestBBDD = requestService.getBBDDRequest(requestInstance, "LifesquareUnderwrittingCaseManagementRequest", null, LifesquareUnderwrittingCaseManagementRequest.class)
-						francesasService.crearExpediente(requestBBDD)
+						expedienteService.crearExpediente(requestBBDD, TipoCompany.ZEN_UP)
 						flash.message = "${message(code: 'default.processed.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
 					} else {
 						flash.error = "${message(code: 'default.invalid.type.operation.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"

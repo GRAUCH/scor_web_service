@@ -1,5 +1,6 @@
 package services
 
+import com.scortelemed.TipoCompany
 import hwsol.webservices.CorreoUtil
 
 import java.text.SimpleDateFormat
@@ -31,6 +32,7 @@ class AfiEscaUnderwrittingCaseManagementService {
 
 	def requestService
 	def estadisticasService
+	def expedienteService
 	def logginService
 	def francesasService
 	def tarificadorService
@@ -67,7 +69,7 @@ class AfiEscaUnderwrittingCaseManagementService {
 
 
 				logginService.putInfoMessage("Se procede el alta automatica de Afiesca con numero de solicitud " + afiEscaUnderwrittingCaseManagementRequest.policy.policy_number)
-				francesasService.crearExpediente(requestBBDD)
+				expedienteService.crearExpediente(requestBBDD, TipoCompany.AFI_ESCA)
 
 				/**Metemos en recibidos
 				 *

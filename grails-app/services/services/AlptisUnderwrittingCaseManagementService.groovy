@@ -1,5 +1,6 @@
 package services
 
+import com.scortelemed.TipoCompany
 import hwsol.webservices.CorreoUtil
 
 import java.text.SimpleDateFormat
@@ -31,6 +32,7 @@ class AlptisUnderwrittingCaseManagementService {
 
 	def requestService
 	def estadisticasService
+	def expedienteService
 	def logginService
 	def francesasService
 	def tarificadorService
@@ -71,7 +73,7 @@ class AlptisUnderwrittingCaseManagementService {
 					if (Company.findByNombre("alptis").generationAutomatic) {
 
 						logginService.putInfoMessage("Se procede el alta automatica de Alptis con numero de solicitud " + alptisUnderwrittingCaseManagementRequest.policy.BasicPolicyGroup.policy_number)
-						francesasService.crearExpediente(requestBBDD)
+						expedienteService.crearExpediente(requestBBDD, TipoCompany.ALPTIS)
 
 
 						/**Metemos en recibidos
