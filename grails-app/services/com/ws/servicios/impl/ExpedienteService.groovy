@@ -4,7 +4,6 @@ import com.scor.global.ExceptionUtils
 import com.scor.global.WSException
 import com.scor.srpfileinbound.DATOS
 import com.scor.srpfileinbound.RootElement
-import com.scortelemed.Company
 import com.scortelemed.Conf
 import com.scortelemed.Request
 import com.scortelemed.TipoCompany
@@ -25,8 +24,9 @@ class ExpedienteService implements IExpedienteService {
     def caserService
     def cbpitaService
     def enginyersService
-    def francesesService
+    def francesasService
     def lagunaroService
+    def methislabCFService
 
     def crearExpediente(Request req, TipoCompany comp) {
         try {
@@ -93,10 +93,13 @@ class ExpedienteService implements IExpedienteService {
                 case TipoCompany.AFI_ESCA:
                 case TipoCompany.ALPTIS:
                 case TipoCompany.ZEN_UP:
-                    francesesService.buildDatos(req, codigoSt)
+                    francesasService.buildDatos(req, codigoSt)
                     break
                 case TipoCompany.LAGUN_ARO:
                     lagunaroService.buildDatos(req, codigoSt)
+                    break
+                case TipoCompany.CF_LIFE:
+                    methislabCFService.buildDatos(req, codigoSt)
                     break
             }
             return dato

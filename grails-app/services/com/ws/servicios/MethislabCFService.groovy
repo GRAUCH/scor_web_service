@@ -9,6 +9,7 @@ import com.scortelemed.Company
 import com.scortelemed.Conf
 import com.scortelemed.Envio
 import com.scortelemed.Recibido
+import com.scortelemed.Request
 import com.scortelemed.schemas.methislabCF.*
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.GenerarZip
@@ -30,7 +31,7 @@ import java.text.SimpleDateFormat
 
 import static grails.async.Promises.task
 
-class MethislabCFService {
+class MethislabCFService implements ICompanyService{
 
     TransformacionUtil util = new TransformacionUtil()
     def grailsApplication
@@ -135,19 +136,6 @@ class MethislabCFService {
         return writer
     }
 
-    def crearExpediente = { req ->
-        try {
-            //SOBREESCRIBIMOS LA URL A LA QUE TIENE QUE LLAMAR EL WSDL
-            def ctx = grailsApplication.mainContext
-            def bean = ctx.getBean("soapClientCrearOrabpel")
-            bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("orabpelCreacion.wsdl")?.value)
-            def salida = grailsApplication.mainContext.soapClientCrearOrabpel.initiate(crearExpedienteBPM(req))
-            return "OK"
-        } catch (Exception e) {
-            throw new WSException(this.getClass(), "Error al crearExpediente", ExceptionUtils.composeMessage(null, e));
-        }
-    }
-
     def consultaExpediente = { ou, filtro ->
 
         try {
@@ -165,29 +153,19 @@ class MethislabCFService {
         }
     }
 
-    private def crearExpedienteBPM = { req ->
-        def listadoFinal = []
-        RootElement payload = new RootElement()
-
-        listadoFinal.add(expedienteService.buildCabecera(req, null))
-        listadoFinal.add(buildDatos(req, req.company))
-        listadoFinal.add(expedienteService.buildPie(null))
-
-        payload.cabeceraOrDATOSOrPIE = listadoFinal
-
-        return payload
+    @Override
+    def getCodigoStManual(Request req) {
+        return null
     }
 
-    private def buildDatos = { req, company ->
-
+    @Override
+    def buildDatos(Request req, String codigoSt) {
         try {
-
             DATOS dato = new DATOS()
-
+            Company company = req.company
             dato.registro = rellenaDatos(req, company)
             dato.servicio = rellenaServicios(req, company.nombre)
             dato.coberturas = rellenaCoberturas(req)
-
             return dato
         } catch (Exception e) {
             logginService.putError(e.toString())
