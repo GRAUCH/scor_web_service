@@ -52,10 +52,48 @@ class NetinsuranceService implements ICompanyService{
 
 	TransformacionUtil util = new TransformacionUtil()
 	def logginService
+	def requestService
 	def expedienteService
 	def tarificadorService
 	GenerarZip generarZip = new GenerarZip()
 	def grailsApplication
+
+	@Override
+	String marshall(String nameSpace, def objeto) {
+		String result
+		try{
+			if (objeto instanceof NetinsuranteUnderwrittingCaseManagementRequest){
+				result = requestService.marshall(nameSpace, objeto, NetinsuranteUnderwrittingCaseManagementRequest.class)
+			} else if (objeto instanceof NetinsuranteUnderwrittingCasesResultsRequest){
+				result = requestService.marshall(nameSpace, objeto, NetinsuranteUnderwrittingCasesResultsRequest.class)
+			} else if (objeto instanceof NetinsuranteGetDossierRequest){
+				result = requestService.marshall(nameSpace, objeto, NetinsuranteGetDossierRequest.class)
+			}
+		} finally {
+			return result
+		}
+	}
+
+	@Override
+	def buildDatos(Request req, String codigoSt) {
+		try {
+			DATOS dato = new DATOS()
+			Company company = req.company
+			dato.registro = rellenaDatos(req, company)
+			//dato.pregunta = rellenaPreguntas(req, company.nombre)
+			dato.servicio = rellenaServicios(req, company.nombre)
+			dato.coberturas = rellenaCoberturas(req)
+
+			return dato
+		} catch (Exception e) {
+			logginService.putError(e.toString())
+		}
+	}
+
+	@Override
+	def getCodigoStManual(Request req) {
+		return null
+	}
 
 	 def rellenaDatosSalidaConsulta(servicios.Expediente expedientePoliza, requestDate, logginService) {
 
@@ -256,49 +294,6 @@ class NetinsuranceService implements ICompanyService{
 		return response
 	}
 
-
-	/**
-	 *
-	 * @param clase
-	 * @return
-	 */
-	def marshall (nameSpace, clase){
-
-		StringWriter writer = new StringWriter();
-
-		try{
-
-			JAXBContext jaxbContext = JAXBContext.newInstance(clase.class);
-			Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-
-			jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-			def root = null
-			QName qName = null
-
-			if (clase instanceof com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCaseManagementRequest){
-				qName = new QName(nameSpace, "NetinsuranteUnderwrittingCaseManagementRequest");
-				root = new JAXBElement<NetinsuranteUnderwrittingCaseManagementRequest>(qName, NetinsuranteUnderwrittingCaseManagementRequest.class, clase);
-			}
-
-			if (clase instanceof com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCasesResultsRequest){
-				qName = new QName(nameSpace, "NetinsuranteUnderwrittingCasesResultsRequest");
-				root = new JAXBElement<NetinsuranteUnderwrittingCasesResultsRequest>(qName, NetinsuranteUnderwrittingCasesResultsRequest.class, clase);
-			}
-
-			if (clase instanceof com.scortelemed.schemas.netinsurance.NetinsuranteGetDossierRequest){
-				qName = new QName(nameSpace, "NetinsuranteGetDossierRequest");
-				root = new JAXBElement<NetinsuranteGetDossierRequest>(qName, NetinsuranteGetDossierRequest.class, clase);
-			}
-
-			jaxbMarshaller.marshal(root, writer);
-			String result = writer.toString();
-		} finally {
-			writer.close();
-		}
-
-		return writer
-	}
-
     def consultaExpediente = {
         ou, filtro ->
 
@@ -339,27 +334,6 @@ class NetinsuranceService implements ICompanyService{
 
         return frontal;
     }
-
-	@Override
-	def buildDatos(Request req, String codigoSt) {
-		try {
-			DATOS dato = new DATOS()
-			Company company = req.company
-			dato.registro = rellenaDatos(req, company)
-			//dato.pregunta = rellenaPreguntas(req, company.nombre)
-			dato.servicio = rellenaServicios(req, company.nombre)
-			dato.coberturas = rellenaCoberturas(req)
-
-			return dato
-		} catch (Exception e) {
-			logginService.putError(e.toString())
-		}
-	}
-
-	@Override
-	def getCodigoStManual(Request req) {
-		return null
-	}
 
 	def rellenaDatos (req, company) {
 

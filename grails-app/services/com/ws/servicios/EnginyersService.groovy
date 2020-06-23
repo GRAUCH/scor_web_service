@@ -9,6 +9,7 @@ import com.scortelemed.Company
 import com.scortelemed.Conf
 import com.scortelemed.Recibido
 import com.scortelemed.Request
+import com.scortelemed.schemas.enginyers.AddExp
 import grails.util.Environment
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
@@ -32,55 +33,22 @@ import static grails.async.Promises.task
 class EnginyersService implements ICompanyService{
 
     def grailsApplication
+    def requestService
     def expedienteService
     def logginService
     def tarificadorService
     TransformacionUtil util = new TransformacionUtil()
 
-    /**
-     *
-     * @param clase
-     * @return
-     */
-    def marshall(nameSpace, clase) {
-
-        StringWriter writer = new StringWriter();
-
-        try {
-
-            JAXBContext jaxbContext = JAXBContext.newInstance(clase.class);
-            Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-
-            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            def root = null
-            QName qName = null
-
-            if (clase instanceof com.scortelemed.schemas.enginyers.AddExp) {
-                qName = new QName(nameSpace, "addExp");
-                root = new JAXBElement<com.scortelemed.schemas.enginyers.AddExp>(qName, com.scortelemed.schemas.enginyers.AddExp.class, clase);
-            }
-
-
-            jaxbMarshaller.marshal(root, writer);
-            String result = writer.toString();
-
-        } finally {
-            writer.close();
-        }
-
-        return writer
-    }
-
     @Override
-    def getCodigoStManual(Request req) {
-        String codigoSt
-        //TODO ESTO TIENE SENTIDO?
-        if (Environment.current.name.equals("production_wildfly")) {
-            codigoSt = "1071"
-        } else {
-            codigoSt = "1072"
+    String marshall(String nameSpace, def objeto) {
+        String result
+        try {
+            if (objeto instanceof AddExp) {
+                result = requestService.marshall(nameSpace, objeto, AddExp.class)
+            }
+        } finally {
+            return result
         }
-        return codigoSt
     }
 
     @Override
@@ -95,6 +63,18 @@ class EnginyersService implements ICompanyService{
         } catch (Exception e) {
             logginService.putError(e.toString())
         }
+    }
+
+    @Override
+    def getCodigoStManual(Request req) {
+        String codigoSt
+        //TODO ESTO TIENE SENTIDO?
+        if (Environment.current.name.equals("production_wildfly")) {
+            codigoSt = "1071"
+        } else {
+            codigoSt = "1072"
+        }
+        return codigoSt
     }
 
     private def rellenaCoberturas(req) {

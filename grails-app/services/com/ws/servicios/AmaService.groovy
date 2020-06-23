@@ -74,12 +74,95 @@ import static grails.async.Promises.*
 class AmaService implements ICompanyService{
 
 	TransformacionUtil util = new TransformacionUtil()
+	def requestService
 	def expedienteService
 	def logginService
 	def tarificadorService
 	GenerarZip generarZip = new GenerarZip()
 	def grailsApplication
 	ContentResult contentResult = new ContentResult()
+
+	@Override
+	String marshall(String nameSpace, def objeto) {
+		String result
+		try{
+			if (objeto instanceof ResultadoReconocimientoMedicoRequest){
+				result = requestService.marshall(nameSpace, objeto, ResultadoReconocimientoMedicoRequest.class)
+			} else if (objeto instanceof GestionReconocimientoMedicoRequest){
+				result = requestService.marshall(nameSpace, objeto, GestionReconocimientoMedicoRequest.class)
+			} else if (objeto instanceof ResultadoSiniestroRequest){
+				result = requestService.marshall(nameSpace, objeto, ResultadoSiniestroRequest.class)
+			} else if (objeto instanceof SaveDossierResultsE){
+				result = requestService.marshall(nameSpace, objeto, SaveDossierResultsE.class)
+			} else if (objeto instanceof ConsolidacionPolizaRequest){
+				result = requestService.marshall(nameSpace, objeto, ConsolidacionPolizaRequest.class)
+			} else if (objeto instanceof ConsultaExpedienteRequest){
+				result = requestService.marshall(nameSpace, objeto, ConsultaExpedienteRequest.class)
+			}
+		} finally {
+			return result
+		}
+	}
+
+	@Override
+	def buildDatos(Request req, String codigoCia) {
+		try {
+			DATOS dato = new DATOS()
+			dato.registro = rellenaDatos(req, codigoCia)
+			dato.servicio = rellenaServicios(req)
+			dato.coberturas = rellenaCoberturas(req)
+			dato.pregunta = rellenaPreguntas(req)
+			return dato
+		} catch (Exception e) {
+			logginService.putError(e.toString())
+		}
+	}
+
+	/**
+	 * Ama usa el mismo wb para dos cias distintas, asi que tenemos que sacar el id del campo ciaCode del xml
+	 */
+	@Override
+	def getCodigoStManual(Request req) {
+
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
+		DocumentBuilder builder = factory.newDocumentBuilder()
+
+		InputSource is = new InputSource(new StringReader(req.request))
+		is.setEncoding("UTF-8")
+		Document doc = builder.parse(is)
+		String codigoCiaAma
+		String codigoCia
+
+		doc.getDocumentElement().normalize()
+
+		NodeList nList = doc.getElementsByTagName("CandidateInformation")
+
+		for (int temp = 0; temp < nList.getLength(); temp++) {
+
+			Node nNode = nList.item(temp)
+
+			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+
+				Element eElement = (Element) nNode;
+
+				/**NUMERO DE PRODUCTO
+				 *
+				 */
+				if (eElement.getElementsByTagName("ciaCode").item(0) != null) {
+					codigoCiaAma = eElement.getElementsByTagName("ciaCode").item(0).getTextContent()
+					if (codigoCiaAma != null && !codigoCiaAma.isEmpty()){
+						if (codigoCiaAma.equals("C0803")){
+							codigoCia = "1065"
+						}
+						if (codigoCiaAma.equals("M0328")){
+							codigoCia = "1059"
+						}
+					}
+				}
+			}
+		}
+		return codigoCia
+	}
 
 	def rellenaDatosSalidaConsultaExpediente(servicios.Expediente expedientePoliza, String requestDate, RespuestaCRM respuestaCRM) {
 
@@ -547,62 +630,6 @@ class AmaService implements ICompanyService{
 		}
 	}
 
-	/**
-	 *
-	 * @param clase
-	 * @return
-	 */
-	def marshall (nameSpace, clase){
-
-		StringWriter writer = new StringWriter();
-
-		try{
-
-			JAXBContext jaxbContext = JAXBContext.newInstance(clase.class);
-			Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-
-			jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-			def root = null
-			QName qName = null
-
-			if (clase instanceof com.scortelemed.schemas.ama.ResultadoReconocimientoMedicoRequest){
-				qName = new QName(nameSpace, "ResultadoReconocimientoMedicoRequest");
-				root = new JAXBElement<ResultadoReconocimientoMedicoRequest>(qName, ResultadoReconocimientoMedicoRequest.class, clase);
-			}
-
-			if (clase instanceof com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest){
-				qName = new QName(nameSpace, "GestionReconocimientoMedicoRequest");
-				root = new JAXBElement<GestionReconocimientoMedicoRequest>(qName, GestionReconocimientoMedicoRequest.class, clase);
-			}
-
-			if (clase instanceof com.scortelemed.schemas.ama.ResultadoSiniestroRequest){
-				qName = new QName(nameSpace, "ResultadoSiniestroRequest");
-				root = new JAXBElement<ResultadoSiniestroRequest>(qName, ResultadoSiniestroRequest.class, clase);
-			}
-
-			if (clase instanceof SaveDossierResultsE){
-				qName = new QName(nameSpace, "SaveDossierResultsE");
-				root = new JAXBElement<SaveDossierResultsE>(qName, SaveDossierResultsE.class, clase);
-			}
-
-			if (clase instanceof ConsolidacionPolizaRequest){
-				qName = new QName(nameSpace, "ConsolidacionPolizaRequest");
-				root = new JAXBElement<SaveDossierResultsE>(qName, ConsolidacionPolizaRequest.class, clase);
-			}
-
-			if (clase instanceof com.scortelemed.schemas.ama.ConsultaExpedienteRequest){
-				qName = new QName(nameSpace, "ConsultaExpedienteRequest");
-				root = new JAXBElement<ConsultaExpedienteRequest>(qName, ConsultaExpedienteRequest.class, clase);
-			}
-
-			jaxbMarshaller.marshal(root, writer);
-			String result = writer.toString();
-		} finally {
-			writer.close();
-		}
-
-		return writer
-	}
 
 	def consultaExpediente = { ou, filtro ->
 
@@ -618,72 +645,6 @@ class AmaService implements ICompanyService{
 		} catch (Exception e) {
 			logginService.putError("obtenerInformeExpedientes","No se ha podido obtener el informe de expediente : " + e)
 			return null
-		}
-	}
-
-	/**
-	 * MÉTODOS DE CREACIÓN DE EXPEDIENTES
-	 */
-
-	def getCodigoStManual(Request req) {
-		/**Ama usa el mismo wb para dos cias distintas, asi que tenemos que sacar el id del campo ciaCode del xml
-		 *
-		 */
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
-		DocumentBuilder builder = factory.newDocumentBuilder()
-
-		InputSource is = new InputSource(new StringReader(req.request))
-		is.setEncoding("UTF-8")
-		Document doc = builder.parse(is)
-		String codigoCiaAma
-		String codigoCia
-
-		doc.getDocumentElement().normalize()
-
-		NodeList nList = doc.getElementsByTagName("CandidateInformation")
-
-		for (int temp = 0; temp < nList.getLength(); temp++) {
-
-			Node nNode = nList.item(temp)
-
-			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-
-				Element eElement = (Element) nNode;
-
-				/**NUMERO DE PRODUCTO
-				 *
-				 */
-				if (eElement.getElementsByTagName("ciaCode").item(0) != null) {
-					codigoCiaAma = eElement.getElementsByTagName("ciaCode").item(0).getTextContent()
-					if (codigoCiaAma != null && !codigoCiaAma.isEmpty()){
-						if (codigoCiaAma.equals("C0803")){
-							codigoCia = "1065"
-						}
-						if (codigoCiaAma.equals("M0328")){
-							codigoCia = "1059"
-						}
-					}
-				}
-			}
-		}
-		return codigoCia
-	}
-
-
-	def buildDatos(Request req, String codigoCia) {
-
-		try {
-
-			DATOS dato = new DATOS()
-
-			dato.registro = rellenaDatos(req, codigoCia)
-			dato.servicio = rellenaServicios(req)
-			dato.coberturas = rellenaCoberturas(req)
-			dato.pregunta = rellenaPreguntas(req)
-
-			return dato
-		} catch (Exception e) {
-			logginService.putError(e.toString())
 		}
 	}
 

@@ -178,7 +178,7 @@ class NationaleNederlandenUnderwrittingCaseManagementService {
 
 				if (resultadoReconocimientoMedico && resultadoReconocimientoMedico.dateStart && resultadoReconocimientoMedico.dateEnd) {
 
-					requestXML=nnService.marshall("http://www.scortelemed.com/schemas/caser",resultadoReconocimientoMedico)
+					requestXML=nnService.marshall("http://www.scortelemed.com/schemas/nn",resultadoReconocimientoMedico)
 
 					requestService.crear(opername,requestXML)
 

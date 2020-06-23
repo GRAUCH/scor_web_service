@@ -270,7 +270,7 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 
 				if (consultaExpediente && consultaExpediente.requestNumber) {
 
-					requestXML=netinsuranceService.marshall("http://www.scortelemed.com/schemas/caser",consultaExpediente)
+					requestXML=netinsuranceService.marshall("http://www.scortelemed.com/schemas/netinsurance",consultaExpediente)
 
 					requestService.crear(opername,requestXML)
 

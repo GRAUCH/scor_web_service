@@ -35,11 +35,26 @@ class MethislabCFService implements ICompanyService{
 
     TransformacionUtil util = new TransformacionUtil()
     def grailsApplication
+    def requestService
     def expedienteService
     def logginService
     GenerarZip generarZip = new GenerarZip()
     def tarificadorService
     TransformacionUtil transformacionUtil = new TransformacionUtil()
+
+    @Override
+    String marshall(String nameSpace, def objeto) {
+        String result
+        try {
+            if (objeto instanceof MethislabCFUnderwrittingCaseManagementRequest) {
+                result = requestService.marshall(nameSpace, objeto, MethislabCFUnderwrittingCaseManagementRequest.class)
+            } else if (objeto instanceof MethislabCFUnderwrittingCasesResultsRequest) {
+                result = requestService.marshall(nameSpace, objeto, MethislabCFUnderwrittingCasesResultsRequest.class)
+            }
+        } finally {
+            return result
+        }
+    }
 
     def rellenaDatosSalidaConsulta(expedientePoliza, requestDate, logginService) {
 
@@ -104,36 +119,6 @@ class MethislabCFService implements ICompanyService{
         }
 
         return expediente
-    }
-
-    def marshall(nameSpace, clase) {
-
-        StringWriter writer = new StringWriter()
-
-        try {
-
-            JAXBContext jaxbContext = JAXBContext.newInstance(clase.class)
-            Marshaller jaxbMarshaller = jaxbContext.createMarshaller()
-
-            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true)
-            def root = null
-            QName qName = null
-
-            if (clase instanceof MethislabCFUnderwrittingCaseManagementRequest) {
-                qName = new QName(nameSpace, "MethislabCFUnderwrittingCaseManagementRequest")
-                root = new JAXBElement<MethislabCFUnderwrittingCaseManagementRequest>(qName, MethislabCFUnderwrittingCaseManagementRequest.class, clase)
-            }
-
-            if (clase instanceof MethislabCFUnderwrittingCasesResultsRequest) {
-                qName = new QName(nameSpace, "MethislabCFUnderwrittingCasesResultsRequest")
-                root = new JAXBElement<MethislabCFUnderwrittingCasesResultsRequest>(qName, MethislabCFUnderwrittingCasesResultsRequest.class, clase)
-            }
-            jaxbMarshaller.marshal(root, writer)
-        } finally {
-            writer.close()
-        }
-
-        return writer
     }
 
     def consultaExpediente = { ou, filtro ->

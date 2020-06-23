@@ -36,11 +36,46 @@ class MethislabService implements ICompanyService{
 
     TransformacionUtil util = new TransformacionUtil()
     def grailsApplication
+    def requestService
     def expedienteService
     def logginService
     GenerarZip generarZip = new GenerarZip()
     def tarificadorService
     TransformacionUtil transformacionUtil = new TransformacionUtil()
+
+    @Override
+    String marshall(String nameSpace, def objeto) {
+        String result
+        try {
+            if (objeto instanceof MethislabUnderwrittingCaseManagementRequest) {
+                result = requestService.marshall(nameSpace, objeto, MethislabUnderwrittingCaseManagementRequest.class)
+            } else if (objeto instanceof MethislabUnderwrittingCasesResultsRequest) {
+                result = requestService.marshall(nameSpace, objeto, MethislabUnderwrittingCasesResultsRequest.class)
+            }
+        } finally {
+            return result
+        }
+    }
+
+    @Override
+    def buildDatos(Request req, String codigoSt) {
+        try {
+            DATOS dato = new DATOS()
+            Company company = req.company
+            dato.registro = rellenaDatos(req, company)
+            //dato.pregunta = rellenaPreguntas(req, company.nombre)
+            dato.servicio = rellenaServicios(req, company.nombre)
+            dato.coberturas = rellenaCoberturas(req)
+            return dato
+        } catch (Exception e) {
+            logginService.putError(e.toString())
+        }
+    }
+
+    @Override
+    def getCodigoStManual(Request req) {
+        return null
+    }
 
     def rellenaDatosSalidaConsulta(expedientePoliza, requestDate, logginService) {
 
@@ -107,38 +142,6 @@ class MethislabService implements ICompanyService{
         return expediente
     }
 
-    def marshall(nameSpace, clase) {
-
-        StringWriter writer = new StringWriter()
-
-        try {
-
-            JAXBContext jaxbContext = JAXBContext.newInstance(clase.class)
-            Marshaller jaxbMarshaller = jaxbContext.createMarshaller()
-
-            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true)
-            def root = null
-            QName qName = null
-
-            if (clase instanceof MethislabUnderwrittingCaseManagementRequest) {
-                qName = new QName(nameSpace, "MethislabUnderwrittingCaseManagementRequest")
-                root = new JAXBElement<MethislabUnderwrittingCaseManagementRequest>(qName, MethislabUnderwrittingCaseManagementRequest.class, clase)
-            }
-
-            if (clase instanceof MethislabUnderwrittingCasesResultsRequest) {
-                qName = new QName(nameSpace, "MethislabUnderwrittingCasesResultsRequest")
-                root = new JAXBElement<MethislabUnderwrittingCasesResultsRequest>(qName, MethislabUnderwrittingCasesResultsRequest.class, clase)
-            }
-
-            jaxbMarshaller.marshal(root, writer)
-            String result = writer.toString()
-        } finally {
-            writer.close()
-        }
-
-        return writer
-    }
-
     def consultaExpediente = { ou, filtro ->
 
         try {
@@ -154,26 +157,6 @@ class MethislabService implements ICompanyService{
             logginService.putError("obtenerInformeExpedientes de Methislab", "No se ha podido obtener el informe de expediente : " + e)
             return null
         }
-    }
-
-    @Override
-    def buildDatos(Request req, String codigoSt) {
-        try {
-            DATOS dato = new DATOS()
-            Company company = req.company
-            dato.registro = rellenaDatos(req, company)
-            //dato.pregunta = rellenaPreguntas(req, company.nombre)
-            dato.servicio = rellenaServicios(req, company.nombre)
-            dato.coberturas = rellenaCoberturas(req)
-            return dato
-        } catch (Exception e) {
-            logginService.putError(e.toString())
-        }
-    }
-
-    @Override
-    def getCodigoStManual(Request req) {
-        return null
     }
 
     def rellenaDatos(req, company) {

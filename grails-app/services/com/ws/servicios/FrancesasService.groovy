@@ -2,6 +2,9 @@ package com.ws.servicios
 
 import com.scortelemed.Company
 import com.scortelemed.Request
+import com.ws.afiesca.beans.AfiEscaUnderwrittingCaseManagementRequest
+import com.ws.alptis.beans.AlptisUnderwrittingCaseManagementRequest
+import com.ws.lifesquare.beans.LifesquareUnderwrittingCaseManagementRequest
 import grails.util.Environment
 import hwsol.webservices.FetchUtilLagunaro
 
@@ -21,17 +24,27 @@ class FrancesasService implements ICompanyService{
 	 Se conecta al CRM y devuelve los expedientes tarificados para una fecha
 	 */
 	def grailsApplication
-	def fetchUtil = new FetchUtilLagunaro()
 	def expedienteService
 	def requestService
 	def logginService = new LogginService()
 
 	/**
-	 * AFI_ESCA, ALPTIS, ZEN_UP(Lifesquare)
+	 * AFI_ESCA, ALPTIS, ZEN_UP(Lifesquare) (Beans, sin namespace)
 	 */
 	@Override
-	def getCodigoStManual(Request req) {
-		return null
+	String marshall(String nameSpace, Object objeto) {
+		String result
+		try {
+			if (objeto instanceof AfiEscaUnderwrittingCaseManagementRequest) {
+				result = requestService.marshall(objeto, AfiEscaUnderwrittingCaseManagementRequest.class)
+			} else if (objeto instanceof AlptisUnderwrittingCaseManagementRequest) {
+				result = requestService.marshall(objeto, AlptisUnderwrittingCaseManagementRequest.class)
+			} else if (objeto instanceof LifesquareUnderwrittingCaseManagementRequest) {
+				result = requestService.marshall(objeto, LifesquareUnderwrittingCaseManagementRequest.class)
+			}
+		} finally {
+			return result
+		}
 	}
 
 	@Override
@@ -47,6 +60,11 @@ class FrancesasService implements ICompanyService{
 		} catch (Exception e) {
 			logginService.putError(e.toString())
 		}
+	}
+
+	@Override
+	def getCodigoStManual(Request req) {
+		return null
 	}
 
 	def rellenaDatos = { req, company ->

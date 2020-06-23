@@ -32,14 +32,27 @@ import static grails.async.Promises.*
 class CajamarService implements ICompanyService{
 
 	TransformacionUtil transformacion = new TransformacionUtil()
+	def requestService
 	def expedienteService
 	def tarificadorService
 	def grailsApplication
 	def logginService
 
+	/**
+	 * CAJAMAR  (Beans, sin namespace)
+	 */
 	@Override
-	def getCodigoStManual(Request req) {
-		return null //No tiene particularidades
+	String marshall(String nameSpace, def objeto) {
+		String result
+		try{
+			if (objeto instanceof CajamarUnderwrittingCaseManagementRequest){
+				result = requestService.marshall(objeto, CajamarUnderwrittingCaseManagementRequest.class)
+			} else if (objeto instanceof ConsolidacionPolizaRequest){
+				result = requestService.marshall(objeto, ConsolidacionPolizaRequest.class)
+			}
+		} finally {
+			return result
+		}
 	}
 
 	@Override
@@ -55,6 +68,11 @@ class CajamarService implements ICompanyService{
 		} catch (Exception e) {
 			logginService.putError(e.toString())
 		}
+	}
+
+	@Override
+	def getCodigoStManual(Request req) {
+		return null //No tiene particularidades
 	}
 
 	def rellenaDatos (req, company) {
@@ -906,35 +924,4 @@ class CajamarService implements ICompanyService{
 		return codigoCRM
 	}
 
-	def marshall (nameSpace, clase){
-
-		StringWriter writer = new StringWriter();
-
-		try{
-
-			JAXBContext jaxbContext = JAXBContext.newInstance(clase.class);
-			Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-
-			jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-			def root = null
-			QName qName = null
-			
-			if (clase instanceof CajamarUnderwrittingCaseManagementRequest){
-				qName = new QName(nameSpace, "CajamarUnderwrittingCaseManagementRequest");
-				root = new JAXBElement<CajamarUnderwrittingCaseManagementRequest>(qName, CajamarUnderwrittingCaseManagementRequest.class, clase);
-			}
-
-			if (clase instanceof ConsolidacionPolizaRequest){
-				qName = new QName(nameSpace, "ConsolidacionPolizaRequest");
-				root = new JAXBElement<ConsolidacionPolizaRequest>(qName, ConsolidacionPolizaRequest.class, clase);
-			}
-
-			jaxbMarshaller.marshal(root, writer);
-			String result = writer.toString();
-		} finally {
-			writer.close();
-		}
-
-		return writer
-	}
 }

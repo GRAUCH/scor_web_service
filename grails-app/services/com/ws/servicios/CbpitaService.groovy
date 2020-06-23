@@ -42,6 +42,7 @@ class CbpitaService implements ICompanyService{
 
     TransformacionUtil util = new TransformacionUtil()
     def grailsApplication
+    def requestService
     def expedienteService
     def logginService
     GenerarZip generarZip = new GenerarZip()
@@ -50,36 +51,38 @@ class CbpitaService implements ICompanyService{
     ZipUtils zipUtils = new ZipUtils()
     CorreoUtil correoUtil = new CorreoUtil()
 
-    def marshall(nameSpace, clase) {
-
-        StringWriter writer = new StringWriter();
-
+    @Override
+    String marshall(String nameSpace, def objeto) {
+        String result
         try {
-
-            JAXBContext jaxbContext = JAXBContext.newInstance(clase.class);
-            Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-
-            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            def root = null
-            QName qName = null
-
-            if (clase instanceof com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCasesResultsRequest) {
-                qName = new QName(nameSpace, "CbpitaUnderwrittingCasesResultsRequest");
-                root = new JAXBElement<CbpitaUnderwrittingCasesResultsRequest>(qName, CbpitaUnderwrittingCasesResultsRequest.class, clase);
+            if (objeto instanceof CbpitaUnderwrittingCasesResultsRequest) {
+                result = requestService.marshall(nameSpace, objeto, CbpitaUnderwrittingCasesResultsRequest.class)
+            } else if (objeto instanceof CbpitaUnderwrittingCaseManagementRequest) {
+                result = requestService.marshall(nameSpace, objeto, CbpitaUnderwrittingCaseManagementRequest.class)
             }
-
-            if (clase instanceof com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCaseManagementRequest) {
-                qName = new QName(nameSpace, "CbpitaUnderwrittingCaseManagementRequest");
-                root = new JAXBElement<CbpitaUnderwrittingCaseManagementRequest>(qName, CbpitaUnderwrittingCaseManagementRequest.class, clase);
-            }
-
-            jaxbMarshaller.marshal(root, writer);
-            String result = writer.toString();
         } finally {
-            writer.close();
+            return result
         }
+    }
 
-        return writer
+    @Override
+    def buildDatos(Request req, String codigoSt) {
+        try {
+            DATOS dato = new DATOS()
+            Company company = req.company
+            dato.registro = rellenaDatos(req, company)
+            dato.pregunta = rellenaPreguntas(req, company.nombre)
+            dato.servicio = rellenaServicios(req, company.nombre)
+            dato.coberturas = rellenaCoberturas(req)
+            return dato
+        } catch (Exception e) {
+            logginService.putError(e.toString())
+        }
+    }
+
+    @Override
+    def getCodigoStManual(Request req) {
+        return null
     }
 
     com.scortelemed.servicios.RespuestaCRM modificarExpediente(com.scortelemed.servicios.Expediente expediente, String ou) {
@@ -166,26 +169,6 @@ class CbpitaService implements ICompanyService{
         } catch (Exception e) {
             logginService.putError("obtenerInformeExpedientes de Methislab", "No se ha podido obtener el informe de expediente : " + e)
             return null
-        }
-    }
-
-    @Override
-    def getCodigoStManual(Request req) {
-        return null
-    }
-
-    @Override
-    def buildDatos(Request req, String codigoSt) {
-        try {
-            DATOS dato = new DATOS()
-            Company company = req.company
-            dato.registro = rellenaDatos(req, company)
-            dato.pregunta = rellenaPreguntas(req, company.nombre)
-            dato.servicio = rellenaServicios(req, company.nombre)
-            dato.coberturas = rellenaCoberturas(req)
-            return dato
-        } catch (Exception e) {
-            logginService.putError(e.toString())
         }
     }
 

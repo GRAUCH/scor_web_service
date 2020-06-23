@@ -68,12 +68,95 @@ class PsnService implements ICompanyService{
 
 	TransformacionUtil util = new TransformacionUtil()
 	def logginService
+	def requestService
 	def expedienteService
 	def tarificadorService
 	GenerarZip generarZip = new GenerarZip()
 	def grailsApplication
 	ContentResult contentResult = new ContentResult()
 
+	@Override
+	String marshall(String nameSpace, def objeto) {
+		String result
+		try{
+			if (objeto instanceof GestionReconocimientoMedicoRequest){
+				result = requestService.marshall(nameSpace, objeto, GestionReconocimientoMedicoRequest.class)
+			} else if (objeto instanceof ResultadoReconocimientoMedicoRequest){
+				result = requestService.marshall(nameSpace, objeto, ResultadoReconocimientoMedicoRequest.class)
+			} else if (objeto instanceof ConsolidacionPolizaRequest){
+				result = requestService.marshall(nameSpace, objeto, ConsolidacionPolizaRequest.class)
+			} else if (objeto instanceof ConsultaExpedienteRequest){
+				result = requestService.marshall(nameSpace, objeto, ConsultaExpedienteRequest.class)
+			} else if (objeto instanceof ConsultaDocumentoRequest){
+				result = requestService.marshall(nameSpace, objeto, ConsultaDocumentoRequest.class)
+			}
+		} finally {
+			return result
+		}
+	}
+
+	@Override
+	def buildDatos(Request req, String codigoSt) {
+		try {
+			DATOS dato = new DATOS()
+			Company company = req.company
+			dato.registro = rellenaDatos(req, company)
+			//dato.pregunta = rellenaPreguntas(req)
+			//dato.servicio = rellenaServicios(req, company.nombre)
+			dato.coberturas = rellenaCoberturas(req)
+			return dato
+		} catch (Exception e) {
+			logginService.putError(e.toString())
+		}
+	}
+
+	@Override
+	String getCodigoStManual(Request req) {
+		def pais
+		def codigoCia
+
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
+		DocumentBuilder builder = factory.newDocumentBuilder()
+
+		InputSource is = new InputSource(new StringReader(req.request))
+		is.setEncoding("UTF-8")
+		Document doc = builder.parse(is)
+
+		doc.getDocumentElement().normalize()
+
+		NodeList nList = doc.getElementsByTagName("CandidateInformation")
+
+		for (int temp = 0; temp < nList.getLength(); temp++) {
+
+			Node nNode = nList.item(temp)
+
+			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+
+				Element eElement = (Element) nNode;
+
+				/**PAIS
+				 *
+				 */
+
+				if (eElement.getElementsByTagName("country").item(0) != null && !eElement.getElementsByTagName("country").item(0).getTextContent().isEmpty()) {
+					pais = eElement.getElementsByTagName("country").item(0).getTextContent().toString()
+				} else {
+					pais = "ES"
+				}
+			}
+		}
+
+		if (pais.toString().equals("ES")){
+
+			codigoCia = "1030"
+		}
+
+		if (pais.toString().equals("PT")){
+
+			codigoCia = "1058"
+		}
+		return codigoCia
+	}
 
 	def rellenaDatosSalidaDocumentoNodo(nodoAlfresco, requestDate, logginService, String codigoSt) {
 
@@ -286,59 +369,6 @@ class PsnService implements ICompanyService{
 		return expediente
 	}
 
-	/**
-	 *
-	 * @param clase
-	 * @return
-	 */
-	def marshall (nameSpace, clase){
-
-		StringWriter writer = new StringWriter();
-
-		try{
-
-			JAXBContext jaxbContext = JAXBContext.newInstance(clase.class);
-			Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-
-			jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-			def root = null
-			QName qName = null
-
-			if (clase instanceof com.scortelemed.schemas.psn.GestionReconocimientoMedicoRequest){
-				qName = new QName(nameSpace, "GestionReconocimientoMedicoRequest");
-				root = new JAXBElement<com.scortelemed.schemas.psn.GestionReconocimientoMedicoRequest>(qName, com.scortelemed.schemas.psn.GestionReconocimientoMedicoRequest.class, clase);
-			}
-
-			if (clase instanceof com.scortelemed.schemas.psn.ResultadoReconocimientoMedicoRequest){
-				qName = new QName(nameSpace, "ResultadoReconocimientoMedicoRequest");
-				root = new JAXBElement<com.scortelemed.schemas.psn.ResultadoReconocimientoMedicoRequest>(qName, com.scortelemed.schemas.psn.ResultadoReconocimientoMedicoRequest.class, clase);
-			}
-
-
-			if (clase instanceof ConsolidacionPolizaRequest){
-				qName = new QName(nameSpace, "ConsolidacionPolizaRequest");
-				root = new JAXBElement<ConsolidacionPolizaRequest>(qName, ConsolidacionPolizaRequest.class, clase);
-			}
-
-			if (clase instanceof com.scortelemed.schemas.psn.ConsultaExpedienteRequest){
-				qName = new QName(nameSpace, "ConsultaExpedienteRequest");
-				root = new JAXBElement<ConsultaExpedienteRequest>(qName, ConsultaExpedienteRequest.class, clase);
-			}
-
-			if (clase instanceof com.scortelemed.schemas.psn.ConsultaDocumentoRequest){
-				qName = new QName(nameSpace, "ConsultaDocumentoRequest");
-				root = new JAXBElement<ConsultaDocumentoRequest>(qName, ConsultaDocumentoRequest.class, clase);
-			}
-
-			jaxbMarshaller.marshal(root, writer);
-			String result = writer.toString();
-		} finally {
-			writer.close();
-		}
-
-		return writer
-	}
-
 	def consultaExpediente = { ou, filtro ->
 
 		try {
@@ -370,69 +400,6 @@ class PsnService implements ICompanyService{
 		} catch (Exception e) {
 			logginService.putError("obtenerInformeExpedientes","No se ha podido obtener el informe de expediente : " + e)
 			response = false
-		}
-	}
-
-	@Override
-	String getCodigoStManual(Request req) {
-		def pais
-		def codigoCia
-
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
-		DocumentBuilder builder = factory.newDocumentBuilder()
-
-		InputSource is = new InputSource(new StringReader(req.request))
-		is.setEncoding("UTF-8")
-		Document doc = builder.parse(is)
-
-		doc.getDocumentElement().normalize()
-
-		NodeList nList = doc.getElementsByTagName("CandidateInformation")
-
-		for (int temp = 0; temp < nList.getLength(); temp++) {
-
-			Node nNode = nList.item(temp)
-
-			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-
-				Element eElement = (Element) nNode;
-
-				/**PAIS
-				 *
-				 */
-
-				if (eElement.getElementsByTagName("country").item(0) != null && !eElement.getElementsByTagName("country").item(0).getTextContent().isEmpty()) {
-					pais = eElement.getElementsByTagName("country").item(0).getTextContent().toString()
-				} else {
-					pais = "ES"
-				}
-			}
-		}
-
-		if (pais.toString().equals("ES")){
-
-			codigoCia = "1030"
-		}
-
-		if (pais.toString().equals("PT")){
-
-			codigoCia = "1058"
-		}
-		return codigoCia
-	}
-
-	@Override
-	def buildDatos(Request req, String codigoSt) {
-		try {
-			DATOS dato = new DATOS()
-			Company company = req.company
-			dato.registro = rellenaDatos(req, company)
-			//dato.pregunta = rellenaPreguntas(req)
-			//dato.servicio = rellenaServicios(req, company.nombre)
-			dato.coberturas = rellenaCoberturas(req)
-			return dato
-		} catch (Exception e) {
-			logginService.putError(e.toString())
 		}
 	}
 

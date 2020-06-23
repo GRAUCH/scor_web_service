@@ -51,40 +51,45 @@ class LagunaroService implements ICompanyService{
 
 	TransformacionUtil util = new TransformacionUtil()
 	def grailsApplication
+	def requestService
 	def expedienteService
 	def logginService
 	GenerarZip generarZip = new GenerarZip()
 	def tarificadorService
-	TransformacionUtil transformacionUtil = new TransformacionUtil()
 
-	def marshall (nameSpace, clase){
-
-		StringWriter writer = new StringWriter();
-
+	/**
+	 * LAGUNARO  (Beans, sin namespace)
+	 */
+	@Override
+	String marshall(String nameSpace, def objeto) {
+		String result
 		try{
-
-			JAXBContext jaxbContext = JAXBContext.newInstance(clase.class);
-			Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-
-			jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-			def root = null
-			QName qName = null
-
-			if (clase instanceof com.ws.lagunaro.beans.GestionReconocimientoMedicoRequest){
-				qName = new QName(nameSpace, "GestionReconocimientoMedicoRequest");
-				root = new JAXBElement<GestionReconocimientoMedicoRequest>(qName, GestionReconocimientoMedicoRequest.class, clase);
+			if (objeto instanceof GestionReconocimientoMedicoRequest){
+				result = requestService.marshall(objeto, GestionReconocimientoMedicoRequest.class)
 			}
-
-			jaxbMarshaller.marshal(root, writer);
-			String result = writer.toString();
 		} finally {
-
-			writer.close();
+			return result
 		}
-
-		return writer
 	}
 
+	@Override
+	def buildDatos(Request req, String codigoSt) {
+		try {
+			DATOS dato = new DATOS()
+			Company company = req.company
+			dato.registro = rellenaDatos(req, company)
+			dato.servicio = rellenaServicios(req, company.nombre)
+			dato.coberturas = rellenaCoberturas(req)
+			return dato
+		} catch (Exception e) {
+			logginService.putError(e.toString())
+		}
+	}
+
+	@Override
+	def getCodigoStManual(Request req) {
+		return null
+	}
 
 	def consultaExpediente = { ou, filtro ->
 
@@ -100,25 +105,6 @@ class LagunaroService implements ICompanyService{
 		} catch (Exception e) {
 			logginService.putError("obtenerInformeExpedientes de Lagunaro","No se ha podido obtener el informe de expediente : " + e)
 			return null
-		}
-	}
-
-	@Override
-	def getCodigoStManual(Request req) {
-		return null
-	}
-
-	@Override
-	def buildDatos(Request req, String codigoSt) {
-		try {
-			DATOS dato = new DATOS()
-			Company company = req.company
-			dato.registro = rellenaDatos(req, company)
-			dato.servicio = rellenaServicios(req, company.nombre)
-			dato.coberturas = rellenaCoberturas(req)
-			return dato
-		} catch (Exception e) {
-			logginService.putError(e.toString())
 		}
 	}
 

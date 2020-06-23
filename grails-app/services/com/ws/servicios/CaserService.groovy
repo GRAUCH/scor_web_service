@@ -38,16 +38,29 @@ class CaserService implements ICompanyService{
     TransformacionUtil util = new TransformacionUtil()
     def grailsApplication
     def logginService
+    def requestService
     def expedienteService
     GenerarZip generarZip = new GenerarZip()
     def tarificadorService
     TransformacionUtil transformacionUtil = new TransformacionUtil()
     CorreoUtil correoUtil = new CorreoUtil()
 
-
     @Override
-    def getCodigoStManual(Request req) {
-        return null
+    String marshall(String nameSpace, def objeto) {
+        String result
+        try {
+            if (objeto instanceof ResultadoReconocimientoMedicoRequest) {
+                result = requestService.marshall(nameSpace, objeto, ResultadoReconocimientoMedicoRequest.class)
+            } else if (objeto instanceof GestionReconocimientoMedicoRequest) {
+                result = requestService.marshall(nameSpace, objeto, GestionReconocimientoMedicoRequest.class)
+            } else if (objeto instanceof ConsultaExpedienteRequest) {
+                result = requestService.marshall(nameSpace, objeto, ConsultaExpedienteRequest.class)
+            } else if (objeto instanceof ConsolidacionPolizaRequest) {
+                result = requestService.marshall(nameSpace, objeto, ConsolidacionPolizaRequest.class)
+            }
+        } finally {
+            return result
+        }
     }
 
     @Override
@@ -63,6 +76,11 @@ class CaserService implements ICompanyService{
         } catch (Exception e) {
             logginService.putError(e.toString())
         }
+    }
+
+    @Override
+    def getCodigoStManual(Request req) {
+        return null
     }
 
     def rellenaDatosSalida(expedientePoliza, requestDate, logginService) {
@@ -209,48 +227,6 @@ class CaserService implements ICompanyService{
         }
 
         return expediente
-    }
-
-    def marshall(nameSpace, clase) {
-
-        StringWriter writer = new StringWriter();
-
-        try {
-
-            JAXBContext jaxbContext = JAXBContext.newInstance(clase.class);
-            Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-
-            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            def root = null
-            QName qName = null
-
-            if (clase instanceof com.scortelemed.schemas.caser.ResultadoReconocimientoMedicoRequest) {
-                qName = new QName(nameSpace, "ResultadoReconocimientoMedicoRequest");
-                root = new JAXBElement<ResultadoReconocimientoMedicoRequest>(qName, ResultadoReconocimientoMedicoRequest.class, clase);
-            }
-
-            if (clase instanceof com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest) {
-                qName = new QName(nameSpace, "GestionReconocimientoMedicoRequest");
-                root = new JAXBElement<GestionReconocimientoMedicoRequest>(qName, GestionReconocimientoMedicoRequest.class, clase);
-            }
-
-            if (clase instanceof com.scortelemed.schemas.caser.ConsultaExpedienteRequest) {
-                qName = new QName(nameSpace, "ConsultaExpedienteRequest");
-                root = new JAXBElement<ConsultaExpedienteRequest>(qName, ConsultaExpedienteRequest.class, clase);
-            }
-
-            if (clase instanceof ConsolidacionPolizaRequest) {
-                qName = new QName(nameSpace, "ConsolidacionPolizaRequest");
-                root = new JAXBElement<ConsolidacionPolizaRequest>(qName, ConsolidacionPolizaRequest.class, clase);
-            }
-
-            jaxbMarshaller.marshal(root, writer);
-            String result = writer.toString();
-        } finally {
-            writer.close();
-        }
-
-        return writer
     }
 
     def consultaExpediente = { ou, filtro ->

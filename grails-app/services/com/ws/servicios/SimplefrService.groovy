@@ -34,59 +34,24 @@ class SimplefrService implements ICompanyService{
 
 	TransformacionUtil util = new TransformacionUtil()
 	def logginService
+	def requestService
 	def expedienteService
 	def tarificadorService
 	GenerarZip generarZip = new GenerarZip()
 	def grailsApplication
 
-	def consultaExpediente = { ou, filtro ->
-
-		try {
-
-			def ctx = grailsApplication.mainContext
-			def bean = ctx.getBean("soapClientAlptis")
-			bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY,Conf.findByName("frontal.wsdl")?.value)
-
-			def salida=grailsApplication.mainContext.soapClientAlptis.consultaExpediente(tarificadorService.obtenerUsuarioFrontal(ou),filtro)
-
-			return salida
-		} catch (Exception e) {
-			logginService.putError("obtenerInformeExpedientes","No se ha podido obtener el informe de expediente : " + e)
-			return null
-		}
-	}
-
-	def marshall (nameSpace, clase){
-
-		StringWriter writer = new StringWriter();
-
+	@Override
+	String marshall(String nameSpace, def objeto) {
+		String result
 		try{
-
-			JAXBContext jaxbContext = JAXBContext.newInstance(clase.class);
-			Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-
-			jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-			def root = null
-			QName qName = null
-
-			if (clase instanceof com.scortelemed.schemas.simplefr.SimplefrUnderwrittingCaseManagementRequest){
-				qName = new QName(nameSpace, "SimplefrUnderwrittingCaseManagementRequest");
-				root = new JAXBElement<SimplefrUnderwrittingCaseManagementRequest>(qName, SimplefrUnderwrittingCaseManagementRequest.class, clase);
+			if (objeto instanceof SimplefrUnderwrittingCaseManagementRequest){
+				result = requestService.marshall(nameSpace, objeto, SimplefrUnderwrittingCaseManagementRequest.class)
+			} else if (objeto instanceof SimplefrUnderwrittingCasesResultsRequest){
+				result = requestService.marshall(nameSpace, objeto, SimplefrUnderwrittingCasesResultsRequest.class)
 			}
-
-			if (clase instanceof com.scortelemed.schemas.simplefr.SimplefrUnderwrittingCasesResultsRequest){
-				qName = new QName(nameSpace, "SimplefrUnderwrittingCasesResultsRequest");
-				root = new JAXBElement<SimplefrUnderwrittingCasesResultsRequest>(qName, SimplefrUnderwrittingCasesResultsRequest.class, clase);
-			}
-
-
-			jaxbMarshaller.marshal(root, writer);
-			String result = writer.toString();
 		} finally {
-			writer.close();
+			return result
 		}
-
-		return writer
 	}
 
 	@Override
@@ -107,6 +72,23 @@ class SimplefrService implements ICompanyService{
 	@Override
 	def getCodigoStManual(Request req) {
 		return null
+	}
+
+	def consultaExpediente = { ou, filtro ->
+
+		try {
+
+			def ctx = grailsApplication.mainContext
+			def bean = ctx.getBean("soapClientAlptis")
+			bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY,Conf.findByName("frontal.wsdl")?.value)
+
+			def salida=grailsApplication.mainContext.soapClientAlptis.consultaExpediente(tarificadorService.obtenerUsuarioFrontal(ou),filtro)
+
+			return salida
+		} catch (Exception e) {
+			logginService.putError("obtenerInformeExpedientes","No se ha podido obtener el informe de expediente : " + e)
+			return null
+		}
 	}
 
 	def rellenaDatos (req, company) {

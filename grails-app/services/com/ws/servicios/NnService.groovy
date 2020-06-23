@@ -34,44 +34,42 @@ import static grails.async.Promises.task
 class NnService implements ICompanyService{
 
     def logginService
+    def requestService
     def expedienteService
     def grailsApplication
 
-    /**
-     *
-     * @param clase
-     * @return
-     */
-    def marshall (nameSpace, clase){
-
-        StringWriter writer = new StringWriter();
-
+    @Override
+    String marshall(String nameSpace, def objeto) {
+        String result
         try{
-
-            JAXBContext jaxbContext = JAXBContext.newInstance(clase.class);
-            Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-
-            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            def root = null
-            QName qName = null
-
-            if (clase instanceof com.scortelemed.schemas.nn.GestionReconocimientoMedicoRequest){
-                qName = new QName(nameSpace, "GestionReconocimientoMedicoRequest");
-                root = new JAXBElement<GestionReconocimientoMedicoRequest>(qName, GestionReconocimientoMedicoRequest.class, clase);
+            if (objeto instanceof GestionReconocimientoMedicoRequest){
+                result = requestService.marshall(nameSpace, objeto, GestionReconocimientoMedicoRequest.class)
+            } else if (objeto instanceof ResultadoReconocimientoMedicoRequest) {
+                result = requestService.marshall(nameSpace, objeto, GestionReconocimientoMedicoRequest.class)
             }
-
-            if (clase instanceof com.scortelemed.schemas.nn.ResultadoReconocimientoMedicoRequest) {
-                qName = new QName(nameSpace, "ResultadoReconocimientoMedicoRequest");
-                root = new JAXBElement<ResultadoReconocimientoMedicoRequest>(qName, ResultadoReconocimientoMedicoRequest.class, clase);
-            }
-
-            jaxbMarshaller.marshal(root, writer);
-            String result = writer.toString();
         } finally {
-            writer.close();
+            return result
         }
+    }
 
-        return writer
+    @Override
+    def buildDatos(Request req, String codigoSt) {
+        try {
+            DATOS dato = new DATOS()
+            Company company = req.company
+            dato.registro = rellenaDatos(req, company)
+            //dato.pregunta = rellenaPreguntas(req)
+            //dato.servicio = rellenaServicios(req, company.nombre)
+            dato.coberturas = rellenaCoberturas(req)
+            return dato
+        } catch (Exception e) {
+            logginService.putError(e.toString())
+        }
+    }
+
+    @Override
+    def getCodigoStManual(Request req) {
+        return null
     }
 
     void insertarRecibido(Company company, String identificador, String info, String operacion) {
@@ -337,26 +335,6 @@ class NnService implements ICompanyService{
                 correoUtil.envioEmailErrores("BusquedaExpedienteCrm","Nueva alta de " + companyName + " con numero de solicitud: " + policyNumber.toString() + " y referencia: " + certificado.toString(), e)
             }
         }
-    }
-
-    @Override
-    def buildDatos(Request req, String codigoSt) {
-        try {
-            DATOS dato = new DATOS()
-            Company company = req.company
-            dato.registro = rellenaDatos(req, company)
-            //dato.pregunta = rellenaPreguntas(req)
-            //dato.servicio = rellenaServicios(req, company.nombre)
-            dato.coberturas = rellenaCoberturas(req)
-            return dato
-        } catch (Exception e) {
-            logginService.putError(e.toString())
-        }
-    }
-
-    @Override
-    def getCodigoStManual(Request req) {
-        return null
     }
 
     def rellenaDatos (req, company) {
