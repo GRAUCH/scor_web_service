@@ -18,7 +18,6 @@ class ExpedienteService implements IExpedienteService {
 
     def logginService = new LogginService()
     def grailsApplication
-    def crearExpedienteService
 
     def crearExpediente(Request req) {
         try {
@@ -49,10 +48,7 @@ class ExpedienteService implements IExpedienteService {
     private def buildDatos(Request req, Company company) {
         try {
             DATOS dato = new DATOS()
-            dato.registro = crearExpedienteService.rellenaDatos(req, company)
-            dato.pregunta = crearExpedienteService.rellenaPreguntas(req, company.nombre)
-            dato.servicio = crearExpedienteService.rellenaServicio(req, company.nombre)
-            dato.coberturas = crearExpedienteService.rellenaCoberturas(req)
+            //TODO IMPLEMENTAR SWITCH
             return dato
         } catch (Exception e) {
             logginService.putError(e.toString())

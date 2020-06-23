@@ -14,14 +14,6 @@ import com.ws.lifesquare.beans.LifesquareUnderwrittingCaseManagementRequest
 
 import grails.plugin.springsecurity.annotation.Secured
 import grails.util.Holders
-
-import javax.xml.bind.JAXBContext
-import javax.xml.bind.JAXBElement
-import javax.xml.bind.Unmarshaller
-import javax.xml.namespace.QName
-import javax.xml.transform.Source
-import javax.xml.transform.stream.StreamSource
-
 import org.springframework.beans.factory.annotation.Autowired
 
 import com.ws.servicios.AmaService
@@ -40,7 +32,7 @@ class RequestController {
 	def estadisticasService
 	def validacionXmlService
 	def logginService = new LogginService()
-	def crearExpedienteService
+	def francesasService
 	def requestService
 
 	@Autowired
@@ -435,7 +427,7 @@ class RequestController {
 					AfiEscaUnderwrittingCaseManagementRequest afiEscaUnderwrittingCaseManagementRequest = requestService.jaxbParser(requestInstance.getRequest(), AfiEscaUnderwrittingCaseManagementRequest.class)
 					if (afiEscaUnderwrittingCaseManagementRequest.getRequest_Data().getRecord().getNombre().equals("A")) {
 						requestBBDD = requestService.getBBDDRequest(requestInstance, "AfiEscaUnderwrittingCaseManagementRequest", null, AfiEscaUnderwrittingCaseManagementRequest.class)
-						crearExpedienteService.crearExpediente(requestBBDD)
+						francesasService.crearExpediente(requestBBDD)
 						flash.message = "${message(code: 'default.processed.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
 					} else {
 						flash.error = "${message(code: 'default.invalid.type.operation.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
@@ -445,7 +437,7 @@ class RequestController {
 					AlptisUnderwrittingCaseManagementRequest alptisUnderwrittingCaseManagementRequest = requestService.jaxbParser(requestInstance.getRequest(), AlptisUnderwrittingCaseManagementRequest.class)
 					if (alptisUnderwrittingCaseManagementRequest.getRequest_Data().getRecord().getNombre().equals("A")) {
 						requestBBDD = requestService.getBBDDRequest(requestInstance, "AlptisUnderwrittingCaseManagementRequest", null, AlptisUnderwrittingCaseManagementRequest.class)
-						crearExpedienteService.crearExpediente(requestBBDD)
+						francesasService.crearExpediente(requestBBDD)
 						flash.message = "${message(code: 'default.processed.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
 					} else {
 						flash.error = "${message(code: 'default.invalid.type.operation.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
@@ -455,7 +447,7 @@ class RequestController {
 					LifesquareUnderwrittingCaseManagementRequest lifesquareUnderwrittingCaseManagementRequest = requestService.jaxbParser(requestInstance.getRequest(), LifesquareUnderwrittingCaseManagementRequest.class)
 					if (lifesquareUnderwrittingCaseManagementRequest.getRequest_Data().getRecord().getNombre().equals("A")) {
 						requestBBDD = requestService.getBBDDRequest(requestInstance, "LifesquareUnderwrittingCaseManagementRequest", null, LifesquareUnderwrittingCaseManagementRequest.class)
-						crearExpedienteService.crearExpediente(requestBBDD)
+						francesasService.crearExpediente(requestBBDD)
 						flash.message = "${message(code: 'default.processed.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
 					} else {
 						flash.error = "${message(code: 'default.invalid.type.operation.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"

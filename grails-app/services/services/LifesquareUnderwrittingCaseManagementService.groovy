@@ -36,7 +36,7 @@ class LifesquareUnderwrittingCaseManagementService {
 	def protected estadisticasService = new EstadisticasService()
 	def protected requestService = new RequestService()
 	def protected logginService = new LogginService()
-	def crearExpedienteService
+	def francesasService
 	def tarificadorService
 	
 	@WebResult(name = "LifesquareUnderwrittingCaseManagementResponse")
@@ -76,7 +76,7 @@ class LifesquareUnderwrittingCaseManagementService {
 					if (Company.findByNombre("lifesquare").generationAutomatic) {
 
 						logginService.putInfoMessage("Se procede el alta automatica de Lifesquare con numero de solicitud " + lifesquareUnderwrittingCaseManagementRequest.policy.policy_number)
-						crearExpedienteService.crearExpediente(requestBBDD)
+						francesasService.crearExpediente(requestBBDD)
 
 
 						/**Metemos en recibidos

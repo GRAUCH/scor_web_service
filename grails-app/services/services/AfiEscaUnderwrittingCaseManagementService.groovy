@@ -13,9 +13,6 @@ import org.grails.cxf.utils.EndpointType
 import org.grails.cxf.utils.GrailsCxfEndpoint
 import org.grails.cxf.utils.GrailsCxfEndpointProperty
 import org.springframework.web.context.request.RequestContextHolder
-
-import servicios.ClaveFiltro
-import servicios.Expediente
 import servicios.Filtro
 
 import com.scortelemed.Company
@@ -35,7 +32,7 @@ class AfiEscaUnderwrittingCaseManagementService {
 	def requestService
 	def estadisticasService
 	def logginService
-	def crearExpedienteService
+	def francesasService
 	def tarificadorService
 
 	@WebResult(name = "AfiEscaUnderwrittingCaseManagementResponse")
@@ -70,7 +67,7 @@ class AfiEscaUnderwrittingCaseManagementService {
 
 
 				logginService.putInfoMessage("Se procede el alta automatica de Afiesca con numero de solicitud " + afiEscaUnderwrittingCaseManagementRequest.policy.policy_number)
-				crearExpedienteService.crearExpediente(requestBBDD)
+				francesasService.crearExpediente(requestBBDD)
 
 				/**Metemos en recibidos
 				 *
@@ -93,7 +90,7 @@ class AfiEscaUnderwrittingCaseManagementService {
 			} else {
 
 				resultado.setStatusType(StatusType.error)
-				resultado.setComments("L'opération est temporairement désactivée")
+				resultado.setComments("L'opï¿½ration est temporairement dï¿½sactivï¿½e")
 				logginService.putInfoMessage("Peticion " + opername + " no realizada para solicitud: " + afiEscaUnderwrittingCaseManagementRequest.policy.policy_number)
 				correoUtil.envioEmailErrores(opername,"Endpoint-"+ opername + ". La operacion esta desactivada temporalmente",null)
 			}

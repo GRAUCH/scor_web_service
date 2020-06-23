@@ -49,7 +49,7 @@ class WsController {
     CorreoUtil correoUtil = new CorreoUtil()
     def requestService
     def tarificadorService
-    def crearExpedienteService
+    def francesasService
 
 
     @Autowired

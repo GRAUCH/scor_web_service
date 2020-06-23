@@ -13,9 +13,6 @@ import org.grails.cxf.utils.EndpointType
 import org.grails.cxf.utils.GrailsCxfEndpoint
 import org.grails.cxf.utils.GrailsCxfEndpointProperty
 import org.springframework.web.context.request.RequestContextHolder
-
-import servicios.ClaveFiltro
-import servicios.Expediente
 import servicios.Filtro
 
 import com.scortelemed.Company
@@ -35,7 +32,7 @@ class AlptisUnderwrittingCaseManagementService {
 	def requestService
 	def estadisticasService
 	def logginService
-	def crearExpedienteService
+	def francesasService
 	def tarificadorService
 
 	@WebResult(name = "AlptisUnderwrittingCaseManagementResponse")
@@ -74,7 +71,7 @@ class AlptisUnderwrittingCaseManagementService {
 					if (Company.findByNombre("alptis").generationAutomatic) {
 
 						logginService.putInfoMessage("Se procede el alta automatica de Alptis con numero de solicitud " + alptisUnderwrittingCaseManagementRequest.policy.BasicPolicyGroup.policy_number)
-						crearExpedienteService.crearExpediente(requestBBDD)
+						francesasService.crearExpediente(requestBBDD)
 
 
 						/**Metemos en recibidos
@@ -98,7 +95,7 @@ class AlptisUnderwrittingCaseManagementService {
 				} else {
 
 					resultado.setStatusType(StatusType.error)
-					resultado.setComments("L'opération est temporairement désactivée.")
+					resultado.setComments("L'opï¿½ration est temporairement dï¿½sactivï¿½e.")
 					logginService.putInfoMessage("Peticion " + opername + " no realizada para solicitud: " + alptisUnderwrittingCaseManagementRequest.policy.BasicPolicyGroup.policy_number)
 					correoUtil.envioEmailErrores(opername,"Endpoint-"+ opername + ". La operacion esta desactivada temporalmente",null)
 				}
@@ -108,7 +105,7 @@ class AlptisUnderwrittingCaseManagementService {
 				fecha.setTime(new Date())
 
 				def fechaIni = fecha.getTime().format ('yyyyMMdd HH:mm')
-				def msg = "Une annulation est requise pour le dossier " + alptisUnderwrittingCaseManagementRequest.policy.BasicPolicyGroup.policy_number.toString() + " en date du : " + fechaIni + " par la société Alptis."
+				def msg = "Une annulation est requise pour le dossier " + alptisUnderwrittingCaseManagementRequest.policy.BasicPolicyGroup.policy_number.toString() + " en date du : " + fechaIni + " par la sociï¿½tï¿½ Alptis."
 
 				correoUtil.envioEmailNoTratados("AlptisUnderwrittingCaseManagementRequest",msg)
 			}

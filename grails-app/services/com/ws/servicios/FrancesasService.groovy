@@ -12,7 +12,7 @@ import com.scor.srpfileinbound.*
 import com.scortelemed.Conf
 import com.scortelemed.Estadistica
 
-class CrearExpedienteService {
+class FrancesasService {
 
 	/*
 	 Se conecta al CRM y devuelve los expedientes tarificados para una fecha
