@@ -1,6 +1,7 @@
 package services
 
-
+import com.scortelemed.TipoCompany
+import com.ws.servicios.impl.ExpedienteService
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
 import hwsol.webservices.WsError
@@ -41,7 +42,8 @@ expose = EndpointType.JAX_WS,properties = [@GrailsCxfEndpointProperty(name = "ws
 @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
 
 class EnginyersUnderwrittingCaseManagementService {
-	
+
+	def expedienteService = new ExpedienteService()
 	@Autowired
 	private EnginyersService enginyersService
 	@Autowired
@@ -98,7 +100,7 @@ class EnginyersUnderwrittingCaseManagementService {
 		
 							if (wsErrors != null && wsErrors.size() == 0) {
 
-								enginyersService.crearExpediente(requestBBDD)
+								expedienteService.crearExpediente(requestBBDD, TipoCompany.ENGINYERS)
 
 								expedient.setAddExpResultCode(0)
 								fault.setFaultCode("0")

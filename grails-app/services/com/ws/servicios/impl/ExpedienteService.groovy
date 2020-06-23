@@ -24,6 +24,7 @@ class ExpedienteService implements IExpedienteService {
     def cajamarService
     def caserService
     def cbpitaService
+    def enginyersService
 
     def crearExpediente(Request req, TipoCompany comp) {
         try {
@@ -57,6 +58,9 @@ class ExpedienteService implements IExpedienteService {
             case TipoCompany.AMA:
                 amaService.getCodigoStManual(req)
                 break
+            case TipoCompany.ENGINYERS:
+                enginyersService.getCodigoStManual(req)
+                break
             case TipoCompany.PSN:
                 break
             default:
@@ -80,6 +84,9 @@ class ExpedienteService implements IExpedienteService {
                     break
                 case TipoCompany.CBP_ITALIA:
                     cbpitaService.buildDatos(req, codigoSt)
+                    break
+                case TipoCompany.ENGINYERS:
+                    enginyersService.buildDatos(req, codigoSt)
                     break
             }
             return dato
