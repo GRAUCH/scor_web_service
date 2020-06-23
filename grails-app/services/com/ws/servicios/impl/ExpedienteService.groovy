@@ -29,6 +29,7 @@ class ExpedienteService implements IExpedienteService {
     def methislabCFService
     def methislabService
     def netinsuranceService
+    def nnService
 
     def crearExpediente(Request req, TipoCompany comp) {
         try {
@@ -108,6 +109,9 @@ class ExpedienteService implements IExpedienteService {
                     break
                 case TipoCompany.NET_INSURANCE:
                     netinsuranceService.buildDatos(req, codigoSt)
+                    break
+                case TipoCompany.NATIONALE_NETHERLANDEN:
+                    nnService.buildDatos(req, codigoSt)
                     break
             }
             return dato

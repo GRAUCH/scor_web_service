@@ -11,6 +11,7 @@ enum TipoCompany {
     CASER("caser"),
     NET_INSURANCE("netinsurance"),
     MALAKOFF_MEDERIC("simplefr"),
+    NATIONALE_NETHERLANDEN("nationaleNetherlanden"),
     SOCIETE_GENERALE("societeGenerale"),
     METHIS_LAB("methislab"),
     CBP_ITALIA("cbp-italia"),

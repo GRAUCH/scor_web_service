@@ -2,6 +2,7 @@ package services
 
 import com.scortelemed.Company
 import com.scortelemed.Operacion
+import com.scortelemed.TipoCompany
 import com.ws.servicios.*
 import com.scortelemed.schemas.nn.*
 import com.ws.servicios.impl.RequestService
@@ -30,6 +31,7 @@ import java.text.SimpleDateFormat
 @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
 class NationaleNederlandenUnderwrittingCaseManagementService {
 
+	def expedienteService
 	@Autowired
 	private NnService nnService
 	@Autowired
@@ -84,7 +86,7 @@ class NationaleNederlandenUnderwrittingCaseManagementService {
 
 					if (wsErrors != null && wsErrors.size() == 0) {
 
-						nnService.crearExpediente(requestBBDD)
+						expedienteService.crearExpediente(requestBBDD, TipoCompany.NATIONALE_NETHERLANDEN)
 
 						message = "El caso se ha procesado correctamente"
 						status = StatusType.OK
