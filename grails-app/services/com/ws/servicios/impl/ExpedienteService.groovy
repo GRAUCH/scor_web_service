@@ -31,6 +31,7 @@ class ExpedienteService implements IExpedienteService {
     def netinsuranceService
     def nnService
     def psnService
+    def simplefrService
 
     def crearExpediente(Request req, TipoCompany comp) {
         try {
@@ -117,6 +118,10 @@ class ExpedienteService implements IExpedienteService {
                     break
                 case TipoCompany.PSN:
                     psnService.buildDatos(req, codigoSt)
+                    break
+                case TipoCompany.MALAKOFF_MEDERIC:
+                    simplefrService.buildDatos(req, codigoSt)
+                    break
             }
             return dato
         } catch (Exception e) {
