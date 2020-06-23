@@ -32,6 +32,7 @@ class ExpedienteService implements IExpedienteService {
     def nnService
     def psnService
     def simplefrService
+    def societeGeneraleService
 
     def crearExpediente(Request req, TipoCompany comp) {
         try {
@@ -122,6 +123,9 @@ class ExpedienteService implements IExpedienteService {
                 case TipoCompany.MALAKOFF_MEDERIC:
                     simplefrService.buildDatos(req, codigoSt)
                     break
+                case TipoCompany.SOCIETE_GENERALE:
+                    societeGeneraleService.buildDatos(req, codigoSt)
+                    break
             }
             return dato
         } catch (Exception e) {
@@ -129,7 +133,7 @@ class ExpedienteService implements IExpedienteService {
         }
     }
 
-    def buildCabecera(Request req, String codigoSt) {
+    private def buildCabecera(Request req, String codigoSt) {
         def formato = new SimpleDateFormat("yyyyMMdd");
         RootElement.CABECERA cabecera = new RootElement.CABECERA()
         if(codigoSt) {
@@ -144,7 +148,7 @@ class ExpedienteService implements IExpedienteService {
         return cabecera
     }
 
-    def buildPie(Request req) {
+    private def buildPie(Request req) {
         RootElement.PIE pie = new RootElement.PIE()
         pie.setFiller("")
         pie.setNumFilasFichero(100)

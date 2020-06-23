@@ -32,27 +32,8 @@ class RequestController {
 	def estadisticasService
 	def validacionXmlService
 	def logginService = new LogginService()
-	def francesasService
 	def requestService
 	def expedienteService
-
-	@Autowired
-	private CaserService caserService
-	@Autowired
-	private AmaService amaService
-	@Autowired
-	private LagunaroService lagunaroService
-	@Autowired
-	private CajamarService cajamarService
-	@Autowired
-	private MethislabService methislabService
-	@Autowired
-	private MethislabCFService methislabCFService
-	@Autowired
-	private NetinsuranceService netinsuranceService
-	@Autowired
-	private EnginyersService enginyersService
-
 
 	static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 

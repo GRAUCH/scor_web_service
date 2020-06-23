@@ -1,5 +1,8 @@
 package com.ws.servicios
 
+import com.scortelemed.Company
+import com.scortelemed.Request
+
 import static grails.async.Promises.*
 
 import com.scor.global.WSException
@@ -28,7 +31,7 @@ import com.scor.srpfileinbound.RootElement
 import org.w3c.dom.Document
 import org.w3c.dom.Element
 
-class SocieteGeneraleService {
+class SocieteGeneraleService implements ICompanyService{
 
 	TransformacionUtil util = new TransformacionUtil()
 	def logginService
@@ -36,19 +39,6 @@ class SocieteGeneraleService {
 	def tarificadorService
 	GenerarZip generarZip = new GenerarZip()
 	def grailsApplication
-
-	def crearExpediente = { req ->
-		try {
-			//SOBREESCRIBIMOS LA URL A LA QUE TIENE QUE LLAMAR EL WSDL
-			def ctx = grailsApplication.mainContext
-			def bean = ctx.getBean("soapClientCrearOrabpel")
-			bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("orabpelCreacion.wsdl")?.value)
-			def salida = grailsApplication.mainContext.soapClientCrearOrabpel.initiate(crearExpedienteBPM(req))
-			return "OK"
-		} catch (Exception e) {
-			throw new WSException(this.getClass(), "crearExpediente", ExceptionUtils.composeMessage(null, e));
-		}
-	}
 
 	def consultaExpediente = { ou, filtro ->
 
@@ -100,25 +90,11 @@ class SocieteGeneraleService {
 		return writer
 	}
 
-	private def crearExpedienteBPM = { req ->
-		def listadoFinal = []
-		RootElement payload = new RootElement()
-
-		listadoFinal.add(expedienteService.buildCabecera(req, null))
-		listadoFinal.add(buildDatos(req, req.company))
-		listadoFinal.add(expedienteService.buildPie(null))
-
-		payload.cabeceraOrDATOSOrPIE = listadoFinal
-
-		return payload
-	}
-
-	private def buildDatos = { req, company ->
-
+	@Override
+	def buildDatos(Request req, String codigoSt) {
 		try {
-
 			DATOS dato = new DATOS()
-
+			Company company = req.company
 			dato.registro = rellenaDatos(req, company)
 			//dato.pregunta = rellenaPreguntas(req, company.nombre)
 			dato.servicio = rellenaServicios(req, company.nombre)
@@ -128,6 +104,11 @@ class SocieteGeneraleService {
 		} catch (Exception e) {
 			logginService.putError(e.toString())
 		}
+	}
+
+	@Override
+	def getCodigoStManual(Request req) {
+		return null
 	}
 
 	public def rellenaDatos (req, company) {

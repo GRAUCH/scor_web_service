@@ -1,5 +1,6 @@
 package services
 
+import com.scortelemed.TipoCompany
 import grails.util.Environment
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
@@ -41,7 +42,8 @@ import com.ws.servicios.TarificadorService
 expose = EndpointType.JAX_WS,properties = [@GrailsCxfEndpointProperty(name = "ws-security.enable.nonce.cache", value = "false"), @GrailsCxfEndpointProperty(name = "ws-security.enable.timestamp.cache", value = "false")])
 @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
 class SocieteGeneraleUnderwrittingCaseManagementService	 {
-	
+
+	def expedienteService
 	@Autowired
 	private SocieteGeneraleService societeGeneraleService
 	@Autowired
@@ -82,7 +84,7 @@ class SocieteGeneraleUnderwrittingCaseManagementService	 {
 				requestBBDD = requestService.crear(opername,requestXML)
 				requestBBDD.fecha_procesado = new Date()
 				requestBBDD.save(flush:true)
-				societeGeneraleService.crearExpediente(requestBBDD)
+				expedienteService.crearExpediente(requestBBDD, TipoCompany.SOCIETE_GENERALE)
 				resultado.setMessage("The case has been successfully processed")
 				resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 				resultado.setStatus(StatusType.OK)
