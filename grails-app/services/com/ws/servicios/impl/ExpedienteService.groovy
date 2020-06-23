@@ -27,6 +27,7 @@ class ExpedienteService implements IExpedienteService {
     def francesasService
     def lagunaroService
     def methislabCFService
+    def methislabService
 
     def crearExpediente(Request req, TipoCompany comp) {
         try {
@@ -100,6 +101,9 @@ class ExpedienteService implements IExpedienteService {
                     break
                 case TipoCompany.CF_LIFE:
                     methislabCFService.buildDatos(req, codigoSt)
+                    break
+                case TipoCompany.METHIS_LAB:
+                    methislabService.buildDatos(req, codigoSt)
                     break
             }
             return dato

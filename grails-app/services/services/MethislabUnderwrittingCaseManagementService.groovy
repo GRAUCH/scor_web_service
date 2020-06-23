@@ -2,6 +2,7 @@ package services
 
 import com.scortelemed.Company
 import com.scortelemed.Operacion
+import com.scortelemed.TipoCompany
 import com.scortelemed.schemas.methislab.*
 import com.ws.servicios.*
 import com.ws.servicios.impl.RequestService
@@ -29,6 +30,7 @@ expose = EndpointType.JAX_WS,properties = [@GrailsCxfEndpointProperty(name = "ws
 @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
 class MethislabUnderwrittingCaseManagementService {
 
+	def expedienteService
 	@Autowired
 	private MethislabService methislabService
 	@Autowired
@@ -84,7 +86,7 @@ class MethislabUnderwrittingCaseManagementService {
 
 						logginService.putInfoMessage("Se procede el alta automatica de " + company.nombre + " con numero de solicitud " + methislabUnderwrittingCaseManagementRequest.candidateInformation.requestNumber)
 
-						methislabService.crearExpediente(requestBBDD)
+						expedienteService.crearExpediente(requestBBDD, TipoCompany.METHIS_LAB)
 
 						methislabService.insertarRecibido(company, methislabUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, requestXML.toString(), "ALTA")
 

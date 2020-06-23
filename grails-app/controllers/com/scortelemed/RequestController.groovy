@@ -456,7 +456,7 @@ class RequestController {
 					break
 				case TipoCompany.METHIS_LAB:
 					requestBBDD = requestService.getBBDDRequest(requestInstance, "MethislabUnderwrittingCaseManagementRequest", "http://www.scortelemed.com/schemas/methislab", MethislabUnderwrittingCaseManagementRequest.class)
-					methislabService.crearExpediente(requestBBDD)
+					expedienteService.crearExpediente(requestBBDD, TipoCompany.METHIS_LAB)
 					flash.message = "${message(code: 'default.processed.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
 					break
 				case TipoCompany.CF_LIFE:
