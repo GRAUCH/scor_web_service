@@ -275,7 +275,7 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 					requestService.crear(opername,requestXML)
 
 					logginService.putInfoEndpoint("ConsultaExpediente","Realizando peticion para " + company.nombre + " con numero de expiente: " + consultaExpediente.requestNumber)
-					respuestaCRM = tarificadorService.consultaExpedienteNumSolicitud(consultaExpediente.requestNumber, company.ou.toString() ,company.codigoSt)
+					respuestaCRM = expedienteService.consultaExpedienteNumSolicitud(consultaExpediente.requestNumber, company.ou.toString() ,company.codigoSt)
 					netinsuranceService.insertarEnvio (company, consultaExpediente.requestNumber, requestXML.toString())
 					if(respuestaCRM != null && respuestaCRM.getListaExpedientes() != null){
 

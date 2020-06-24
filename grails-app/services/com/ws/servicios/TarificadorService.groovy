@@ -25,6 +25,7 @@ class TarificadorService {
      Se conecta al CRM y devuelve los expedientes tarificados para una fecha
      */
     def grailsApplication
+    def expedienteService
     def hwSoapClientService
     def fetchUtil = new FetchUtilLagunaro()
     def soapAlptisRecetteWSPRO
@@ -314,67 +315,6 @@ class TarificadorService {
         }
     }
 
-    def consultaExpedienteNumSolicitud(String requestNumber, String pais, String codigoST) {
-
-        try {
-
-            def ctx = grailsApplication.mainContext
-            def bean = ctx.getBean("soapClientAlptis")
-            bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("frontal.wsdl")?.value)
-
-            Filtro filtro = new Filtro()
-            filtro.setClave(ClaveFiltro.CLIENTE)
-            filtro.setValor(codigoST)
-            Filtro filtroRelacionado = new Filtro()
-            filtroRelacionado.setClave(ClaveFiltro.NUM_SOLICITUD)
-            filtroRelacionado.setValor(requestNumber)
-            filtro.setFiltroRelacionado(filtroRelacionado)
-
-            def salida = grailsApplication.mainContext.soapClientAlptis.consultaExpediente(obtenerUsuarioFrontal(pais), filtro)
-
-            return salida
-        } catch (Exception e) {
-            logginService.putError("consultaExpedienteNumSolicitud de Caser", "No se ha podido obtener el informe de expediente : " + e)
-            return null
-        }
-    }
-    def consultaExpedienteCodigoST(String codigoST, String pais) {
-
-        try {
-
-            def ctx = grailsApplication.mainContext
-            def bean = ctx.getBean("soapClientAlptis")
-            bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("frontal.wsdl")?.value)
-
-            Filtro filtro = new Filtro()
-            filtro.setClave(ClaveFiltro.EXPEDIENTE)
-            filtro.setValor(codigoST)
-
-
-            return grailsApplication.mainContext.soapClientAlptis.consultaExpediente(obtenerUsuarioFrontal(pais), filtro)?.listaExpedientes
-        } catch (Exception e) {
-            logginService.putError("consultaExpedienteNumSolicitud de Caser", "No se ha podido obtener el informe de expediente : " + e)
-            return null
-        }
-    }
-
-    def consultaExpediente = { ou, filtro ->
-
-        try {
-
-            def ctx = grailsApplication.mainContext
-            def bean = ctx.getBean("soapClientAlptis")
-            bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("frontal.wsdl")?.value)
-
-            def salida = grailsApplication.mainContext.soapClientAlptis.consultaExpediente(obtenerUsuarioFrontal(ou), filtro)
-
-            return salida
-        } catch (Exception e) {
-            logginService.putError("obtenerInformeExpedientes", "No se ha podido obtener el informe de expediente : " + e)
-            return null
-        }
-    }
-
     def modificaExpediente(String arg1, Expediente arg2, String arg3, String arg4) {
 
         def response
@@ -524,7 +464,7 @@ class TarificadorService {
                     filtroRelacionado.setValor(policyNumber.toString())
                     filtro.setFiltroRelacionado(filtroRelacionado)
 
-                    respuestaCrm = consultaExpediente(ou.toString(), filtro)
+                    respuestaCrm = expedienteService.consultaExpediente(ou.toString(), filtro)
 
                     if (respuestaCrm != null && respuestaCrm.getListaExpedientes() != null && respuestaCrm.getListaExpedientes().size() > 0) {
 
@@ -611,7 +551,7 @@ class TarificadorService {
                     filtro.setClave(servicios.ClaveFiltro.NUM_POLIZA);
                     filtro.setValor(policyNumber.toString());
 
-                    respuestaCrm = consultaExpediente(ou.toString(), filtro)
+                    respuestaCrm = expedienteService.consultaExpediente(ou.toString(), filtro)
 
                     if (respuestaCrm != null && respuestaCrm.getListaExpedientes() != null && respuestaCrm.getListaExpedientes().size() > 0) {
 
@@ -702,7 +642,7 @@ class TarificadorService {
                     filtro.setClave(servicios.ClaveFiltro.NUM_POLIZA);
                     filtro.setValor(policyNumber.toString());
 
-                    respuestaCrm = consultaExpediente(ou.toString(), filtro)
+                    respuestaCrm = expedienteService.consultaExpediente(ou.toString(), filtro)
 
                     if (respuestaCrm != null && respuestaCrm.getListaExpedientes() != null && respuestaCrm.getListaExpedientes().size() > 0) {
 

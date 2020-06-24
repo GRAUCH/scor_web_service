@@ -53,6 +53,7 @@ expose = EndpointType.JAX_WS,properties = [@GrailsCxfEndpointProperty(name = "ws
 @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
 class AmaUnderwrittingCaseManagementService	 {
 
+	def expedienteService
 	@Autowired
 	private AmaService amaService
 	@Autowired
@@ -72,7 +73,6 @@ class AmaUnderwrittingCaseManagementService	 {
 		def opername="AmaResultadoReconocimientoMedicoRequest"
 		def correoUtil = new CorreoUtil()
 		def requestXML = ""
-		def expedienteService = new ExpedienteService()
 		def requestBBDD
 		def respuestaCrm
 
@@ -349,7 +349,7 @@ class AmaUnderwrittingCaseManagementService	 {
 
 					amaService.insertarRecibido(company, consolidacionPoliza.requestNumber, requestXML.toString(), "CONSOLIDACION")
 
-					expediente = tarificadorService.consultaExpedienteNumSolicitud(consolidacionPoliza.requestNumber,"ES",codigoSt )
+					expediente = expedienteService.consultaExpedienteNumSolicitud(consolidacionPoliza.requestNumber,"ES",codigoSt )
 
 					if (expediente != null && expediente.getErrorCRM() == null && expediente.getListaExpedientes() != null && expediente.getListaExpedientes().size() > 0){
 

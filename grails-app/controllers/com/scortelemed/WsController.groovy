@@ -48,6 +48,7 @@ class WsController {
     def soapCaserRecetteWSPRO
     CorreoUtil correoUtil = new CorreoUtil()
     def requestService
+    def expedienteService
     def tarificadorService
     def francesasService
 
@@ -71,7 +72,7 @@ class WsController {
             StringBuilder sbInfo = new StringBuilder("* Realizando proceso envio de informacion para " + company.nombre + " *")
             if (params.myGroup != null && params.myGroup == 'codigoST' && params.codigoST) {
                 sbInfo.append(" al expediente con codigo ST ${params.codigoST}")
-                resulExpedienteSoap = tarificadorService.consultaExpedienteCodigoST(params.codigoST, "FR")
+                resulExpedienteSoap = expedienteService.consultaExpedienteCodigoST(params.codigoST, "FR")
                 sbInfo.append(" * se encontraron :  ${resulExpedienteSoap.size()}  expedientes con el codigo ST *")
             } else {
                 //EJEMPLO DE URL:
@@ -220,7 +221,7 @@ class WsController {
             sbInfo.append("\n")
             if (params.myGroup != null && params.myGroup == 'codigoST' && params.codigoST) {
                 sbInfo.append(" al expediente con codigo ST ${params.codigoST}")
-                resulExpedienteSoap.addAll(tarificadorService.consultaExpedienteCodigoST(params.codigoST, "ES"))
+                resulExpedienteSoap.addAll(expedienteService.consultaExpedienteCodigoST(params.codigoST, "ES"))
                 sbInfo.append("se encontraron :  ${resulExpedienteSoap.size()}  expedientes con el codigo ST")
             } else {
                 fechaIni = LogUtil.paramsToDateIni(params)
@@ -449,7 +450,7 @@ class WsController {
             sbInfo.append("\n")
             if (params.myGroup != null && params.myGroup == 'codigoST' && params.codigoST) {
                 sbInfo.append(" al expediente con codigo ST ${params.codigoST}")
-                expedientes.addAll(tarificadorService.consultaExpedienteCodigoST(params.codigoST, "ES"))
+                expedientes.addAll(expedienteService.consultaExpedienteCodigoST(params.codigoST, "ES"))
                 sbInfo.append(" * se encontraron :  ${expedientes.size()}  expedientes con el codigo ST *")
             } else {
                 fechaIni = LogUtil.paramsToDateIni(params)
@@ -577,7 +578,7 @@ class WsController {
             sbInfo.append("\n")
             if (params.myGroup != null && params.myGroup == 'codigoST' && params.codigoST) {
                 sbInfo.append(" al expediente con codigo ST ${params.codigoST}")
-                expedientes.addAll(tarificadorService.consultaExpedienteCodigoST(params.codigoST, "ES"))
+                expedientes.addAll(expedienteService.consultaExpedienteCodigoST(params.codigoST, "ES"))
                 sbInfo.append(" * se encontraron :  ${expedientes.size()}  expedientes con el codigo ST *")
             } else {
                 fechaIni = LogUtil.paramsToDateIni(params)

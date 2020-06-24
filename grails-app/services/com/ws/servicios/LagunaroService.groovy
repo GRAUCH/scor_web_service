@@ -91,23 +91,6 @@ class LagunaroService implements ICompanyService{
 		return null
 	}
 
-	def consultaExpediente = { ou, filtro ->
-
-		try {
-
-			def ctx = grailsApplication.mainContext
-			def bean = ctx.getBean("soapClientAlptis")
-			bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY,Conf.findByName("frontal.wsdl")?.value)
-
-			def salida=grailsApplication.mainContext.soapClientAlptis.consultaExpediente(tarificadorService.obtenerUsuarioFrontal(ou),filtro)
-
-			return salida
-		} catch (Exception e) {
-			logginService.putError("obtenerInformeExpedientes de Lagunaro","No se ha podido obtener el informe de expediente : " + e)
-			return null
-		}
-	}
-
 	def rellenaDatos (req, company) {
 
 		def mapDatos = [:]
@@ -575,7 +558,7 @@ class LagunaroService implements ICompanyService{
 
 					filtro.setFiltroRelacionado(filtroRelacionado1)
 
-					respuestaCrm = consultaExpediente(ou.toString(),filtro)
+					respuestaCrm = expedienteService.consultaExpediente(ou.toString(),filtro)
 
 					if (respuestaCrm != null && respuestaCrm.getListaExpedientes() != null && respuestaCrm.getListaExpedientes().size() > 0) {
 

@@ -275,7 +275,7 @@ class CaserUnderwrittingCaseManagementService {
 
                     logginService.putInfoEndpoint("ConsultaExpediente", "Realizando peticion para " + company.nombre + " con numero de expiente: " + consultaExpediente.codExpediente)
 
-                    respuestaCRM = tarificadorService.consultaExpedienteNumSolicitud(consultaExpediente.codExpediente, "ES", company.codigoSt)
+                    respuestaCRM = expedienteService.consultaExpedienteNumSolicitud(consultaExpediente.codExpediente, "ES", company.codigoSt)
 
                     caserService.insertarEnvio(company, consultaExpediente.codExpediente, requestXML.toString())
 
@@ -385,7 +385,7 @@ class CaserUnderwrittingCaseManagementService {
 
                     caserService.insertarRecibido(company, consolidacionPoliza.requestNumber, requestXML.toString(), "CONSOLIDACION")
 
-                    expediente = tarificadorService.consultaExpedienteNumSolicitud(consolidacionPoliza.requestNumber, "ES", codigoSt)
+                    expediente = expedienteService.consultaExpedienteNumSolicitud(consolidacionPoliza.requestNumber, "ES", codigoSt)
 
                     if (expediente != null && expediente.getErrorCRM() == null && expediente.getListaExpedientes() != null && expediente.getListaExpedientes().size() > 0) {
 

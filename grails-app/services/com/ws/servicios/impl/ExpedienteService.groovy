@@ -10,6 +10,8 @@ import com.scortelemed.TipoCompany
 import com.ws.servicios.IExpedienteService
 import com.ws.servicios.LogginService
 import grails.transaction.Transactional
+import servicios.ClaveFiltro
+import servicios.Filtro
 
 import java.text.SimpleDateFormat
 
@@ -17,6 +19,7 @@ import java.text.SimpleDateFormat
 class ExpedienteService implements IExpedienteService {
 
     def logginService = new LogginService()
+    def tarificadorService
     def grailsApplication
     //Servicios Compañías
     def amaService
@@ -34,6 +37,41 @@ class ExpedienteService implements IExpedienteService {
     def simplefrService
     def societeGeneraleService
 
+    @Override
+    def consultaExpediente(String unidadOrganizativa, Filtro filtro) {
+        try {
+            def ctx = grailsApplication.mainContext
+            def bean = ctx.getBean("soapClientAlptis")
+            bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY,Conf.findByName("frontal.wsdl")?.value)
+            def salida=grailsApplication.mainContext.soapClientAlptis.consultaExpediente(tarificadorService.obtenerUsuarioFrontal(unidadOrganizativa),filtro)
+            return salida
+        } catch (Exception e) {
+            logginService.putError("obtenerInformeExpedientes","No se ha podido obtener el informe de expediente : " + e)
+            return null
+        }
+    }
+
+    @Override
+    def consultaExpedienteCodigoST(String codigoST, String unidadOrganizativa) {
+        Filtro filtro = new Filtro()
+        filtro.setClave(ClaveFiltro.EXPEDIENTE)
+        filtro.setValor(codigoST)
+        return consultaExpediente(unidadOrganizativa, filtro)
+    }
+
+    @Override
+    def consultaExpedienteNumSolicitud(String requestNumber, String unidadOrganizativa, String codigoST) {
+        Filtro filtro = new Filtro()
+        filtro.setClave(ClaveFiltro.CLIENTE)
+        filtro.setValor(codigoST)
+        Filtro filtroRelacionado = new Filtro()
+        filtroRelacionado.setClave(ClaveFiltro.NUM_SOLICITUD)
+        filtroRelacionado.setValor(requestNumber)
+        filtro.setFiltroRelacionado(filtroRelacionado)
+        return consultaExpediente(unidadOrganizativa, filtro)
+    }
+
+    @Override
     def crearExpediente(Request req, TipoCompany comp) {
         try {
             //SOBREESCRIBIMOS LA URL A LA QUE TIENE QUE LLAMAR EL WSDL

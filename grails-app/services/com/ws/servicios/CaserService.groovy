@@ -229,23 +229,6 @@ class CaserService implements ICompanyService{
         return expediente
     }
 
-    def consultaExpediente = { ou, filtro ->
-
-        try {
-
-            def ctx = grailsApplication.mainContext
-            def bean = ctx.getBean("soapClientAlptis")
-            bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("frontal.wsdl")?.value)
-
-            def salida = grailsApplication.mainContext.soapClientAlptis.consultaExpediente(tarificadorService.obtenerUsuarioFrontal(ou), filtro)
-
-            return salida
-        } catch (Exception e) {
-            logginService.putError("obtenerInformeExpedientes de Caser", "No se ha podido obtener el informe de expediente : " + e)
-            return null
-        }
-    }
-
     def envioEmail(req) {
 
         def datosEmail = rellenoDatosEmail(req)
@@ -868,7 +851,7 @@ class CaserService implements ICompanyService{
             filtroRelacionado1.setValor(numeroSolicitud)
             filtro.setFiltroRelacionado(filtroRelacionado1)
 
-            respuestaCrm = consultaExpediente(unidadOrganizativa.toString(), filtro)
+            respuestaCrm = expedienteService.consultaExpediente(unidadOrganizativa.toString(), filtro)
 
             if (respuestaCrm != null && respuestaCrm.getListaExpedientes() != null && respuestaCrm.getListaExpedientes().size() > 0) {
 

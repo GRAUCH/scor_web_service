@@ -265,7 +265,7 @@ class CajamarUnderwrittingCaseManagementService {
 
 				if (consolidacionPoliza.requestNumber != null && !consolidacionPoliza.requestNumber.isEmpty() != null && consolidacionPoliza.ciaCode !=null && !consolidacionPoliza.ciaCode.isEmpty() && consolidacionPoliza.policyNumber != null && !consolidacionPoliza.policyNumber.isEmpty()){
 
-					expediente = tarificadorService.consultaExpedienteNumSolicitud(consolidacionPoliza.requestNumber,"ES", consolidacionPoliza.ciaCode)
+					expediente = expedienteService.consultaExpedienteNumSolicitud(consolidacionPoliza.requestNumber,"ES", consolidacionPoliza.ciaCode)
 
 					if (expediente != null && expediente.getErrorCRM() == null && expediente.getListaExpedientes() != null && expediente.getListaExpedientes().size() > 0){
 
