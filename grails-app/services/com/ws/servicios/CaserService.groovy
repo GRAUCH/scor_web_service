@@ -322,7 +322,7 @@ class CaserService {
         def textEmail = compongoText(datosEmail)
 
         logginService.putInfo('Envio email modificacion Caser', textEmail)
-        correoUtil.envioEmail('Modificacion caso', textEmail, 0)
+        correoUtil.envioEmail('Caser MODIFICACION DE CASO', textEmail, 0)
     }
 
     String compongoText(datosEmail){
