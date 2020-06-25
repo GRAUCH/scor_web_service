@@ -1,10 +1,12 @@
 package com.scortelemed
 
+import com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCaseManagementRequest
 import com.scortelemed.schemas.enginyers.AddExp
 import com.scortelemed.schemas.methislab.MethislabUnderwrittingCaseManagementRequest
 import com.scortelemed.schemas.methislabCF.MethislabCFUnderwrittingCaseManagementRequest
 import com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest as GestionReconocimientoMedicoRequestAma
 import com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest as GestionReconocimientoMedicoRequestCaser
+import com.scortelemed.schemas.psn.GestionReconocimientoMedicoRequest as GestionReconocimientoMedicoRequestPsn
 import com.ws.lagunaro.beans.GestionReconocimientoMedicoRequest as GestionReconocimientoMedicoRequestLagunaro
 import com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCaseManagementRequest
 import com.ws.afiesca.beans.AfiEscaUnderwrittingCaseManagementRequest
@@ -454,6 +456,24 @@ class RequestController {
 					requestBBDD = requestService.getBBDDRequest(requestInstance, "EnginyersResultadoReconocimientoMedicoRequest", "http://www.scortelemed.com/schemas/enginyers", AddExp.class)
 					expedienteService.crearExpediente(requestBBDD, TipoCompany.ENGINYERS)
 					flash.message = "${message(code: 'default.processed.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
+					break
+				case TipoCompany.CBP_ITALIA:
+					requestBBDD = requestService.getBBDDRequest(requestInstance, "CbpitaUnderwrittingCaseManagementRequest", "http://www.scortelemed.com/schemas/cbpita", CbpitaUnderwrittingCaseManagementRequest.class)
+					expedienteService.crearExpediente(requestBBDD, TipoCompany.CBP_ITALIA)
+					flash.message = "${message(code: 'default.processed.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
+					break
+					break
+				case TipoCompany.PSN:
+					requestBBDD = requestService.getBBDDRequest(requestInstance, "PsnResultadoReconocimientoMedicoRequest", "http://www.scortelemed.com/schemas/psn", GestionReconocimientoMedicoRequestPsn.class)
+					expedienteService.crearExpediente(requestBBDD, TipoCompany.PSN)
+					flash.message = "${message(code: 'default.processed.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
+					break
+					break
+				case TipoCompany.NATIONALE_NETHERLANDEN:
+					break
+				case TipoCompany.MALAKOFF_MEDERIC:
+					break
+				case TipoCompany.SOCIETE_GENERALE:
 					break
 				default:
 					break
