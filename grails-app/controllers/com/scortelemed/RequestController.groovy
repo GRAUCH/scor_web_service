@@ -224,11 +224,11 @@ class RequestController {
 		if(params.input == 'Buscar' || params.pag) {
 			def opera
 			if(params.operacion){
-				opera = Operacion.findAllByClaveLike("%" + params.operacion.replaceAll(" ", "%") + "%")
+				opera = Operacion.findAllByClave(params.operacion)
 			}
 			def comp
 			if(params.company){
-				comp = Company.findAllByNombreLike("%" + params.company.replaceAll(" ", "%") + "%")
+				comp = Company.findAllByNombre(params.company)
 			}
 
 			def descartado
@@ -400,7 +400,7 @@ class RequestController {
 				case TipoCompany.CAJAMAR:
 					CajamarUnderwrittingCaseManagementRequest cajamarUnderwrittingCaseManagementRequest = requestService.jaxbParser(requestInstance.getRequest(), CajamarUnderwrittingCaseManagementRequest.class)
 					if (cajamarUnderwrittingCaseManagementRequest.getRegScor().getYtipo().toString().equals("1")) {
-						requestBBDD = requestService.getBBDDRequest(requestInstance, "CajamarUnderwrittingCaseManagementRequest", null, CajamarUnderwrittingCaseManagementRequest.class)
+						requestBBDD = requestService.getBBDDRequest(requestInstance, "CajamarUnderwrittingCaseManagementRequest", "http://www.scortelemed.com/schemas/cajamar", CajamarUnderwrittingCaseManagementRequest.class)
 						expedienteService.crearExpediente(requestBBDD, TipoCompany.CAJAMAR)
 						flash.message = "${message(code: 'default.processed.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
 					} else {

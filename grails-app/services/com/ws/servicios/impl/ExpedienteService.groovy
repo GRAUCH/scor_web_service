@@ -102,13 +102,13 @@ class ExpedienteService implements IExpedienteService {
         String codigoSt = null
         switch(comp) {
             case TipoCompany.AMA:
-                amaService.getCodigoStManual(req)
+                codigoSt = amaService.getCodigoStManual(req)
                 break
             case TipoCompany.ENGINYERS:
-                enginyersService.getCodigoStManual(req)
+                codigoSt = enginyersService.getCodigoStManual(req)
                 break
             case TipoCompany.PSN:
-                psnService.getCodigoStManual(req)
+                codigoSt = psnService.getCodigoStManual(req)
                 break
             default:
                 break
@@ -121,48 +121,48 @@ class ExpedienteService implements IExpedienteService {
             DATOS dato = new DATOS()
             switch(tipo) {
                 case TipoCompany.AMA:
-                    amaService.buildDatos(req, codigoSt)
+                    dato = amaService.buildDatos(req, codigoSt)
                     break
                 case TipoCompany.CAJAMAR:
-                    cajamarService.buildDatos(req, codigoSt)
+                    dato = cajamarService.buildDatos(req, codigoSt)
                     break
                 case TipoCompany.CASER:
-                    caserService.buildDatos(req, codigoSt)
+                    dato = caserService.buildDatos(req, codigoSt)
                     break
                 case TipoCompany.CBP_ITALIA:
-                    cbpitaService.buildDatos(req, codigoSt)
+                    dato = cbpitaService.buildDatos(req, codigoSt)
                     break
                 case TipoCompany.ENGINYERS:
-                    enginyersService.buildDatos(req, codigoSt)
+                    dato = enginyersService.buildDatos(req, codigoSt)
                     break
                 case TipoCompany.AFI_ESCA:
                 case TipoCompany.ALPTIS:
                 case TipoCompany.ZEN_UP:
-                    francesasService.buildDatos(req, codigoSt)
+                    dato = francesasService.buildDatos(req, codigoSt)
                     break
                 case TipoCompany.LAGUN_ARO:
-                    lagunaroService.buildDatos(req, codigoSt)
+                    dato = lagunaroService.buildDatos(req, codigoSt)
                     break
                 case TipoCompany.CF_LIFE:
-                    methislabCFService.buildDatos(req, codigoSt)
+                    dato = methislabCFService.buildDatos(req, codigoSt)
                     break
                 case TipoCompany.METHIS_LAB:
-                    methislabService.buildDatos(req, codigoSt)
+                    dato = methislabService.buildDatos(req, codigoSt)
                     break
                 case TipoCompany.NET_INSURANCE:
-                    netinsuranceService.buildDatos(req, codigoSt)
+                    dato = netinsuranceService.buildDatos(req, codigoSt)
                     break
                 case TipoCompany.NATIONALE_NETHERLANDEN:
-                    nnService.buildDatos(req, codigoSt)
+                    dato = nnService.buildDatos(req, codigoSt)
                     break
                 case TipoCompany.PSN:
-                    psnService.buildDatos(req, codigoSt)
+                    dato = psnService.buildDatos(req, codigoSt)
                     break
                 case TipoCompany.MALAKOFF_MEDERIC:
-                    simplefrService.buildDatos(req, codigoSt)
+                    dato = simplefrService.buildDatos(req, codigoSt)
                     break
                 case TipoCompany.SOCIETE_GENERALE:
-                    societeGeneraleService.buildDatos(req, codigoSt)
+                    dato = societeGeneraleService.buildDatos(req, codigoSt)
                     break
             }
             return dato

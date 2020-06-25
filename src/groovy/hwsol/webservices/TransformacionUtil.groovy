@@ -809,7 +809,7 @@ class TransformacionUtil {
         int pos = 0
 
         if (fecha != null && !fecha.isEmpty()) {
-
+            fecha = fecha.replace(" ","")
             GregorianCalendar cal = new GregorianCalendar()
 
             if (fecha.contains('/')) {

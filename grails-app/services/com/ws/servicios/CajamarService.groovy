@@ -46,9 +46,9 @@ class CajamarService implements ICompanyService{
 		String result
 		try{
 			if (objeto instanceof CajamarUnderwrittingCaseManagementRequest){
-				result = requestService.marshall(objeto, CajamarUnderwrittingCaseManagementRequest.class)
+				result = requestService.marshall(nameSpace, objeto, CajamarUnderwrittingCaseManagementRequest.class)
 			} else if (objeto instanceof ConsolidacionPolizaRequest){
-				result = requestService.marshall(objeto, ConsolidacionPolizaRequest.class)
+				result = requestService.marshall(nameSpace, objeto, ConsolidacionPolizaRequest.class)
 			}
 		} finally {
 			return result
