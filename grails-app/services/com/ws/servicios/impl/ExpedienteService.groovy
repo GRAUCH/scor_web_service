@@ -7,6 +7,8 @@ import com.scor.srpfileinbound.RootElement
 import com.scortelemed.Conf
 import com.scortelemed.Request
 import com.scortelemed.TipoCompany
+import com.ws.servicios.CompanyFactory
+import com.ws.servicios.ICompanyService
 import com.ws.servicios.IExpedienteService
 import com.ws.servicios.LogginService
 import grails.transaction.Transactional
@@ -21,6 +23,7 @@ class ExpedienteService implements IExpedienteService {
     def logginService = new LogginService()
     def tarificadorService
     def grailsApplication
+    ICompanyService companyService
     //Servicios Compañías
     def amaService
     def cajamarService
@@ -86,89 +89,19 @@ class ExpedienteService implements IExpedienteService {
     }
 
     private def crearExpedienteBPM(Request req, TipoCompany comp) {
+        companyService = CompanyFactory.getCompanyImpl(comp)
         def listadoFinal = []
         RootElement payload = new RootElement()
-        String codigoSt = getCodigoStManual(req, comp)
-        listadoFinal.add(buildCabecera(req, codigoSt))
-        listadoFinal.add(buildDatos(req, codigoSt, comp))
-        listadoFinal.add(buildPie(null))
-
-        payload.cabeceraOrDATOSOrPIE = listadoFinal
-
-        return payload
-    }
-
-    private def getCodigoStManual(Request req, TipoCompany comp) {
-        String codigoSt = null
-        switch(comp) {
-            case TipoCompany.AMA:
-                codigoSt = amaService.getCodigoStManual(req)
-                break
-            case TipoCompany.ENGINYERS:
-                codigoSt = enginyersService.getCodigoStManual(req)
-                break
-            case TipoCompany.PSN:
-                codigoSt = psnService.getCodigoStManual(req)
-                break
-            default:
-                break
-        }
-        return codigoSt
-    }
-
-    private def buildDatos(Request req, String codigoSt, TipoCompany tipo) {
         try {
-            DATOS dato = new DATOS()
-            switch(tipo) {
-                case TipoCompany.AMA:
-                    dato = amaService.buildDatos(req, codigoSt)
-                    break
-                case TipoCompany.CAJAMAR:
-                    dato = cajamarService.buildDatos(req, codigoSt)
-                    break
-                case TipoCompany.CASER:
-                    dato = caserService.buildDatos(req, codigoSt)
-                    break
-                case TipoCompany.CBP_ITALIA:
-                    dato = cbpitaService.buildDatos(req, codigoSt)
-                    break
-                case TipoCompany.ENGINYERS:
-                    dato = enginyersService.buildDatos(req, codigoSt)
-                    break
-                case TipoCompany.AFI_ESCA:
-                case TipoCompany.ALPTIS:
-                case TipoCompany.ZEN_UP:
-                    dato = francesasService.buildDatos(req, codigoSt)
-                    break
-                case TipoCompany.LAGUN_ARO:
-                    dato = lagunaroService.buildDatos(req, codigoSt)
-                    break
-                case TipoCompany.CF_LIFE:
-                    dato = methislabCFService.buildDatos(req, codigoSt)
-                    break
-                case TipoCompany.METHIS_LAB:
-                    dato = methislabService.buildDatos(req, codigoSt)
-                    break
-                case TipoCompany.NET_INSURANCE:
-                    dato = netinsuranceService.buildDatos(req, codigoSt)
-                    break
-                case TipoCompany.NATIONALE_NETHERLANDEN:
-                    dato = nnService.buildDatos(req, codigoSt)
-                    break
-                case TipoCompany.PSN:
-                    dato = psnService.buildDatos(req, codigoSt)
-                    break
-                case TipoCompany.MALAKOFF_MEDERIC:
-                    dato = simplefrService.buildDatos(req, codigoSt)
-                    break
-                case TipoCompany.SOCIETE_GENERALE:
-                    dato = societeGeneraleService.buildDatos(req, codigoSt)
-                    break
-            }
-            return dato
+            String codigoSt = companyService.getCodigoStManual(req)
+            listadoFinal.add(buildCabecera(req, codigoSt))
+            listadoFinal.add(companyService.buildDatos(req, codigoSt))
+            listadoFinal.add(buildPie(null))
+            payload.cabeceraOrDATOSOrPIE = listadoFinal
         } catch (Exception e) {
             logginService.putError(e.toString())
         }
+        return payload
     }
 
     private def buildCabecera(Request req, String codigoSt) {
