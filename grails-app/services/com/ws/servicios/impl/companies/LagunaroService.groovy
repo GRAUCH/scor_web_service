@@ -1,4 +1,4 @@
-package com.ws.servicios
+package com.ws.servicios.impl.companies
 
 import com.scor.global.WSException
 import com.scor.global.ExceptionUtils
@@ -11,7 +11,7 @@ import com.scortelemed.servicios.Filtro
 import com.scortelemed.Estadistica
 import com.scortelemed.Conf
 import com.ws.lagunaro.beans.GestionReconocimientoMedicoRequest
-
+import com.ws.servicios.ICompanyService
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.GenerarZip
 import hwsol.webservices.TransformacionUtil

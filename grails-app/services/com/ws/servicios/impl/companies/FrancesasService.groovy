@@ -1,10 +1,12 @@
-package com.ws.servicios
+package com.ws.servicios.impl.companies
 
 import com.scortelemed.Company
 import com.scortelemed.Request
 import com.ws.afiesca.beans.AfiEscaUnderwrittingCaseManagementRequest
 import com.ws.alptis.beans.AlptisUnderwrittingCaseManagementRequest
 import com.ws.lifesquare.beans.LifesquareUnderwrittingCaseManagementRequest
+import com.ws.servicios.ICompanyService
+import com.ws.servicios.LogginService
 import grails.util.Environment
 import hwsol.webservices.FetchUtilLagunaro
 

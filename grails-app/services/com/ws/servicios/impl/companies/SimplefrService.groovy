@@ -1,9 +1,8 @@
-package com.ws.servicios
+package com.ws.servicios.impl.companies
 
 import com.scortelemed.Company
 import com.scortelemed.Request
-import com.scortelemed.schemas.societegenerale.SocieteGeneraleUnderwrittingCaseManagementRequest
-import com.scortelemed.schemas.societegenerale.SocieteGeneraleUnderwrittingCasesResultsRequest
+import com.ws.servicios.ICompanyService
 
 import static grails.async.Promises.*
 
@@ -24,16 +23,15 @@ import javax.xml.namespace.QName
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 import org.xml.sax.InputSource
-
+import org.w3c.dom.Document
+import org.w3c.dom.Element
 import com.scortelemed.Conf
 import com.scor.global.ExceptionUtils
 import com.scor.srpfileinbound.DATOS
 import com.scor.srpfileinbound.REGISTRODATOS;
 import com.scor.srpfileinbound.RootElement
-import org.w3c.dom.Document
-import org.w3c.dom.Element
 
-class SocieteGeneraleService implements ICompanyService{
+class SimplefrService implements ICompanyService{
 
 	TransformacionUtil util = new TransformacionUtil()
 	def logginService
@@ -47,10 +45,10 @@ class SocieteGeneraleService implements ICompanyService{
 	String marshall(String nameSpace, def objeto) {
 		String result
 		try{
-			if (objeto instanceof SocieteGeneraleUnderwrittingCaseManagementRequest){
-				result = requestService.marshall(nameSpace, objeto, SocieteGeneraleUnderwrittingCaseManagementRequest.class)
-			} else if (objeto instanceof SocieteGeneraleUnderwrittingCasesResultsRequest){
-				result = requestService.marshall(nameSpace, objeto, SocieteGeneraleUnderwrittingCasesResultsRequest.class)
+			if (objeto instanceof SimplefrUnderwrittingCaseManagementRequest){
+				result = requestService.marshall(nameSpace, objeto, SimplefrUnderwrittingCaseManagementRequest.class)
+			} else if (objeto instanceof SimplefrUnderwrittingCasesResultsRequest){
+				result = requestService.marshall(nameSpace, objeto, SimplefrUnderwrittingCasesResultsRequest.class)
 			}
 		} finally {
 			return result
@@ -66,7 +64,6 @@ class SocieteGeneraleService implements ICompanyService{
 			//dato.pregunta = rellenaPreguntas(req, company.nombre)
 			dato.servicio = rellenaServicios(req, company.nombre)
 			dato.coberturas = rellenaCoberturas(req)
-
 			return dato
 		} catch (Exception e) {
 			logginService.putError(e.toString())
@@ -78,7 +75,7 @@ class SocieteGeneraleService implements ICompanyService{
 		return null
 	}
 
-	public def rellenaDatos (req, company) {
+	def rellenaDatos (req, company) {
 
 		def mapDatos = [:]
 		def listadoPreguntas = []
@@ -493,6 +490,7 @@ class SocieteGeneraleService implements ICompanyService{
 			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
 		}
 	}
+
 	def busquedaCrm (requestNumber, ou, opername, comapanyCodigoSt, companyId, requestBBDD) {
 
 		task {
@@ -570,7 +568,7 @@ class SocieteGeneraleService implements ICompanyService{
 		}
 	}
 
-	public def rellenaDatosSalida(expedientePoliza, requestDate, logginService) {
+	def rellenaDatosSalida(expedientePoliza, requestDate, logginService) {
 
 		return null
 	}

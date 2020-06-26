@@ -16,17 +16,7 @@ import com.ws.lifesquare.beans.LifesquareUnderwrittingCaseManagementRequest
 
 import grails.plugin.springsecurity.annotation.Secured
 import grails.util.Holders
-import org.springframework.beans.factory.annotation.Autowired
-
-import com.ws.servicios.AmaService
-import com.ws.servicios.CajamarService
-import com.ws.servicios.CaserService
-import com.ws.servicios.LagunaroService
 import com.ws.servicios.LogginService
-import com.ws.servicios.NetinsuranceService
-import com.ws.servicios.EnginyersService
-import com.ws.servicios.MethislabCFService
-import com.ws.servicios.MethislabService
 
 @Secured(['ROLE_ADMIN'])
 class RequestController {

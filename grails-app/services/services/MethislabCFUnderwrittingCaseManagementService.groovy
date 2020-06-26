@@ -6,6 +6,7 @@ import com.scortelemed.TipoCompany
 import com.scortelemed.schemas.methislabCF.*
 import com.ws.servicios.*
 import com.ws.servicios.impl.RequestService
+import com.ws.servicios.impl.companies.MethislabCFService
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
 import hwsol.webservices.WsError

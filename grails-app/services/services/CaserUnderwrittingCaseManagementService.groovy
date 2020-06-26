@@ -7,6 +7,7 @@ import com.scortelemed.schemas.caser.*
 import com.ws.servicios.*
 import com.ws.servicios.impl.ExpedienteService
 import com.ws.servicios.impl.RequestService
+import com.ws.servicios.impl.companies.CaserService
 import grails.util.Environment
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil

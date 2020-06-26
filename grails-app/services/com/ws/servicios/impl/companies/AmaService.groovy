@@ -1,6 +1,7 @@
-package com.ws.servicios
+package com.ws.servicios.impl.companies
 
 import com.scortelemed.Request
+import com.ws.servicios.ICompanyService
 import com.ws.servicios.impl.ExpedienteService
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.GenerarZip

@@ -6,6 +6,7 @@ import com.scortelemed.TipoCompany
 import com.ws.servicios.*
 import com.scortelemed.schemas.nn.*
 import com.ws.servicios.impl.RequestService
+import com.ws.servicios.impl.companies.NnService
 import grails.util.Environment
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil

@@ -28,7 +28,7 @@ import com.scortelemed.schemas.enginyers.Expedient
 import com.scortelemed.schemas.enginyers.AddExpResponse
 import com.scortelemed.schemas.enginyers.AddExp
 import com.scortelemed.schemas.enginyers.FaultElement;
-import com.ws.servicios.EnginyersService
+import com.ws.servicios.impl.companies.EnginyersService
 import com.ws.servicios.EstadisticasService
 import com.ws.servicios.LogginService;
 import com.ws.servicios.impl.RequestService

@@ -33,7 +33,7 @@ import com.scortelemed.schemas.societegenerale.StatusType
 import com.ws.servicios.EstadisticasService
 import com.ws.servicios.LogginService
 import com.ws.servicios.impl.RequestService
-import com.ws.servicios.SocieteGeneraleService
+import com.ws.servicios.impl.companies.SocieteGeneraleService
 import com.ws.servicios.TarificadorService
 
 @WebService(targetNamespace = "http://www.scortelemed.com/schemas/societeGenerale")

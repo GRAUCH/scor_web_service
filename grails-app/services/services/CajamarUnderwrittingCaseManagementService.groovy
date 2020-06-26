@@ -29,7 +29,7 @@ import com.ws.cajamar.beans.CajamarUnderwrittingCaseManagementResponse
 import com.ws.cajamar.beans.ConsolidacionPolizaRequest
 import com.ws.cajamar.beans.ConsolidacionPolizaResponse
 import com.ws.cajamar.beans.StatusType
-import com.ws.servicios.CajamarService
+import com.ws.servicios.impl.companies.CajamarService
 import com.ws.servicios.EstadisticasService
 import com.ws.servicios.LogginService
 import com.ws.servicios.impl.RequestService

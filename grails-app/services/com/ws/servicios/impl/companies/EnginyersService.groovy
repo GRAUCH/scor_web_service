@@ -1,4 +1,4 @@
-package com.ws.servicios
+package com.ws.servicios.impl.companies
 
 import com.scor.global.ExceptionUtils
 import com.scor.global.WSException
@@ -10,6 +10,7 @@ import com.scortelemed.Conf
 import com.scortelemed.Recibido
 import com.scortelemed.Request
 import com.scortelemed.schemas.enginyers.AddExp
+import com.ws.servicios.ICompanyService
 import grails.util.Environment
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil

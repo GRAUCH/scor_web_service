@@ -16,7 +16,7 @@ import com.scortelemed.schemas.caser.XSDProcessExecutionPort
 import com.scortelemed.schemas.caser.XSDProcessExecutionServiceLocator
 import com.ws.alptis.sp.beans.AlptisUnderwrittingCaseResultsRequest
 import com.ws.cajamar.beans.Cobertura
-import com.ws.servicios.AmaService
+import com.ws.servicios.impl.companies.AmaService
 import grails.plugin.springsecurity.annotation.Secured
 import grails.util.Environment
 import hwsol.entities.parser.RegistrarEventoSCOR

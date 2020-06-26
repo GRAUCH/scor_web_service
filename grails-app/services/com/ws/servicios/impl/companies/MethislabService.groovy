@@ -1,4 +1,4 @@
-package com.ws.servicios
+package com.ws.servicios.impl.companies
 
 import com.scor.global.ExceptionUtils
 import com.scor.global.WSException
@@ -10,7 +10,9 @@ import com.scortelemed.Conf
 import com.scortelemed.Envio
 import com.scortelemed.Recibido
 import com.scortelemed.Request
-import com.scortelemed.schemas.methislabCF.*
+import com.scortelemed.schemas.methislab.*
+import com.scortelemed.schemas.methislab.MethislabUnderwrittingCasesResultsResponse.Expediente
+import com.ws.servicios.ICompanyService
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.GenerarZip
 import hwsol.webservices.TransformacionUtil
@@ -31,7 +33,7 @@ import java.text.SimpleDateFormat
 
 import static grails.async.Promises.task
 
-class MethislabCFService implements ICompanyService{
+class MethislabService implements ICompanyService{
 
     TransformacionUtil util = new TransformacionUtil()
     def grailsApplication
@@ -46,10 +48,10 @@ class MethislabCFService implements ICompanyService{
     String marshall(String nameSpace, def objeto) {
         String result
         try {
-            if (objeto instanceof MethislabCFUnderwrittingCaseManagementRequest) {
-                result = requestService.marshall(nameSpace, objeto, MethislabCFUnderwrittingCaseManagementRequest.class)
-            } else if (objeto instanceof MethislabCFUnderwrittingCasesResultsRequest) {
-                result = requestService.marshall(nameSpace, objeto, MethislabCFUnderwrittingCasesResultsRequest.class)
+            if (objeto instanceof MethislabUnderwrittingCaseManagementRequest) {
+                result = requestService.marshall(nameSpace, objeto, MethislabUnderwrittingCaseManagementRequest.class)
+            } else if (objeto instanceof MethislabUnderwrittingCasesResultsRequest) {
+                result = requestService.marshall(nameSpace, objeto, MethislabUnderwrittingCasesResultsRequest.class)
             }
         } finally {
             return result
@@ -62,6 +64,7 @@ class MethislabCFService implements ICompanyService{
             DATOS dato = new DATOS()
             Company company = req.company
             dato.registro = rellenaDatos(req, company)
+            //dato.pregunta = rellenaPreguntas(req, company.nombre)
             dato.servicio = rellenaServicios(req, company.nombre)
             dato.coberturas = rellenaCoberturas(req)
             return dato
@@ -77,7 +80,7 @@ class MethislabCFService implements ICompanyService{
 
     def rellenaDatosSalidaConsulta(expedientePoliza, requestDate, logginService) {
 
-        MethislabCFUnderwrittingCasesResultsResponse.Expediente expediente = new MethislabCFUnderwrittingCasesResultsResponse.Expediente()
+        Expediente expediente = new Expediente()
 
         expediente.setRequestDate(requestDate)
         expediente.setRequestNumber(util.devolverDatos(expedientePoliza.getNumSolicitud()))
@@ -144,7 +147,7 @@ class MethislabCFService implements ICompanyService{
 
         def mapDatos = [:]
         def listadoPreguntas = []
-        def formato = new SimpleDateFormat("yyyyMMdd")
+        def formato = new SimpleDateFormat("yyyyMMdd");
         def apellido
         def telefono1
         def telefono2
@@ -173,12 +176,16 @@ class MethislabCFService implements ICompanyService{
 
                 if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-                    Element eElement = (Element) nNode
+                    Element eElement = (Element) nNode;
 
                     /**NUMERO DE PRODUCTO
                      *
                      */
-                    datosRegistro.codigoProducto = "CFLIFE"
+
+
+
+                    datosRegistro.codigoProducto = "EUROVITAPEN"
+
                     if (eElement.getElementsByTagName("productCode").item(0) != null) {
                         datosRegistro.campo8 = eElement.getElementsByTagName("productCode").item(0).getTextContent()
                     }
@@ -257,26 +264,49 @@ class MethislabCFService implements ICompanyService{
                     }
 
                     /**TELEFONOS
-                     *
-                     */
-
-                    /**TELEFONOS
-                     *
                      */
 
                     if (eElement.getElementsByTagName("phoneNumber1").item(0) != null && eElement.getElementsByTagName("phoneNumber1").item(0).getTextContent() != null && !eElement.getElementsByTagName("phoneNumber1").item(0).getTextContent().isEmpty()) {
+
                         telefono1 = eElement.getElementsByTagName("phoneNumber1").item(0).getTextContent()
-                        datosRegistro.telefono1 = telefono1
+
+                        if (telefono1 != null && !telefono1.isEmpty() && (telefono1.startsWith("0039") || telefono1.startsWith("+39"))) {
+                            datosRegistro.telefono1 = telefono1
+                        } else if (telefono1 != null && !telefono1.isEmpty()) {
+                            datosRegistro.telefono1 = "0039" + telefono1
+                        } else {
+                            datosRegistro.telefono1 = null
+                        }
                     }
 
                     if (eElement.getElementsByTagName("phoneNumber2").item(0) != null && eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent() != null && !eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent().isEmpty()) {
+
                         telefono2 = eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent()
-                        datosRegistro.telefono2 = telefono2
+
+                        if (telefono2 != null && !telefono2.isEmpty() && (telefono2.startsWith("0039") || telefono2.startsWith("+39"))) {
+                            datosRegistro.telefono2 = telefono2
+                        } else if (telefono2 != null && !telefono2.isEmpty()) {
+                            datosRegistro.telefono2 = "0039" + telefono2
+                        } else {
+                            datosRegistro.telefono2 = null
+                        }
                     }
 
-                    if (eElement.getElementsByTagName("mobileNumber").item(0) != null && eElement.getElementsByTagName("mobileNumber").item(0).getTextContent() != null && !eElement.getElementsByTagName("mobileNumber").item(0).getTextContent().isEmpty()) {
+                    if (eElement.getElementsByTagName("mobileNumber").item(0) != null) {
+
                         telefonoMovil = eElement.getElementsByTagName("mobileNumber").item(0).getTextContent()
-                        datosRegistro.telefono3 = telefonoMovil
+
+                        if (telefonoMovil != null && !telefonoMovil.isEmpty() && (telefonoMovil.startsWith("0039") || telefonoMovil.startsWith("+39"))) {
+                            telefonoMovil = telefonoMovil
+                        } else if (telefonoMovil != null && !telefonoMovil.isEmpty()) {
+                            telefonoMovil = "0039" + telefonoMovil
+                        } else {
+                            telefonoMovil = null
+                        }
+                    }
+
+                    if (telefonoMovil != null && !telefonoMovil.isEmpty()) {
+                        datosRegistro.telefono1 = telefonoMovil
                     }
 
                     if (datosRegistro.telefono1 == null || datosRegistro.telefono1.isEmpty()) {
@@ -373,23 +403,19 @@ class MethislabCFService implements ICompanyService{
                      *
                      */
 
-                    if (eElement.getElementsByTagName("fiscalIdentificationNumber").item(0) != null) {
-                        datosRegistro.codigoAgencia = eElement.getElementsByTagName("fiscalIdentificationNumber").item(0).getTextContent()
-                    }
+                    if (eElement.getElementsByTagName("agent").item(0) != null) {
 
-                    /**NOMBRE DE AGENTE
-                     *
-                     */
-                    if (eElement.getElementsByTagName("name").item(0) != null) {
-                        nombreAgente = eElement.getElementsByTagName("name").item(0).getTextContent()
-                    }
+                        if (eElement.getElementsByTagName("agent").item(0).getTextContent().toString().length() > 20) {
+                            datosRegistro.codigoAgencia = eElement.getElementsByTagName("agent").item(0).getTextContent().substring(0, 19)
+                        } else {
+                            datosRegistro.codigoAgencia = eElement.getElementsByTagName("agent").item(0).getTextContent()
+                        }
 
-                    if (eElement.getElementsByTagName("surname1").item(0) != null) {
-                        nombreAgente = nombreAgente + " " + eElement.getElementsByTagName("surname1").item(0).getTextContent()
-                    }
+                        datosRegistro.nomApellAgente = eElement.getElementsByTagName("agent").item(0).getTextContent()
+                    } else {
 
-                    if (eElement.getElementsByTagName("surname2").item(0) != null) {
-                        nombreAgente = nombreAgente + " " + eElement.getElementsByTagName("surname2").item(0).getTextContent()
+                        datosRegistro.codigoAgencia = "."
+                        datosRegistro.nomApellAgente = "."
                     }
 
                     datosRegistro.nomApellAgente = nombreAgente
@@ -607,7 +633,7 @@ class MethislabCFService implements ICompanyService{
             SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
             CorreoUtil correoUtil = new CorreoUtil()
 
-            Thread.sleep(30000);
+            Thread.sleep(90000);
 
 
             try {

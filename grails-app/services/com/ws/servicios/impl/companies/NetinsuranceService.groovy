@@ -1,4 +1,4 @@
-package com.ws.servicios
+package com.ws.servicios.impl.companies
 
 import com.scor.comprimirdocumentos.ParametrosEntrada
 import com.scortelemed.Agente
@@ -6,6 +6,7 @@ import com.scortelemed.Request
 import com.scortelemed.servicios.Candidato
 import com.scortelemed.servicios.FrontalServiceLocator
 import com.scortelemed.servicios.Frontal
+import com.ws.servicios.ICompanyService
 import servicios.RespuestaCRM
 
 import static grails.async.Promises.*

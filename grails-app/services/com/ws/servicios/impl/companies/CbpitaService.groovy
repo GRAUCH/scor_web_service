@@ -1,7 +1,8 @@
-package com.ws.servicios
+package com.ws.servicios.impl.companies
 
 import com.scor.global.ExceptionUtils
 import com.scor.global.WSException
+import com.scor.global.ZipUtils
 import com.scor.srpfileinbound.DATOS
 import com.scor.srpfileinbound.REGISTRODATOS
 import com.scor.srpfileinbound.RootElement
@@ -10,8 +11,11 @@ import com.scortelemed.Conf
 import com.scortelemed.Envio
 import com.scortelemed.Recibido
 import com.scortelemed.Request
-import com.scortelemed.schemas.methislab.*
-import com.scortelemed.schemas.methislab.MethislabUnderwrittingCasesResultsResponse.Expediente
+import com.scortelemed.schemas.cbpita.*
+import com.scortelemed.servicios.Candidato
+import com.scortelemed.servicios.Frontal
+import com.scortelemed.servicios.FrontalServiceLocator
+import com.ws.servicios.ICompanyService
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.GenerarZip
 import hwsol.webservices.TransformacionUtil
@@ -21,6 +25,9 @@ import org.w3c.dom.Element
 import org.w3c.dom.Node
 import org.w3c.dom.NodeList
 import org.xml.sax.InputSource
+import servicios.RespuestaCRM
+import servicios.TipoEstadoExpediente
+import servicios.TipoMotivoAnulacion
 
 import javax.xml.bind.JAXBContext
 import javax.xml.bind.JAXBElement
@@ -32,7 +39,7 @@ import java.text.SimpleDateFormat
 
 import static grails.async.Promises.task
 
-class MethislabService implements ICompanyService{
+class CbpitaService implements ICompanyService{
 
     TransformacionUtil util = new TransformacionUtil()
     def grailsApplication
@@ -42,15 +49,17 @@ class MethislabService implements ICompanyService{
     GenerarZip generarZip = new GenerarZip()
     def tarificadorService
     TransformacionUtil transformacionUtil = new TransformacionUtil()
+    ZipUtils zipUtils = new ZipUtils()
+    CorreoUtil correoUtil = new CorreoUtil()
 
     @Override
     String marshall(String nameSpace, def objeto) {
         String result
         try {
-            if (objeto instanceof MethislabUnderwrittingCaseManagementRequest) {
-                result = requestService.marshall(nameSpace, objeto, MethislabUnderwrittingCaseManagementRequest.class)
-            } else if (objeto instanceof MethislabUnderwrittingCasesResultsRequest) {
-                result = requestService.marshall(nameSpace, objeto, MethislabUnderwrittingCasesResultsRequest.class)
+            if (objeto instanceof CbpitaUnderwrittingCasesResultsRequest) {
+                result = requestService.marshall(nameSpace, objeto, CbpitaUnderwrittingCasesResultsRequest.class)
+            } else if (objeto instanceof CbpitaUnderwrittingCaseManagementRequest) {
+                result = requestService.marshall(nameSpace, objeto, CbpitaUnderwrittingCaseManagementRequest.class)
             }
         } finally {
             return result
@@ -63,7 +72,7 @@ class MethislabService implements ICompanyService{
             DATOS dato = new DATOS()
             Company company = req.company
             dato.registro = rellenaDatos(req, company)
-            //dato.pregunta = rellenaPreguntas(req, company.nombre)
+            dato.pregunta = rellenaPreguntas(req, company.nombre)
             dato.servicio = rellenaServicios(req, company.nombre)
             dato.coberturas = rellenaCoberturas(req)
             return dato
@@ -77,69 +86,74 @@ class MethislabService implements ICompanyService{
         return null
     }
 
-    def rellenaDatosSalidaConsulta(expedientePoliza, requestDate, logginService) {
+    com.scortelemed.servicios.RespuestaCRM modificarExpediente(com.scortelemed.servicios.Expediente expediente, String ou) {
 
-        Expediente expediente = new Expediente()
+        Frontal frontal = instanciarFrontal(Conf.findByName("frontal.wsdl")?.value)
 
-        expediente.setRequestDate(requestDate)
-        expediente.setRequestNumber(util.devolverDatos(expedientePoliza.getNumSolicitud()))
-        expediente.setRequestState(devolverStateType(expedientePoliza.getCodigoEstado()))
-        expediente.setProductCode(util.devolverDatos(expedientePoliza.getProducto().getCodigoProductoCompanya()))
-        expediente.setPolicyNumber(util.devolverDatos(expedientePoliza.getNumPoliza()))
-        expediente.setCertificateNumber(util.devolverDatos(expedientePoliza.getNumCertificado()))
+        com.scortelemed.servicios.Usuario usuario = new com.scortelemed.servicios.Usuario()
 
+        usuario.clave = "P@ssword"
+        usuario.dominio = "scor.local"
+        usuario.unidadOrganizativa = "IT"
+        usuario.usuario = "admin-ITA"
 
-        if (expedientePoliza.getCandidato() != null) {
-            expediente.setFiscalIdentificationNumber(expedientePoliza.getCandidato().getNumeroDocumento())
-            expediente.setMobilePhone(util.devolverTelefonoMovil(expedientePoliza.getCandidato()))
-            expediente.setPhoneNumber1(util.devolverTelefono1(expedientePoliza.getCandidato()))
-            expediente.setPhoneNumber2(util.devolverTelefono2(expedientePoliza.getCandidato()))
-        } else {
-            expediente.setFiscalIdentificationNumber("")
-            expediente.setMobilePhone("")
-            expediente.setPhoneNumber1("")
-            expediente.setPhoneNumber2("")
-        }
+        return frontal.modificaExpediente(usuario, expediente, null, null)
+    }
 
-        byte[] compressedData = tarificadorService.obtenerZip(expedientePoliza.getNodoAlfresco())
+    def instanciarFrontal(String frontalPortAddress) {
 
-        expediente.setZip(compressedData)
+        FrontalServiceLocator fs = new FrontalServiceLocator();
+        fs.setFrontalPortEndpointAddress(frontalPortAddress);
+        Frontal frontal = fs.getFrontalPort();
 
-        expediente.setNotes(util.devolverDatos(expedientePoliza.getTarificacion().getObservaciones()))
+        return frontal;
+    }
 
-        if (expedientePoliza.getCoberturasExpediente() != null && expedientePoliza.getCoberturasExpediente().size() > 0) {
+    List<servicios.Expediente> existeExpediente(String numPoliza, String nombreCia, String companyCodigoSt, String ou) {
 
-            expedientePoliza.getCoberturasExpediente().each { coberturasPoliza ->
+        logginService.putInfoMessage("Buscando si existe expediente con numero de poliza " + numPoliza + " para " + nombreCia)
 
-                BenefitsType benefitsType = new BenefitsType()
+        servicios.Filtro filtro = new servicios.Filtro()
+        List<servicios.Expediente> expedientes = new ArrayList<servicios.Expediente>()
+        RespuestaCRM respuestaCrm
 
-                benefitsType.setBenefictName(devolverNombreCobertura(coberturasPoliza.getCodigoCobertura()))
-                benefitsType.setBenefictCode(util.devolverDatos(coberturasPoliza.getCodigoCobertura()))
-                benefitsType.setBenefictCapital(util.devolverDatos(coberturasPoliza.getCapitalCobertura()))
+        try {
 
-                BenefictResultType benefictResultType = new BenefictResultType()
+            filtro.setClave(servicios.ClaveFiltro.CLIENTE);
+            filtro.setValor(companyCodigoSt.toString());
 
-                benefictResultType.setDescResult(util.devolverDatos(coberturasPoliza.getResultadoCobertura()))
-                benefictResultType.setResultCode(util.devolverDatos(coberturasPoliza.getCodResultadoCobertura()))
+            servicios.Filtro filtroRelacionado1 = new servicios.Filtro()
+            filtroRelacionado1.setClave(servicios.ClaveFiltro.NUM_SOLICITUD)
+            filtroRelacionado1.setValor(numPoliza.toString())
 
-                benefictResultType.setPremiumLoading(util.devolverDatos(coberturasPoliza.getValoracionPrima()))
-                benefictResultType.setCapitalLoading(util.devolverDatos(coberturasPoliza.getValoracionCapital()))
-                benefictResultType.setDescPremiumLoading("")
-                benefictResultType.setDescCapitalLoading("")
+            filtro.setFiltroRelacionado(filtroRelacionado1)
 
-                benefictResultType.exclusions = util.fromStringLoList(coberturasPoliza.getExclusiones())
-                benefictResultType.temporalLoading = util.fromStringLoList(coberturasPoliza.getValoracionTemporal())
-                benefictResultType.medicalReports = util.fromStringLoList(coberturasPoliza.getInformesMedicos())
-                //benefictResultType.medicalTest = util.fromStringLoList(coberturasPoliza.getInformes)
-                benefictResultType.notes = util.fromStringLoList(coberturasPoliza.getNotas())
+            respuestaCrm = expedienteService.consultaExpediente(ou.toString(), filtro)
 
-                benefitsType.setBenefictResult(benefictResultType)
+            if (respuestaCrm != null && respuestaCrm.getListaExpedientes() != null && respuestaCrm.getListaExpedientes().size() > 0) {
 
-                expediente.getBenefitsList().add(benefitsType)
+                for (int i = 0; i < respuestaCrm.getListaExpedientes().size(); i++) {
+
+                    servicios.Expediente exp = respuestaCrm.getListaExpedientes().get(i)
+
+                    if (exp.getCandidato() != null && exp.getCandidato().getCompanya() != null && exp.getCandidato().getCompanya().getCodigoST().equals(companyCodigoSt.toString()) && exp.getNumSolicitud() != null && exp.getNumSolicitud().equals(numPoliza.toString())) {
+
+                        logginService.putInfoMessage("Expediente con número de poliza " + numPoliza + " y expediente " + exp.getCodigoST() + " para " + nombreCia + " ya existe en el sistema")
+                        expedientes.add(respuestaCrm.getListaExpedientes().get(i))
+                    }
+                }
+            } else {
+
+                logginService.putInfoMessage("Expediente con número de poliza " + numPoliza + " para " + nombreCia + " no se existe en el sistema")
             }
+
+        } catch (Exception e) {
+
+            logginService.putInfoMessage("Buscando si existe expediente con numero de poliza " + numPoliza + " para " + nombreCia + " . Error: " + +e.getMessage())
+            correoUtil.envioEmailErrores("ERROR en búsqueda de duplicados para " + nombreCia, "Buscando si existe expediente con numero de poliza " + numPoliza + " para " + nombreCia, e)
         }
 
-        return expediente
+        return expedientes
     }
 
     def rellenaDatos(req, company) {
@@ -181,12 +195,11 @@ class MethislabService implements ICompanyService{
                      *
                      */
 
+                    datosRegistro.codigoProducto = "SRP"
 
-
-                    datosRegistro.codigoProducto = "EUROVITAPEN"
 
                     if (eElement.getElementsByTagName("productCode").item(0) != null) {
-                        datosRegistro.campo8 = eElement.getElementsByTagName("productCode").item(0).getTextContent()
+                        datosRegistro.codigoProducto = eElement.getElementsByTagName("productCode").item(0).getTextContent()
                     }
 
                     /**NOMBRE DE CANDIDATO
@@ -263,6 +276,7 @@ class MethislabService implements ICompanyService{
                     }
 
                     /**TELEFONOS
+                     *
                      */
 
                     if (eElement.getElementsByTagName("phoneNumber1").item(0) != null && eElement.getElementsByTagName("phoneNumber1").item(0).getTextContent() != null && !eElement.getElementsByTagName("phoneNumber1").item(0).getTextContent().isEmpty()) {
@@ -278,7 +292,9 @@ class MethislabService implements ICompanyService{
                         }
                     }
 
-                    if (eElement.getElementsByTagName("phoneNumber2").item(0) != null && eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent() != null && !eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent().isEmpty()) {
+                    if (eElement.getElementsByTagName("phoneNumber2").item(0) != null
+                            && eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent() != null
+                            && !eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent().isEmpty()) {
 
                         telefono2 = eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent()
 
@@ -290,7 +306,6 @@ class MethislabService implements ICompanyService{
                             datosRegistro.telefono2 = null
                         }
                     }
-
                     if (eElement.getElementsByTagName("mobileNumber").item(0) != null) {
 
                         telefonoMovil = eElement.getElementsByTagName("mobileNumber").item(0).getTextContent()
@@ -403,21 +418,36 @@ class MethislabService implements ICompanyService{
                      */
 
                     if (eElement.getElementsByTagName("agent").item(0) != null) {
+                        datosRegistro.codigoAgencia = codificarAgente(eElement.getElementsByTagName("agent").item(0).getTextContent())
+                    }
 
-                        if (eElement.getElementsByTagName("agent").item(0).getTextContent().toString().length() > 20) {
-                            datosRegistro.codigoAgencia = eElement.getElementsByTagName("agent").item(0).getTextContent().substring(0, 19)
-                        } else {
-                            datosRegistro.codigoAgencia = eElement.getElementsByTagName("agent").item(0).getTextContent()
-                        }
+                    /**NOMBRE DE AGENTE
 
-                        datosRegistro.nomApellAgente = eElement.getElementsByTagName("agent").item(0).getTextContent()
-                    } else {
+                     *                    */
+                    if (eElement.getElementsByTagName("agent").item(0) != null) {
+                        nombreAgente = codificarAgente(eElement.getElementsByTagName("agent").item(0).getTextContent())
+                    }
 
-                        datosRegistro.codigoAgencia = "."
-                        datosRegistro.nomApellAgente = "."
+                    if (eElement.getElementsByTagName("surname1").item(0) != null) {
+                        nombreAgente = nombreAgente + " " + eElement.getElementsByTagName("surname1").item(0).getTextContent()
+                    }
+
+                    if (eElement.getElementsByTagName("surname2").item(0) != null) {
+                        nombreAgente = nombreAgente + " " + eElement.getElementsByTagName("surname2").item(0).getTextContent()
                     }
 
                     datosRegistro.nomApellAgente = nombreAgente
+
+                    if (eElement.getElementsByTagName("contactTime").item(0) != null) {
+                        if (eElement.getElementsByTagName("contactTime").item(0).getTextContent() == "M") {
+                            datosRegistro.observaciones = "Mattina (08:00 a 14:00) C (12:00 a 16:00)"
+                        } else if (eElement.getElementsByTagName("contactTime").item(0).getTextContent() == "P") {
+                            datosRegistro.observaciones = "Pomeriggio (14:00 a 20:00)"
+                        } else if (eElement.getElementsByTagName("contactTime").item(0).getTextContent() == "I") {
+                            datosRegistro.observaciones = "Indifferente"
+                        } else datosRegistro.observaciones = ""
+                    }
+
                 }
             }
 
@@ -459,6 +489,7 @@ class MethislabService implements ICompanyService{
         datos.campo19 = ""
         datos.campo20 = ""
     }
+
 
     private def rellenaServicios(req, nameCompany) {
 
@@ -506,7 +537,7 @@ class MethislabService implements ICompanyService{
 
                 DATOS.Servicio servicio = new DATOS.Servicio()
 
-                servicio.codigoServicio = "TS"
+                servicio.codigoServicio = "TM"
                 servicio.tipoServicios = "S"
                 servicio.descripcionServicio = "Teleselezione"
                 servicio.filler = ""
@@ -618,11 +649,11 @@ class MethislabService implements ICompanyService{
         }
     }
 
-    def busquedaCrm(policyNumber, ou, requestNumber, opername, companyCodigoSt, companyId, requestBBDD, certificateNumber, String companyName) {
+    def busquedaCrm(solicitud, ou, companyCodigoSt, companyId, requestBBDD, String nombrecia) {
 
         task {
 
-            logginService.putInfoMessage("BusquedaExpedienteCrm - Buscando en CRM solicitud de " + companyName + " con numero de solicitud: " + requestNumber + " y num. certificado: " + certificateNumber.toString())
+            logginService.putInfoMessage("Buscando en CRM solicitud de " + nombrecia + " con requestNumber: " + solicitud.toString())
 
             def respuestaCrm
             int limite = 0;
@@ -630,8 +661,6 @@ class MethislabService implements ICompanyService{
 
             servicios.Filtro filtro = new servicios.Filtro()
             SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
-            CorreoUtil correoUtil = new CorreoUtil()
-
             Thread.sleep(90000);
 
 
@@ -645,16 +674,11 @@ class MethislabService implements ICompanyService{
 
                     servicios.Filtro filtroRelacionado1 = new servicios.Filtro()
                     filtroRelacionado1.setClave(servicios.ClaveFiltro.NUM_SOLICITUD)
-                    filtroRelacionado1.setValor(requestNumber.toString())
-
-                    servicios.Filtro filtroRelacionado2 = new servicios.Filtro()
-                    filtroRelacionado2.setClave(servicios.ClaveFiltro.NUM_CERTIFICADO);
-                    filtroRelacionado2.setValor(certificateNumber.toString())
-                    filtroRelacionado1.setFiltroRelacionado(filtroRelacionado2)
+                    filtroRelacionado1.setValor(solicitud.toString())
 
                     filtro.setFiltroRelacionado(filtroRelacionado1)
 
-                    respuestaCrm = expedienteService.consultaExpediente(ou.toString(), filtro)
+                    respuestaCrm = consultaExpediente(ou.toString(), filtro)
 
                     if (respuestaCrm != null && respuestaCrm.getListaExpedientes() != null && respuestaCrm.getListaExpedientes().size() > 0) {
 
@@ -662,24 +686,24 @@ class MethislabService implements ICompanyService{
 
                             servicios.Expediente exp = respuestaCrm.getListaExpedientes().get(i)
 
-                            logginService.putInfoMessage("BusquedaExpedienteCrm - Expediente encontrado: " + exp.getCodigoST() + " para " + companyName)
-
                             String fechaCreacion = format.format(new Date());
 
                             if (exp.getCandidato() != null && exp.getCandidato().getCompanya() != null && exp.getCandidato().getCompanya().getCodigoST().equals(companyCodigoSt.toString()) &&
-                                    exp.getNumSolicitud() != null && exp.getNumSolicitud().equals(requestNumber.toString()) && fechaCreacion != null && fechaCreacion.equals(exp.getFechaApertura()) && exp.getNumCertificado() != null && exp.getNumCertificado().equals(certificateNumber)) {
+                                    exp.getNumSolicitud() != null && exp.getNumSolicitud().equals(solicitud.toString()) && fechaCreacion != null && fechaCreacion.equals(exp.getFechaApertura())) {
 
                                 /**Alta procesada correctamente
                                  *
                                  */
 
                                 encontrado = true
-                                logginService.putInfoMessage("BusquedaExpedienteCrm - Nueva alta automatica de " + companyName + " con numero de solicitud: " + requestNumber.toString() + " y num. certificado: " + certificateNumber.toString() + " procesada correctamente")
-
                             }
                         }
                     }
 
+                    if (encontrado) {
+
+                        logginService.putInfoMessage("Nueva alta automatica de " + nombrecia + " con numero de solicitud: " + solicitud.toString() + " procesada correctamente")
+                    }
 
                     limite++
                     Thread.sleep(10000)
@@ -690,8 +714,9 @@ class MethislabService implements ICompanyService{
                  */
                 if (limite == 10) {
 
-                    logginService.putInfoMessage("BusquedaExpedienteCrm - Nueva alta de " + companyName + " con numero de solicitud: " + requestNumber.toString() + " y num. certificado: " + certificateNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM")
-                    correoUtil.envioEmailErrores("BusquedaExpedienteCrm", "Nueva alta de " + companyName + " con numero de solicitud: " + requestNumber.toString() + " y num. certificado: " + certificateNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM", null)
+
+                    logginService.putInfoMessage("Nueva alta de " + nombrecia + " con numero de solicitud: " + solicitud.toString() + " se ha procesado pero no se ha dado de alta en CRM")
+                    correoUtil.envioEmailErrores("ERROR en alta de HMI-CBP", "Nueva alta de " + nombrecia + " con numero de solicitud: " + solicitud.toString() + " se ha procesado pero no se ha dado de alta en CRM", null)
 
                     /**Metemos en errores
                      *
@@ -699,16 +724,18 @@ class MethislabService implements ICompanyService{
                     com.scortelemed.Error error = new com.scortelemed.Error()
                     error.setFecha(new Date())
                     error.setCia(companyId.toString())
-                    error.setIdentificador(requestNumber.toString())
+                    error.setIdentificador(solicitud.toString())
                     error.setInfo(requestBBDD.request)
                     error.setOperacion("ALTA")
-                    error.setError("Peticion procesada para numero de solicitud: " + requestNumber.toString() + " y num. certificado: " + certificateNumber.toString() + ". No encontrada en CRM")
+                    error.setError("Peticion procesada para numero de solicitud: " + solicitud.toString() + ". No encontrada en CRM")
                     error.save(flush: true)
                 }
             } catch (Exception e) {
 
-                logginService.putInfoMessage("BusquedaExpedienteCrm - Nueva alta de " + companyName + " con numero de solicitud: " + requestNumber.toString() + " y num. certificado: " + certificateNumber.toString() + ". Error: " + e.getMessage())
-                correoUtil.envioEmailErrores("BusquedaExpedienteCrm", "Nueva alta de " + companyName + " con numero de solicitud: " + requestNumber.toString() + " y num. certificado: " + certificateNumber.toString(), e)
+
+                logginService.putErrorMessage("Nueva alta de " + nombrecia + " con numero de solicitud: " + solicitud.toString() + " no se ha procesado: Motivo: " + e.getMessage())
+                correoUtil.envioEmailErrores("ERROR en alta de HMI-CBP", "Nueva alta de " + nombrecia + " con numero de solicitud: " + solicitud.toString() + " no se ha procesado: Motivo: " + e.getMessage(), null)
+
             }
         }
     }
@@ -744,35 +771,7 @@ class MethislabService implements ICompanyService{
         envio.setIdentificador(identificador)
         envio.setInfo(info)
         envio.save(flush: true)
-    }
-
-
-    private def obtenerProductos(req, nameCompany) {
-        return null
-    }
-
-    def devolverStateType(estado) {
-
-        switch (estado) {
-            case "CERRADO": return RequestStateType.CLOSED;
-            case "ANULADO": return RequestStateType.CANCELLED;
-            case "RECHAZADO": return RequestStateType.REJECTED;
-            default: return null;
-        }
-
-    }
-
-    def devolverNombreCobertura(codigo) {
-
-        if (codigo.equals("COB5")) {
-            return BenefictNameType.DEAD
-        } else if (codigo.equals("COB4")) {
-            return BenefictNameType.DISABILITY_30
-        } else if (codigo.equals("COB2")) {
-            return BenefictNameType.ACCIDENTAL_DEAD
-        } else {
-            return null
-        }
+        envio.hasErrors()
     }
 
     /**Devuelve lista con los errores de validacion
@@ -919,4 +918,226 @@ class MethislabService implements ICompanyService{
             throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
         }
     }
+
+    def rellenaDatosSalidaConsulta(servicios.ExpedienteInforme expedientePoliza, codigoSt, requestDate, String zipPath, String user, String password) {
+
+        CbpitaUnderwrittingCasesResultsResponse.Expediente expediente = new CbpitaUnderwrittingCasesResultsResponse.Expediente()
+
+        expediente.setRequestDate(requestDate)
+        expediente.setRequestNumber(util.devolverDatos(expedientePoliza.getNumSolicitud()))
+        expediente.setRequestState(devolverStateType(expedientePoliza.getCodigoEstado()))
+
+        if (expedientePoliza.getCodigoEstado() == TipoEstadoExpediente.ANULADO && expedientePoliza.getMotivoAnulacion() != TipoMotivoAnulacion.ABIERTO_POR_ERROR) {
+            expediente.setCancellationReason(traducirMotivo(expedientePoliza.getMotivoAnulacion().toString()))
+        } else {
+            expediente.setCancellationReason("")
+        }
+
+        expediente.setProductCode(util.devolverDatos(expedientePoliza.getProducto().getCodigoProductoCompanya()))
+        expediente.setPolicyNumber(util.devolverDatos(expedientePoliza.getNumPoliza()))
+        expediente.setCertificateNumber(util.devolverDatos(expedientePoliza.getNumCertificado()))
+
+        if (expedientePoliza.getCandidato() != null) {
+            expediente.setFiscalIdentificationNumber(expedientePoliza.getCandidato().getNumeroDocumento())
+            expediente.setMobilePhone(util.devolverTelefonoMovil(expedientePoliza.getCandidato()))
+            expediente.setPhoneNumber1(util.devolverTelefono1(expedientePoliza.getCandidato()))
+            expediente.setPhoneNumber2(util.devolverTelefono2(expedientePoliza.getCandidato()))
+        } else {
+            expediente.setFiscalIdentificationNumber("")
+            expediente.setMobilePhone("")
+            expediente.setPhoneNumber1("")
+            expediente.setPhoneNumber2("")
+        }
+
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        String dateString = formatter.format(requestDate.toGregorianCalendar().getTime());
+
+        logginService.putInfoMessage("Iniciado generacion de zip para expediente " + codigoSt)
+
+        if (expedientePoliza.getCodigoEstado() != TipoEstadoExpediente.ANULADO) {
+            try {
+                byte[] compressedData = zipUtils.generarZips(expedientePoliza, codigoSt, dateString, zipPath, user, password)
+                expediente.setZip(compressedData)
+            } catch (Exception e) {
+                logginService.putError("rellenaDatosSalidaConsulta", "Error:  " + e.getMessage())
+                correoUtil.envioEmailErrores("rellenaDatosSalidaConsulta", "COMPRIMIR FICHEROS", e)
+                expediente.setZip(new byte[0])
+            }
+            //zipUtils.eraseFiles(expedientePoliza, zipPath)
+        } else {
+            expediente.setZip(new byte[0])
+        }
+
+        logginService.putInfoMessage("Fin generacion de zip para expediente " + codigoSt)
+
+        expediente.setNotes(util.devolverDatos(expedientePoliza.getTarificacion().getObservaciones()))
+
+        if (expedientePoliza.getCoberturasExpediente() != null && expedientePoliza.getCoberturasExpediente().size() > 0) {
+
+
+            expedientePoliza.getCoberturasExpediente().each {
+                coberturasPoliza ->
+
+                    BenefitsType benefitsType = new BenefitsType()
+
+                    benefitsType.setBenefictName(devolverNombreCobertura(coberturasPoliza.getCodigoCobertura()))
+                    benefitsType.setBenefictCode(util.devolverDatos(coberturasPoliza.getCodigoCobertura()))
+                    benefitsType.setBenefictCapital(util.devolverDatos(coberturasPoliza.getCapitalCobertura()))
+
+                    BenefictResultType benefictResultType = new BenefictResultType()
+
+                    benefictResultType.setDescResult(util.devolverDatos(coberturasPoliza.getResultadoCobertura()))
+                    benefictResultType.setResultCode(util.codificarResultado(coberturasPoliza.getCodResultadoCobertura()))
+
+                    benefictResultType.setPremiumLoading(util.devolverDatos(coberturasPoliza.getValoracionPrima()))
+                    benefictResultType.setCapitalLoading(util.devolverDatos(coberturasPoliza.getValoracionCapital()))
+                    benefictResultType.setDescPremiumLoading("")
+                    benefictResultType.setDescCapitalLoading("")
+
+                    benefictResultType.exclusions = util.fromStringLoList(coberturasPoliza.getExclusiones())
+                    benefictResultType.temporalLoading = util.fromStringLoList(coberturasPoliza.getValoracionTemporal())
+                    benefictResultType.medicalReports = util.fromStringLoList(coberturasPoliza.getInformesMedicos())
+                    //				benefictResultType.medicalTest = util.fromStringLoList(coberturasPoliza.getInformes())
+                    benefictResultType.notes = util.fromStringLoList(coberturasPoliza.getNotas())
+
+                    benefitsType.setBenefictResult(benefictResultType)
+
+                    expediente.getBenefitsList().add(benefitsType)
+            }
+        }
+
+        return expediente
+    }
+
+    String traducirMotivo(String motivo) {
+
+        String motivoTraducido = null
+
+        switch (motivo) {
+            case "DUPLICIDAD":
+                motivoTraducido = "Doppione (stesso numero richiesta)"
+                break
+            case "RECHAZO_DEL_CANDIDATO":
+                motivoTraducido = "Assicurto rifiuta la chiamata"
+                break
+            case "ILOCALIZABLE":
+                motivoTraducido = "Assicurato non risponde"
+                break
+            case "FALTA_DE_DATOS":
+                motivoTraducido = "Mancano dati necessari al processo di TUW"
+                break
+            case "CANDIDATO_NO_ACUDE":
+                motivoTraducido = "Assicurato non si presenta"
+                break
+                break
+            case "RECHAZA_PRUEBAS":
+                motivoTraducido = "Rifiuta ulteriori esami"
+                break
+                break
+            case "NO_AUTORIZA_LOPD":
+                motivoTraducido = "LOPD non autorizzato"
+                break
+                break
+            case "SOLICITUD_DUPLICADA":
+                motivoTraducido = "Doppione (stesso numero richiesta)"
+                break
+                break
+            case "ANULADO_POR_LA_COMPANYA":
+                motivoTraducido = "Annullata da CBP"
+                break
+            case "NO_RECIBIDA_DOCUMENTACION_PRELIMINAR":
+                motivoTraducido = "Documentazione mancante"
+                break
+            default:
+                break
+        }
+
+
+        return motivoTraducido
+    }
+
+    private def obtenerProductos(req, nameCompany) {
+        return null
+    }
+
+    def devolverStateType(estado) {
+
+        switch (estado) {
+            case "CERRADO": return RequestStateType.CLOSED;
+            case "ANULADO": return RequestStateType.CANCELLED;
+            case "RECHAZADO": return RequestStateType.REJECTED;
+            default: return null;
+        }
+    }
+
+    def devolverNombreCobertura(codigo) {
+
+        if (codigo.equals("COB5")) {
+            return BenefictNameType.DEAD
+        } else if (codigo.equals("COB4")) {
+            return BenefictNameType.DISABILITY_30
+        } else if (codigo.equals("COB2")) {
+            return BenefictNameType.ACCIDENTAL_DEAD
+        } else {
+            return null
+        }
+    }
+
+    com.scortelemed.servicios.Expediente componerExpedienteModificado(servicios.Expediente expediente, CbpitaUnderwrittingCaseManagementRequest.CandidateInformation infoCandidato) {
+
+        com.scortelemed.servicios.Expediente expedienteModificado = new com.scortelemed.servicios.Expediente()
+        SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
+        String observaciones = ""
+        String modificaciones = ""
+
+        expedienteModificado.setCodigoST(expediente.getCodigoST())
+        expedienteModificado.setCandidato(new Candidato())
+        expedienteModificado.getCandidato().setDireccion(infoCandidato.getAddress())
+        expedienteModificado.getCandidato().setCodigoPostal(infoCandidato.getPostalCode())
+        expedienteModificado.getCandidato().setProvincia(infoCandidato.getProvince())
+        expedienteModificado.getCandidato().setLocalidad(infoCandidato.getCity())
+
+        if (infoCandidato.getPhoneNumber1() != null && !infoCandidato.getPhoneNumber1().toString().isEmpty()) {
+            expedienteModificado.getCandidato().setTelefono1("0039" + infoCandidato.getPhoneNumber1().toString())
+            modificaciones += "Telefono1: " + "0039" + infoCandidato.getPhoneNumber1().toString() + " "
+        }
+        if (infoCandidato.getPhoneNumber2() != null && !infoCandidato.getPhoneNumber2().toString().isEmpty()) {
+            expedienteModificado.getCandidato().setTelefono2("0039" + infoCandidato.getPhoneNumber2().toString())
+            modificaciones += "Telefono2: " + "0039" + infoCandidato.getPhoneNumber1().toString() + " "
+        }
+        if (infoCandidato.getMobileNumber() != null && !infoCandidato.getMobileNumber().toString().isEmpty()) {
+            expedienteModificado.getCandidato().setTelefono3("0039" + infoCandidato.getMobileNumber())
+            modificaciones += "Mobile: " + "0039" + infoCandidato.getPhoneNumber1().toString() + " "
+        }
+
+        if (expediente.getObservaciones() != null) {
+            observaciones = expediente.getObservaciones() + "\n"
+            expedienteModificado.setObservaciones(observaciones + formato.format(new Date()) + ": " + modificaciones)
+        } else {
+            expedienteModificado.setObservaciones(formato.format(new Date()) + ": " + modificaciones)
+        }
+
+        return expedienteModificado
+    }
+
+
+    String codificarAgente(String agente) {
+
+        switch (agente) {
+
+            case "300.CBPPIT": return "PITAGORA"
+            case "300.CBPSPE": return "SPEFIN"
+            case "300.CBPPRO": return "BANCA PROGETTO"
+            case "300.CBPWEF": return "WE FINANCE"
+            case "300.CBPRAC": return "RACES"
+            case "300.CBPSIR": return "SIRIOFIN"
+            case "300.CBPDYN": return "DYNAMICA RETAIL"
+            case "300.CBPCOF": return "COFIDIS"
+            case "300.CBPBPF": return "BANCA POPOLARE DEL FRUSINATE"
+
+            default:
+                return agente
+        }
+    }
+
 }

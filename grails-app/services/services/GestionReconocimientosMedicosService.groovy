@@ -9,7 +9,7 @@ import com.ws.enumeration.TipoDictamenType
 import com.ws.enumeration.TipoDocumentoType
 import com.ws.enumeration.TipoGarantiaType
 import com.ws.lagunaro.beans.*
-import com.ws.servicios.LagunaroService
+import com.ws.servicios.impl.companies.LagunaroService
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
 import org.apache.cxf.annotations.SchemaValidation

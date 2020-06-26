@@ -34,7 +34,7 @@ import com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCasesResult
 import com.scortelemed.schemas.netinsurance.StatusType
 import com.ws.servicios.EstadisticasService
 import com.ws.servicios.LogginService
-import com.ws.servicios.NetinsuranceService
+import com.ws.servicios.impl.companies.NetinsuranceService
 import com.ws.servicios.impl.RequestService
 import com.ws.servicios.TarificadorService
 

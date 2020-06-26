@@ -1,4 +1,4 @@
-package com.ws.servicios
+package com.ws.servicios.impl.companies
 
 import com.scor.global.ExceptionUtils
 import com.scor.global.WSException
@@ -13,6 +13,7 @@ import com.scortelemed.Request
 import com.scortelemed.schemas.caser.*
 import com.scortelemed.schemas.caser.ConsultaExpedienteResponse.ExpedienteConsulta
 import com.scortelemed.schemas.caser.ResultadoReconocimientoMedicoResponse.Expediente
+import com.ws.servicios.ICompanyService
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.GenerarZip
 import hwsol.webservices.TransformacionUtil

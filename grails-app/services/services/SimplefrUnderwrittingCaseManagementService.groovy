@@ -32,7 +32,7 @@ import com.scortelemed.schemas.simplefr.SimplefrUnderwrittingCasesResultsRespons
 import com.ws.servicios.EstadisticasService
 import com.ws.servicios.LogginService
 import com.ws.servicios.impl.RequestService
-import com.ws.servicios.SimplefrService
+import com.ws.servicios.impl.companies.SimplefrService
 import com.ws.servicios.TarificadorService
 
 @WebService(targetNamespace = "http://www.scortelemed.com/schemas/simplefr")

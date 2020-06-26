@@ -1,7 +1,6 @@
 package services
 
 import com.scortelemed.TipoCompany
-import com.ws.servicios.impl.ExpedienteService
 import grails.util.Environment
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
@@ -40,7 +39,7 @@ import com.scortelemed.schemas.ama.GestionReconocimientoMedicoResponse
 import com.scortelemed.schemas.ama.ResultadoSiniestroRequest
 import com.scortelemed.schemas.ama.ResultadoSiniestroResponse
 import com.scortelemed.schemas.ama.StatusType
-import com.ws.servicios.AmaService
+import com.ws.servicios.impl.companies.AmaService
 import com.ws.servicios.EstadisticasService
 import com.ws.servicios.LogginService
 import com.ws.servicios.impl.RequestService
