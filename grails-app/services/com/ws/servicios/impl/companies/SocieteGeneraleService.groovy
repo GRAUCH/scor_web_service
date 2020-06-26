@@ -1,38 +1,25 @@
 package com.ws.servicios.impl.companies
 
+import com.scor.global.ExceptionUtils
+import com.scor.global.WSException
+import com.scor.srpfileinbound.DATOS
+import com.scor.srpfileinbound.REGISTRODATOS
 import com.scortelemed.Company
 import com.scortelemed.Request
 import com.scortelemed.schemas.societegenerale.SocieteGeneraleUnderwrittingCaseManagementRequest
 import com.scortelemed.schemas.societegenerale.SocieteGeneraleUnderwrittingCasesResultsRequest
 import com.ws.servicios.ICompanyService
-
-import static grails.async.Promises.*
-
-import com.scor.global.WSException
-import com.scortelemed.schemas.simplefr.SimplefrUnderwrittingCaseManagementRequest
-import com.scortelemed.schemas.simplefr.SimplefrUnderwrittingCasesResultsRequest
-
 import hwsol.webservices.CorreoUtil
-import hwsol.webservices.GenerarZip;
-import hwsol.webservices.TransformacionUtil;
-
-import java.text.SimpleDateFormat
-
-import javax.xml.bind.JAXBContext
-import javax.xml.bind.JAXBElement
-import javax.xml.bind.Marshaller
-import javax.xml.namespace.QName
-import javax.xml.parsers.DocumentBuilder
-import javax.xml.parsers.DocumentBuilderFactory
-import org.xml.sax.InputSource
-
-import com.scortelemed.Conf
-import com.scor.global.ExceptionUtils
-import com.scor.srpfileinbound.DATOS
-import com.scor.srpfileinbound.REGISTRODATOS;
-import com.scor.srpfileinbound.RootElement
+import hwsol.webservices.TransformacionUtil
 import org.w3c.dom.Document
 import org.w3c.dom.Element
+import org.xml.sax.InputSource
+
+import javax.xml.parsers.DocumentBuilder
+import javax.xml.parsers.DocumentBuilderFactory
+import java.text.SimpleDateFormat
+
+import static grails.async.Promises.task
 
 class SocieteGeneraleService implements ICompanyService{
 
@@ -41,7 +28,6 @@ class SocieteGeneraleService implements ICompanyService{
 	def requestService
 	def expedienteService
 	def tarificadorService
-	GenerarZip generarZip = new GenerarZip()
 	def grailsApplication
 
 	@Override
@@ -83,7 +69,7 @@ class SocieteGeneraleService implements ICompanyService{
 
 		def mapDatos = [:]
 		def listadoPreguntas = []
-		def formato = new SimpleDateFormat("yyyyMMdd");
+		def formato = new SimpleDateFormat("yyyyMMdd")
 		def apellido
 		def telefono1
 		def telefono2
@@ -112,7 +98,7 @@ class SocieteGeneraleService implements ICompanyService{
 
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-					Element eElement = (Element) nNode;
+					Element eElement = (Element) nNode
 
 					/**NUMERO DE PRODUCTO
 					 *
@@ -353,7 +339,7 @@ class SocieteGeneraleService implements ICompanyService{
 
 			return datosRegistro
 		} catch (Exception e) {
-			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
 		}
 	}
 
@@ -413,7 +399,7 @@ class SocieteGeneraleService implements ICompanyService{
 
 					if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-						Element eElement = (Element) nNode;
+						Element eElement = (Element) nNode
 
 						if (eElement.getElementsByTagName("serviceCode").item(0) != null) {
 
@@ -471,7 +457,7 @@ class SocieteGeneraleService implements ICompanyService{
 
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-					Element eElement = (Element) nNode;
+					Element eElement = (Element) nNode
 
 					DATOS.Coberturas cobertura = new DATOS.Coberturas()
 
@@ -491,7 +477,7 @@ class SocieteGeneraleService implements ICompanyService{
 
 			return listadoCoberturas
 		} catch (Exception e) {
-			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
 		}
 	}
 	def busquedaCrm (requestNumber, ou, opername, comapanyCodigoSt, companyId, requestBBDD) {

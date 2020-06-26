@@ -4,12 +4,12 @@ import com.scor.global.ExceptionUtils
 import com.scor.global.WSException
 import com.scor.srpfileinbound.DATOS
 import com.scor.srpfileinbound.REGISTRODATOS
-import com.scor.srpfileinbound.RootElement
 import com.scortelemed.Company
-import com.scortelemed.Conf
 import com.scortelemed.Envio
 import com.scortelemed.Recibido
 import com.scortelemed.Request
+import com.scortelemed.schemas.nn.GestionReconocimientoMedicoRequest
+import com.scortelemed.schemas.nn.ResultadoReconocimientoMedicoRequest
 import com.ws.servicios.ICompanyService
 import grails.transaction.Transactional
 import hwsol.webservices.CorreoUtil
@@ -19,12 +19,7 @@ import org.w3c.dom.Element
 import org.w3c.dom.Node
 import org.w3c.dom.NodeList
 import org.xml.sax.InputSource
-import com.scortelemed.schemas.nn.ResultadoReconocimientoMedicoRequest
-import com.scortelemed.schemas.nn.GestionReconocimientoMedicoRequest
-import javax.xml.bind.JAXBContext
-import javax.xml.bind.JAXBElement
-import javax.xml.bind.Marshaller
-import javax.xml.namespace.QName
+
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 import java.text.SimpleDateFormat
@@ -115,7 +110,7 @@ class NnService implements ICompanyService{
     List<WsError> validarDatosObligatorios(requestBBDD) {
 
         List<WsError> wsErrors = new ArrayList<WsError>()
-        SimpleDateFormat formato = new SimpleDateFormat("yyyyMMdd");
+        SimpleDateFormat formato = new SimpleDateFormat("yyyyMMdd")
         String telefono1 = null
         String telefono2 = null
         String telefonoMovil = null
@@ -140,7 +135,7 @@ class NnService implements ICompanyService{
 
                 if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-                    Element eElement = (Element) nNode;
+                    Element eElement = (Element) nNode
 
                     /**CODIGO DE PRODUCTO
                      *
@@ -248,7 +243,7 @@ class NnService implements ICompanyService{
             return wsErrors
 
         } catch (Exception e) {
-            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
         }
     }
 
@@ -259,21 +254,21 @@ class NnService implements ICompanyService{
             logginService.putInfoMessage("BusquedaExpedienteCrm - Buscando en CRM solicitud de " + companyName + " con numSolicitud: " + policyNumber.toString() + ", suplemento: " + certificado)
 
             def respuestaCrm
-            int limite = 0;
-            boolean encontrado = false;
+            int limite = 0
+            boolean encontrado = false
 
             servicios.Filtro filtro = new servicios.Filtro()
             SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
             CorreoUtil correoUtil = new CorreoUtil()
 
-            Thread.sleep(90000);
+            Thread.sleep(90000)
 
             try {
 
                 while( !encontrado && limite < 10) {
 
-                    filtro.setClave(servicios.ClaveFiltro.CLIENTE);
-                    filtro.setValor(companyCodigoSt.toString());
+                    filtro.setClave(servicios.ClaveFiltro.CLIENTE)
+                    filtro.setValor(companyCodigoSt.toString())
 
                     servicios.Filtro filtroRelacionado1 = new servicios.Filtro()
                     filtroRelacionado1.setClave(servicios.ClaveFiltro.NUM_SOLICITUD)
@@ -291,7 +286,7 @@ class NnService implements ICompanyService{
 
                             logginService.putInfoMessage("BusquedaExpedienteCrm - Expediente encontrado: " + exp.getCodigoST() + " para " + companyName)
 
-                            String fechaCreacion = format.format(new Date());
+                            String fechaCreacion = format.format(new Date())
 
                             if (exp.getCandidato() != null && exp.getCandidato().getCompanya() != null && exp.getCandidato().getCompanya().getCodigoST().equals(companyCodigoSt.toString()) &&
                                     exp.getNumSolicitud() != null && exp.getNumSolicitud().equals(policyNumber.toString()) && fechaCreacion != null && fechaCreacion.equals(exp.getFechaApertura())){
@@ -342,7 +337,7 @@ class NnService implements ICompanyService{
 
         def mapDatos = [:]
         def listadoPreguntas = []
-        def formato = new SimpleDateFormat("yyyyMMdd");
+        def formato = new SimpleDateFormat("yyyyMMdd")
         def apellido
         def telefono1
         def telefono2
@@ -373,7 +368,7 @@ class NnService implements ICompanyService{
 
                 if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-                    Element eElement = (Element) nNode;
+                    Element eElement = (Element) nNode
 
                     /**NUMERO DE PRODUCTO
                      *
@@ -610,7 +605,7 @@ class NnService implements ICompanyService{
 
             return datosRegistro
         } catch (Exception e) {
-            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
         }
     }
 
@@ -676,7 +671,7 @@ class NnService implements ICompanyService{
 
                 if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-                    Element eElement = (Element) nNode;
+                    Element eElement = (Element) nNode
 
                     DATOS.Coberturas cobertura = new DATOS.Coberturas()
 
@@ -722,7 +717,7 @@ class NnService implements ICompanyService{
 
             return listadoCoberturas
         } catch (Exception e) {
-            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
         }
     }
 }

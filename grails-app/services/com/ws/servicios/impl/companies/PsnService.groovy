@@ -1,69 +1,31 @@
 package com.ws.servicios.impl.companies
 
-import com.scortelemed.Request
-import com.ws.servicios.ICompanyService
-import hwsol.webservices.WsError
-
-import static grails.async.Promises.*
-import hwsol.webservices.CorreoUtil
-import hwsol.webservices.GenerarZip
-import hwsol.webservices.TransformacionUtil
-
-import java.text.SimpleDateFormat
-
-import javax.xml.bind.JAXBContext
-import javax.xml.bind.JAXBElement
-import javax.xml.bind.Marshaller
-import javax.xml.datatype.XMLGregorianCalendar
-import javax.xml.namespace.QName
-import javax.xml.parsers.DocumentBuilder
-import javax.xml.parsers.DocumentBuilderFactory
-
-import org.w3c.dom.Document
-import org.w3c.dom.Element
-import org.w3c.dom.Node
-import org.w3c.dom.NodeList
-import org.xml.sax.InputSource
-
-import servicios.Cita
-import servicios.DocumentacionExpedienteInforme
-import servicios.Filtro
-import servicios.Llamada
-import servicios.RespuestaCRM
-import servicios.TipoCita
-
 import com.scor.global.ContentResult
 import com.scor.global.ExceptionUtils
 import com.scor.global.WSException
 import com.scor.srpfileinbound.DATOS
 import com.scor.srpfileinbound.REGISTRODATOS
-import com.scor.srpfileinbound.RootElement
-import com.scortelemed.Company;
-import com.scortelemed.Conf
-import com.scortelemed.Envio
-import com.scortelemed.Recibido
-import com.scortelemed.schemas.psn.ActivitiesType
-import com.scortelemed.schemas.psn.AppointmentsType
-import com.scortelemed.schemas.psn.BenefictNameType
-import com.scortelemed.schemas.psn.BenefictResultType
-import com.scortelemed.schemas.psn.BenefitsType
-import com.scortelemed.schemas.psn.CandidateInformationType;
-import com.scortelemed.schemas.psn.ConsolidacionPolizaRequest
-import com.scortelemed.schemas.psn.ConsultaDocumentoRequest
-import com.scortelemed.schemas.psn.ConsultaExpedienteRequest
-import com.scortelemed.schemas.psn.ConsultaExpedienteResponse;
-import com.scortelemed.schemas.psn.DocumentType
-import com.scortelemed.schemas.psn.EstadoCitaType;
-import com.scortelemed.schemas.psn.GenderType;
-import com.scortelemed.schemas.psn.GestionReconocimientoMedicoRequest
-import com.scortelemed.schemas.psn.PolicyHolderInformationType;
-import com.scortelemed.schemas.psn.RequestStateType
-import com.scortelemed.schemas.psn.ResultadoReconocimientoMedicoRequest
+import com.scortelemed.*
+import com.scortelemed.schemas.psn.*
 import com.scortelemed.schemas.psn.ConsultaDocumentoResponse.Documento
 import com.scortelemed.schemas.psn.ResultadoReconocimientoMedicoResponse.Expediente
-import com.scortelemed.schemas.psn.CivilStateType
-import com.scortelemed.schemas.psn.TipoCitaType
-import com.scortelemed.servicios.TipoSexo;
+import com.scortelemed.servicios.TipoSexo
+import com.ws.servicios.ICompanyService
+import hwsol.webservices.CorreoUtil
+import hwsol.webservices.TransformacionUtil
+import hwsol.webservices.WsError
+import org.w3c.dom.Document
+import org.w3c.dom.Element
+import org.w3c.dom.Node
+import org.w3c.dom.NodeList
+import org.xml.sax.InputSource
+import servicios.*
+
+import javax.xml.parsers.DocumentBuilder
+import javax.xml.parsers.DocumentBuilderFactory
+import java.text.SimpleDateFormat
+
+import static grails.async.Promises.task
 
 class PsnService implements ICompanyService{
 
@@ -72,7 +34,6 @@ class PsnService implements ICompanyService{
 	def requestService
 	def expedienteService
 	def tarificadorService
-	GenerarZip generarZip = new GenerarZip()
 	def grailsApplication
 	ContentResult contentResult = new ContentResult()
 
@@ -133,7 +94,7 @@ class PsnService implements ICompanyService{
 
 			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-				Element eElement = (Element) nNode;
+				Element eElement = (Element) nNode
 
 				/**PAIS
 				 *
@@ -192,7 +153,7 @@ class PsnService implements ICompanyService{
 
 		if (expedientePoliza.getCandidato() != null) {
 
-			SimpleDateFormat myFormat = new SimpleDateFormat("yyyyMMdd");
+			SimpleDateFormat myFormat = new SimpleDateFormat("yyyyMMdd")
 			SimpleDateFormat fromUser = new SimpleDateFormat("yyyy/MM/dd");
 
 			candidateInformation.setCodigoSt(expedientePoliza.getCandidato().getCodigoST())
@@ -245,7 +206,7 @@ class PsnService implements ICompanyService{
 
 		if (expedientePoliza.getListaCitas() != null && expedientePoliza.getListaCitas().size() > 0) {
 
-			SimpleDateFormat myFormat = new SimpleDateFormat("yyyyMMdd");
+			SimpleDateFormat myFormat = new SimpleDateFormat("yyyyMMdd")
 			SimpleDateFormat fromUser = new SimpleDateFormat("yyyy/MM/dd");
 
 
@@ -273,7 +234,7 @@ class PsnService implements ICompanyService{
 			expedientePoliza.getListaLlamadas().each { Llamada actividad ->
 
 
-				SimpleDateFormat myFormat = new SimpleDateFormat("yyyyMMdd");
+				SimpleDateFormat myFormat = new SimpleDateFormat("yyyyMMdd")
 
 				ActivitiesType activities = new ActivitiesType()
 
@@ -391,7 +352,7 @@ class PsnService implements ICompanyService{
 
 		def mapDatos = [:]
 		def listadoPreguntas = []
-		def formato = new SimpleDateFormat("yyyyMMdd");
+		def formato = new SimpleDateFormat("yyyyMMdd")
 		def apellido
 		def telefono1
 		def telefono2
@@ -422,7 +383,7 @@ class PsnService implements ICompanyService{
 
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-					Element eElement = (Element) nNode;
+					Element eElement = (Element) nNode
 
 					/**NUMERO DE PRODUCTO
 					 *
@@ -665,7 +626,7 @@ class PsnService implements ICompanyService{
 
 			return datosRegistro
 		} catch (Exception e) {
-			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
 		}
 	}
 
@@ -731,7 +692,7 @@ class PsnService implements ICompanyService{
 
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-					Element eElement = (Element) nNode;
+					Element eElement = (Element) nNode
 
 					DATOS.Coberturas cobertura = new DATOS.Coberturas()
 
@@ -777,7 +738,7 @@ class PsnService implements ICompanyService{
 
 			return listadoCoberturas
 		} catch (Exception e) {
-			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
 		}
 	}
 
@@ -889,7 +850,7 @@ class PsnService implements ICompanyService{
 
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-					Element eElement = (Element) nNode;
+					Element eElement = (Element) nNode
 
 
 					/**PREGUNTAS PREVIAS
@@ -907,7 +868,7 @@ class PsnService implements ICompanyService{
 
 			return listadoPreguntas
 		} catch (Exception e) {
-			throw new WSException(this.getClass(), "rellenaPreguntas", ExceptionUtils.composeMessage(null, e));
+			throw new WSException(this.getClass(), "rellenaPreguntas", ExceptionUtils.composeMessage(null, e))
 		}
 	}
 
@@ -1094,7 +1055,7 @@ class PsnService implements ICompanyService{
 	List<WsError> validarDatosObligatorios(requestBBDD) {
 
 		List<WsError> wsErrors = new ArrayList<WsError>()
-		SimpleDateFormat formato = new SimpleDateFormat("yyyyMMdd");
+		SimpleDateFormat formato = new SimpleDateFormat("yyyyMMdd")
 		String telefono1 = null
 		String telefono2 = null
 		String telefonoMovil = null
@@ -1119,7 +1080,7 @@ class PsnService implements ICompanyService{
 
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-					Element eElement = (Element) nNode;
+					Element eElement = (Element) nNode
 
 
 					/**CODIGO DE OPERACION
@@ -1251,7 +1212,7 @@ class PsnService implements ICompanyService{
 			return wsErrors
 
 		} catch (Exception e) {
-			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
 		}
 	}
 

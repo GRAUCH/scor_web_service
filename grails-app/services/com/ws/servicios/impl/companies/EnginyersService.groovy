@@ -4,9 +4,7 @@ import com.scor.global.ExceptionUtils
 import com.scor.global.WSException
 import com.scor.srpfileinbound.DATOS
 import com.scor.srpfileinbound.REGISTRODATOS
-import com.scor.srpfileinbound.RootElement
 import com.scortelemed.Company
-import com.scortelemed.Conf
 import com.scortelemed.Recibido
 import com.scortelemed.Request
 import com.scortelemed.schemas.enginyers.AddExp
@@ -21,10 +19,6 @@ import org.w3c.dom.Node
 import org.w3c.dom.NodeList
 import org.xml.sax.InputSource
 
-import javax.xml.bind.JAXBContext
-import javax.xml.bind.JAXBElement
-import javax.xml.bind.Marshaller
-import javax.xml.namespace.QName
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 import java.text.SimpleDateFormat
@@ -101,7 +95,7 @@ class EnginyersService implements ICompanyService{
 
                 if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-                    Element eElement = (Element) nNode;
+                    Element eElement = (Element) nNode
 
                     DATOS.Coberturas cobertura = new DATOS.Coberturas()
 
@@ -118,7 +112,7 @@ class EnginyersService implements ICompanyService{
             return listadoCoberturas
 
         } catch (Exception e) {
-            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
         }
     }
 
@@ -182,7 +176,7 @@ class EnginyersService implements ICompanyService{
 
                 if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-                    Element eElement = (Element) nNode;
+                    Element eElement = (Element) nNode
 
 //TODO: en la proxima implementacion sacar el paquete y asegurase que entre el campo observaciones en el sitio correcto.
 
@@ -196,7 +190,7 @@ class EnginyersService implements ICompanyService{
             return observaciones
 
         } catch (Exception e) {
-            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
         }
     }
 
@@ -294,7 +288,7 @@ class EnginyersService implements ICompanyService{
 
         def mapDatos = [:]
         def listadoPreguntas = []
-        def formato = new SimpleDateFormat("yyyyMMdd");
+        def formato = new SimpleDateFormat("yyyyMMdd")
         def apellido
         def telefono1
         def telefono2
@@ -540,7 +534,7 @@ class EnginyersService implements ICompanyService{
 
             return datosRegistro
         } catch (Exception e) {
-            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
         }
 
     }
@@ -691,7 +685,7 @@ class EnginyersService implements ICompanyService{
     List<WsError> validarDatosObligatorios(requestBBDD) {
 
         List<WsError> wsErrors = new ArrayList<WsError>()
-        SimpleDateFormat formato = new SimpleDateFormat("yyyyMMdd");
+        SimpleDateFormat formato = new SimpleDateFormat("yyyyMMdd")
         String telefono1 = null
         String telefono2 = null
         String telefonoMovil = null
@@ -716,7 +710,7 @@ class EnginyersService implements ICompanyService{
 
                 if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-                    Element eElement = (Element) nNode;
+                    Element eElement = (Element) nNode
 
                     /**NOMBRE DE CANDIDATO
                      *
@@ -790,7 +784,7 @@ class EnginyersService implements ICompanyService{
 
             return wsErrors
         } catch (Exception e) {
-            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
         }
     }
 
@@ -814,7 +808,7 @@ class EnginyersService implements ICompanyService{
 
                 if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-                    Element eElement = (Element) nNode;
+                    Element eElement = (Element) nNode
 
                     if (eElement.getElementsByTagName("idRisk").item(0).getTextContent().toString().equals("1") || eElement.getElementsByTagName("idRisk").item(0).getTextContent().toString().equals("453")) {
                         return true
@@ -823,7 +817,7 @@ class EnginyersService implements ICompanyService{
             }
 
         } catch (Exception e) {
-            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
         }
 
         return false
@@ -850,7 +844,7 @@ class EnginyersService implements ICompanyService{
 
                 if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-                    Element eElement = (Element) nNode;
+                    Element eElement = (Element) nNode
 
                     if (eElement.getElementsByTagName("idRisk").item(0).getTextContent().toString().equals("432") || eElement.getElementsByTagName("idRisk").item(0).getTextContent().toString().equals("449")) {
                         return true
@@ -859,7 +853,7 @@ class EnginyersService implements ICompanyService{
             }
 
         } catch (Exception e) {
-            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
         }
 
         return false

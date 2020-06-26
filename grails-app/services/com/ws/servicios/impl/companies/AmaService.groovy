@@ -1,76 +1,35 @@
 package com.ws.servicios.impl.companies
 
-import com.scortelemed.Request
-import com.ws.servicios.ICompanyService
-import com.ws.servicios.impl.ExpedienteService
-import hwsol.webservices.CorreoUtil
-import hwsol.webservices.GenerarZip
-import hwsol.webservices.TransformacionUtil
-
-import java.text.SimpleDateFormat
-
-import javax.xml.bind.JAXBContext
-import javax.xml.bind.JAXBElement
-import javax.xml.bind.Marshaller
-import javax.xml.namespace.QName
-import javax.xml.parsers.DocumentBuilder
-import javax.xml.parsers.DocumentBuilderFactory
-
-import org.w3c.dom.Document
-import org.w3c.dom.Element
-import org.w3c.dom.Node
-import org.w3c.dom.NodeList
-import org.xml.sax.InputSource
-
-import servicios.Cita
-import servicios.DocumentacionExpedienteInforme
-import servicios.Filtro;
-import servicios.Llamada
-import servicios.RespuestaCRM;
-import servicios.TipoCita;
-import servicios.TipoDocumentoIdentidad;
-import servicios.TipoPerceptor
-
 import com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.BenefitInformation
 import com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.SaveDossierResultsE
-import com.scor.global.ContentResult;
+import com.scor.global.ContentResult
 import com.scor.global.ExceptionUtils
 import com.scor.global.WSException
 import com.scor.srpfileinbound.DATOS
 import com.scor.srpfileinbound.REGISTRODATOS
-import com.scor.srpfileinbound.RootElement
-import com.scortelemed.Company;
-import com.scortelemed.Conf
-import com.scortelemed.Envio
-import com.scortelemed.Recibido
-import com.scortelemed.schemas.ama.ActivitiesType
-import com.scortelemed.schemas.ama.AppointmentsType
-import com.scortelemed.schemas.ama.BenefictNameType
-import com.scortelemed.schemas.ama.CandidateInformationType
-import com.scortelemed.schemas.ama.ConsolidacionPolizaRequest
-import com.scortelemed.schemas.ama.ConsultaExpedienteRequest
-import com.scortelemed.schemas.ama.ConsultaExpedienteResponse
-import com.scortelemed.schemas.ama.DocumentType
-import com.scortelemed.schemas.ama.PolicyHolderInformationType
-import com.scortelemed.schemas.ama.RequestStateType
-import com.scortelemed.schemas.ama.BenefictResultType
-import com.scortelemed.schemas.ama.BenefitsType
-import com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest
-import com.scortelemed.schemas.ama.Interviniente
-import com.scortelemed.schemas.ama.Resultado
-import com.scortelemed.schemas.ama.ResultadoReconocimientoMedicoRequest
-import com.scortelemed.schemas.ama.ResultadoSiniestroRequest
+import com.scortelemed.*
+import com.scortelemed.schemas.ama.*
 import com.scortelemed.schemas.ama.ConsultaDocumentoResponse.Documento
 import com.scortelemed.schemas.ama.ResultadoSiniestroResponse.Expediente
 import com.scortelemed.schemas.ama.ResultadoSiniestroResponse.Expediente.Siniestro
 import com.scortelemed.schemas.ama.ResultadoSiniestroResponse.Expediente.Siniestro.Pago
 import com.scortelemed.schemas.ama.ResultadoSiniestroResponse.Expediente.Siniestro.Provision
-import com.scortelemed.servicios.TipoSexo;
-import com.scortelemed.schemas.ama.GenderType;
-import com.scortelemed.schemas.ama.CivilStateType
-import com.scortelemed.schemas.ama.TipoCitaType
+import com.scortelemed.servicios.TipoSexo
+import com.ws.servicios.ICompanyService
+import hwsol.webservices.CorreoUtil
+import hwsol.webservices.TransformacionUtil
+import org.w3c.dom.Document
+import org.w3c.dom.Element
+import org.w3c.dom.Node
+import org.w3c.dom.NodeList
+import org.xml.sax.InputSource
+import servicios.*
 
-import static grails.async.Promises.*
+import javax.xml.parsers.DocumentBuilder
+import javax.xml.parsers.DocumentBuilderFactory
+import java.text.SimpleDateFormat
+
+import static grails.async.Promises.task
 
 class AmaService implements ICompanyService{
 
@@ -79,7 +38,6 @@ class AmaService implements ICompanyService{
 	def expedienteService
 	def logginService
 	def tarificadorService
-	GenerarZip generarZip = new GenerarZip()
 	def grailsApplication
 	ContentResult contentResult = new ContentResult()
 
@@ -144,7 +102,7 @@ class AmaService implements ICompanyService{
 
 			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-				Element eElement = (Element) nNode;
+				Element eElement = (Element) nNode
 
 				/**NUMERO DE PRODUCTO
 				 *
@@ -180,7 +138,7 @@ class AmaService implements ICompanyService{
 		policyHolderInformationType.setRequestState(expedientePoliza.getCodigoEstado().toString())
 		policyHolderInformationType.setRequestNumber(expedientePoliza.getNumSubPoliza())
 
-		expediente.setPolicyHolderInformation(policyHolderInformationType);
+		expediente.setPolicyHolderInformation(policyHolderInformationType)
 
 		if (expedientePoliza.getCandidato() != null) {
 
@@ -206,7 +164,7 @@ class AmaService implements ICompanyService{
 			candidateInformation.setProductCode(expedientePoliza.getProducto().getCodigoProductoCompanya())
 			candidateInformation.setBirthDate(myFormat.format(fromUser.parse(expedientePoliza.getCandidato().getFechaNacimiento())))
 
-			expediente.setCandidateInformation(candidateInformation);
+			expediente.setCandidateInformation(candidateInformation)
 		}
 
 		if (expedientePoliza.getCoberturasExpediente() != null && expedientePoliza.getCoberturasExpediente().size() > 0) {
@@ -236,8 +194,8 @@ class AmaService implements ICompanyService{
 
 		if (expedientePoliza.getListaCitas() != null && expedientePoliza.getListaCitas().size() > 0) {
 
-			SimpleDateFormat myFormat = new SimpleDateFormat("yyyyMMdd");
-			SimpleDateFormat fromUser = new SimpleDateFormat("yyyy/MM/dd");
+			SimpleDateFormat myFormat = new SimpleDateFormat("yyyyMMdd")
+			SimpleDateFormat fromUser = new SimpleDateFormat("yyyy/MM/dd")
 
 
 			expedientePoliza.getListaCitas().each {Cita cita ->
@@ -255,7 +213,7 @@ class AmaService implements ICompanyService{
 				appointments.setTema(cita.getTema())
 				appointments.setTipoCita(devolverTipoCita(cita.getTipoCita()))
 
-				expediente.getAppointments().add(appointments);
+				expediente.getAppointments().add(appointments)
 			}
 		}
 
@@ -264,7 +222,7 @@ class AmaService implements ICompanyService{
 			expedientePoliza.getListaLlamadas().each {Llamada actividad ->
 
 
-				SimpleDateFormat myFormat = new SimpleDateFormat("yyyyMMdd");
+				SimpleDateFormat myFormat = new SimpleDateFormat("yyyyMMdd")
 
 				ActivitiesType activities = new ActivitiesType()
 
@@ -276,7 +234,7 @@ class AmaService implements ICompanyService{
 				activities.setSubject(actividad.getSubject())
 				activities.setType("LLamada")
 
-				expediente.getActivities().add(activities);
+				expediente.getActivities().add(activities)
 			}
 		}
 
@@ -294,7 +252,7 @@ class AmaService implements ICompanyService{
 				document.setNodoAlfresco(documento.getNodoAlfresco())
 				document.setNombre(documento.getNombre())
 
-				expediente.getDocuments().add(document);
+				expediente.getDocuments().add(document)
 			}
 		}
 
@@ -366,15 +324,15 @@ class AmaService implements ICompanyService{
 
 	def rellenaDatosSalidaSiniestro(expedientePoliza) {
 
-		List<Interviniente> listaIntervinientes = new ArrayList<Interviniente>();
-		List<Pago> listaPagos = new ArrayList<Pago>();
-		List<Provision> listaProvisiones = new ArrayList<Provision>();
+		List<Interviniente> listaIntervinientes = new ArrayList<Interviniente>()
+		List<Pago> listaPagos = new ArrayList<Pago>()
+		List<Provision> listaProvisiones = new ArrayList<Provision>()
 
 		/**CREAMOS CANDIDATO
 		 *
 		 */
 
-		Interviniente candidato = new Interviniente();
+		Interviniente candidato = new Interviniente()
 
 		candidato.setCodigoST(util.devolverDatos(expedientePoliza.getCandidato().getCodigoST()))
 		candidato.setTipoInterviniente(util.obtenerTipoInterviniente("ASEGURADO"))
@@ -406,7 +364,7 @@ class AmaService implements ICompanyService{
 
 		if (expedientePoliza.getTomador() != null){
 
-			Interviniente tomador = new Interviniente();
+			Interviniente tomador = new Interviniente()
 
 			tomador.setCodigoST(util.devolverDatos(expedientePoliza.getTomador().getCodigoST()))
 			tomador.setTipoInterviniente(util.obtenerTipoInterviniente("TOMADOR"))
@@ -437,7 +395,7 @@ class AmaService implements ICompanyService{
 			 */
 		} else {
 
-			Interviniente asegurado = new Interviniente();
+			Interviniente asegurado = new Interviniente()
 
 			asegurado.setCodigoST(util.devolverDatos(expedientePoliza.getCandidato().getCodigoST()))
 			asegurado.setTipoInterviniente(util.obtenerTipoInterviniente("TOMADOR"))
@@ -468,7 +426,7 @@ class AmaService implements ICompanyService{
 		/**RECORREMOS EXPEDIENTE
 		 *
 		 */
-		Expediente expediente = new Expediente();
+		Expediente expediente = new Expediente()
 
 		expediente.setCodigoST(util.devolverDatos(expedientePoliza.getCodigoST()))
 		expediente.setEstado(util.obtenerValorEstadoExpediente(expedientePoliza.getCodigoEstado().toString()))
@@ -635,7 +593,7 @@ class AmaService implements ICompanyService{
 
 		def mapDatos = [:]
 		def listadoPreguntas = []
-		def formato = new SimpleDateFormat("yyyyMMdd");
+		def formato = new SimpleDateFormat("yyyyMMdd")
 		def apellido
 		def telefono1
 		def telefono2
@@ -663,7 +621,7 @@ class AmaService implements ICompanyService{
 
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-					Element eElement = (Element) nNode;
+					Element eElement = (Element) nNode
 
 					/**NUMERO DE PRODUCTO
 					 *
@@ -922,7 +880,7 @@ class AmaService implements ICompanyService{
 
 			return datos
 		} catch (Exception e) {
-			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
 		}
 	}
 
@@ -977,7 +935,7 @@ class AmaService implements ICompanyService{
 
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-					Element eElement = (Element) nNode;
+					Element eElement = (Element) nNode
 
 					if (eElement.getElementsByTagName("serviceType").item(0) != null) {
 
@@ -994,7 +952,7 @@ class AmaService implements ICompanyService{
 
 			return listadoServicios
 		} catch (Exception e) {
-			throw new WSException(this.getClass(), "rellenaServicios", ExceptionUtils.composeMessage(null, e));
+			throw new WSException(this.getClass(), "rellenaServicios", ExceptionUtils.composeMessage(null, e))
 		}
 	}
 
@@ -1020,7 +978,7 @@ class AmaService implements ICompanyService{
 
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-					Element eElement = (Element) nNode;
+					Element eElement = (Element) nNode
 
 					DATOS.Coberturas cobertura = new DATOS.Coberturas()
 
@@ -1041,7 +999,7 @@ class AmaService implements ICompanyService{
 
 			return listadoCoberturas
 		} catch (Exception e) {
-			throw new WSException(this.getClass(), "rellenaCOberturas", ExceptionUtils.composeMessage(null, e));
+			throw new WSException(this.getClass(), "rellenaCOberturas", ExceptionUtils.composeMessage(null, e))
 		}
 	}
 
@@ -1067,7 +1025,7 @@ class AmaService implements ICompanyService{
 
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-					Element eElement = (Element) nNode;
+					Element eElement = (Element) nNode
 
 
 					/**PREGUNTAS PREVIAS
@@ -1090,7 +1048,7 @@ class AmaService implements ICompanyService{
 
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-					Element eElement = (Element) nNode;
+					Element eElement = (Element) nNode
 					if (eElement.getElementsByTagName("rentaDiaria").item(0) != null) {
 						/**NUMERO DE PRODUCTO
 						 *
@@ -1106,32 +1064,32 @@ class AmaService implements ICompanyService{
 
 			return listadoPreguntas
 		} catch (Exception e) {
-			throw new WSException(this.getClass(), "rellenaPreguntas", ExceptionUtils.composeMessage(null, e));
+			throw new WSException(this.getClass(), "rellenaPreguntas", ExceptionUtils.composeMessage(null, e))
 		}
 	}
 
 	static String getCodeResult(String code) {
 
-		String result = null;
+		String result = null
 
 		switch(code){
-			case "1": result="Estandar";break;
-			case "2": result="Rechazo Poliza";break;
-			case "3": result="Sobreprima";break;
-			case "4": result="Exclusion";break;
-			case "5": result="Informe Medico";break;
-			case "6": result="Prueba Medica";break;
-			case "7": result="Rechazo Cobertura";break;
-			case "8": result="Postponer";break;
-			case "9": result="Consultar Tarificador";break;
-			case "10": result="Aceptado";break;
-			case "11": result="Teleseleccion";break;
-			case "12": result="Valor Absoluto";break;
-			case "20": result="No Tarificado";break;
-			default: result="";
+			case "1": result="Estandar";break
+			case "2": result="Rechazo Poliza";break
+			case "3": result="Sobreprima";break
+			case "4": result="Exclusion";break
+			case "5": result="Informe Medico";break
+			case "6": result="Prueba Medica";break
+			case "7": result="Rechazo Cobertura";break
+			case "8": result="Postponer";break
+			case "9": result="Consultar Tarificador";break
+			case "10": result="Aceptado";break
+			case "11": result="Teleseleccion";break
+			case "12": result="Valor Absoluto";break
+			case "20": result="No Tarificado";break
+			default: result=""
 		}
 
-		return result;
+		return result
 	}
 
 	/**METODO QUE VALIDA QUE LOS CAMPOS NECESARIOS PARA EL ENVIO A AMA ESTAN RELLENOS. CAMPOS QUE TIENEN QUE ESTAR RELLENOS
@@ -1286,22 +1244,22 @@ class AmaService implements ICompanyService{
 			logginService.putInfoMessage("BusquedaExpedienteCrm - Buscando en CRM solicitud de " + companyName + " con numSolicitud: " + requestNumber)
 
 			def respuestaCrm
-			int limite = 0;
-			boolean encontrado = false;
+			int limite = 0
+			boolean encontrado = false
 
 
 			servicios.Filtro filtro = new servicios.Filtro()
 			SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
 			CorreoUtil correoUtil = new CorreoUtil()
 
-			Thread.sleep(90000);
+			Thread.sleep(90000)
 
 			try {
 
 				while( !encontrado && limite < 10) {
 
-					filtro.setClave(servicios.ClaveFiltro.CLIENTE);
-					filtro.setValor(comapanyCodigoSt.toString());
+					filtro.setClave(servicios.ClaveFiltro.CLIENTE)
+					filtro.setValor(comapanyCodigoSt.toString())
 					servicios.Filtro filtroRelacionado = new servicios.Filtro()
 					filtroRelacionado.setClave(servicios.ClaveFiltro.NUM_SOLICITUD)
 					filtroRelacionado.setValor(requestNumber.toString())
@@ -1317,7 +1275,7 @@ class AmaService implements ICompanyService{
 
 							logginService.putInfoMessage("BusquedaExpedienteCrm - Expediente encontrado: " + exp.getCodigoST() + " para " + companyName)
 
-							String fechaCreacion = format.format(new Date());
+							String fechaCreacion = format.format(new Date())
 
 							if (exp.getCandidato() != null && exp.getCandidato().getCompanya() != null && exp.getCandidato().getCompanya().getCodigoST().equals(comapanyCodigoSt.toString()) &&
 							exp.getNumSolicitud() != null && exp.getNumSolicitud() != null && exp.getNumSolicitud().equals(requestNumber.toString())
@@ -1386,13 +1344,13 @@ class AmaService implements ICompanyService{
 	def devolverEstadoCivil(estado){
 
 		switch(estado){
-			case "SOLTERO" : return CivilStateType.S;
-			case "CASADO" : return CivilStateType.C;
-			case "DIVORCIADO" : return CivilStateType.D;
-			case "SEPARADO" : return CivilStateType.S;
-			case "PAREJA_DE_HECHO" : return CivilStateType.P;
-			case "VIUDO" : return CivilStateType.V;
-			default: return null;
+			case "SOLTERO" : return CivilStateType.S
+			case "CASADO" : return CivilStateType.C
+			case "DIVORCIADO" : return CivilStateType.D
+			case "SEPARADO" : return CivilStateType.S
+			case "PAREJA_DE_HECHO" : return CivilStateType.P
+			case "VIUDO" : return CivilStateType.V
+			default: return null
 		}
 	}
 
@@ -1437,12 +1395,12 @@ class AmaService implements ICompanyService{
 			case TipoCita.TELESELECCION : return TipoCitaType.TELESELECCION
 			case TipoCita.SERVICIO_CITA : return TipoCitaType.SERVICIO_CITA
 			case TipoCita.CENTRO_MEDICO : return TipoCitaType.CENTRO_MEDICO
-			default: return null;
+			default: return null
 		}
 	}
 	Boolean existeDocumentoNodo (RespuestaCRM respuestaCRM, String nodo ) {
 
-		boolean existeDocumento = false;
+		boolean existeDocumento = false
 
 		if(respuestaCRM != null && respuestaCRM.getListaExpedientesInforme() != null && respuestaCRM.getListaExpedientesInforme().size() > 0){
 
@@ -1462,7 +1420,7 @@ class AmaService implements ICompanyService{
 
 	Boolean existeDocumentoId (RespuestaCRM respuestaCRM, String id ) {
 
-		boolean existeDocumento = false;
+		boolean existeDocumento = false
 
 		if(respuestaCRM != null && respuestaCRM.getListaExpedientesInforme() != null && respuestaCRM.getListaExpedientesInforme().size() > 0){
 
@@ -1484,9 +1442,9 @@ class AmaService implements ICompanyService{
 
 		byte[] compressedData=contentResult.obtenerFichero(nodoAlfresco)
 
-		Documento documento = new Documento();
+		Documento documento = new Documento()
 		documento.setCodigoSt(codigoSt)
-		documento.setDocumentacionId(null);
+		documento.setDocumentacionId(null)
 		documento.setNodoAlfresco(nodoAlfresco)
 		documento.setContenido(compressedData)
 
@@ -1498,9 +1456,9 @@ class AmaService implements ICompanyService{
 
 		byte[] compressedData=contentResult.obtenerFichero(documentoId)
 
-		Documento documento = new Documento();
+		Documento documento = new Documento()
 		documento.setCodigoSt(codigoSt)
-		documento.setDocumentacionId(documentoId);
+		documento.setDocumentacionId(documentoId)
 		documento.setNodoAlfresco(null)
 		documento.setContenido(compressedData)
 

@@ -2,7 +2,6 @@ package com.ws.servicios.impl
 
 import com.scor.global.ExceptionUtils
 import com.scor.global.WSException
-import com.scor.srpfileinbound.DATOS
 import com.scor.srpfileinbound.RootElement
 import com.scortelemed.Conf
 import com.scortelemed.Request
@@ -24,21 +23,6 @@ class ExpedienteService implements IExpedienteService {
     def tarificadorService
     def grailsApplication
     ICompanyService companyService
-    //Servicios Compañías
-    def amaService
-    def cajamarService
-    def caserService
-    def cbpitaService
-    def enginyersService
-    def francesasService
-    def lagunaroService
-    def methislabCFService
-    def methislabService
-    def netinsuranceService
-    def nnService
-    def psnService
-    def simplefrService
-    def societeGeneraleService
 
     @Override
     def consultaExpediente(String unidadOrganizativa, Filtro filtro) {

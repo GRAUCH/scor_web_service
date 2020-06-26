@@ -4,9 +4,7 @@ import com.scor.global.ExceptionUtils
 import com.scor.global.WSException
 import com.scor.srpfileinbound.DATOS
 import com.scor.srpfileinbound.REGISTRODATOS
-import com.scor.srpfileinbound.RootElement
 import com.scortelemed.Company
-import com.scortelemed.Conf
 import com.scortelemed.Envio
 import com.scortelemed.Recibido
 import com.scortelemed.Request
@@ -14,7 +12,6 @@ import com.scortelemed.schemas.methislab.*
 import com.scortelemed.schemas.methislab.MethislabUnderwrittingCasesResultsResponse.Expediente
 import com.ws.servicios.ICompanyService
 import hwsol.webservices.CorreoUtil
-import hwsol.webservices.GenerarZip
 import hwsol.webservices.TransformacionUtil
 import hwsol.webservices.WsError
 import org.w3c.dom.Document
@@ -23,10 +20,6 @@ import org.w3c.dom.Node
 import org.w3c.dom.NodeList
 import org.xml.sax.InputSource
 
-import javax.xml.bind.JAXBContext
-import javax.xml.bind.JAXBElement
-import javax.xml.bind.Marshaller
-import javax.xml.namespace.QName
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 import java.text.SimpleDateFormat
@@ -40,9 +33,7 @@ class MethislabService implements ICompanyService{
     def requestService
     def expedienteService
     def logginService
-    GenerarZip generarZip = new GenerarZip()
     def tarificadorService
-    TransformacionUtil transformacionUtil = new TransformacionUtil()
 
     @Override
     String marshall(String nameSpace, def objeto) {
@@ -147,7 +138,7 @@ class MethislabService implements ICompanyService{
 
         def mapDatos = [:]
         def listadoPreguntas = []
-        def formato = new SimpleDateFormat("yyyyMMdd");
+        def formato = new SimpleDateFormat("yyyyMMdd")
         def apellido
         def telefono1
         def telefono2
@@ -176,7 +167,7 @@ class MethislabService implements ICompanyService{
 
                 if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-                    Element eElement = (Element) nNode;
+                    Element eElement = (Element) nNode
 
                     /**NUMERO DE PRODUCTO
                      *
@@ -426,7 +417,7 @@ class MethislabService implements ICompanyService{
 
             return datosRegistro
         } catch (Exception e) {
-            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
         }
     }
 
@@ -486,7 +477,7 @@ class MethislabService implements ICompanyService{
 
                     if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-                        Element eElement = (Element) nNode;
+                        Element eElement = (Element) nNode
 
                         if (eElement.getElementsByTagName("serviceCode").item(0) != null) {
 
@@ -543,7 +534,7 @@ class MethislabService implements ICompanyService{
 
                 if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-                    Element eElement = (Element) nNode;
+                    Element eElement = (Element) nNode
 
                     /**PREGUNTAS PREVIAS
                      *
@@ -568,7 +559,7 @@ class MethislabService implements ICompanyService{
 
             return listadoPreguntas
         } catch (Exception e) {
-            throw new WSException(this.getClass(), "rellenaPreguntas", ExceptionUtils.composeMessage(null, e));
+            throw new WSException(this.getClass(), "rellenaPreguntas", ExceptionUtils.composeMessage(null, e))
         }
     }
 
@@ -595,7 +586,7 @@ class MethislabService implements ICompanyService{
 
                 if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-                    Element eElement = (Element) nNode;
+                    Element eElement = (Element) nNode
 
                     DATOS.Coberturas cobertura = new DATOS.Coberturas()
 
@@ -615,7 +606,7 @@ class MethislabService implements ICompanyService{
 
             return listadoCoberturas
         } catch (Exception e) {
-            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
         }
     }
 
@@ -626,14 +617,14 @@ class MethislabService implements ICompanyService{
             logginService.putInfoMessage("BusquedaExpedienteCrm - Buscando en CRM solicitud de " + companyName + " con numero de solicitud: " + requestNumber + " y num. certificado: " + certificateNumber.toString())
 
             def respuestaCrm
-            int limite = 0;
-            boolean encontrado = false;
+            int limite = 0
+            boolean encontrado = false
 
             servicios.Filtro filtro = new servicios.Filtro()
             SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
             CorreoUtil correoUtil = new CorreoUtil()
 
-            Thread.sleep(90000);
+            Thread.sleep(90000)
 
 
             try {
@@ -641,15 +632,15 @@ class MethislabService implements ICompanyService{
 
                 while (!encontrado && limite < 10) {
 
-                    filtro.setClave(servicios.ClaveFiltro.CLIENTE);
-                    filtro.setValor(companyCodigoSt.toString());
+                    filtro.setClave(servicios.ClaveFiltro.CLIENTE)
+                    filtro.setValor(companyCodigoSt.toString())
 
                     servicios.Filtro filtroRelacionado1 = new servicios.Filtro()
                     filtroRelacionado1.setClave(servicios.ClaveFiltro.NUM_SOLICITUD)
                     filtroRelacionado1.setValor(requestNumber.toString())
 
                     servicios.Filtro filtroRelacionado2 = new servicios.Filtro()
-                    filtroRelacionado2.setClave(servicios.ClaveFiltro.NUM_CERTIFICADO);
+                    filtroRelacionado2.setClave(servicios.ClaveFiltro.NUM_CERTIFICADO)
                     filtroRelacionado2.setValor(certificateNumber.toString())
                     filtroRelacionado1.setFiltroRelacionado(filtroRelacionado2)
 
@@ -665,7 +656,7 @@ class MethislabService implements ICompanyService{
 
                             logginService.putInfoMessage("BusquedaExpedienteCrm - Expediente encontrado: " + exp.getCodigoST() + " para " + companyName)
 
-                            String fechaCreacion = format.format(new Date());
+                            String fechaCreacion = format.format(new Date())
 
                             if (exp.getCandidato() != null && exp.getCandidato().getCompanya() != null && exp.getCandidato().getCompanya().getCodigoST().equals(companyCodigoSt.toString()) &&
                                     exp.getNumSolicitud() != null && exp.getNumSolicitud().equals(requestNumber.toString()) && fechaCreacion != null && fechaCreacion.equals(exp.getFechaApertura()) && exp.getNumCertificado() != null && exp.getNumCertificado().equals(certificateNumber)) {
@@ -755,10 +746,10 @@ class MethislabService implements ICompanyService{
     def devolverStateType(estado) {
 
         switch (estado) {
-            case "CERRADO": return RequestStateType.CLOSED;
-            case "ANULADO": return RequestStateType.CANCELLED;
-            case "RECHAZADO": return RequestStateType.REJECTED;
-            default: return null;
+            case "CERRADO": return RequestStateType.CLOSED
+            case "ANULADO": return RequestStateType.CANCELLED
+            case "RECHAZADO": return RequestStateType.REJECTED
+            default: return null
         }
 
     }
@@ -784,7 +775,7 @@ class MethislabService implements ICompanyService{
     List<WsError> validarDatosObligatorios(requestBBDD) {
 
         List<WsError> wsErrors = new ArrayList<WsError>()
-        SimpleDateFormat formato = new SimpleDateFormat("yyyyMMdd");
+        SimpleDateFormat formato = new SimpleDateFormat("yyyyMMdd")
         String telefono1 = null
         String telefono2 = null
         String telefonoMovil = null
@@ -809,7 +800,7 @@ class MethislabService implements ICompanyService{
 
                 if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-                    Element eElement = (Element) nNode;
+                    Element eElement = (Element) nNode
 
                     /**CODIGO DE PRODUCTO
                      *
@@ -917,7 +908,7 @@ class MethislabService implements ICompanyService{
             return wsErrors
 
         } catch (Exception e) {
-            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
         }
     }
 }

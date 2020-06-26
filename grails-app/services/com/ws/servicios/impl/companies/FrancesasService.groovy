@@ -1,6 +1,11 @@
 package com.ws.servicios.impl.companies
 
+import com.scor.global.ExceptionUtils
+import com.scor.global.WSException
+import com.scor.srpfileinbound.DATOS
+import com.scor.srpfileinbound.REGISTRODATOS
 import com.scortelemed.Company
+import com.scortelemed.Estadistica
 import com.scortelemed.Request
 import com.ws.afiesca.beans.AfiEscaUnderwrittingCaseManagementRequest
 import com.ws.alptis.beans.AlptisUnderwrittingCaseManagementRequest
@@ -8,27 +13,16 @@ import com.ws.lifesquare.beans.LifesquareUnderwrittingCaseManagementRequest
 import com.ws.servicios.ICompanyService
 import com.ws.servicios.LogginService
 import grails.util.Environment
-import hwsol.webservices.FetchUtilLagunaro
+import org.apache.axis.types.Token
 
 import java.text.SimpleDateFormat
 
-import org.apache.axis.types.Token
-
-import com.scor.global.ExceptionUtils
-import com.scor.global.WSException
-import com.scor.srpfileinbound.*
-import com.scortelemed.Conf
-import com.scortelemed.Estadistica
-
 class FrancesasService implements ICompanyService{
 
-	/*
-	 Se conecta al CRM y devuelve los expedientes tarificados para una fecha
-	 */
 	def grailsApplication
 	def expedienteService
 	def requestService
-	def logginService = new LogginService()
+	def logginService
 
 	/**
 	 * AFI_ESCA, ALPTIS, ZEN_UP(Lifesquare) (Beans, sin namespace)
@@ -71,7 +65,7 @@ class FrancesasService implements ICompanyService{
 
 	def rellenaDatos = { req, company ->
 		def mapDatos = [:]
-		def formato = new SimpleDateFormat("yyyyMMdd");
+		def formato = new SimpleDateFormat("yyyyMMdd")
 
 		try {
 			def estadisticas = Estadistica.findAllByRequestAndClaveInList(req, ["policy", "candidate", "agent", "request_Data"])
@@ -202,7 +196,7 @@ class FrancesasService implements ICompanyService{
 
 			return datos
 		} catch (Exception e) {
-			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
 		}
 	}
 
@@ -259,7 +253,7 @@ class FrancesasService implements ICompanyService{
 
 			return listadoPreguntas
 		} catch (Exception e) {
-			throw new WSException(this.getClass(), "rellenaPreguntas", ExceptionUtils.composeMessage(null, e));
+			throw new WSException(this.getClass(), "rellenaPreguntas", ExceptionUtils.composeMessage(null, e))
 		}
 	}
 
@@ -331,7 +325,7 @@ class FrancesasService implements ICompanyService{
 
 			return listadoCoberturas
 		} catch (Exception e) {
-			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
 		}
 	}
 

@@ -1,51 +1,26 @@
 package com.ws.servicios.impl.companies
 
-import com.scor.global.WSException
 import com.scor.global.ExceptionUtils
+import com.scor.global.WSException
 import com.scor.srpfileinbound.DATOS
 import com.scor.srpfileinbound.REGISTRODATOS
-import com.scor.srpfileinbound.RootElement
 import com.scortelemed.Company
 import com.scortelemed.Request
-import com.scortelemed.servicios.Filtro
-import com.scortelemed.Estadistica
-import com.scortelemed.Conf
 import com.ws.lagunaro.beans.GestionReconocimientoMedicoRequest
 import com.ws.servicios.ICompanyService
 import hwsol.webservices.CorreoUtil
-import hwsol.webservices.GenerarZip
 import hwsol.webservices.TransformacionUtil
-import servicios.Candidato
-import servicios.DocumentacionExpedienteInforme
-import servicios.RespuestaCRM
-import servicios.RespuestaCRMInforme
-import servicios.TipoDocumentacion;
-import servicios.TipoTelefono;
+import org.w3c.dom.Document
+import org.w3c.dom.Element
+import org.w3c.dom.Node
+import org.w3c.dom.NodeList
+import org.xml.sax.InputSource
 
-import java.nio.file.Path
-import java.text.SimpleDateFormat
-import java.util.zip.ZipEntry
-import java.util.zip.ZipInputStream
-import java.util.zip.ZipOutputStream
-
-import javax.servlet.http.HttpSession
-import javax.xml.bind.JAXBContext
-import javax.xml.bind.JAXBElement
-import javax.xml.bind.Marshaller
-import javax.xml.bind.Unmarshaller
-import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.namespace.QName
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
+import java.text.SimpleDateFormat
 
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Node;
-import org.w3c.dom.Element;
-import org.apache.axis.types.Token
-import org.xml.sax.InputSource
-import static grails.async.Promises.*
-import org.apache.commons.codec.binary.Base64;
+import static grails.async.Promises.task
 
 class LagunaroService implements ICompanyService{
 
@@ -54,7 +29,6 @@ class LagunaroService implements ICompanyService{
 	def requestService
 	def expedienteService
 	def logginService
-	GenerarZip generarZip = new GenerarZip()
 	def tarificadorService
 
 	/**
@@ -95,7 +69,7 @@ class LagunaroService implements ICompanyService{
 
 		def mapDatos = [:]
 		def listadoPreguntas = []
-		def formato = new SimpleDateFormat("yyyyMMdd");
+		def formato = new SimpleDateFormat("yyyyMMdd")
 		def apellido1
 		def apellido2
 		def telefono1
@@ -125,7 +99,7 @@ class LagunaroService implements ICompanyService{
 
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-					Element eElement = (Element) nNode;
+					Element eElement = (Element) nNode
 
 					/**El producto para lagunaro es fijo
 					 * 
@@ -188,7 +162,7 @@ class LagunaroService implements ICompanyService{
 
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-					Element eElement = (Element) nNode;
+					Element eElement = (Element) nNode
 
 
 
@@ -342,7 +316,7 @@ class LagunaroService implements ICompanyService{
 
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-					Element eElement = (Element) nNode;
+					Element eElement = (Element) nNode
 
 					/**CODIGO AGENCIA
 					 *
@@ -371,7 +345,7 @@ class LagunaroService implements ICompanyService{
 
 			return datosRegistro
 		} catch (Exception e) {
-			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
 		}
 	}
 
@@ -429,7 +403,7 @@ class LagunaroService implements ICompanyService{
 
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-					Element eElement = (Element) nNode;
+					Element eElement = (Element) nNode
 
 					DATOS.Servicio servicio = new DATOS.Servicio()
 
@@ -456,7 +430,7 @@ class LagunaroService implements ICompanyService{
 
 					if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-						Element eElement = (Element) nNode;
+						Element eElement = (Element) nNode
 
 						if (eElement.getFirstChild() != null) {
 
@@ -502,7 +476,7 @@ class LagunaroService implements ICompanyService{
 
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-					Element eElement = (Element) nNode;
+					Element eElement = (Element) nNode
 
 					DATOS.Coberturas cobertura = new DATOS.Coberturas()
 
@@ -520,7 +494,7 @@ class LagunaroService implements ICompanyService{
 
 			return listadoCoberturas
 		} catch (Exception e) {
-			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
 		}
 	}
 
@@ -531,28 +505,28 @@ class LagunaroService implements ICompanyService{
 			logginService.putInfoMessage("Buscando en CRM solicitud de Lagunaro con numSolicitud: " + policyNumber.toString() + ", numCertificado: " + certificado)
 
 			def respuestaCrm
-			int limite = 0;
-			boolean encontrado = false;
+			int limite = 0
+			boolean encontrado = false
 
 			servicios.Filtro filtro = new servicios.Filtro()
 			SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
 			CorreoUtil correoUtil = new CorreoUtil()
 
-			Thread.sleep(90000);
+			Thread.sleep(90000)
 
 			try {
 
 				while( !encontrado && limite < 10) {
 
-					filtro.setClave(servicios.ClaveFiltro.CLIENTE);
-					filtro.setValor(companyCodigoSt.toString());
+					filtro.setClave(servicios.ClaveFiltro.CLIENTE)
+					filtro.setValor(companyCodigoSt.toString())
 
 					servicios.Filtro filtroRelacionado1 = new servicios.Filtro()
 					filtroRelacionado1.setClave(servicios.ClaveFiltro.NUM_SOLICITUD)
 					filtroRelacionado1.setValor(policyNumber.toString())
 
 					servicios.Filtro filtroRelacionado2 = new servicios.Filtro()
-					filtroRelacionado2.setClave(servicios.ClaveFiltro.NUM_CERTIFICADO);
+					filtroRelacionado2.setClave(servicios.ClaveFiltro.NUM_CERTIFICADO)
 					filtroRelacionado2.setValor(certificado.toString())
 					filtroRelacionado1.setFiltroRelacionado(filtroRelacionado2)
 
@@ -568,7 +542,7 @@ class LagunaroService implements ICompanyService{
 
 							logginService.putInfoMessage("Expediente encontrado: " + exp.getCodigoST())
 
-							String fechaCreacion = format.format(new Date());
+							String fechaCreacion = format.format(new Date())
 
 							if (exp.getCandidato() != null && exp.getCandidato().getCompanya() != null && exp.getCandidato().getCompanya().getCodigoST().equals(companyCodigoSt.toString()) &&
 							exp.getNumSolicitud() != null && exp.getNumSolicitud().equals(policyNumber.toString()) && fechaCreacion != null && fechaCreacion.equals(exp.getFechaApertura())){

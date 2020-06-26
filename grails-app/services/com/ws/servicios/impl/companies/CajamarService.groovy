@@ -1,34 +1,27 @@
 package com.ws.servicios.impl.companies
 
-import com.scortelemed.Company
-import com.scortelemed.Request
-import com.ws.servicios.ICompanyService
-
-import javax.xml.bind.JAXBContext
-import javax.xml.bind.JAXBElement
-import javax.xml.bind.Marshaller
-import javax.xml.namespace.QName
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.DocumentBuilder;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Node;
-import org.w3c.dom.Element;
-import org.xml.sax.InputSource
-import java.io.File;
-import java.text.SimpleDateFormat
-import com.scor.srpfileinbound.DATOS
-import com.scor.srpfileinbound.REGISTRODATOS
-import com.scor.srpfileinbound.RootElement
-import hwsol.webservices.CorreoUtil
-import hwsol.webservices.TransformacionUtil
 import com.scor.global.ExceptionUtils
 import com.scor.global.WSException
-import org.apache.axis.types.Token
-import com.scortelemed.Conf
+import com.scor.srpfileinbound.DATOS
+import com.scor.srpfileinbound.REGISTRODATOS
+import com.scortelemed.Company
+import com.scortelemed.Request
 import com.ws.cajamar.beans.CajamarUnderwrittingCaseManagementRequest
 import com.ws.cajamar.beans.ConsolidacionPolizaRequest
-import static grails.async.Promises.*
+import com.ws.servicios.ICompanyService
+import hwsol.webservices.CorreoUtil
+import hwsol.webservices.TransformacionUtil
+import org.w3c.dom.Document
+import org.w3c.dom.Element
+import org.w3c.dom.Node
+import org.w3c.dom.NodeList
+import org.xml.sax.InputSource
+
+import javax.xml.parsers.DocumentBuilder
+import javax.xml.parsers.DocumentBuilderFactory
+import java.text.SimpleDateFormat
+
+import static grails.async.Promises.task
 
 class CajamarService implements ICompanyService{
 
@@ -80,7 +73,7 @@ class CajamarService implements ICompanyService{
 
 		def mapDatos = [:]
 		def listadoPreguntas = []
-		def formato = new SimpleDateFormat("yyyyMMdd");
+		def formato = new SimpleDateFormat("yyyyMMdd")
 		def apellido1
 		def apellido2
 		def codigoCliente
@@ -114,7 +107,7 @@ class CajamarService implements ICompanyService{
 
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-					Element eElement = (Element) nNode;
+					Element eElement = (Element) nNode
 
 					/**NUMERO DE REFERENCIA
 					 *
@@ -285,7 +278,7 @@ class CajamarService implements ICompanyService{
 				return datos
 			}
 		} catch (Exception e) {
-			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
 		}
 	}
 
@@ -349,7 +342,7 @@ class CajamarService implements ICompanyService{
 
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-					Element eElement = (Element) nNode;
+					Element eElement = (Element) nNode
 
 
 					/**PREGUNTAS PREVIAS
@@ -438,7 +431,7 @@ class CajamarService implements ICompanyService{
 
 			return listadoPreguntas
 		} catch (Exception e) {
-			throw new WSException(this.getClass(), "rellenaPreguntas", ExceptionUtils.composeMessage(null, e));
+			throw new WSException(this.getClass(), "rellenaPreguntas", ExceptionUtils.composeMessage(null, e))
 		}
 	}
 
@@ -464,7 +457,7 @@ class CajamarService implements ICompanyService{
 
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-					Element eElement = (Element) nNode;
+					Element eElement = (Element) nNode
 
 					DATOS.Coberturas cobertura = new DATOS.Coberturas()
 
@@ -527,7 +520,7 @@ class CajamarService implements ICompanyService{
 
 			return listadoServicios
 		} catch (Exception e) {
-			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
 		}
 	}
 
@@ -552,7 +545,7 @@ class CajamarService implements ICompanyService{
 
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-					Element eElement = (Element) nNode;
+					Element eElement = (Element) nNode
 
 					/**NUMERO DE REFERENCIA
 					 *
@@ -573,7 +566,7 @@ class CajamarService implements ICompanyService{
 
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-					Element eElement = (Element) nNode;
+					Element eElement = (Element) nNode
 
 					DATOS.Coberturas cobertura = new DATOS.Coberturas()
 
@@ -596,7 +589,7 @@ class CajamarService implements ICompanyService{
 
 			return listadoCoberturas
 		} catch (Exception e) {
-			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
 		}
 	}
 
