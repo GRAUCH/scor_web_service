@@ -36,7 +36,8 @@ class CajamarService implements ICompanyService{
 	 * CAJAMAR  (Beans, sin namespace)
 	 */
 	@Override
-	String marshall(String nameSpace, def objeto) {
+	String marshall(def objeto) {
+		String nameSpace = "http://www.scortelemed.com/schemas/cajamar"
 		String result
 		try{
 			if (objeto instanceof CajamarUnderwrittingCaseManagementRequest){

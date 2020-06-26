@@ -72,7 +72,7 @@ class MethislabCFUnderwrittingCaseManagementService {
 
 				if (Company.findByNombre("methislabCF").generationAutomatic) {
 
-					requestXML=methislabCFService.marshall("http://www.scortelemed.com/schemas/methislabCF",MethislabCFUnderwrittingCaseManagementRequest)
+					requestXML=methislabCFService.marshall(MethislabCFUnderwrittingCaseManagementRequest)
 					requestBBDD = requestService.crear(opername,requestXML)
 					requestBBDD.fecha_procesado = new Date()
 					requestBBDD.save(flush:true)
@@ -167,7 +167,7 @@ class MethislabCFUnderwrittingCaseManagementService {
 
 				if (methislabCFUnderwrittingCasesResults && methislabCFUnderwrittingCasesResults.dateStart && methislabCFUnderwrittingCasesResults.dateEnd){
 
-					requestXML=methislabCFService.marshall("http://www.scortelemed.com/schemas/methislabCF",methislabCFUnderwrittingCasesResults)
+					requestXML=methislabCFService.marshall(methislabCFUnderwrittingCasesResults)
 
 					requestService.crear(opername,requestXML)
 

@@ -36,7 +36,8 @@ class MethislabService implements ICompanyService{
     def tarificadorService
 
     @Override
-    String marshall(String nameSpace, def objeto) {
+    String marshall(def objeto) {
+        String nameSpace = "http://www.scortelemed.com/schemas/methislab"
         String result
         try {
             if (objeto instanceof MethislabUnderwrittingCaseManagementRequest) {

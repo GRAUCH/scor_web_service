@@ -75,7 +75,7 @@ class CaserUnderwrittingCaseManagementService {
 
                 if (Company.findByNombre("caser").generationAutomatic) {
 
-                    requestXML = caserService.marshall("http://www.scortelemed.com/schemas/caser", gestionReconocimientoMedico)
+                    requestXML = caserService.marshall(gestionReconocimientoMedico)
                     requestBBDD = requestService.crear(opername, requestXML)
                     requestBBDD.fecha_procesado = new Date()
                     requestBBDD.save(flush: true)
@@ -162,7 +162,7 @@ class CaserUnderwrittingCaseManagementService {
 
                 if (resultadoReconocimientoMedico && resultadoReconocimientoMedico.dateStart && resultadoReconocimientoMedico.dateEnd) {
 
-                    requestXML = caserService.marshall("http://www.scortelemed.com/schemas/caser", resultadoReconocimientoMedico)
+                    requestXML = caserService.marshall(resultadoReconocimientoMedico)
 
                     requestService.crear(opername, requestXML)
 
@@ -270,7 +270,7 @@ class CaserUnderwrittingCaseManagementService {
 
                 if (consultaExpediente && consultaExpediente.codExpediente) {
 
-                    requestXML = caserService.marshall("http://www.scortelemed.com/schemas/caser", consultaExpediente)
+                    requestXML = caserService.marshall(consultaExpediente)
 
                     requestService.crear(opername, requestXML)
 
@@ -377,7 +377,7 @@ class CaserUnderwrittingCaseManagementService {
 
             if (operacion && operacion.activo) {
 
-                requestXML = caserService.marshall("http://www.scortelemed.com/schemas/caser", consolidacionPoliza)
+                requestXML = caserService.marshall(consolidacionPoliza)
                 requestBBDD = requestService.crear(opername, requestXML)
                 requestBBDD.fecha_procesado = new Date()
                 requestBBDD.save(flush: true)

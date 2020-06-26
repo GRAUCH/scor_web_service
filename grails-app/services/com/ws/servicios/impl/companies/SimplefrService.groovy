@@ -31,7 +31,8 @@ class SimplefrService implements ICompanyService{
 	def grailsApplication
 
 	@Override
-	String marshall(String nameSpace, def objeto) {
+	String marshall(def objeto) {
+		String nameSpace = "http://www.scortelemed.com/schemas/simplefr"
 		String result
 		try{
 			if (objeto instanceof SimplefrUnderwrittingCaseManagementRequest){

@@ -78,7 +78,7 @@ class NationaleNederlandenUnderwrittingCaseManagementService {
 
 					logginService.putErrorEndpoint("GestionReconocimientoMedico","Realizando peticion " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber)
 
-					requestXML=nnService.marshall("http://www.scortelemed.com/schemas/nn",gestionReconocimientoMedico)
+					requestXML=nnService.marshall(gestionReconocimientoMedico)
 					requestBBDD = requestService.crear(opername,requestXML)
 					requestBBDD.fecha_procesado = new Date()
 					requestBBDD.save(flush:true)
@@ -179,7 +179,7 @@ class NationaleNederlandenUnderwrittingCaseManagementService {
 
 				if (resultadoReconocimientoMedico && resultadoReconocimientoMedico.dateStart && resultadoReconocimientoMedico.dateEnd) {
 
-					requestXML=nnService.marshall("http://www.scortelemed.com/schemas/nn",resultadoReconocimientoMedico)
+					requestXML=nnService.marshall(resultadoReconocimientoMedico)
 
 					requestService.crear(opername,requestXML)
 

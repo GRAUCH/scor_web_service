@@ -79,7 +79,7 @@ class SimplefrUnderwrittingCaseManagementService	 {
 			def operacion = estadisticasService.obtenerObjetoOperacion(opername)
 
 			if (operacion && operacion.activo){
-				requestXML=simplefrService.marshall("http://www.scortelemed.com/schemas/simplefr",simplefrUnderwrittingCaseManagement)
+				requestXML=simplefrService.marshall(simplefrUnderwrittingCaseManagement)
 				requestBBDD = requestService.crear(opername,requestXML)
 				requestBBDD.fecha_procesado = new Date()
 				requestBBDD.save(flush:true)
@@ -171,7 +171,7 @@ class SimplefrUnderwrittingCaseManagementService	 {
 			
 			if(operacion && operacion.activo && simplefrUnderwrittingCasesResults && simpleUnderwrittingCasesResults.dateStart && simpleUnderwrittingCasesResults.dateEnd){
 
-				requestXML=simplefrService.marshall("http://www.scortelemed.com/schemas/simplefr",simplefrUnderwrittingCasesResults)
+				requestXML=simplefrService.marshall(simplefrUnderwrittingCasesResults)
 
 				requestService.crear(opername,requestXML)
 

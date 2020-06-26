@@ -41,7 +41,8 @@ class CbpitaService implements ICompanyService{
     CorreoUtil correoUtil = new CorreoUtil()
 
     @Override
-    String marshall(String nameSpace, def objeto) {
+    String marshall(def objeto) {
+        String nameSpace = "http://www.scortelemed.com/schemas/cbpita"
         String result
         try {
             if (objeto instanceof CbpitaUnderwrittingCasesResultsRequest) {
@@ -666,7 +667,7 @@ class CbpitaService implements ICompanyService{
 
                     filtro.setFiltroRelacionado(filtroRelacionado1)
 
-                    respuestaCrm = consultaExpediente(ou.toString(), filtro)
+                    respuestaCrm = expedienteService.consultaExpediente(ou.toString(), filtro)
 
                     if (respuestaCrm != null && respuestaCrm.getListaExpedientes() != null && respuestaCrm.getListaExpedientes().size() > 0) {
 

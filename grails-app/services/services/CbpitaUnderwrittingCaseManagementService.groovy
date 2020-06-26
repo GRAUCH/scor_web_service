@@ -78,7 +78,7 @@ class CbpitaUnderwrittingCaseManagementService {
 
                 if (company.generationAutomatic) {
 
-                    requestXML = cbpitaService.marshall("http://www.scortelemed.com/schemas/cbpita", cbpitaUnderwrittingCaseManagementRequest)
+                    requestXML = cbpitaService.marshall(cbpitaUnderwrittingCaseManagementRequest)
                     requestBBDD = requestService.crear(opername, requestXML)
                     requestBBDD.fecha_procesado = new Date()
                     requestBBDD.save(flush: true)
@@ -242,7 +242,7 @@ class CbpitaUnderwrittingCaseManagementService {
 
                     if (cbpitaUnderwrittingCasesResultsRequest && cbpitaUnderwrittingCasesResultsRequest.dateStart && cbpitaUnderwrittingCasesResultsRequest.dateEnd) {
 
-                        requestXML = cbpitaService.marshall("http://www.scortelemed.com/schemas/cbpita", cbpitaUnderwrittingCasesResultsRequest)
+                        requestXML = cbpitaService.marshall(cbpitaUnderwrittingCasesResultsRequest)
 
                         requestService.crear(opername, requestXML)
 

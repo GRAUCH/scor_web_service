@@ -35,7 +35,7 @@ class LagunaroService implements ICompanyService{
 	 * LAGUNARO  (Beans, sin namespace)
 	 */
 	@Override
-	String marshall(String nameSpace, def objeto) {
+	String marshall(def objeto) {
 		String result
 		try{
 			if (objeto instanceof GestionReconocimientoMedicoRequest){

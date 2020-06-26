@@ -88,7 +88,7 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 
 				if (Company.findByNombre("netinsurance").generationAutomatic) {
 
-					requestXML=netinsuranceService.marshall("http://www.scortelemed.com/schemas/netinsurance",netInsuranteUnderwrittingCaseManagement)
+					requestXML=netinsuranceService.marshall(netInsuranteUnderwrittingCaseManagement)
 					requestBBDD = requestService.crear(opername,requestXML)
 					requestBBDD.fecha_procesado = new Date()
 					requestBBDD.save(flush:true)
@@ -163,7 +163,7 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 
 				if (netInsuranteUnderwrittingCasesResults && netInsuranteUnderwrittingCasesResults.dateStart && netInsuranteUnderwrittingCasesResults.dateEnd){
 
-					requestXML=netinsuranceService.marshall("http://www.scortelemed.com/schemas/netinsurance",netInsuranteUnderwrittingCasesResults)
+					requestXML=netinsuranceService.marshall(netInsuranteUnderwrittingCasesResults)
 
 					requestService.crear(opername,requestXML)
 
@@ -270,7 +270,7 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 
 				if (consultaExpediente && consultaExpediente.requestNumber) {
 
-					requestXML=netinsuranceService.marshall("http://www.scortelemed.com/schemas/netinsurance",consultaExpediente)
+					requestXML=netinsuranceService.marshall(consultaExpediente)
 
 					requestService.crear(opername,requestXML)
 

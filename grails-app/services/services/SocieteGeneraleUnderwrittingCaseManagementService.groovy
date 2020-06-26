@@ -80,7 +80,7 @@ class SocieteGeneraleUnderwrittingCaseManagementService	 {
 			def operacion = estadisticasService.obtenerObjetoOperacion(opername)
 
 			if (operacion && operacion.activo){
-				requestXML=societeGeneraleService.marshall("http://www.scortelemed.com/schemas/societeGenerale",societeGeneraleUnderwrittingCaseManagement)
+				requestXML=societeGeneraleService.marshall(societeGeneraleUnderwrittingCaseManagement)
 				requestBBDD = requestService.crear(opername,requestXML)
 				requestBBDD.fecha_procesado = new Date()
 				requestBBDD.save(flush:true)
@@ -172,7 +172,7 @@ class SocieteGeneraleUnderwrittingCaseManagementService	 {
 			
 			if(operacion && operacion.activo && societeGeneraleUnderwrittingCasesResults && societeGeneraleUnderwrittingCasesResults.dateStart && societeGeneraleUnderwrittingCasesResults.dateEnd){
 
-				requestXML=societeGeneraleService.marshall("http://www.scortelemed.com/schemas/societeGenerale",societeGeneraleUnderwrittingCasesResults)
+				requestXML=societeGeneraleService.marshall(societeGeneraleUnderwrittingCasesResults)
 
 				requestService.crear(opername,requestXML)
 

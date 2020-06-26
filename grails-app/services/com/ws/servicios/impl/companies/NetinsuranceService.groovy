@@ -39,7 +39,8 @@ class NetinsuranceService implements ICompanyService{
 	def grailsApplication
 
 	@Override
-	String marshall(String nameSpace, def objeto) {
+	String marshall(def objeto) {
+		String nameSpace = "http://www.scortelemed.com/schemas/netinsurance"
 		String result
 		try{
 			if (objeto instanceof NetinsuranteUnderwrittingCaseManagementRequest){
@@ -952,7 +953,7 @@ class NetinsuranceService implements ICompanyService{
 
 			filtro.setFiltroRelacionado(filtroRelacionado1)
 
-			respuestaCrm = consultaExpediente(ou.toString(), filtro)
+			respuestaCrm = expedienteService.consultaExpediente(ou.toString(), filtro)
 
 			if (respuestaCrm != null && respuestaCrm.getListaExpedientes() != null && respuestaCrm.getListaExpedientes().size() > 0) {
 

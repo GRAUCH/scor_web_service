@@ -91,7 +91,7 @@ class EnginyersUnderwrittingCaseManagementService {
 							
 							logginService.putInfoMessage("Realizando peticion AddExp para " + company.nombre + " con numero de solicitud: " + addExp.d.getPolicyNumber())
 
-							requestXML = enginyersService.marshall("http://www.scortelemed.com/schemas/enginyers", addExp)
+							requestXML = enginyersService.marshall(addExp)
 							requestBBDD = requestService.crear(opername, requestXML)
 							requestBBDD.fecha_procesado = new Date()
 							requestBBDD.save(flush: true)

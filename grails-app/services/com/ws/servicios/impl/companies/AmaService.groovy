@@ -42,7 +42,8 @@ class AmaService implements ICompanyService{
 	ContentResult contentResult = new ContentResult()
 
 	@Override
-	String marshall(String nameSpace, def objeto) {
+	String marshall(def objeto) {
+		String nameSpace = "http://www.scortelemed.com/schemas/ama"
 		String result
 		try{
 			if (objeto instanceof ResultadoReconocimientoMedicoRequest){

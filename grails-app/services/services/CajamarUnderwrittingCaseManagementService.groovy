@@ -93,7 +93,7 @@ class CajamarUnderwrittingCaseManagementService {
 
 				if (Company.findByNombre("cajamar").generationAutomatic && cajamarUnderwrittingCaseManagementRequest.getRegScor().getYtipo().toString().equals("1")) {
 
-					requestXML=cajamarService.marshall("http://www.scortelemed.com/schemas/cajamar",cajamarUnderwrittingCaseManagementRequest)
+					requestXML=cajamarService.marshall(cajamarUnderwrittingCaseManagementRequest)
 					requestBBDD = requestService.crear(opername,requestXML)
 					requestBBDD.fecha_procesado = new Date()
 					requestBBDD.save(flush:true)
@@ -130,7 +130,7 @@ class CajamarUnderwrittingCaseManagementService {
 
 					def msg = "Ha llegado una anulaci�n de " + company.nombre + " con n�mero de referencia: " + cajamarUnderwrittingCaseManagementRequest.getRegScor().getNumref()
 
-					requestXML=cajamarService.marshall("http://www.scortelemed.com/schemas/cajamar",cajamarUnderwrittingCaseManagementRequest)
+					requestXML=cajamarService.marshall(cajamarUnderwrittingCaseManagementRequest)
 					requestBBDD = requestService.crear(opername,requestXML)
 
 					Recibido recibido = new Recibido()
@@ -159,7 +159,7 @@ class CajamarUnderwrittingCaseManagementService {
 
 					def msg = "Ha llegado una modificaci�n de " + company.nombre + " con n�mero de referencia: " + cajamarUnderwrittingCaseManagementRequest.getRegScor().getNumref()
 
-					requestXML=cajamarService.marshall("http://www.scortelemed.com/schemas/cajamar",cajamarUnderwrittingCaseManagementRequest)
+					requestXML=cajamarService.marshall(cajamarUnderwrittingCaseManagementRequest)
 					requestBBDD = requestService.crear(opername,requestXML)
 
 					Recibido recibido = new Recibido()
@@ -246,7 +246,7 @@ class CajamarUnderwrittingCaseManagementService {
 
 			if (operacion && operacion.activo){
 
-				requestXML=cajamarService.marshall("http://www.scortelemed.com/schemas/cajamar",consolidacionPoliza)
+				requestXML=cajamarService.marshall(consolidacionPoliza)
 				requestBBDD = requestService.crear(opername,requestXML)
 				requestBBDD.fecha_procesado = new Date()
 				requestBBDD.save(flush:true)

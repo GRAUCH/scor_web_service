@@ -97,7 +97,7 @@ class PsnUnderwrittingCaseManagementService	 {
 
 					logginService.putErrorEndpoint("GestionReconocimientoMedico", "Realizando peticion " + gestionReconocimientoMedico.getCandidateInformation().getOperation().toString() + " para " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber)
 
-					requestXML = psnService.marshall("http://www.scortelemed.com/schemas/psn", gestionReconocimientoMedico)
+					requestXML = psnService.marshall(gestionReconocimientoMedico)
 					requestBBDD = requestService.crear(opername, requestXML)
 					requestBBDD.fecha_procesado = new Date()
 					requestBBDD.save(flush: true)
@@ -126,7 +126,7 @@ class PsnUnderwrittingCaseManagementService	 {
 
 						if (gestionReconocimientoMedico.getCandidateInformation().getOperation().toString().equals("B")) {
 
-							requestXML = psnService.marshall("http://www.scortelemed.com/schemas/psn", gestionReconocimientoMedico)
+							requestXML = psnService.marshall(gestionReconocimientoMedico)
 							requestBBDD = requestService.crear(opername, requestXML)
 
 							Recibido recibido = new Recibido()
@@ -148,7 +148,7 @@ class PsnUnderwrittingCaseManagementService	 {
 
 						if (gestionReconocimientoMedico.getCandidateInformation().getOperation().toString().equals("M")) {
 
-							requestXML = psnService.marshall("http://www.scortelemed.com/schemas/psn", gestionReconocimientoMedico)
+							requestXML = psnService.marshall(gestionReconocimientoMedico)
 							requestBBDD = requestService.crear(opername, requestXML)
 
 							Recibido recibido = new Recibido()
@@ -246,7 +246,7 @@ class PsnUnderwrittingCaseManagementService	 {
 
 				if (resultadoReconocimientoMedico.numSolicitud != null && !resultadoReconocimientoMedico.numSolicitud.isEmpty()){
 
-					requestXML=psnService.marshall("http://www.scortelemed.com/schemas/psn",resultadoReconocimientoMedico)
+					requestXML=psnService.marshall(resultadoReconocimientoMedico)
 
 					requestService.crear(opername,requestXML)
 
@@ -391,7 +391,7 @@ class PsnUnderwrittingCaseManagementService	 {
 
 			if (operacion && operacion.activo){
 
-				requestXML=psnService.marshall("http://www.scortelemed.com/schemas/psn",consolidacionPoliza)
+				requestXML=psnService.marshall(consolidacionPoliza)
 				requestBBDD = requestService.crear(opername,requestXML)
 				requestBBDD.fecha_procesado = new Date()
 				requestBBDD.save(flush:true)
@@ -533,7 +533,7 @@ class PsnUnderwrittingCaseManagementService	 {
 
 				if ((consultaExpediente.numSolicitud != null && !consultaExpediente.numSolicitud.isEmpty()) || (consultaExpediente.numExpediente != null  && !consultaExpediente.numExpediente.isEmpty()) || (consultaExpediente.numSumplemento != null && !consultaExpediente.numSumplemento.isEmpty())){
 
-					requestXML=psnService.marshall("http://www.scortelemed.com/schemas/psn",consultaExpediente)
+					requestXML=psnService.marshall(consultaExpediente)
 
 					requestService.crear(opername,requestXML)
 
@@ -710,7 +710,7 @@ class PsnUnderwrittingCaseManagementService	 {
 
 							identificador = "nodo: " + consultaDocumento.nodoAlfresco.substring(consultaDocumento.nodoAlfresco.lastIndexOf("/")+1,consultaDocumento.nodoAlfresco.length())
 
-							requestXML=psnService.marshall("http://www.scortelemed.com/schemas/psn",consultaDocumento)
+							requestXML=psnService.marshall(consultaDocumento)
 
 							requestService.crear(opername,requestXML)
 
@@ -748,7 +748,7 @@ class PsnUnderwrittingCaseManagementService	 {
 
 							identificador = "documentacionId: " + consultaDocumento.documentacionId
 
-							requestXML=psnService.marshall("http://www.scortelemed.com/schemas/psn",consultaDocumento)
+							requestXML=psnService.marshall(consultaDocumento)
 
 							requestService.crear(opername,requestXML)
 

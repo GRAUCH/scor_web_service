@@ -93,7 +93,7 @@ class AmaUnderwrittingCaseManagementService	 {
 
 				if (Company.findByNombre("ama").generationAutomatic) {
 
-					requestXML=amaService.marshall("http://www.scortelemed.com/schemas/ama",gestionReconocimientoMedico)
+					requestXML=amaService.marshall(gestionReconocimientoMedico)
 					requestBBDD = requestService.crear(opername,requestXML)
 					requestBBDD.fecha_procesado = new Date()
 					requestBBDD.save(flush:true)
@@ -207,7 +207,7 @@ class AmaUnderwrittingCaseManagementService	 {
 
 				if (resultadoSiniestro && resultadoSiniestro.dateStart && resultadoSiniestro.dateEnd) {
 
-					requestXML=amaService.marshall("http://www.scortelemed.com/schemas/ama",resultadoSiniestro)
+					requestXML=amaService.marshall(resultadoSiniestro)
 					requestBBDD = requestService.crear(opername,requestXML)
 					requestBBDD.fecha_procesado = new Date()
 					requestBBDD.save(flush:true)
@@ -332,7 +332,7 @@ class AmaUnderwrittingCaseManagementService	 {
 
 			if (operacion && operacion.activo){
 
-				requestXML=amaService.marshall("http://www.scortelemed.com/schemas/ama",consolidacionPoliza)
+				requestXML=amaService.marshall(consolidacionPoliza)
 				requestBBDD = requestService.crear(opername,requestXML)
 				requestBBDD.fecha_procesado = new Date()
 				requestBBDD.save(flush:true)
@@ -465,7 +465,7 @@ class AmaUnderwrittingCaseManagementService	 {
 
 				if ((consultaExpediente.numSolicitud != null && !consultaExpediente.numSolicitud.isEmpty()) || (consultaExpediente.numExpediente != null  && !consultaExpediente.numExpediente.isEmpty()) || (consultaExpediente.numSumplemento != null && !consultaExpediente.numSumplemento.isEmpty())){
 
-					requestXML=amaService.marshall("http://www.scortelemed.com/schemas/ama",consultaExpediente)
+					requestXML=amaService.marshall(consultaExpediente)
 
 					requestService.crear(opername,requestXML)
 
@@ -647,7 +647,7 @@ class AmaUnderwrittingCaseManagementService	 {
 
 						if (amaService.existeDocumentoNodo(respuestaCRM,consultaDocumento.nodoAlfresco)) {
 
-							requestXML=amaService.marshall("http://www.scortelemed.com/schemas/ama",consultaDocumento)
+							requestXML=amaService.marshall(consultaDocumento)
 
 							requestService.crear(opername,requestXML)
 
@@ -693,7 +693,7 @@ class AmaUnderwrittingCaseManagementService	 {
 
 						if (amaService.existeDocumentoId(respuestaCRM,consultaDocumento.documentacionId)) {
 
-							requestXML=amaService.marshall("http://www.scortelemed.com/schemas/ama",consultaDocumento)
+							requestXML=amaService.marshall(consultaDocumento)
 
 							requestService.crear(opername,requestXML)
 

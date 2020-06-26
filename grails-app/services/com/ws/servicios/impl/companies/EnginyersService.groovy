@@ -35,7 +35,8 @@ class EnginyersService implements ICompanyService{
     TransformacionUtil util = new TransformacionUtil()
 
     @Override
-    String marshall(String nameSpace, def objeto) {
+    String marshall(def objeto) {
+        String nameSpace = "http://www.scortelemed.com/schemas/enginyers"
         String result
         try {
             if (objeto instanceof AddExp) {

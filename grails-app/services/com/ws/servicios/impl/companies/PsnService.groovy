@@ -38,7 +38,8 @@ class PsnService implements ICompanyService{
 	ContentResult contentResult = new ContentResult()
 
 	@Override
-	String marshall(String nameSpace, def objeto) {
+	String marshall(def objeto) {
+		String nameSpace = "http://www.scortelemed.com/schemas/psn"
 		String result
 		try{
 			if (objeto instanceof GestionReconocimientoMedicoRequest){
