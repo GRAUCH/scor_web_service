@@ -22,9 +22,7 @@ import org.springframework.web.context.request.RequestContextHolder
 import servicios.Filtro
 
 import com.scortelemed.Company
-import com.scortelemed.Envio
 import com.scortelemed.Operacion
-import com.scortelemed.Recibido
 import com.scortelemed.schemas.societegenerale.SocieteGeneraleUnderwrittingCaseManagementRequest
 import com.scortelemed.schemas.societegenerale.SocieteGeneraleUnderwrittingCaseManagementResponse
 import com.scortelemed.schemas.societegenerale.SocieteGeneraleUnderwrittingCasesResultsRequest
@@ -88,18 +86,8 @@ class SocieteGeneraleUnderwrittingCaseManagementService	 {
 				resultado.setMessage("The case has been successfully processed")
 				resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 				resultado.setStatus(StatusType.OK)
-				
-				/**Metemos en recibidos
-				 *
-				 */
-				Recibido recibido = new Recibido()
-				recibido.setFecha(new Date())
-				recibido.setCia(company.id.toString())
-				recibido.setIdentificador(societeGeneraleUnderwrittingCaseManagement.candidateInformation.requestNumber)
-				recibido.setInfo(requestBBDD.request)
-				recibido.setOperacion("ALTA")
-				recibido.save(flush:true)
-				
+				requestService.insertarRecibido(company, societeGeneraleUnderwrittingCaseManagement.candidateInformation.requestNumber, requestBBDD.request, "ALTA")
+
 				/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
 				 *
 				 */
@@ -121,19 +109,8 @@ class SocieteGeneraleUnderwrittingCaseManagementService	 {
 			resultado.setMessage("Error: " + e.printStackTrace())
 			resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 			resultado.setStatus(StatusType.ERROR)
-			
-			/**Metemos en errores
-			 *
-			 */
-			com.scortelemed.Error error = new com.scortelemed.Error()
-			error.setFecha(new Date())
-			error.setCia(company.id.toString())
-			error.setIdentificador(societeGeneraleUnderwrittingCaseManagement.candidateInformation.requestNumber)
-			error.setInfo(requestBBDD.request)
-			error.setOperacion("ALTA")
-			error.setError("Peticion no realizada para solicitud: " + societeGeneraleUnderwrittingCaseManagement.candidateInformation.requestNumber + ". Error: "+e.getMessage())
-			error.save(flush:true)
-			
+			requestService.insertarError(company, societeGeneraleUnderwrittingCaseManagement.candidateInformation.requestNumber, requestBBDD.request, "ALTA", "Peticion no realizada para solicitud: " + societeGeneraleUnderwrittingCaseManagement.candidateInformation.requestNumber + ". Error: "+e.getMessage())
+
 		}finally{
 			
 			def sesion=RequestContextHolder.currentRequestAttributes().getSession()
@@ -175,20 +152,11 @@ class SocieteGeneraleUnderwrittingCaseManagementService	 {
 				requestBBDD=requestService.crear(opername,requestXML)
 
 				Date date = societeGeneraleUnderwrittingCasesResults.dateStart.toGregorianCalendar().getTime()
-				SimpleDateFormat sdfr = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
-				String fechaIni = sdfr.format(date);
+				SimpleDateFormat sdfr = new SimpleDateFormat("yyyyMMdd HH:mm:ss")
+				String fechaIni = sdfr.format(date)
 				date = societeGeneraleUnderwrittingCasesResults.dateEnd.toGregorianCalendar().getTime()
-				String fechaFin = sdfr.format(date);
-				
-				/**Metemos en enviados
-				 *
-				 */
-				Envio envio = new Envio()
-				envio.setFecha(new Date())
-				envio.setCia(company.id.toString())
-				envio.setIdentificador(societeGeneraleUnderwrittingCasesResults.dateStart.toString() + "-" + societeGeneraleUnderwrittingCasesResults.dateEnd.toString())
-				envio.setInfo(requestXML.toString())
-				envio.save(flush:true)
+				String fechaFin = sdfr.format(date)
+				requestService.insertarEnvio(company, societeGeneraleUnderwrittingCasesResults.dateStart.toString() + "-" + societeGeneraleUnderwrittingCasesResults.dateEnd.toString(), requestXML.toString())
 
 				for (int i = 1; i < 3; i++){
 					if (Environment.current.name.equals("production_wildfly")) {
@@ -234,16 +202,8 @@ class SocieteGeneraleUnderwrittingCaseManagementService	 {
 			resultado.setNotes("Errore nel " + opername + ": " + e.getMessage())
 			resultado.setDate(societeGeneraleUnderwrittingCasesResults.dateStart)
 			resultado.setStatus(StatusType.ERROR)
-			
-			com.scortelemed.Error error = new com.scortelemed.Error()
-			error.setFecha(new Date())
-			error.setCia(company.id.toString())
-			error.setIdentificador(societeGeneraleUnderwrittingCasesResults.dateStart.toString() + "-" + societeGeneraleUnderwrittingCasesResults.dateEnd.toString())
-			error.setInfo(requestXML.toString())
-			error.setOperacion("CONSULTA")
-			error.setError(e.getMessage())
-			error.save(flush:true)
-			
+			requestService.insertarError(company, societeGeneraleUnderwrittingCasesResults.dateStart.toString() + "-" + societeGeneraleUnderwrittingCasesResults.dateEnd.toString(), requestXML.toString(), "CONSULTA", e.getMessage())
+
 		}finally{
 			
 			def sesion=RequestContextHolder.currentRequestAttributes().getSession()

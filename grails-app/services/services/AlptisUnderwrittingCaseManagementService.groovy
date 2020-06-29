@@ -17,7 +17,6 @@ import org.springframework.web.context.request.RequestContextHolder
 import servicios.Filtro
 
 import com.scortelemed.Company
-import com.scortelemed.Recibido
 import com.ws.alptis.beans.AlptisUnderwrittingCaseManagementRequest
 import com.ws.alptis.beans.AlptisUnderwrittingCaseManagementResponse
 import com.ws.enumeration.StatusType
@@ -34,7 +33,6 @@ class AlptisUnderwrittingCaseManagementService {
 	def estadisticasService
 	def expedienteService
 	def logginService
-	def francesasService
 	def tarificadorService
 
 	@WebResult(name = "AlptisUnderwrittingCaseManagementResponse")
@@ -73,19 +71,8 @@ class AlptisUnderwrittingCaseManagementService {
 
 						logginService.putInfoMessage("Se procede el alta automatica de Alptis con numero de solicitud " + alptisUnderwrittingCaseManagementRequest.policy.BasicPolicyGroup.policy_number)
 						expedienteService.crearExpediente(requestBBDD, TipoCompany.ALPTIS)
+						requestService.insertarRecibido(company, alptisUnderwrittingCaseManagementRequest.policy.BasicPolicyGroup.policy_number, requestBBDD.request, "ALTA")
 
-
-						/**Metemos en recibidos
-						 *
-						 */
-						Recibido recibido = new Recibido()
-						recibido.setFecha(new Date())
-						recibido.setCia(company.id.toString())
-						recibido.setIdentificador(alptisUnderwrittingCaseManagementRequest.policy.BasicPolicyGroup.policy_number)
-						recibido.setInfo(requestBBDD.request)
-						recibido.setOperacion("ALTA")
-						recibido.save(flush:true)
-										
 						/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
 						 *
 						 */
@@ -116,18 +103,8 @@ class AlptisUnderwrittingCaseManagementService {
 			correoUtil.envioEmailErrores(opername," Peticion no realizada para solicitud "+ alptisUnderwrittingCaseManagementRequest.policy.BasicPolicyGroup.policy_number.toString(),e)
 			resultado.setStatusType(StatusType.error)
 			resultado.setComments(opername+": "+e.getMessage())
+			requestService.insertarError(company, alptisUnderwrittingCaseManagementRequest.policy.BasicPolicyGroup.policy_number, requestBBDD.request, "ALTA", "Peticion no realizada para solicitud: " + alptisUnderwrittingCaseManagementRequest.policy.BasicPolicyGroup.policy_number + ". Error: "+e.getMessage())
 
-			/**Metemos en errores
-			 *
-			 */
-			com.scortelemed.Error error = new com.scortelemed.Error()
-			error.setFecha(new Date())
-			error.setCia(company.id.toString())
-			error.setIdentificador(alptisUnderwrittingCaseManagementRequest.policy.BasicPolicyGroup.policy_number)
-			error.setInfo(requestBBDD.request)
-			error.setOperacion("ALTA")
-			error.setError("Peticion no realizada para solicitud: " + alptisUnderwrittingCaseManagementRequest.policy.BasicPolicyGroup.policy_number + ". Error: "+e.getMessage())
-			error.save(flush:true)
 		} finally {
 
 			def sesion=RequestContextHolder.currentRequestAttributes().getSession()

@@ -10,13 +10,12 @@ import com.ws.lifesquare.beans.LifesquareUnderwrittingCasesResultsRequest
 import com.ws.lifesquare.beans.LifesquareUnderwrittingCasesResultsResponse
 import com.ws.lifesquare.beans.TuwCase
 import com.scortelemed.Company
-import com.scortelemed.Envio
 
 import hwsol.webservices.CorreoUtil
 
 import java.text.SimpleDateFormat
 
-import javax.jws.WebMethod;
+import javax.jws.WebMethod
 import javax.jws.WebParam
 import javax.jws.WebResult
 import javax.jws.WebService
@@ -24,7 +23,6 @@ import javax.jws.soap.SOAPBinding
 
 import org.apache.cxf.annotations.SchemaValidation
 import org.springframework.web.context.request.RequestContextHolder
-import org.springframework.security.core.context.SecurityContextHolder
 
 @WebService(targetNamespace = "http://www.scortelemed.com/schemas/lifesquare")
 @SchemaValidation
@@ -101,14 +99,9 @@ class LifesquareUnderwrittingCasesResultsService {
 					
 					
 					listTuwCases.each { caso ->
-						Envio envio = new Envio()
-						envio.setFecha(new Date())
-						envio.setCia(company.id.toString())
-						envio.setIdentificador(caso.policy_number!=null?caso.policy_number:caso.reference_number)
-						envio.setInfo("")
-						envio.save(flush:true)
-						
-						logginService.putInfoMessage("Informacion expediente " + envio.getIdentificador() + " enviado a " + company.nombre + " correctamente")
+						def identificador = caso.policy_number!=null?caso.policy_number:caso.reference_number
+						requestService.insertarEnvio(company, identificador, "")
+						logginService.putInfoMessage("Informacion expediente " + identificador + " enviado a " + company.nombre + " correctamente")
 						
 					}
 					

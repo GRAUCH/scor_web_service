@@ -19,7 +19,6 @@ import org.springframework.web.context.request.RequestContextHolder
 import servicios.Filtro
 
 import com.scortelemed.Company
-import com.scortelemed.Recibido
 import com.ws.enumeration.StatusType
 import com.ws.lifesquare.beans.LifesquareUnderwrittingCaseManagementRequest
 import com.ws.lifesquare.beans.LifesquareUnderwrittingCaseManagementResponse
@@ -78,21 +77,8 @@ class LifesquareUnderwrittingCaseManagementService {
 
 						logginService.putInfoMessage("Se procede el alta automatica de Lifesquare con numero de solicitud " + lifesquareUnderwrittingCaseManagementRequest.policy.policy_number)
 						expedienteService.crearExpediente(requestBBDD, TipoCompany.ZEN_UP)
+						requestService.insertarRecibido(company,lifesquareUnderwrittingCaseManagementRequest.policy.policy_number,requestBBDD.request,"ALTA")
 
-
-						/**Metemos en recibidos
-						 *
-						 */
-						Recibido recibido = new Recibido()
-						recibido.setFecha(new Date())
-						recibido.setCia(company.id.toString())
-						recibido.setIdentificador(lifesquareUnderwrittingCaseManagementRequest.policy.policy_number)
-						recibido.setInfo(requestBBDD.request)
-						recibido.setOperacion("ALTA")
-						recibido.save(flush:true)
-						
-						
-						
 						/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
 						 *
 						 */
@@ -119,19 +105,9 @@ class LifesquareUnderwrittingCaseManagementService {
 			correoUtil.envioEmailErrores(opername,"Peticion no realizada para solicitud: " + lifesquareUnderwrittingCaseManagementRequest.policy.policy_number.toString(),e)
 			resultado.setStatusType(StatusType.error)
 			resultado.setComments("Error en "+opername+ ": "+e.getMessage())
-			
-			/**Metemos en errores
-			 *
-			 */
-			com.scortelemed.Error error = new com.scortelemed.Error()
-			error.setFecha(new Date())
-			error.setCia(company.id.toString())
-			error.setIdentificador(lifesquareUnderwrittingCaseManagementRequest.policy.policy_number.toString())
-			error.setInfo(requestBBDD.request)
-			error.setOperacion("ALTA")
-			error.setError("Peticion no realizada para solicitud: " + lifesquareUnderwrittingCaseManagementRequest.policy.policy_number.toString() + "- Error: "+e.getMessage())
-			error.save(flush:true)
-			
+			requestService.insertarError(company, lifesquareUnderwrittingCaseManagementRequest.policy.policy_number.toString(), requestBBDD.request, "ALTA",
+										  "Peticion no realizada para solicitud: " + lifesquareUnderwrittingCaseManagementRequest.policy.policy_number.toString() + "- Error: "+e.getMessage())
+
 		} finally {
 
 			def sesion=RequestContextHolder.currentRequestAttributes().getSession()

@@ -26,7 +26,6 @@ import servicios.RespuestaCRM
 import servicios.RespuestaCRMInforme
 
 import com.scortelemed.Company
-import com.scortelemed.Envio
 import com.scortelemed.Operacion
 import com.scortelemed.schemas.ama.ConsolidacionPolizaRequest
 import com.scortelemed.schemas.ama.ConsolidacionPolizaResponse
@@ -518,17 +517,7 @@ class AmaUnderwrittingCaseManagementService	 {
 						logginService.putInfoMessage("Datos obligatorios incompletos. Es necesario indicar numExpediente o numSolicitud o numSolicitud+numSuplemento." + company.nombre)
 						return resultado
 					}
-
-					/**Metemos en enviados
-					 *
-					 */
-					Envio envio = new Envio()
-					envio.setFecha(new Date())
-					envio.setCia(company.id.toString())
-					envio.setIdentificador(identificador)
-					envio.setInfo(requestXML.toString())
-					envio.save(flush:true)
-
+					requestService.insertarEnvio(company, identificador, requestXML.toString())
 
 					respuestaCRM = amaService.informeExpedientePorFiltro(filtro,"ES")
 
@@ -584,15 +573,8 @@ class AmaUnderwrittingCaseManagementService	 {
 			resultado.setNotes("Error en consultaExpediente: " + e.getMessage())
 			resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 			resultado.setStatus(StatusType.ERROR)
+			requestService.insertarError(company, identificador, requestXML.toString(), "CONSULTA EXPEDIENTE", e.getMessage())
 
-			com.scortelemed.Error error = new com.scortelemed.Error()
-			error.setFecha(new Date())
-			error.setCia(company.id.toString())
-			error.setIdentificador(identificador)
-			error.setInfo(requestXML.toString())
-			error.setOperacion("CONSULTA EXPEDIENTE")
-			error.setError(e.getMessage())
-			error.save(flush:true)
 		}finally{
 			//BORRAMOS VARIABLES DE SESION
 			def sesion=RequestContextHolder.currentRequestAttributes().getSession()
@@ -641,17 +623,7 @@ class AmaUnderwrittingCaseManagementService	 {
 
 							requestXML=amaService.marshall(consultaDocumento)
 							requestBBDD=requestService.crear(opername,requestXML)
-
-
-							/**Metemos en enviados
-							 *
-							 */
-							Envio envio = new Envio()
-							envio.setFecha(new Date())
-							envio.setCia(company.id.toString())
-							envio.setIdentificador(consultaDocumento.nodoAlfresco.substring(consultaDocumento.nodoAlfresco.lastIndexOf("/")+1,consultaDocumento.nodoAlfresco.length()))
-							envio.setInfo(requestXML.toString())
-							envio.save(flush:true)
+							requestService.insertarEnvio(company, consultaDocumento.nodoAlfresco.substring(consultaDocumento.nodoAlfresco.lastIndexOf("/")+1,consultaDocumento.nodoAlfresco.length()), requestXML.toString())
 
 							resultado.setDocumento(amaService.rellenaDatosSalidaDocumentoNodo(consultaDocumento.nodoAlfresco, util.fromDateToXmlCalendar(new Date()), logginService, consultaDocumento.codigoSt))
 
@@ -686,16 +658,7 @@ class AmaUnderwrittingCaseManagementService	 {
 
 							requestXML=amaService.marshall(consultaDocumento)
 							requestBBDD=requestService.crear(opername,requestXML)
-
-							/**Metemos en enviados
-							 *
-							 */
-							Envio envio = new Envio()
-							envio.setFecha(new Date())
-							envio.setCia(company.id.toString())
-							envio.setIdentificador(consultaDocumento.documentacionId)
-							envio.setInfo(requestXML.toString())
-							envio.save(flush:true)
+							requestService.insertarEnvio(company, consultaDocumento.documentacionId, requestXML.toString())
 
 							resultado.setDocumento(amaService.rellenaDatosSalidaDocumentoId(consultaDocumento.documentacionId, util.fromDateToXmlCalendar(new Date()), logginService, consultaDocumento.codigoSt))
 
@@ -751,15 +714,8 @@ class AmaUnderwrittingCaseManagementService	 {
 			resultado.setMessage("Error en consultaExpediente: " + e.getMessage())
 			resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 			resultado.setStatus(StatusType.ERROR)
+			requestService.insertarError(company, consultaDocumento.nodoAlfresco.substring(consultaDocumento.nodoAlfresco.lastIndexOf("/")+1,consultaDocumento.nodoAlfresco.length()), requestXML.toString(), "CONSULTA DOCUMENTO", e.getMessage())
 
-			com.scortelemed.Error error = new com.scortelemed.Error()
-			error.setFecha(new Date())
-			error.setCia(company.id.toString())
-			error.setIdentificador(consultaDocumento.nodoAlfresco.substring(consultaDocumento.nodoAlfresco.lastIndexOf("/")+1,consultaDocumento.nodoAlfresco.length()))
-			error.setInfo(requestXML.toString())
-			error.setOperacion("CONSULTA DOCUMENTO")
-			error.setError(e.getMessage())
-			error.save(flush:true)
 		}finally{
 			//BORRAMOS VARIABLES DE SESION
 			def sesion=RequestContextHolder.currentRequestAttributes().getSession()

@@ -1,8 +1,6 @@
 package services
 
 import com.scortelemed.Company
-import com.scortelemed.Envio
-import com.scortelemed.Recibido
 import com.scortelemed.TipoCompany
 import com.ws.enumeration.StatusType
 import com.ws.enumeration.TipoDictamenType
@@ -80,23 +78,13 @@ class GestionReconocimientosMedicosService {
                     requestBBDD = requestService.crear(opername, requestXML)
 
                     expedienteService.crearExpediente(requestBBDD, TipoCompany.LAGUN_ARO)
+                    requestService.insertarRecibido(company, gestionReconocimientoMedicoRequest.poliza.cod_poliza, requestBBDD.request, "ALTA")
 
                     resultado.setMensaje("El caso se ha procesado correctamente")
                     resultado.setFecha(new Date())
                     resultado.setStatusType(StatusType.ok)
 
                     logginService.putInfoMessage("Se procede el alta automatica de Lagunaro con numero de solicitud " + gestionReconocimientoMedicoRequest.poliza.cod_poliza)
-
-                    /**Metemos en recibidos
-                     *
-                     */
-                    Recibido recibido = new Recibido()
-                    recibido.setFecha(new Date())
-                    recibido.setCia(company.id.toString())
-                    recibido.setIdentificador(gestionReconocimientoMedicoRequest.poliza.cod_poliza)
-                    recibido.setInfo(requestBBDD.request)
-                    recibido.setOperacion("ALTA")
-                    recibido.save(flush: true)
 
                     /**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
                      *
@@ -115,17 +103,7 @@ class GestionReconocimientosMedicosService {
 
                     requestXML = requestService.marshall(gestionReconocimientoMedicoRequest, GestionReconocimientoMedicoRequest.class)
                     requestBBDD = requestService.crear(opername, requestXML)
-
-                    /**Metemos en recibidos
-                     *
-                     */
-                    Recibido recibido = new Recibido()
-                    recibido.setFecha(new Date())
-                    recibido.setCia(company.id.toString())
-                    recibido.setIdentificador(gestionReconocimientoMedicoRequest.poliza.cod_poliza)
-                    recibido.setInfo(requestBBDD.request)
-                    recibido.setOperacion("CANCELACION")
-                    recibido.save(flush: true)
+                    requestService.insertarRecibido(company, gestionReconocimientoMedicoRequest.poliza.cod_poliza, requestBBDD.request, "CANCELACION")
 
                     resultado.setMensaje("El baja se ha procesado correctamente")
                     resultado.setFecha(new Date())
@@ -153,18 +131,7 @@ class GestionReconocimientosMedicosService {
             resultado.setMensaje("Error: " + "Peticion no realizada para solicitud: " + gestionReconocimientoMedicoRequest.poliza.cod_poliza + " y certificado: " + gestionReconocimientoMedicoRequest.poliza.certificado)
             resultado.setFecha(new Date())
             resultado.setStatusType(StatusType.error)
-
-            /**Metemos en errores
-             *
-             */
-            com.scortelemed.Error error = new com.scortelemed.Error()
-            error.setFecha(new Date())
-            error.setCia(company.id.toString())
-            error.setIdentificador(gestionReconocimientoMedicoRequest.poliza.cod_poliza)
-            error.setInfo(requestBBDD.request)
-            error.setOperacion("ALTA")
-            error.setError("Peticion no realizada para solicitud: " + gestionReconocimientoMedicoRequest.poliza.cod_poliza + " y certificado: " + gestionReconocimientoMedicoRequest.poliza.certificado + ". Error: " + e.getMessage())
-            error.save(flush: true)
+            requestService.insertarError(company, gestionReconocimientoMedicoRequest.poliza.cod_poliza, requestBBDD.request, "ALTA", "Peticion no realizada para solicitud: " + gestionReconocimientoMedicoRequest.poliza.cod_poliza + " y certificado: " + gestionReconocimientoMedicoRequest.poliza.certificado + ". Error: " + e.getMessage())
 
         } finally {
 
@@ -264,13 +231,7 @@ class GestionReconocimientosMedicosService {
                     if (it.zip) {
                         polizaBasicaGroup.zip = it.zip.toString()
                     }
-
-                    Envio envio = new Envio()
-                    envio.setFecha(new Date())
-                    envio.setCia(company.id.toString())
-                    envio.setIdentificador(polizaBasicaGroup.cod_poliza)
-                    envio.setInfo("Peticion realizada para fecha: " + tramitacionReconocimientoMedicoRequest.fecha + " poliza " + polizaBasicaGroup.cod_poliza + ", certificado: " + polizaBasicaGroup.certificado + " movimiento " + polizaBasicaGroup.movimiento)
-                    envio.save(flush: true)
+                    requestService.insertarEnvio(company, polizaBasicaGroup.cod_poliza, "Peticion realizada para fecha: " + tramitacionReconocimientoMedicoRequest.fecha + " poliza " + polizaBasicaGroup.cod_poliza + ", certificado: " + polizaBasicaGroup.certificado + " movimiento " + polizaBasicaGroup.movimiento)
 
                     listPolizaBasicaGroup.add(polizaBasicaGroup)
                     logginService.putInfoEndpoint("Endpoint-" + opername, "Peticion realizada para fecha: " + tramitacionReconocimientoMedicoRequest.fecha + " poliza " + polizaBasicaGroup.cod_poliza + ", certificado: " + polizaBasicaGroup.certificado + " mofivimiento " + polizaBasicaGroup.movimiento)
@@ -287,29 +248,13 @@ class GestionReconocimientosMedicosService {
             } else {
                 result.setStatusType(StatusType.error)
                 result.setObservaciones("La operacion esta desactivada temporalmente.")
-
-                com.scortelemed.Error error = new com.scortelemed.Error()
-                error.setFecha(new Date())
-                error.setCia(company.id.toString())
-                error.setIdentificador()
-                error.setInfo(tramitacionReconocimientoMedicoRequest.fecha)
-                error.setOperacion("CONSULTA")
-                error.setError("La operacion esta desactivada temporalmente")
-                error.save(flush: true)
+                requestService.insertarError(company, "", tramitacionReconocimientoMedicoRequest.fecha.toString(), "CONSULTA", "La operacion esta desactivada temporalmente")
 
                 logginService.putInfoEndpoint("Endpoint-" + opername, "Peticion no realizada para fecha: " + tramitacionReconocimientoMedicoRequest.fecha)
 
             }
         } catch (Exception e) {
-
-            com.scortelemed.Error error = new com.scortelemed.Error()
-            error.setFecha(new Date())
-            error.setCia(company.id.toString())
-            error.setIdentificador()
-            error.setInfo(tramitacionReconocimientoMedicoRequest.fecha)
-            error.setOperacion("CONSULTA")
-            error.setError("Endpoint-" + opername, "Peticion no realizada para fecha: " + tramitacionReconocimientoMedicoRequest.fecha + "- Error: " + e)
-            error.save(flush: true)
+            requestService.insertarError(company, "", tramitacionReconocimientoMedicoRequest.fecha.toString(), "CONSULTA", "Peticion no realizada para fecha: " + tramitacionReconocimientoMedicoRequest.fecha.toString() + "- Error: " + e.getMessage())
             logginService.putErrorEndpoint("Endpoint-" + opername, "Peticion no realizada para fecha: " + tramitacionReconocimientoMedicoRequest.fecha + "- Error: " + e)
             correoUtil.envioEmailErrores("TramitacionReconocimientoMedicoRequest", "Peticion no realizada para fecha: " + tramitacionReconocimientoMedicoRequest.fecha, e)
             result.setStatusType(StatusType.error)

@@ -21,9 +21,7 @@ import org.springframework.web.context.request.RequestContextHolder
 import servicios.Filtro
 
 import com.scortelemed.Company
-import com.scortelemed.Envio
 import com.scortelemed.Operacion
-import com.scortelemed.Recibido
 import com.scortelemed.schemas.netinsurance.StatusType
 import com.scortelemed.schemas.simplefr.SimplefrUnderwrittingCaseManagementRequest
 import com.scortelemed.schemas.simplefr.SimplefrUnderwrittingCaseManagementResponse
@@ -31,7 +29,6 @@ import com.scortelemed.schemas.simplefr.SimplefrUnderwrittingCasesResultsRequest
 import com.scortelemed.schemas.simplefr.SimplefrUnderwrittingCasesResultsResponse
 import com.ws.servicios.EstadisticasService
 import com.ws.servicios.LogginService
-import com.ws.servicios.impl.RequestService
 import com.ws.servicios.impl.companies.SimplefrService
 import com.ws.servicios.TarificadorService
 
@@ -43,12 +40,11 @@ expose = EndpointType.JAX_WS,properties = [@GrailsCxfEndpointProperty(name = "ws
 class SimplefrUnderwrittingCaseManagementService	 {
 
 	def expedienteService
+	def requestService
 	@Autowired
 	private SimplefrService simplefrService
 	@Autowired
 	private EstadisticasService estadisticasService
-	@Autowired
-	private RequestService requestService
 	@Autowired
 	private LogginService logginService
 	@Autowired
@@ -86,18 +82,8 @@ class SimplefrUnderwrittingCaseManagementService	 {
 				resultado.setMessage("The case has been successfully processed")
 				resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 				resultado.setStatus(StatusType.OK)
-				
-				/**Metemos en recibidos
-				 *
-				 */
-				Recibido recibido = new Recibido()
-				recibido.setFecha(new Date())
-				recibido.setCia(company.id.toString())
-				recibido.setIdentificador(simplefrUnderwrittingCaseManagement.candidateInformation.requestNumber)
-				recibido.setInfo(requestBBDD.request)
-				recibido.setOperacion("ALTA")
-				recibido.save(flush:true)
-				
+				requestService.insertarRecibido(company, simplefrUnderwrittingCaseManagement.candidateInformation.requestNumber, requestBBDD.request, "ALTA")
+
 				/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
 				 *
 				 */
@@ -119,19 +105,9 @@ class SimplefrUnderwrittingCaseManagementService	 {
 			resultado.setMessage("Error: " + e.printStackTrace())
 			resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 			resultado.setStatus(StatusType.ERROR)
-			
-			/**Metemos en errores
-			 *
-			 */
-			com.scortelemed.Error error = new com.scortelemed.Error()
-			error.setFecha(new Date())
-			error.setCia(company.id.toString())
-			error.setIdentificador(simplefrUnderwrittingCaseManagement.candidateInformation.requestNumber)
-			error.setInfo(requestBBDD.request)
-			error.setOperacion("ALTA")
-			error.setError("Peticion no realizada para solicitud: " + simplefrUnderwrittingCaseManagement.candidateInformation.requestNumber + ". Error: "+e.getMessage())
-			error.save(flush:true)
-			
+			requestService.insertarError(company, simplefrUnderwrittingCaseManagement.candidateInformation.requestNumber, requestBBDD.request, "ALTA",
+										  "Peticion no realizada para solicitud: " + simplefrUnderwrittingCaseManagement.candidateInformation.requestNumber + ". Error: "+e.getMessage())
+
 		}finally{
 			
 			def sesion=RequestContextHolder.currentRequestAttributes().getSession()
@@ -153,7 +129,6 @@ class SimplefrUnderwrittingCaseManagementService	 {
 		def expedientes
 		def company = Company.findByNombre('simplefr')
 		def estadisticasService = new EstadisticasService()
-		def requestService = new RequestService()
 		def tarificadorService = new TarificadorService()
 		def logginService = new LogginService()
 		def requestBBDD
@@ -174,20 +149,11 @@ class SimplefrUnderwrittingCaseManagementService	 {
 				requestBBDD=requestService.crear(opername,requestXML)
 
 				Date date = simpleUnderwrittingCasesResults.dateStart.toGregorianCalendar().getTime()
-				SimpleDateFormat sdfr = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
-				String fechaIni = sdfr.format(date);
+				SimpleDateFormat sdfr = new SimpleDateFormat("yyyyMMdd HH:mm:ss")
+				String fechaIni = sdfr.format(date)
 				date = simpleUnderwrittingCasesResults.dateEnd.toGregorianCalendar().getTime()
-				String fechaFin = sdfr.format(date);
-				
-				/**Metemos en enviados
-				 *
-				 */
-				Envio envio = new Envio()
-				envio.setFecha(new Date())
-				envio.setCia(company.id.toString())
-				envio.setIdentificador(simpleUnderwrittingCasesResults.dateStart.toString() + "-" + simpleUnderwrittingCasesResults.dateEnd.toString())
-				envio.setInfo(requestXML.toString())
-				envio.save(flush:true)
+				String fechaFin = sdfr.format(date)
+				requestService.insertarEnvio(company, simpleUnderwrittingCasesResults.dateStart.toString() + "-" + simpleUnderwrittingCasesResults.dateEnd.toString(), requestXML.toString())
 
 				for (int i = 1; i < 3; i++){
 					if (Environment.current.name.equals("production_wildfly")) {
@@ -233,16 +199,8 @@ class SimplefrUnderwrittingCaseManagementService	 {
 			resultado.setNotes("Errore nel " + opername + ": " + e.getMessage())
 			resultado.setDate(simpleUnderwrittingCasesResults.dateStart)
 			resultado.setStatus(StatusType.ERROR)
-			
-			com.scortelemed.Error error = new com.scortelemed.Error()
-			error.setFecha(new Date())
-			error.setCia(company.id.toString())
-			error.setIdentificador(simpleUnderwrittingCasesResults.dateStart.toString() + "-" + simpleUnderwrittingCasesResults.dateEnd.toString())
-			error.setInfo(requestXML.toString())
-			error.setOperacion("CONSULTA")
-			error.setError(e.getMessage())
-			error.save(flush:true)
-			
+			requestService.insertarError(company, simpleUnderwrittingCasesResults.dateStart.toString() + "-" + simpleUnderwrittingCasesResults.dateEnd.toString(), requestXML.toString(), "CONSULTA", e.getMessage())
+
 		}finally{
 			
 			def sesion=RequestContextHolder.currentRequestAttributes().getSession()

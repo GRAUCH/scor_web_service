@@ -23,7 +23,6 @@ import servicios.Filtro
 import servicios.RespuestaCRM
 
 import com.scortelemed.Company
-import com.scortelemed.Recibido
 import com.ws.cajamar.beans.CajamarUnderwrittingCaseManagementRequest
 import com.ws.cajamar.beans.CajamarUnderwrittingCaseManagementResponse
 import com.ws.cajamar.beans.ConsolidacionPolizaRequest
@@ -102,18 +101,7 @@ class CajamarUnderwrittingCaseManagementService {
 					resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 
 					logginService.putInfoMessage("Se procede el alta automatica de " + company.nombre + " con numero de solicitud " + cajamarUnderwrittingCaseManagementRequest.regScor.numref)
-
-
-					/**Metemos en recibidos
-					 *
-					 */
-					Recibido recibido = new Recibido()
-					recibido.setFecha(new Date())
-					recibido.setCia(company.id.toString())
-					recibido.setIdentificador(cajamarUnderwrittingCaseManagementRequest.regScor.numref)
-					recibido.setInfo(requestBBDD.request)
-					recibido.setOperacion("ALTA")
-					recibido.save(flush:true)
+					requestService.insertarRecibido(company, cajamarUnderwrittingCaseManagementRequest.regScor.numref, requestBBDD.request, "ALTA")
 
 					/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
 					 * 
@@ -131,14 +119,7 @@ class CajamarUnderwrittingCaseManagementService {
 
 					requestXML=cajamarService.marshall(cajamarUnderwrittingCaseManagementRequest)
 					requestBBDD = requestService.crear(opername,requestXML)
-
-					Recibido recibido = new Recibido()
-					recibido.setFecha(new Date())
-					recibido.setCia(company.id.toString())
-					recibido.setIdentificador(cajamarUnderwrittingCaseManagementRequest.regScor.numref)
-					recibido.setInfo(requestBBDD.request)
-					recibido.setOperacion("ANULACION")
-					recibido.save(flush:true)
+					requestService.insertarRecibido(company, cajamarUnderwrittingCaseManagementRequest.regScor.numref, requestBBDD.request, "ANULACION")
 					
 					resultado.setComments("El caso se ha procesado correctamente")
 					resultado.setStatus(StatusType.OK)
@@ -160,14 +141,7 @@ class CajamarUnderwrittingCaseManagementService {
 
 					requestXML=cajamarService.marshall(cajamarUnderwrittingCaseManagementRequest)
 					requestBBDD = requestService.crear(opername,requestXML)
-
-					Recibido recibido = new Recibido()
-					recibido.setFecha(new Date())
-					recibido.setCia(company.id.toString())
-					recibido.setIdentificador(cajamarUnderwrittingCaseManagementRequest.regScor.numref)
-					recibido.setInfo(requestBBDD.request)
-					recibido.setOperacion("MODIFICACION")
-					recibido.save(flush:true)
+					requestService.insertarRecibido(company, cajamarUnderwrittingCaseManagementRequest.regScor.numref, requestBBDD.request, "MODIFICACION")
 					
 					resultado.setComments("El caso se ha procesado correctamente")
 					resultado.setStatus(StatusType.OK)
@@ -197,18 +171,7 @@ class CajamarUnderwrittingCaseManagementService {
 			resultado.setComments("Error: " + e.printStackTrace())
 			resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 			resultado.setStatus(StatusType.ERROR)
-
-			/**Metemos en errores
-			 * 
-			 */
-			com.scortelemed.Error error = new com.scortelemed.Error()
-			error.setFecha(new Date())
-			error.setCia(company.id.toString())
-			error.setIdentificador(cajamarUnderwrittingCaseManagementRequest.regScor.numref)
-			error.setInfo(requestBBDD.request)
-			error.setOperacion("ALTA")
-			error.setError("Peticion no realizada para solicitud: " + cajamarUnderwrittingCaseManagementRequest.regScor.numref + "- Error: "+e.getMessage())
-			error.save(flush:true)
+			requestService.insertarError(company, cajamarUnderwrittingCaseManagementRequest.regScor.numref, requestBBDD.request, "ALTA", "Peticion no realizada para solicitud: " + cajamarUnderwrittingCaseManagementRequest.regScor.numref + "- Error: "+e.getMessage())
 
 		}finally{
 
@@ -247,18 +210,7 @@ class CajamarUnderwrittingCaseManagementService {
 
 				requestXML=cajamarService.marshall(consolidacionPoliza)
 				requestBBDD = requestService.crear(opername,requestXML)
-
-				/**Metemos en recibidos
-				 *
-				 */
-				Recibido recibido = new Recibido()
-				recibido.setFecha(new Date())
-				recibido.setCia(consolidacionPoliza.ciaCode)
-				recibido.setIdentificador(consolidacionPoliza.requestNumber)
-				recibido.setInfo(requestXML.toString())
-				recibido.setOperacion("CONSOLIDACION")
-				recibido.save(flush:true)
-
+				requestService.insertarRecibido(company, consolidacionPoliza.requestNumber, requestXML.toString(), "CONSOLIDACION")
 
 				if (consolidacionPoliza.requestNumber != null && !consolidacionPoliza.requestNumber.isEmpty() != null && consolidacionPoliza.ciaCode !=null && !consolidacionPoliza.ciaCode.isEmpty() && consolidacionPoliza.policyNumber != null && !consolidacionPoliza.policyNumber.isEmpty()){
 
@@ -279,19 +231,8 @@ class CajamarUnderwrittingCaseManagementService {
 							resultado.setCodigo(0)
 
 							logginService.putInfoEndpoint("Endpoint-"+opername,"Error en la modificacion para NUM_SOLICITUD: " + consolidacionPoliza.requestNumber + ", ciaCode: " + consolidacionPoliza.ciaCode +". Error: " + respuestaCrmExpediente.getErrorCRM().getDetalle())
+							requestService.insertarError(company, consolidacionPoliza.requestNumber, requestXML.toString(), opername, respuestaCrmExpediente.getErrorCRM().getDetalle())
 
-
-							/**Metemos en errores
-							 *
-							 */
-							com.scortelemed.Error error = new com.scortelemed.Error()
-							error.setFecha(new Date())
-							error.setCia(company.id.toString())
-							error.setIdentificador(consolidacionPoliza.requestNumber)
-							error.setInfo(requestXML.toString())
-							error.setOperacion(opername)
-							error.setError(respuestaCrmExpediente.getErrorCRM().getDetalle())
-							error.save(flush:true)
 						} else {
 
 							resultado.setMessage("El caso se ha procesado correctamente")
@@ -332,17 +273,8 @@ class CajamarUnderwrittingCaseManagementService {
 			resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 			resultado.setStatus(StatusType.ERROR)
 			resultado.setCodigo(4)
-			/**Metemos en errores
-			 *
-			 */
-			com.scortelemed.Error error = new com.scortelemed.Error()
-			error.setFecha(new Date())
-			error.setCia(company.id.toString())
-			error.setIdentificador(consolidacionPoliza.requestNumber)
-			error.setInfo(requestXML.toString())
-			error.setOperacion(opername)
-			error.setError(e.getMessage())
-			error.save(flush:true)
+			requestService.insertarError(company, consolidacionPoliza.requestNumber, requestXML.toString(), opername, e.getMessage())
+
 		}finally{
 
 			def sesion=RequestContextHolder.currentRequestAttributes().getSession()

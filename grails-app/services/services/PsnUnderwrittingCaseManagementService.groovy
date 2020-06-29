@@ -1,6 +1,5 @@
 package services
 
-import com.scortelemed.Recibido
 import com.scortelemed.TipoCompany
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
@@ -126,14 +125,7 @@ class PsnUnderwrittingCaseManagementService	 {
 
 							requestXML = psnService.marshall(gestionReconocimientoMedico)
 							requestBBDD = requestService.crear(opername, requestXML)
-
-							Recibido recibido = new Recibido()
-							recibido.setFecha(new Date())
-							recibido.setCia(company.id.toString())
-							recibido.setIdentificador(gestionReconocimientoMedico.candidateInformation.requestNumber)
-							recibido.setInfo(requestBBDD.request)
-							recibido.setOperacion("BAJA")
-							recibido.save(flush: true)
+							requestService.insertarRecibido(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestBBDD.request, "BAJA")
 
 							message = "La baja se ha procesado correctamente"
 							status = StatusType.OK
@@ -148,14 +140,7 @@ class PsnUnderwrittingCaseManagementService	 {
 
 							requestXML = psnService.marshall(gestionReconocimientoMedico)
 							requestBBDD = requestService.crear(opername, requestXML)
-
-							Recibido recibido = new Recibido()
-							recibido.setFecha(new Date())
-							recibido.setCia(company.id.toString())
-							recibido.setIdentificador(gestionReconocimientoMedico.candidateInformation.requestNumber)
-							recibido.setInfo(requestBBDD.request)
-							recibido.setOperacion("MODIFICACION")
-							recibido.save(flush: true)
+							requestService.insertarRecibido(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestBBDD.request, "MODIFICACION")
 
 							message = "La modificacion se ha procesado correctamente"
 							status = StatusType.OK
