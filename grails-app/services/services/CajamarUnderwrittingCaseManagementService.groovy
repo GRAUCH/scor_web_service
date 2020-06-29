@@ -95,8 +95,7 @@ class CajamarUnderwrittingCaseManagementService {
 
 					requestXML=cajamarService.marshall(cajamarUnderwrittingCaseManagementRequest)
 					requestBBDD = requestService.crear(opername,requestXML)
-					requestBBDD.fecha_procesado = new Date()
-					requestBBDD.save(flush:true)
+
 					expedienteService.crearExpediente(requestBBDD, TipoCompany.CAJAMAR)
 					resultado.setComments("El caso se ha procesado correctamente")
 					resultado.setStatus(StatusType.OK)
@@ -248,8 +247,6 @@ class CajamarUnderwrittingCaseManagementService {
 
 				requestXML=cajamarService.marshall(consolidacionPoliza)
 				requestBBDD = requestService.crear(opername,requestXML)
-				requestBBDD.fecha_procesado = new Date()
-				requestBBDD.save(flush:true)
 
 				/**Metemos en recibidos
 				 *

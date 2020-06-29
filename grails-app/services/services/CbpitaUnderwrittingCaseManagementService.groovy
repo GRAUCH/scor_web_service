@@ -80,8 +80,6 @@ class CbpitaUnderwrittingCaseManagementService {
 
                     requestXML = cbpitaService.marshall(cbpitaUnderwrittingCaseManagementRequest)
                     requestBBDD = requestService.crear(opername, requestXML)
-                    requestBBDD.fecha_procesado = new Date()
-                    requestBBDD.save(flush: true)
 
                     wsErrors = cbpitaService.validarDatosObligatorios(requestBBDD)
 
@@ -216,6 +214,7 @@ class CbpitaUnderwrittingCaseManagementService {
 
         def opername = "cbpitaUnderwrittingCaseManagementResponse"
         def requestXML = ""
+        def requestBBDD
         List<RespuestaCRMInforme> expedientes = new ArrayList<RespuestaCRMInforme>()
         TransformacionUtil util = new TransformacionUtil()
         CorreoUtil correoUtil = new CorreoUtil()
@@ -243,8 +242,7 @@ class CbpitaUnderwrittingCaseManagementService {
                     if (cbpitaUnderwrittingCasesResultsRequest && cbpitaUnderwrittingCasesResultsRequest.dateStart && cbpitaUnderwrittingCasesResultsRequest.dateEnd) {
 
                         requestXML = cbpitaService.marshall(cbpitaUnderwrittingCasesResultsRequest)
-
-                        requestService.crear(opername, requestXML)
+                        requestBBDD = requestService.crear(opername, requestXML)
 
                         Calendar calendarIni = Calendar.getInstance()
                         Date date = cbpitaUnderwrittingCasesResultsRequest.dateStart.toGregorianCalendar().getTime()

@@ -43,6 +43,7 @@ expose = EndpointType.JAX_WS,properties = [@GrailsCxfEndpointProperty(name = "ws
 @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
 class SocieteGeneraleUnderwrittingCaseManagementService	 {
 
+	def requestService
 	def expedienteService
 	@Autowired
 	private SocieteGeneraleService societeGeneraleService
@@ -82,8 +83,7 @@ class SocieteGeneraleUnderwrittingCaseManagementService	 {
 			if (operacion && operacion.activo){
 				requestXML=societeGeneraleService.marshall(societeGeneraleUnderwrittingCaseManagement)
 				requestBBDD = requestService.crear(opername,requestXML)
-				requestBBDD.fecha_procesado = new Date()
-				requestBBDD.save(flush:true)
+
 				expedienteService.crearExpediente(requestBBDD, TipoCompany.SOCIETE_GENERALE)
 				resultado.setMessage("The case has been successfully processed")
 				resultado.setDate(util.fromDateToXmlCalendar(new Date()))
@@ -155,7 +155,6 @@ class SocieteGeneraleUnderwrittingCaseManagementService	 {
 		def expedientes
 		def company = Company.findByNombre('simplefr')
 		def estadisticasService = new EstadisticasService()
-		def requestService = new RequestService()
 		def tarificadorService = new TarificadorService()
 		def logginService = new LogginService()
 		def requestBBDD
@@ -173,8 +172,7 @@ class SocieteGeneraleUnderwrittingCaseManagementService	 {
 			if(operacion && operacion.activo && societeGeneraleUnderwrittingCasesResults && societeGeneraleUnderwrittingCasesResults.dateStart && societeGeneraleUnderwrittingCasesResults.dateEnd){
 
 				requestXML=societeGeneraleService.marshall(societeGeneraleUnderwrittingCasesResults)
-
-				requestService.crear(opername,requestXML)
+				requestBBDD=requestService.crear(opername,requestXML)
 
 				Date date = societeGeneraleUnderwrittingCasesResults.dateStart.toGregorianCalendar().getTime()
 				SimpleDateFormat sdfr = new SimpleDateFormat("yyyyMMdd HH:mm:ss");

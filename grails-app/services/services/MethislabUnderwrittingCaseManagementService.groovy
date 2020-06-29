@@ -74,8 +74,6 @@ class MethislabUnderwrittingCaseManagementService {
 
 					requestXML=methislabService.marshall(methislabUnderwrittingCaseManagementRequest)
 					requestBBDD = requestService.crear(opername,requestXML)
-					requestBBDD.fecha_procesado = new Date()
-					requestBBDD.save(flush:true)
 
 					wsErrors = methislabService.validarDatosObligatorios(requestBBDD)
 
@@ -153,6 +151,7 @@ class MethislabUnderwrittingCaseManagementService {
 
 		def opername="MethislabUnderwrittingCaseManagementResponse"
 		def requestXML = ""
+		def requestBBDD
 		List<RespuestaCRMInforme> expedientes = new ArrayList<RespuestaCRMInforme>();
 		TransformacionUtil util = new TransformacionUtil()
 		CorreoUtil correoUtil = new CorreoUtil()
@@ -174,8 +173,7 @@ class MethislabUnderwrittingCaseManagementService {
 				if (methislabUnderwrittingCasesResults && methislabUnderwrittingCasesResults.dateStart && methislabUnderwrittingCasesResults.dateEnd){
 
 					requestXML=methislabService.marshall(methislabUnderwrittingCasesResults)
-
-					requestService.crear(opername,requestXML)
+					requestBBDD = requestService.crear(opername,requestXML)
 
 					Date date = methislabUnderwrittingCasesResults.dateStart.toGregorianCalendar().getTime()
 					SimpleDateFormat sdfr = new SimpleDateFormat("yyyyMMdd HH:mm:ss");

@@ -99,8 +99,6 @@ class PsnUnderwrittingCaseManagementService	 {
 
 					requestXML = psnService.marshall(gestionReconocimientoMedico)
 					requestBBDD = requestService.crear(opername, requestXML)
-					requestBBDD.fecha_procesado = new Date()
-					requestBBDD.save(flush: true)
 
 					wsErrors = psnService.validarDatosObligatorios(requestBBDD)
 
@@ -225,6 +223,7 @@ class PsnUnderwrittingCaseManagementService	 {
 
 		def opername="PsnResultadoReconocimientoMedicoResponse"
 		def requestXML = ""
+		def requestBBDD
 		List<RespuestaCRMInforme> expedientes = new ArrayList<RespuestaCRMInforme>();
 		TransformacionUtil util = new TransformacionUtil()
 		CorreoUtil correoUtil = new CorreoUtil()
@@ -247,8 +246,7 @@ class PsnUnderwrittingCaseManagementService	 {
 				if (resultadoReconocimientoMedico.numSolicitud != null && !resultadoReconocimientoMedico.numSolicitud.isEmpty()){
 
 					requestXML=psnService.marshall(resultadoReconocimientoMedico)
-
-					requestService.crear(opername,requestXML)
+					requestBBDD=requestService.crear(opername,requestXML)
 
 					psnService.insertarEnvio (company, resultadoReconocimientoMedico.numSolicitud.toString(), requestXML.toString())
 
@@ -393,8 +391,6 @@ class PsnUnderwrittingCaseManagementService	 {
 
 				requestXML=psnService.marshall(consolidacionPoliza)
 				requestBBDD = requestService.crear(opername,requestXML)
-				requestBBDD.fecha_procesado = new Date()
-				requestBBDD.save(flush:true)
 
 				if (consolidacionPoliza.requestNumber != null && !consolidacionPoliza.requestNumber.isEmpty() && consolidacionPoliza.policyNumber != null && !consolidacionPoliza.policyNumber.isEmpty()){
 
@@ -511,6 +507,7 @@ class PsnUnderwrittingCaseManagementService	 {
 
 		def opername="PsnConsultaExpediente"
 		def requestXML = ""
+		def requestBBDD
 		RespuestaCRM respuestaCRM = new RespuestaCRM();
 		TransformacionUtil util = new TransformacionUtil()
 		CorreoUtil correoUtil = new CorreoUtil()
@@ -534,8 +531,7 @@ class PsnUnderwrittingCaseManagementService	 {
 				if ((consultaExpediente.numSolicitud != null && !consultaExpediente.numSolicitud.isEmpty()) || (consultaExpediente.numExpediente != null  && !consultaExpediente.numExpediente.isEmpty()) || (consultaExpediente.numSumplemento != null && !consultaExpediente.numSumplemento.isEmpty())){
 
 					requestXML=psnService.marshall(consultaExpediente)
-
-					requestService.crear(opername,requestXML)
+					requestBBDD=requestService.crear(opername,requestXML)
 
 					Filtro filtro = new Filtro();
 
@@ -677,7 +673,7 @@ class PsnUnderwrittingCaseManagementService	 {
 
 		def opername="PsnConsultaDocumento"
 		def requestXML = ""
-
+		def requestBBDD
 		TransformacionUtil util = new TransformacionUtil()
 		CorreoUtil correoUtil = new CorreoUtil()
 		Filtro filtro = new Filtro();
@@ -711,8 +707,7 @@ class PsnUnderwrittingCaseManagementService	 {
 							identificador = "nodo: " + consultaDocumento.nodoAlfresco.substring(consultaDocumento.nodoAlfresco.lastIndexOf("/")+1,consultaDocumento.nodoAlfresco.length())
 
 							requestXML=psnService.marshall(consultaDocumento)
-
-							requestService.crear(opername,requestXML)
+							requestBBDD=requestService.crear(opername,requestXML)
 
 							psnService.insertarEnvio(company, identificador, requestXML.toString())
 
@@ -749,8 +744,7 @@ class PsnUnderwrittingCaseManagementService	 {
 							identificador = "documentacionId: " + consultaDocumento.documentacionId
 
 							requestXML=psnService.marshall(consultaDocumento)
-
-							requestService.crear(opername,requestXML)
+							requestBBDD=requestService.crear(opername,requestXML)
 
 							psnService.insertarEnvio(company, identificador, requestXML.toString())
 

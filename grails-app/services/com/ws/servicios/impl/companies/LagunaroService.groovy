@@ -7,6 +7,7 @@ import com.scor.srpfileinbound.REGISTRODATOS
 import com.scortelemed.Company
 import com.scortelemed.Request
 import com.ws.lagunaro.beans.GestionReconocimientoMedicoRequest
+import com.ws.lagunaro.beans.TramitacionReconocimientoMedicoRequest
 import com.ws.servicios.ICompanyService
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
@@ -40,6 +41,8 @@ class LagunaroService implements ICompanyService{
 		try{
 			if (objeto instanceof GestionReconocimientoMedicoRequest){
 				result = requestService.marshall(objeto, GestionReconocimientoMedicoRequest.class)
+			} else if (objeto instanceof TramitacionReconocimientoMedicoRequest){
+				result = requestService.marshall(objeto, TramitacionReconocimientoMedicoRequest.class)
 			}
 		} finally {
 			return result

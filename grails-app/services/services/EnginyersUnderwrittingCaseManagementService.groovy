@@ -93,8 +93,6 @@ class EnginyersUnderwrittingCaseManagementService {
 
 							requestXML = enginyersService.marshall(addExp)
 							requestBBDD = requestService.crear(opername, requestXML)
-							requestBBDD.fecha_procesado = new Date()
-							requestBBDD.save(flush: true)
 		
 							wsErrors = enginyersService.validarDatosObligatorios(requestBBDD)
 		

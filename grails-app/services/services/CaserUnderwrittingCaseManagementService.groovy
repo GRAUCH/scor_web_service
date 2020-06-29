@@ -77,8 +77,6 @@ class CaserUnderwrittingCaseManagementService {
 
                     requestXML = caserService.marshall(gestionReconocimientoMedico)
                     requestBBDD = requestService.crear(opername, requestXML)
-                    requestBBDD.fecha_procesado = new Date()
-                    requestBBDD.save(flush: true)
 
                     notes = "El caso se ha procesado correctamente"
                     status = StatusType.OK
@@ -142,7 +140,7 @@ class CaserUnderwrittingCaseManagementService {
 
         def opername = "CaserResultadoReconocimientoMedicoResponse"
         def requestXML = ""
-
+        def requestBBDD
         String notes = null
         StatusType status = null
 
@@ -163,8 +161,7 @@ class CaserUnderwrittingCaseManagementService {
                 if (resultadoReconocimientoMedico && resultadoReconocimientoMedico.dateStart && resultadoReconocimientoMedico.dateEnd) {
 
                     requestXML = caserService.marshall(resultadoReconocimientoMedico)
-
-                    requestService.crear(opername, requestXML)
+                    requestBBDD = requestService.crear(opername, requestXML)
 
                     Date date = resultadoReconocimientoMedico.dateStart.toGregorianCalendar().getTime()
                     SimpleDateFormat sdfr = new SimpleDateFormat("yyyyMMdd HH:mm:ss")
@@ -250,7 +247,7 @@ class CaserUnderwrittingCaseManagementService {
 
         def opername = "CaserConsultaExpedienteResponse"
         def requestXML = ""
-
+        def requestBBDD
         String notes = null
         StatusType status = null
 
@@ -271,8 +268,7 @@ class CaserUnderwrittingCaseManagementService {
                 if (consultaExpediente && consultaExpediente.codExpediente) {
 
                     requestXML = caserService.marshall(consultaExpediente)
-
-                    requestService.crear(opername, requestXML)
+                    requestBBDD = requestService.crear(opername, requestXML)
 
                     logginService.putInfoEndpoint("ConsultaExpediente", "Realizando peticion para " + company.nombre + " con numero de expiente: " + consultaExpediente.codExpediente)
 
@@ -379,8 +375,6 @@ class CaserUnderwrittingCaseManagementService {
 
                 requestXML = caserService.marshall(consolidacionPoliza)
                 requestBBDD = requestService.crear(opername, requestXML)
-                requestBBDD.fecha_procesado = new Date()
-                requestBBDD.save(flush: true)
 
                 if (consolidacionPoliza.requestNumber != null && !consolidacionPoliza.requestNumber.isEmpty() != null && consolidacionPoliza.ciaCode != null && !consolidacionPoliza.ciaCode.isEmpty() && consolidacionPoliza.policyNumber != null && !consolidacionPoliza.policyNumber.isEmpty()) {
 

@@ -90,8 +90,7 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 
 					requestXML=netinsuranceService.marshall(netInsuranteUnderwrittingCaseManagement)
 					requestBBDD = requestService.crear(opername,requestXML)
-					requestBBDD.fecha_procesado = new Date()
-					requestBBDD.save(flush:true)
+
 					expedienteService.crearExpediente(requestBBDD, TipoCompany.NET_INSURANCE)
 
 					message = "Il caso � stato elaborato correttamente";
@@ -142,6 +141,7 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 
 		def opername="NetinsuranceUnderwrittingCaseManagementResponse"
 		def requestXML = ""
+		def requestBBDD
 		List<RespuestaCRMInforme> expedientes = new ArrayList<RespuestaCRMInforme>();
 		TransformacionUtil util = new TransformacionUtil()
 		CorreoUtil correoUtil = new CorreoUtil()
@@ -164,8 +164,7 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 				if (netInsuranteUnderwrittingCasesResults && netInsuranteUnderwrittingCasesResults.dateStart && netInsuranteUnderwrittingCasesResults.dateEnd){
 
 					requestXML=netinsuranceService.marshall(netInsuranteUnderwrittingCasesResults)
-
-					requestService.crear(opername,requestXML)
+					requestBBDD=requestService.crear(opername,requestXML)
 
 					Date date = netInsuranteUnderwrittingCasesResults.dateStart.toGregorianCalendar().getTime()
 					SimpleDateFormat sdfr = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
@@ -250,7 +249,7 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 
 		def opername="NetinsuranteGetDossier"
 		def requestXML = ""
-
+		def requestBBDD
 		String notes = null
 		StatusType status = null
 
@@ -271,8 +270,7 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 				if (consultaExpediente && consultaExpediente.requestNumber) {
 
 					requestXML=netinsuranceService.marshall(consultaExpediente)
-
-					requestService.crear(opername,requestXML)
+					requestBBDD=requestService.crear(opername,requestXML)
 
 					logginService.putInfoEndpoint("ConsultaExpediente","Realizando peticion para " + company.nombre + " con numero de expiente: " + consultaExpediente.requestNumber)
 					respuestaCRM = expedienteService.consultaExpedienteNumSolicitud(consultaExpediente.requestNumber, company.ou.toString() ,company.codigoSt)

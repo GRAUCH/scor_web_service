@@ -80,8 +80,6 @@ class NationaleNederlandenUnderwrittingCaseManagementService {
 
 					requestXML=nnService.marshall(gestionReconocimientoMedico)
 					requestBBDD = requestService.crear(opername,requestXML)
-					requestBBDD.fecha_procesado = new Date()
-					requestBBDD.save(flush:true)
 
 					wsErrors = nnService.validarDatosObligatorios(requestBBDD)
 
@@ -158,6 +156,7 @@ class NationaleNederlandenUnderwrittingCaseManagementService {
 
 		def opername="NnResultadoReconocimientoMedicoResponse"
 		def requestXML = ""
+		def requestBBDD
 		List<RespuestaCRMInforme> expedientes = new ArrayList<RespuestaCRMInforme>()
 		TransformacionUtil util = new TransformacionUtil()
 		CorreoUtil correoUtil = new CorreoUtil()
@@ -180,8 +179,7 @@ class NationaleNederlandenUnderwrittingCaseManagementService {
 				if (resultadoReconocimientoMedico && resultadoReconocimientoMedico.dateStart && resultadoReconocimientoMedico.dateEnd) {
 
 					requestXML=nnService.marshall(resultadoReconocimientoMedico)
-
-					requestService.crear(opername,requestXML)
+					requestBBDD=requestService.crear(opername,requestXML)
 
 					Date date = resultadoReconocimientoMedico.dateStart.toGregorianCalendar().getTime()
 					SimpleDateFormat sdfr = new SimpleDateFormat("yyyyMMdd HH:mm:ss");

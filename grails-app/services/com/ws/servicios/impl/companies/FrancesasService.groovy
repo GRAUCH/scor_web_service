@@ -8,10 +8,11 @@ import com.scortelemed.Company
 import com.scortelemed.Estadistica
 import com.scortelemed.Request
 import com.ws.afiesca.beans.AfiEscaUnderwrittingCaseManagementRequest
+import com.ws.afiesca.beans.AfiEscaUnderwrittingCasesResultsRequest
 import com.ws.alptis.beans.AlptisUnderwrittingCaseManagementRequest
 import com.ws.lifesquare.beans.LifesquareUnderwrittingCaseManagementRequest
+import com.ws.lifesquare.beans.LifesquareUnderwrittingCasesResultsRequest
 import com.ws.servicios.ICompanyService
-import com.ws.servicios.LogginService
 import grails.util.Environment
 import org.apache.axis.types.Token
 
@@ -33,10 +34,14 @@ class FrancesasService implements ICompanyService{
 		try {
 			if (objeto instanceof AfiEscaUnderwrittingCaseManagementRequest) {
 				result = requestService.marshall(objeto, AfiEscaUnderwrittingCaseManagementRequest.class)
+			} else if(objeto instanceof AfiEscaUnderwrittingCasesResultsRequest) {
+				result = requestService.marshall(objeto, AfiEscaUnderwrittingCasesResultsRequest.class)
 			} else if (objeto instanceof AlptisUnderwrittingCaseManagementRequest) {
 				result = requestService.marshall(objeto, AlptisUnderwrittingCaseManagementRequest.class)
 			} else if (objeto instanceof LifesquareUnderwrittingCaseManagementRequest) {
 				result = requestService.marshall(objeto, LifesquareUnderwrittingCaseManagementRequest.class)
+			} else if (objeto instanceof LifesquareUnderwrittingCasesResultsRequest) {
+				result = requestService.marshall(objeto, LifesquareUnderwrittingCasesResultsRequest.class)
 			}
 		} finally {
 			return result

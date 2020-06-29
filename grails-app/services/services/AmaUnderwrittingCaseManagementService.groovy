@@ -209,10 +209,6 @@ class AmaUnderwrittingCaseManagementService	 {
 
 					requestXML=amaService.marshall(resultadoSiniestro)
 					requestBBDD = requestService.crear(opername,requestXML)
-					requestBBDD.fecha_procesado = new Date()
-					requestBBDD.save(flush:true)
-
-					requestService.crear(opername,requestXML)
 
 					Date date = resultadoSiniestro.dateStart.toGregorianCalendar().getTime()
 					SimpleDateFormat sdfr = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
@@ -334,8 +330,6 @@ class AmaUnderwrittingCaseManagementService	 {
 
 				requestXML=amaService.marshall(consolidacionPoliza)
 				requestBBDD = requestService.crear(opername,requestXML)
-				requestBBDD.fecha_procesado = new Date()
-				requestBBDD.save(flush:true)
 
 				if (consolidacionPoliza.requestNumber != null && !consolidacionPoliza.requestNumber.isEmpty() != null && consolidacionPoliza.ciaCode !=null && !consolidacionPoliza.ciaCode.isEmpty() && consolidacionPoliza.policyNumber != null && !consolidacionPoliza.policyNumber.isEmpty()){
 
@@ -447,7 +441,8 @@ class AmaUnderwrittingCaseManagementService	 {
 
 		def opername="AmaConsultaExpediente"
 		def requestXML = ""
-		RespuestaCRM respuestaCRM = new RespuestaCRM();
+		def requestBBDD
+		RespuestaCRM respuestaCRM = new RespuestaCRM()
 		TransformacionUtil util = new TransformacionUtil()
 		CorreoUtil correoUtil = new CorreoUtil()
 		String identificador = ""
@@ -466,8 +461,7 @@ class AmaUnderwrittingCaseManagementService	 {
 				if ((consultaExpediente.numSolicitud != null && !consultaExpediente.numSolicitud.isEmpty()) || (consultaExpediente.numExpediente != null  && !consultaExpediente.numExpediente.isEmpty()) || (consultaExpediente.numSumplemento != null && !consultaExpediente.numSumplemento.isEmpty())){
 
 					requestXML=amaService.marshall(consultaExpediente)
-
-					requestService.crear(opername,requestXML)
+					requestBBDD=requestService.crear(opername,requestXML)
 
 					Filtro filtro = new Filtro();
 
@@ -619,7 +613,7 @@ class AmaUnderwrittingCaseManagementService	 {
 
 		def opername="AmaConsultaDocumento"
 		def requestXML = ""
-
+		def requestBBDD
 		TransformacionUtil util = new TransformacionUtil()
 		CorreoUtil correoUtil = new CorreoUtil()
 		Filtro filtro = new Filtro();
@@ -648,8 +642,7 @@ class AmaUnderwrittingCaseManagementService	 {
 						if (amaService.existeDocumentoNodo(respuestaCRM,consultaDocumento.nodoAlfresco)) {
 
 							requestXML=amaService.marshall(consultaDocumento)
-
-							requestService.crear(opername,requestXML)
+							requestBBDD=requestService.crear(opername,requestXML)
 
 
 							/**Metemos en enviados
@@ -694,9 +687,7 @@ class AmaUnderwrittingCaseManagementService	 {
 						if (amaService.existeDocumentoId(respuestaCRM,consultaDocumento.documentacionId)) {
 
 							requestXML=amaService.marshall(consultaDocumento)
-
-							requestService.crear(opername,requestXML)
-
+							requestBBDD=requestService.crear(opername,requestXML)
 
 							/**Metemos en enviados
 							 *

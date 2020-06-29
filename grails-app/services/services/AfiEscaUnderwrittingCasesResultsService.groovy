@@ -64,10 +64,7 @@ class AfiEscaUnderwrittingCasesResultsService {
 			
 			if(operacion && operacion.activo && afiEscaUnderwrittingCasesResultsRequest && afiEscaUnderwrittingCasesResultsRequest.date){
 				requestXML=requestService.marshall(afiEscaUnderwrittingCasesResultsRequest,AfiEscaUnderwrittingCasesResultsRequest.class)
-				
 				requestBBDD = requestService.crear(opername,requestXML)
-				requestBBDD.fecha_procesado = new Date()
-				requestBBDD.save(flush:true)
 				
 				//PARSEAMOS LA FECHA
 				def fechaHora = new SimpleDateFormat("yyyyMMdd HH:mm");
