@@ -104,7 +104,7 @@ class EnginyersUnderwrittingCaseManagementService {
 								fault.setFaultCode("0")
 								fault.setFaultString("")
 
-								enginyersService.insertarRecibido(company, addExp.d.getPolicyNumber(), requestXML.toString(), "ALTA")
+								requestService.insertarRecibido(company, addExp.d.getPolicyNumber(), requestXML.toString(), "ALTA")
 
 								/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
 								 *                                */
@@ -118,7 +118,7 @@ class EnginyersUnderwrittingCaseManagementService {
 								fault.setFaultCode("8")
 								fault.setFaultString("Error de validacion: " + error)
 
-								enginyersService.insertarError(company, addExp.d.getPolicyNumber(), requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + addExp.d.getPolicyNumber() + ". Error de validacion: " + error)
+								requestService.insertarError(company, addExp.d.getPolicyNumber(), requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + addExp.d.getPolicyNumber() + ". Error de validacion: " + error)
 								logginService.putErrorEndpoint("GestionReconocimientoMedico", "Peticion no realizada de " + company.nombre + " con numero de solicitud: " + addExp.d.getPolicyNumber() + ". Error de validacion: " + error)
 
 							}
@@ -135,7 +135,7 @@ class EnginyersUnderwrittingCaseManagementService {
 					}
 			} catch (Exception e){
 
-				enginyersService.insertarError(company,addExp.d.getPolicyNumber(), requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + addExp.d.getPolicyNumber() + ". Error: " + e.getMessage())
+				requestService.insertarError(company,addExp.d.getPolicyNumber(), requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + addExp.d.getPolicyNumber() + ". Error: " + e.getMessage())
 
 				logginService.putErrorEndpoint("GestionReconocimientoMedico","Peticion no realizada de " + company.nombre + " con numero de solicitud: " + addExp.d.getPolicyNumber() + ". Error: " + e.getMessage())
 				correoUtil.envioEmailErrores("GestionReconocimientoMedico","Peticion de " + company.nombre + " con numero de solicitud: " + addExp.d.getPolicyNumber(), e)

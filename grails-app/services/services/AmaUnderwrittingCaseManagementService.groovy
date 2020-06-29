@@ -107,7 +107,7 @@ class AmaUnderwrittingCaseManagementService	 {
 
 							expedienteService.crearExpediente(requestBBDD, TipoCompany.AMA)
 
-							amaService.insertarRecibido(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), "ALTA")
+							requestService.insertarRecibido(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), "ALTA")
 
 							notes = "El caso se ha procesado correctamente"
 							status = StatusType.OK
@@ -120,7 +120,7 @@ class AmaUnderwrittingCaseManagementService	 {
 						} else if (gestionReconocimientoMedico.candidateInformation.operacion.toString().toUpperCase().equals("M")){
 
 
-							amaService.insertarRecibido(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), "MODIFICACION")
+							requestService.insertarRecibido(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), "MODIFICACION")
 
 							notes = "El caso se ha procesado correctamente"
 							status = StatusType.OK
@@ -130,7 +130,7 @@ class AmaUnderwrittingCaseManagementService	 {
 						} else if (gestionReconocimientoMedico.candidateInformation.operacion.toString().toUpperCase().equals("B")){
 
 
-							amaService.insertarRecibido(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), "BAJA")
+							requestService.insertarRecibido(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), "BAJA")
 
 							notes = "El caso se ha procesado correctamente"
 							status = StatusType.OK
@@ -160,7 +160,7 @@ class AmaUnderwrittingCaseManagementService	 {
 			notes = "Error: " + e.getMessage()
 			status = StatusType.ERROR
 
-			amaService.insertarError(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber + ". Error: " + e.getMessage())
+			requestService.insertarError(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber + ". Error: " + e.getMessage())
 
 			logginService.putErrorEndpoint("GestionReconocimientoMedico","Peticion no realizada de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber + ". Error: " + e.getMessage())
 			correoUtil.envioEmailErrores("GestionReconocimientoMedico","Peticion de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber,e)
@@ -224,7 +224,7 @@ class AmaUnderwrittingCaseManagementService	 {
 
 					logginService.putInfoEndpoint("ResultadoSiniestro","Realizando peticion para " + company.nombre + " con fecha " + resultadoSiniestro.dateStart.toString().substring(0,10) +"-"+resultadoSiniestro.dateEnd.toString().substring(0,10))
 
-					amaService.insertarEnvio (company, resultadoSiniestro.dateStart.toString().substring(0,10) +"-"+resultadoSiniestro.dateEnd.toString().substring(0,10), requestXML.toString())
+					requestService.insertarEnvio (company, resultadoSiniestro.dateStart.toString().substring(0,10) +"-"+resultadoSiniestro.dateEnd.toString().substring(0,10), requestXML.toString())
 
 
 					if(expedientes){
@@ -284,7 +284,7 @@ class AmaUnderwrittingCaseManagementService	 {
 			notes = "Error: " + e.getMessage()
 			status = StatusType.ERROR
 
-			amaService.insertarError(company, resultadoSiniestro.dateStart.toString().substring(0,10) +"-"+resultadoSiniestro.dateEnd.toString().substring(0,10), requestXML.toString(), "CONSULTA", "Peticion no realizada para solicitud: " + resultadoSiniestro.dateStart.toString().substring(0,10) +"-"+resultadoSiniestro.dateEnd.toString().substring(0,10) + ". Error: " + e.getMessage())
+			requestService.insertarError(company, resultadoSiniestro.dateStart.toString().substring(0,10) +"-"+resultadoSiniestro.dateEnd.toString().substring(0,10), requestXML.toString(), "CONSULTA", "Peticion no realizada para solicitud: " + resultadoSiniestro.dateStart.toString().substring(0,10) +"-"+resultadoSiniestro.dateEnd.toString().substring(0,10) + ". Error: " + e.getMessage())
 		}finally{
 			//BORRAMOS VARIABLES DE SESION
 			def sesion=RequestContextHolder.currentRequestAttributes().getSession()
@@ -340,7 +340,7 @@ class AmaUnderwrittingCaseManagementService	 {
 						codigoSt = "1059"
 					}
 
-					amaService.insertarRecibido(company, consolidacionPoliza.requestNumber, requestXML.toString(), "CONSOLIDACION")
+					requestService.insertarRecibido(company, consolidacionPoliza.requestNumber, requestXML.toString(), "CONSOLIDACION")
 
 					expediente = expedienteService.consultaExpedienteNumSolicitud(consolidacionPoliza.requestNumber,"ES",codigoSt )
 
@@ -365,7 +365,7 @@ class AmaUnderwrittingCaseManagementService	 {
 								correoUtil.envioEmail("ConsolidacionPoliza","Error en la modificacion de " + company.nombre + " con numero de solicitud: " + consolidacionPoliza.requestNumber + ". Error: " + respuestaCrmExpediente.getErrorCRM().getDetalle(), null)
 								logginService.putInfoEndpoint("ConsolidacionPoliza","Error en la modificacion de " + company.nombre + " con numero de solicitud: " + consolidacionPoliza.requestNumber + ". Error: " + respuestaCrmExpediente.getErrorCRM().getDetalle())
 
-								amaService.insertarError(company, consolidacionPoliza.requestNumber, requestXML.toString(), "CONSOLIDACION", "Peticion no realizada para solicitud: " + consolidacionPoliza.requestNumber + ". Error: " + respuestaCrmExpediente.getErrorCRM().getDetalle())
+								requestService.insertarError(company, consolidacionPoliza.requestNumber, requestXML.toString(), "CONSOLIDACION", "Peticion no realizada para solicitud: " + consolidacionPoliza.requestNumber + ". Error: " + respuestaCrmExpediente.getErrorCRM().getDetalle())
 							} else {
 
 								notes = "El caso se ha procesado correctamente"
@@ -416,7 +416,7 @@ class AmaUnderwrittingCaseManagementService	 {
 			logginService.putErrorEndpoint("ConsolidacionPoliza","Peticion realizada para " + company.nombre + " con con numero de expiente: " + consolidacionPoliza.requestNumber + ". Error: " + e.getMessage())
 			correoUtil.envioEmailErrores("ConsolidacionPoliza","Peticion realizada para " + company.nombre + " con numero de expiente: " + consolidacionPoliza.requestNumber,e)
 
-			amaService.insertarError(company, consolidacionPoliza.requestNumber, requestXML.toString(), "CONSOLIDACION", "Peticion no realizada para solicitud: " + consolidacionPoliza.requestNumber + ". Error: " + e.getMessage())
+			requestService.insertarError(company, consolidacionPoliza.requestNumber, requestXML.toString(), "CONSOLIDACION", "Peticion no realizada para solicitud: " + consolidacionPoliza.requestNumber + ". Error: " + e.getMessage())
 		}finally{
 
 			def sesion=RequestContextHolder.currentRequestAttributes().getSession()

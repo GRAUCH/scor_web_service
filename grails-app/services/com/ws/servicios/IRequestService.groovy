@@ -1,5 +1,6 @@
 package com.ws.servicios
 
+import com.scortelemed.Company
 import com.scortelemed.Request
 
 interface IRequestService {
@@ -9,5 +10,8 @@ interface IRequestService {
     def marshall(def objetoRelleno, Class<?> clase)
     def marshall(String nameSpace, def objetoRelleno, Class<?> clase)
     def crear(message, requestXML)
+    void insertarRecibido(Company company, String identificador, String info, String operacion)
+    void insertarError(Company company, String identificador, String info, String operacion, String detalleError)
+    void insertarEnvio (Company company, String identificador, String info)
 
 }

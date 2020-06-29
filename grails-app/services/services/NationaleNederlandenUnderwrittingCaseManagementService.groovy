@@ -91,7 +91,7 @@ class NationaleNederlandenUnderwrittingCaseManagementService {
 						status = StatusType.OK
 						code = 0
 
-						nnService.insertarRecibido(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), "ALTA")
+						requestService.insertarRecibido(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), "ALTA")
 
 						/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
 						 *
@@ -107,7 +107,7 @@ class NationaleNederlandenUnderwrittingCaseManagementService {
 						status = StatusType.ERROR
 						code = 8
 
-						nnService.insertarError(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber + ". Error de validacion: " + error)
+						requestService.insertarError(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber + ". Error de validacion: " + error)
 						logginService.putErrorEndpoint("GestionReconocimientoMedico","Peticion no realizada de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber + ". Error de validacion: " + error)
 
 					}
@@ -127,7 +127,7 @@ class NationaleNederlandenUnderwrittingCaseManagementService {
 			status = StatusType.ERROR
 			code = 2
 
-			nnService.insertarError(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber + ". Error: " + e.getMessage())
+			requestService.insertarError(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber + ". Error: " + e.getMessage())
 
 			logginService.putErrorEndpoint("GestionReconocimientoMedico","Peticion no realizada de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber + ". Error: " + e.getMessage())
 			correoUtil.envioEmailErrores("GestionReconocimientoMedico","Peticion de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber, e)
@@ -189,7 +189,7 @@ class NationaleNederlandenUnderwrittingCaseManagementService {
 
 					logginService.putInfoEndpoint("ResultadoReconocimientoMedico","Realizando peticion para " + company.nombre + " con fecha: " + resultadoReconocimientoMedico.dateStart.toString() + "-" + resultadoReconocimientoMedico.dateEnd.toString())
 
-					nnService.insertarEnvio (company, resultadoReconocimientoMedico.dateStart.toString().substring(0,10) + "-" + resultadoReconocimientoMedico.dateEnd.toString().substring(0,10), requestXML.toString())
+					requestService.insertarEnvio (company, resultadoReconocimientoMedico.dateStart.toString().substring(0,10) + "-" + resultadoReconocimientoMedico.dateEnd.toString().substring(0,10), requestXML.toString())
 
 					for (int i = 1; i < 3; i++){
 
@@ -246,7 +246,7 @@ class NationaleNederlandenUnderwrittingCaseManagementService {
 			status = StatusType.ERROR
 			code = 2
 
-			nnService.insertarError(company,resultadoReconocimientoMedico.fechaIni.toString(), requestXML.toString(), "CONSULTA", "Peticion no realizada para solicitud: " + resultadoReconocimientoMedico.fechaIni.toString() + ". Error: " + e.getMessage())
+			requestService.insertarError(company,resultadoReconocimientoMedico.fechaIni.toString(), requestXML.toString(), "CONSULTA", "Peticion no realizada para solicitud: " + resultadoReconocimientoMedico.fechaIni.toString() + ". Error: " + e.getMessage())
 		}finally{
 
 			def sesion=RequestContextHolder.currentRequestAttributes().getSession()

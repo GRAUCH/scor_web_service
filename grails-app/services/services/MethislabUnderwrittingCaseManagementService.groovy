@@ -87,7 +87,7 @@ class MethislabUnderwrittingCaseManagementService {
 
 						expedienteService.crearExpediente(requestBBDD, TipoCompany.METHIS_LAB)
 
-						methislabService.insertarRecibido(company, methislabUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, requestXML.toString(), "ALTA")
+						requestService.insertarRecibido(company, methislabUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, requestXML.toString(), "ALTA")
 
 						/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
 						 *
@@ -103,7 +103,7 @@ class MethislabUnderwrittingCaseManagementService {
 						status = StatusType.ERROR
 						code = 8
 
-						methislabService.insertarError(company, methislabUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + methislabUnderwrittingCaseManagementRequest.candidateInformation.requestNumber + ". Error de validacion: " + error)
+						requestService.insertarError(company, methislabUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + methislabUnderwrittingCaseManagementRequest.candidateInformation.requestNumber + ". Error de validacion: " + error)
 						logginService.putErrorEndpoint("GestionReconocimientoMedico","Peticion no realizada de " + company.nombre + " con numero de solicitud: " + methislabUnderwrittingCaseManagementRequest.candidateInformation.requestNumber + ". Error de validacion: " + error)
 
 					}
@@ -124,7 +124,7 @@ class MethislabUnderwrittingCaseManagementService {
 			status = StatusType.ERROR
 			code = 2
 
-			methislabService.insertarError(company, methislabUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + methislabUnderwrittingCaseManagementRequest.candidateInformation.requestNumber + ". Error: " + e.getMessage())
+			requestService.insertarError(company, methislabUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + methislabUnderwrittingCaseManagementRequest.candidateInformation.requestNumber + ". Error: " + e.getMessage())
 
 			logginService.putErrorEndpoint("GestionReconocimientoMedico","Peticion no realizada de " + company.nombre + " con numero de solicitud: " + methislabUnderwrittingCaseManagementRequest.candidateInformation.requestNumber + ". Error: " + e.getMessage())
 			correoUtil.envioEmailErrores("GestionReconocimientoMedico","Peticion de " + company.nombre + " con numero de solicitud: " + methislabUnderwrittingCaseManagementRequest.candidateInformation.requestNumber,e.getMessage())
@@ -186,7 +186,7 @@ class MethislabUnderwrittingCaseManagementService {
 						expedientes.addAll(tarificadorService.obtenerInformeExpedientes(company.codigoSt,null,i,fechaIni,fechaFin,"IT"))
 					}
 
-					methislabService.insertarEnvio(company, methislabUnderwrittingCasesResults.dateStart.toString().substring(0,10) + "-" + methislabUnderwrittingCasesResults.dateEnd.toString().substring(0,10), requestXML.toString())
+					requestService.insertarEnvio(company, methislabUnderwrittingCasesResults.dateStart.toString().substring(0,10) + "-" + methislabUnderwrittingCasesResults.dateEnd.toString().substring(0,10), requestXML.toString())
 
 					if(expedientes){
 						expedientes.each { expedientePoliza ->
@@ -231,7 +231,7 @@ class MethislabUnderwrittingCaseManagementService {
 			logginService.putErrorEndpoint("ResultadoReconocimientoMedico","Peticion realizada para " + company.nombre + " con fecha: " + methislabUnderwrittingCasesResults.dateStart.toString() + "-" + methislabUnderwrittingCasesResults.dateEnd.toString() + ". Error: " + e.getMessage())
 			correoUtil.envioEmailErrores("ResultadoReconocimientoMedico","Peticion realizada para " + company.nombre + " con fecha: " + methislabUnderwrittingCasesResults.dateStart.toString() + "-" + methislabUnderwrittingCasesResults.dateEnd.toString(), e)
 
-			methislabService.insertarError(company, methislabUnderwrittingCasesResults.dateStart.toString().substring(0,10) + "-" + methislabUnderwrittingCasesResults.dateEnd.toString().substring(0,10), requestXML.toString(), "CONSULTA", "Peticion no realizada para solicitud: " + methislabUnderwrittingCasesResults.dateStart.toString() + "-" + methislabUnderwrittingCasesResults.dateEnd.toString() + ". Error: " + e.getMessage())
+			requestService.insertarError(company, methislabUnderwrittingCasesResults.dateStart.toString().substring(0,10) + "-" + methislabUnderwrittingCasesResults.dateEnd.toString().substring(0,10), requestXML.toString(), "CONSULTA", "Peticion no realizada para solicitud: " + methislabUnderwrittingCasesResults.dateStart.toString() + "-" + methislabUnderwrittingCasesResults.dateEnd.toString() + ". Error: " + e.getMessage())
 			
 		}finally{
 

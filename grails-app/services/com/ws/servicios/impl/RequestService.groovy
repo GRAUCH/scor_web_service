@@ -1,7 +1,10 @@
 package com.ws.servicios.impl
 
 import com.scortelemed.Company
+import com.scortelemed.Envio
+import com.scortelemed.Recibido
 import com.scortelemed.Request
+import com.scortelemed.Error
 import com.ws.servicios.EstadisticasService
 import com.ws.servicios.IRequestService
 import com.ws.servicios.LogginService
@@ -123,6 +126,35 @@ class RequestService implements IRequestService{
         return result
     }
 
+    void insertarRecibido(Company company, String identificador, String info, String operacion) {
+        Recibido recibido = new Recibido()
+        recibido.setFecha(new Date())
+        recibido.setCia(company.id.toString())
+        recibido.setIdentificador(identificador)
+        recibido.setInfo(info)
+        recibido.setOperacion(operacion)
+        recibido.save(flush:true)
+    }
+
+    void insertarError(Company company, String identificador, String info, String operacion, String detalleError) {
+        Error error = new Error()
+        error.setFecha(new Date())
+        error.setCia(company.id.toString())
+        error.setIdentificador(identificador)
+        error.setInfo(info)
+        error.setOperacion(operacion)
+        error.setError(detalleError)
+        error.save(flush:true)
+    }
+
+    void insertarEnvio (Company company, String identificador, String info) {
+        Envio envio = new Envio()
+        envio.setFecha(new Date())
+        envio.setCia(company.id.toString())
+        envio.setIdentificador(identificador)
+        envio.setInfo(info)
+        envio.save(flush:true)
+    }
     /**
      * No utilizado
 

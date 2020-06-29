@@ -167,27 +167,6 @@ class NetinsuranceService implements ICompanyService{
 			expediente.setPhoneNumber2("")
 		}
 
-		 /*if (expedientePoliza.getCodigoEstado() == servicios.TipoEstadoExpediente.CERRADO) {
-
-             ZipResponse zipResponse = obtenerZip(expedientePoliza.getCodigoST(), expedientePoliza.getNodoAlfresco(), cia);
-
-             if (!zipResponse.getError()) {
-
-                 compressedData = zipResponse.getDatosRespuesta()
-
-
-             } else {
-
-                 compressedData = zipResponse.getDatosRespuesta()
-                 logginService.putErrorEndpoint("rellenaDatosSalidaExpediente", "El método obtener zip ha generado el siguiente error: " + zipResponse.getCodigo() + "-" + zipResponse.getDescripcion())
-                 insertarError(company, expedientePoliza.getNumSolicitud(), "Error en generado de zip", "obtenerZip", zipResponse.getCodigo() + "-" + zipResponse.getDescripcion())
-             }
-
-             expediente.setZip(compressedData)
-         } else {
-             expediente.setZip(new byte[0])
-         }*/
-
 		expediente.setZip(new byte[0])
 		expediente.setNotes(util.devolverDatos(expedientePoliza.getTarificacion().getObservaciones()))
 
@@ -848,39 +827,6 @@ class NetinsuranceService implements ICompanyService{
 			case "RECHAZADO": return RequestStateType.REJECTED;
 			default: return null;
 		}
-	}
-
-	void insertarRecibido(Company company, String identificador, String info, String operacion) {
-
-		Recibido recibido = new Recibido()
-		recibido.setFecha(new Date())
-		recibido.setCia(company.id.toString())
-		recibido.setIdentificador(identificador)
-		recibido.setInfo(info)
-		recibido.setOperacion(operacion)
-		recibido.save(flush:true)
-	}
-
-	void insertarError(Company company, String identificador, String info, String operacion, String detalleError) {
-
-		com.scortelemed.Error error = new com.scortelemed.Error()
-		error.setFecha(new Date())
-		error.setCia(company.id.toString())
-		error.setIdentificador(identificador)
-		error.setInfo(info)
-		error.setOperacion(operacion)
-		error.setError(detalleError)
-		error.save(flush:true)
-	}
-
-	void insertarEnvio (Company company, String identificador, String info) {
-
-		Envio envio = new Envio()
-		envio.setFecha(new Date())
-		envio.setCia(company.id.toString())
-		envio.setIdentificador(identificador)
-		envio.setInfo(info)
-		envio.save(flush:true)
 	}
 
 	String traducirEstado(estado) {

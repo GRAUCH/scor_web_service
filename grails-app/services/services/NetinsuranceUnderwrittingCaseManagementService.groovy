@@ -96,7 +96,7 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 					message = "Il caso � stato elaborato correttamente";
 					status = StatusType.OK
 
-					netinsuranceService.insertarRecibido(company, netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber, requestXML.toString(), "ALTA")
+					requestService.insertarRecibido(company, netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber, requestXML.toString(), "ALTA")
 
 					/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
 					 *
@@ -116,7 +116,7 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 			message = "Error: " + e.printStackTrace();
 			status = StatusType.ERROR
 
-			netinsuranceService.insertarError(company, netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber, requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber + ". Error: " + e.getMessage())
+			requestService.insertarError(company, netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber, requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber + ". Error: " + e.getMessage())
 
 			logginService.putErrorEndpoint("GestionReconocimientoMedico","Peticion no realizada de " + company.nombre + " con numero de solicitud: " + netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber + ". Error: " + e.getMessage())
 			correoUtil.envioEmailErrores("GestionReconocimientoMedico","Peticion de " + company.nombre + " con numero de solicitud: " + netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber,e.getMessage())
@@ -181,7 +181,7 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 						}
 					}
 
-					netinsuranceService.insertarEnvio(company, netInsuranteUnderwrittingCasesResults.dateStart.toString().substring(0,10) + "-" + netInsuranteUnderwrittingCasesResults.dateEnd.toString().substring(0,10), requestXML.toString())
+					requestService.insertarEnvio(company, netInsuranteUnderwrittingCasesResults.dateStart.toString().substring(0,10) + "-" + netInsuranteUnderwrittingCasesResults.dateEnd.toString().substring(0,10), requestXML.toString())
 
 					if(expedientes){
 
@@ -225,7 +225,7 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 			logginService.putErrorEndpoint("ResultadoReconocimientoMedico","Peticion realizada para " + company.nombre + " con fecha: " + netInsuranteUnderwrittingCasesResults.dateStart.toString() + "-" + netInsuranteUnderwrittingCasesResults.dateEnd.toString() + ". Error: " + e.getMessage())
 			correoUtil.envioEmailErrores("ResultadoReconocimientoMedico","Peticion realizada para " + company.nombre + " con fecha: " + netInsuranteUnderwrittingCasesResults.dateStart.toString() + "-" + netInsuranteUnderwrittingCasesResults.dateEnd.toString() + ". Error: " + e.getMessage())
 
-			netinsuranceService.insertarError(company, netInsuranteUnderwrittingCasesResults.dateStart.toString().substring(0,10) + "-" + netInsuranteUnderwrittingCasesResults.dateEnd.toString().substring(0,10), requestXML.toString(), "CONSULTA", "Peticion no realizada para solicitud: " + netInsuranteUnderwrittingCasesResults.dateStart.toString() + "-" + netInsuranteUnderwrittingCasesResults.dateEnd.toString() + ". Error: " + e.getMessage())
+			requestService.insertarError(company, netInsuranteUnderwrittingCasesResults.dateStart.toString().substring(0,10) + "-" + netInsuranteUnderwrittingCasesResults.dateEnd.toString().substring(0,10), requestXML.toString(), "CONSULTA", "Peticion no realizada para solicitud: " + netInsuranteUnderwrittingCasesResults.dateStart.toString() + "-" + netInsuranteUnderwrittingCasesResults.dateEnd.toString() + ". Error: " + e.getMessage())
 		}finally{
 
 			def sesion=RequestContextHolder.currentRequestAttributes().getSession()
@@ -274,7 +274,7 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 
 					logginService.putInfoEndpoint("ConsultaExpediente","Realizando peticion para " + company.nombre + " con numero de expiente: " + consultaExpediente.requestNumber)
 					respuestaCRM = expedienteService.consultaExpedienteNumSolicitud(consultaExpediente.requestNumber, company.ou.toString() ,company.codigoSt)
-					netinsuranceService.insertarEnvio (company, consultaExpediente.requestNumber, requestXML.toString())
+					requestService.insertarEnvio (company, consultaExpediente.requestNumber, requestXML.toString())
 					if(respuestaCRM != null && respuestaCRM.getListaExpedientes() != null){
 
 						for (int i = 0; i < respuestaCRM.getListaExpedientes().size(); i++){
@@ -324,7 +324,7 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 			notes = "Errore in ConsultaExpediente: " + e.getMessage()
 			status = StatusType.ERROR
 
-			netinsuranceService.insertarError(company, consultaExpediente.requestNumber, requestXML.toString(), "CONSULTA", "Peticion no realizada para solicitud: " + consultaExpediente.requestNumber + ". Error: " + e.getMessage())
+			requestService.insertarError(company, consultaExpediente.requestNumber, requestXML.toString(), "CONSULTA", "Peticion no realizada para solicitud: " + consultaExpediente.requestNumber + ". Error: " + e.getMessage())
 		}finally{
 			//BORRAMOS VARIABLES DE SESION
 			def sesion=RequestContextHolder.currentRequestAttributes().getSession()

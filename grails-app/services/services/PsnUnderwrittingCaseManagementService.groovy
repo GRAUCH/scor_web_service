@@ -113,7 +113,7 @@ class PsnUnderwrittingCaseManagementService	 {
 							status = StatusType.OK
 							code = 0
 
-							psnService.insertarRecibido(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), "ALTA")
+							requestService.insertarRecibido(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), "ALTA")
 
 							/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
 							 *                                */
@@ -174,7 +174,7 @@ class PsnUnderwrittingCaseManagementService	 {
 						status = StatusType.ERROR
 						code = 8
 
-						psnService.insertarError(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber + ". Error de validacion: " + error)
+						requestService.insertarError(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber + ". Error de validacion: " + error)
 						logginService.putErrorEndpoint("GestionReconocimientoMedico", "Peticion no realizada de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber + ". Error de validacion: " + error)
 
 					}
@@ -194,7 +194,7 @@ class PsnUnderwrittingCaseManagementService	 {
 			status = StatusType.ERROR
 			code = 2
 
-			psnService.insertarError(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber + ". Error: " + e.getMessage())
+			requestService.insertarError(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber + ". Error: " + e.getMessage())
 
 			logginService.putErrorEndpoint("GestionReconocimientoMedico","Peticion no realizada de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber + ". Error: " + e.getMessage())
 			correoUtil.envioEmailErrores("GestionReconocimientoMedico","Peticion de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber, e)
@@ -248,7 +248,7 @@ class PsnUnderwrittingCaseManagementService	 {
 					requestXML=psnService.marshall(resultadoReconocimientoMedico)
 					requestBBDD=requestService.crear(opername,requestXML)
 
-					psnService.insertarEnvio (company, resultadoReconocimientoMedico.numSolicitud.toString(), requestXML.toString())
+					requestService.insertarEnvio (company, resultadoReconocimientoMedico.numSolicitud.toString(), requestXML.toString())
 
 					logginService.putInfoEndpoint("ResultadoReconocimientoMedico","Realizando peticion para " + company.nombre + " con numero de solicitud: " + resultadoReconocimientoMedico.numSolicitud.toString())
 
@@ -345,7 +345,7 @@ class PsnUnderwrittingCaseManagementService	 {
 			status = StatusType.ERROR
 			code = 2
 
-			psnService.insertarError(company,resultadoReconocimientoMedico.numSolicitud.toString(), requestXML.toString(), "CONSULTA", "Peticion no realizada para solicitud: " + resultadoReconocimientoMedico.numSolicitud.toString() + ". Error: " + e.getMessage())
+			requestService.insertarError(company,resultadoReconocimientoMedico.numSolicitud.toString(), requestXML.toString(), "CONSULTA", "Peticion no realizada para solicitud: " + resultadoReconocimientoMedico.numSolicitud.toString() + ". Error: " + e.getMessage())
 		}finally{
 
 			def sesion=RequestContextHolder.currentRequestAttributes().getSession()
@@ -415,7 +415,7 @@ class PsnUnderwrittingCaseManagementService	 {
 
 					filtro.setFiltroRelacionado(filtroRelacionado)
 
-					psnService.insertarRecibido(company, identificador, requestXML.toString(), "CONSOLIDACION")
+					requestService.insertarRecibido(company, identificador, requestXML.toString(), "CONSOLIDACION")
 
 					expediente = psnService.informeExpedientePorFiltro(filtro,"ES")
 
@@ -438,7 +438,7 @@ class PsnUnderwrittingCaseManagementService	 {
 								correoUtil.envioEmail("ConsolidacionPoliza","Error en la modificacion de " + company.nombre + " con " + identificador + ". Error: " + respuestaCrmExpediente.getErrorCRM().getDetalle(), null)
 								logginService.putInfoEndpoint("ConsolidacionPoliza","Error en la modificacion de " + company.nombre + " con " + identificador + ". Error: " + respuestaCrmExpediente.getErrorCRM().getDetalle())
 
-								psnService.insertarError(company, identificador, requestXML.toString(), "CONSOLIDACION", "Peticion no realizada para solicitud: " + identificador + ". Error: " + respuestaCrmExpediente.getErrorCRM().getDetalle())
+								requestService.insertarError(company, identificador, requestXML.toString(), "CONSOLIDACION", "Peticion no realizada para solicitud: " + identificador + ". Error: " + respuestaCrmExpediente.getErrorCRM().getDetalle())
 							} else {
 
 								notes = "El caso se ha procesado correctamente"
@@ -483,7 +483,7 @@ class PsnUnderwrittingCaseManagementService	 {
 			logginService.putErrorEndpoint("ConsolidacionPoliza","Peticion realizada para " + company.nombre + " con con numero de expiente: " + consolidacionPoliza.requestNumber + ". Error: " + e.getMessage())
 			correoUtil.envioEmailErrores("ConsolidacionPoliza","Peticion realizada para " + company.nombre + " con numero de expiente: " + consolidacionPoliza.requestNumber, e)
 
-			psnService.insertarError(company, identificador, requestXML.toString(), "CONSOLIDACION", "Peticion no realizada para solicitud: " + consolidacionPoliza.requestNumber + ". Error: " + e.getMessage())
+			requestService.insertarError(company, identificador, requestXML.toString(), "CONSOLIDACION", "Peticion no realizada para solicitud: " + consolidacionPoliza.requestNumber + ". Error: " + e.getMessage())
 		}finally{
 
 			def sesion=RequestContextHolder.currentRequestAttributes().getSession()
@@ -583,7 +583,7 @@ class PsnUnderwrittingCaseManagementService	 {
 						identificador = "num_sol: " + consultaExpediente.numSolicitud + "-numSup: " + consultaExpediente.numSumplemento
 					}
 
-					psnService.insertarEnvio (company, identificador, requestXML.toString())
+					requestService.insertarEnvio (company, identificador, requestXML.toString())
 
 					logginService.putInfoEndpoint("ConsultaExpediente","Realizando peticion para " + company.nombre + " con " + identificador)
 
@@ -648,7 +648,7 @@ class PsnUnderwrittingCaseManagementService	 {
 			status = StatusType.ERROR
 			code = 2
 
-			psnService.insertarError(company, identificador, requestXML.toString(), "CONSULTA", "Peticion no realizada para " + identificador + ". Error: " + e.getMessage())
+			requestService.insertarError(company, identificador, requestXML.toString(), "CONSULTA", "Peticion no realizada para " + identificador + ". Error: " + e.getMessage())
 		}finally{
 			//BORRAMOS VARIABLES DE SESION
 			def sesion=RequestContextHolder.currentRequestAttributes().getSession()
@@ -709,7 +709,7 @@ class PsnUnderwrittingCaseManagementService	 {
 							requestXML=psnService.marshall(consultaDocumento)
 							requestBBDD=requestService.crear(opername,requestXML)
 
-							psnService.insertarEnvio(company, identificador, requestXML.toString())
+							requestService.insertarEnvio(company, identificador, requestXML.toString())
 
 							logginService.putInfoEndpoint("ConsultaDocumento","Realizando peticion para " + company.nombre + " con numero de expiente: " + consultaDocumento.codigoSt + " y " + identificador)
 
@@ -746,7 +746,7 @@ class PsnUnderwrittingCaseManagementService	 {
 							requestXML=psnService.marshall(consultaDocumento)
 							requestBBDD=requestService.crear(opername,requestXML)
 
-							psnService.insertarEnvio(company, identificador, requestXML.toString())
+							requestService.insertarEnvio(company, identificador, requestXML.toString())
 
 							logginService.putInfoEndpoint("ConsultaDocumento","Realizando peticion para " + company.nombre + " con numero de expiente: " + consultaDocumento.codigoSt + " y " + identificador)
 
@@ -801,7 +801,7 @@ class PsnUnderwrittingCaseManagementService	 {
 			messages = "Error en ConsultaExpediente: " + e.getMessage()
 			status = StatusType.ERROR
 
-			psnService.insertarError(company, identificador, requestXML.toString(), "CONSULTA", "Peticion no realizada para solicitud: " + identificador + ". Error: " + e.getMessage())
+			requestService.insertarError(company, identificador, requestXML.toString(), "CONSULTA", "Peticion no realizada para solicitud: " + identificador + ". Error: " + e.getMessage())
 			
 		}finally{
 			//BORRAMOS VARIABLES DE SESION

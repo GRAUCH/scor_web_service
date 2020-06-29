@@ -90,7 +90,7 @@ class CaserUnderwrittingCaseManagementService {
                     logginService.putInfoMessage("Exisiten ${expedientes.size()}  con numero de solicitud " + gestionReconocimientoMedico.policyHolderInformation.requestNumber)
                     if (expedientes != null && expedientes.size() == 0) {
                         expedienteService.crearExpediente(requestBBDD, TipoCompany.CASER)
-                        caserService.insertarRecibido(company, gestionReconocimientoMedico.policyHolderInformation.requestNumber, requestXML.toString(), "ALTA")
+                        requestService.insertarRecibido(company, gestionReconocimientoMedico.policyHolderInformation.requestNumber, requestXML.toString(), "ALTA")
                         /**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
                          *
                          */
@@ -113,7 +113,7 @@ class CaserUnderwrittingCaseManagementService {
             notes = "Error: " + e.getMessage()
             status = StatusType.ERROR
 
-            caserService.insertarError(company, gestionReconocimientoMedico.policyHolderInformation.requestNumber, requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + gestionReconocimientoMedico.policyHolderInformation.requestNumber + ". Error: " + e.getMessage())
+            requestService.insertarError(company, gestionReconocimientoMedico.policyHolderInformation.requestNumber, requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + gestionReconocimientoMedico.policyHolderInformation.requestNumber + ". Error: " + e.getMessage())
 
             logginService.putErrorEndpoint("GestionReconocimientoMedico", "Peticion no realizada de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.policyHolderInformation.requestNumber + ". Error: " + e.getMessage())
             correoUtil.envioEmailErrores("GestionReconocimientoMedico", "Peticion de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.policyHolderInformation.requestNumber, e)
@@ -171,7 +171,7 @@ class CaserUnderwrittingCaseManagementService {
 
                     logginService.putInfoEndpoint("ResultadoReconocimientoMedico", "Realizando peticion para " + company.nombre + " con fecha: " + resultadoReconocimientoMedico.dateStart.toString() + "-" + resultadoReconocimientoMedico.dateEnd.toString())
 
-                    caserService.insertarEnvio(company, resultadoReconocimientoMedico.dateStart.toString().substring(0, 10) + "-" + resultadoReconocimientoMedico.dateEnd.toString().substring(0, 10), requestXML.toString())
+                    requestService.insertarEnvio(company, resultadoReconocimientoMedico.dateStart.toString().substring(0, 10) + "-" + resultadoReconocimientoMedico.dateEnd.toString().substring(0, 10), requestXML.toString())
 
                     for (int i = 1; i < 3; i++) {
 
@@ -223,7 +223,7 @@ class CaserUnderwrittingCaseManagementService {
             notes = "Error en resultadoReconocimientoMedico: " + e.getMessage()
             status = StatusType.ERROR
 
-            caserService.insertarError(company, resultadoReconocimientoMedico.dateStart.toString().substring(0, 10) + "-" + resultadoReconocimientoMedico.dateEnd.toString().substring(0, 10), requestXML.toString(), "CONSULTA", "Peticion no realizada para solicitud: " + resultadoReconocimientoMedico.dateStart.toString() + "-" + resultadoReconocimientoMedico.dateEnd.toString() + ". Error: " + e.getMessage())
+            requestService.insertarError(company, resultadoReconocimientoMedico.dateStart.toString().substring(0, 10) + "-" + resultadoReconocimientoMedico.dateEnd.toString().substring(0, 10), requestXML.toString(), "CONSULTA", "Peticion no realizada para solicitud: " + resultadoReconocimientoMedico.dateStart.toString() + "-" + resultadoReconocimientoMedico.dateEnd.toString() + ". Error: " + e.getMessage())
         } finally {
 
             def sesion = RequestContextHolder.currentRequestAttributes().getSession()
@@ -274,7 +274,7 @@ class CaserUnderwrittingCaseManagementService {
 
                     respuestaCRM = expedienteService.consultaExpedienteNumSolicitud(consultaExpediente.codExpediente, "ES", company.codigoSt)
 
-                    caserService.insertarEnvio(company, consultaExpediente.codExpediente, requestXML.toString())
+                    requestService.insertarEnvio(company, consultaExpediente.codExpediente, requestXML.toString())
 
                     if (respuestaCRM != null && respuestaCRM.getListaExpedientes() != null) {
 
@@ -329,7 +329,7 @@ class CaserUnderwrittingCaseManagementService {
             notes = "Error en ConsultaExpediente: " + e.getMessage()
             status = StatusType.ERROR
 
-            caserService.insertarError(company, consultaExpediente.codExpediente, requestXML.toString(), "CONSULTA", "Peticion no realizada para solicitud: " + consultaExpediente.codExpediente + ". Error: " + e.getMessage())
+            requestService.insertarError(company, consultaExpediente.codExpediente, requestXML.toString(), "CONSULTA", "Peticion no realizada para solicitud: " + consultaExpediente.codExpediente + ". Error: " + e.getMessage())
         } finally {
             //BORRAMOS VARIABLES DE SESION
             def sesion = RequestContextHolder.currentRequestAttributes().getSession()
@@ -378,7 +378,7 @@ class CaserUnderwrittingCaseManagementService {
 
                 if (consolidacionPoliza.requestNumber != null && !consolidacionPoliza.requestNumber.isEmpty() != null && consolidacionPoliza.ciaCode != null && !consolidacionPoliza.ciaCode.isEmpty() && consolidacionPoliza.policyNumber != null && !consolidacionPoliza.policyNumber.isEmpty()) {
 
-                    caserService.insertarRecibido(company, consolidacionPoliza.requestNumber, requestXML.toString(), "CONSOLIDACION")
+                    requestService.insertarRecibido(company, consolidacionPoliza.requestNumber, requestXML.toString(), "CONSOLIDACION")
 
                     expediente = expedienteService.consultaExpedienteNumSolicitud(consolidacionPoliza.requestNumber, "ES", codigoSt)
 
@@ -402,7 +402,7 @@ class CaserUnderwrittingCaseManagementService {
                                 correoUtil.envioEmail("ConsolidacionPoliza", "Error en la modificacion de " + company.nombre + " con numero de solicitud: " + consolidacionPoliza.requestNumber + ". Error: " + respuestaCrmExpediente.getErrorCRM().getDetalle(), null)
                                 logginService.putInfoEndpoint("ConsolidacionPoliza", "Error en la modificacion de " + company.nombre + " con numero de solicitud: " + consolidacionPoliza.requestNumber + ". Error: " + respuestaCrmExpediente.getErrorCRM().getDetalle())
 
-                                caserService.insertarError(company, consolidacionPoliza.requestNumber, requestXML.toString(), "CONSOLIDACION", "Peticion no realizada para solicitud: " + consolidacionPoliza.requestNumber + ". Error: " + respuestaCrmExpediente.getErrorCRM().getDetalle())
+                                requestService.insertarError(company, consolidacionPoliza.requestNumber, requestXML.toString(), "CONSOLIDACION", "Peticion no realizada para solicitud: " + consolidacionPoliza.requestNumber + ". Error: " + respuestaCrmExpediente.getErrorCRM().getDetalle())
                             } else {
 
                                 notes = "El caso se ha procesado correctamente"
@@ -453,7 +453,7 @@ class CaserUnderwrittingCaseManagementService {
             logginService.putErrorEndpoint("ConsolidacionPoliza", "Peticion realizada para " + company.nombre + " con con numero de expiente: " + consolidacionPoliza.requestNumber + ". Error: " + e.getMessage())
             correoUtil.envioEmailErrores("ConsolidacionPoliza", "Peticion realizada para " + company.nombre + " con numero de expiente: " + consolidacionPoliza.requestNumber, e)
 
-            caserService.insertarError(company, consolidacionPoliza.requestNumber, requestXML.toString(), "CONSOLIDACION", "Peticion no realizada para solicitud: " + consolidacionPoliza.requestNumber + ". Error: " + e.getMessage())
+            requestService.insertarError(company, consolidacionPoliza.requestNumber, requestXML.toString(), "CONSOLIDACION", "Peticion no realizada para solicitud: " + consolidacionPoliza.requestNumber + ". Error: " + e.getMessage())
         } finally {
 
             def sesion = RequestContextHolder.currentRequestAttributes().getSession()
