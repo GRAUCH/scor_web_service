@@ -65,8 +65,7 @@ class AlptisUnderwrittingCaseManagementService {
 
 					requestXML=requestService.marshall(alptisUnderwrittingCaseManagementRequest,AlptisUnderwrittingCaseManagementRequest.class)
 					requestBBDD = requestService.crear(opername,requestXML)
-					requestBBDD.fecha_procesado = new Date()
-					requestBBDD.save(flush:true)
+
 					resultado.setStatusType(StatusType.ok)
 					resultado.setComments("ok mensaje")
 

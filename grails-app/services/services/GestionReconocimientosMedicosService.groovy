@@ -77,10 +77,7 @@ class GestionReconocimientosMedicosService {
                 if (Company.findByNombre("lagunaro").generationAutomatic && gestionReconocimientoMedicoRequest.getDatos_envio().getMovimiento().getNombre().equals("A")) {
 
                     requestXML = requestService.marshall(gestionReconocimientoMedicoRequest, GestionReconocimientoMedicoRequest.class)
-
                     requestBBDD = requestService.crear(opername, requestXML)
-                    requestBBDD.fecha_procesado = new Date()
-                    requestBBDD.save(flush: true)
 
                     expedienteService.crearExpediente(requestBBDD, TipoCompany.LAGUN_ARO)
 
@@ -191,6 +188,7 @@ class GestionReconocimientosMedicosService {
         def opername = "TramitacionReconocimientoMedicoRequest"
         def correoUtil = new CorreoUtil()
         def requestXML = ""
+        def requestBBDD
         TramitacionReconocimientoMedicoResponse result = new TramitacionReconocimientoMedicoResponse()
         def timedelay = System.currentTimeMillis()
         logginService.putInfoEndpoint("Endpoint-" + opername, "Peticion para fecha: " + tramitacionReconocimientoMedicoRequest.fecha)
@@ -205,7 +203,7 @@ class GestionReconocimientosMedicosService {
             session.setAttribute("compa", "lagunaro")
             if (operacion && operacion.activo) {
                 requestXML = requestService.marshall(tramitacionReconocimientoMedicoRequest, TramitacionReconocimientoMedicoRequest.class)
-                requestService.crear(opername, requestXML)
+                requestBBDD = requestService.crear(opername, requestXML)
                 listaExpedientes = tarificadorService.tarificador(tramitacionReconocimientoMedicoRequest.fecha)
                 def listPolizaBasicaGroup = []
                 listaExpedientes.each {

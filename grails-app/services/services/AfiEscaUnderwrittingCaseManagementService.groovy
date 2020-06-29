@@ -62,8 +62,6 @@ class AfiEscaUnderwrittingCaseManagementService {
 
 				requestXML=requestService.marshall(afiEscaUnderwrittingCaseManagementRequest,AfiEscaUnderwrittingCaseManagementRequest.class)
 				requestBBDD = requestService.crear(opername,requestXML)
-				requestBBDD.fecha_procesado = new Date()
-				requestBBDD.save(flush:true)
 				resultado.setStatusType(StatusType.ok)
 				resultado.setComments("ok mensaje")
 

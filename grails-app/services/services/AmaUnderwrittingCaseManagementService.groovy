@@ -95,8 +95,6 @@ class AmaUnderwrittingCaseManagementService	 {
 
 					requestXML=amaService.marshall(gestionReconocimientoMedico)
 					requestBBDD = requestService.crear(opername,requestXML)
-					requestBBDD.fecha_procesado = new Date()
-					requestBBDD.save(flush:true)
 
 					if (gestionReconocimientoMedico && gestionReconocimientoMedico.candidateInformation.operacion) {
 
