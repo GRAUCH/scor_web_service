@@ -28,7 +28,7 @@ class RequestService implements IRequestService {
     def estadisticasService = new EstadisticasService()
 
     def getBBDDRequest(Request requestInstance, String opername, String schema, Class<?> myObjectClass) {
-        def object = jaxbParser(requestInstance.getRequest(),myObjectClass)
+        def object = unmarshall(requestInstance.getRequest(), myObjectClass)
         def requestXML
         if (schema) {
             requestXML = marshall(schema, object, myObjectClass)
@@ -40,7 +40,7 @@ class RequestService implements IRequestService {
         return requestBBDD
     }
 
-    def jaxbParser(String entrada, Class<?> myObjectClass) {
+    def unmarshall(String entrada, Class<?> myObjectClass) {
         def object = null
         if (entrada != null && !entrada.trim().isEmpty()) {
             JAXBContext jaxbContext = JAXBContext.newInstance(myObjectClass)
