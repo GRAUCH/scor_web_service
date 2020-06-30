@@ -13,5 +13,8 @@ interface IRequestService {
     void insertarRecibido(Company company, String identificador, String info, String operacion)
     void insertarError(Company company, String identificador, String info, String operacion, String detalleError)
     void insertarEnvio (Company company, String identificador, String info)
+    void insertarRecibido(String companyId, String identificador, String info, String operacion)
+    void insertarError(String companyId, String identificador, String info, String operacion, String detalleError)
+    void insertarEnvio (String companyId, String identificador, String info)
 
 }

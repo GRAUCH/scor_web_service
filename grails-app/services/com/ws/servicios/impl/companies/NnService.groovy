@@ -5,8 +5,6 @@ import com.scor.global.WSException
 import com.scor.srpfileinbound.DATOS
 import com.scor.srpfileinbound.REGISTRODATOS
 import com.scortelemed.Company
-import com.scortelemed.Envio
-import com.scortelemed.Recibido
 import com.scortelemed.Request
 import com.scortelemed.schemas.nn.GestionReconocimientoMedicoRequest
 import com.scortelemed.schemas.nn.ResultadoReconocimientoMedicoRequest
@@ -214,7 +212,7 @@ class NnService implements ICompanyService{
         }
     }
 
-    def busquedaCrm (policyNumber, ou, opername, companyCodigoSt, companyId, requestBBDD, certificado, companyName) {
+    def busquedaCrm (def policyNumber, def ou, def opername, def companyCodigoSt, def companyId, def requestBBDD, def certificado, def companyName) {
 
         task {
 
@@ -279,18 +277,7 @@ class NnService implements ICompanyService{
 
                     logginService.putInfoMessage("BusquedaExpedienteCrm - Nueva alta de " + companyName + " con numero de solicitud: " + policyNumber.toString() + " y referencia: " + certificado.toString() + " se ha procesado pero no se ha dado de alta en CRM")
                     correoUtil.envioEmailErrores("BusquedaExpedienteCrm","Nueva alta de " + companyName + " con numero de solicitud: " + policyNumber.toString() + " y referencia: " + certificado.toString() + " se ha procesado pero no se ha dado de alta en CRM",null)
-
-                    /**Metemos en errores
-                     *
-                     */
-                    com.scortelemed.Error error = new com.scortelemed.Error()
-                    error.setFecha(new Date())
-                    error.setCia(companyId.toString())
-                    error.setIdentificador(policyNumber.toString())
-                    error.setInfo(requestBBDD.request)
-                    error.setOperacion("ALTA")
-                    error.setError("Peticion procesada para numero de solicitud: " + policyNumber.toString() + ". No encontrada en CRM")
-                    error.save(flush:true)
+                    requestService.insertarError(companyId.toString(), policyNumber.toString(), (String)requestBBDD.request, "ALTA", "Peticion procesada para numero de solicitud: " + policyNumber.toString() + ". No encontrada en CRM")
                 }
             } catch (Exception e) {
 

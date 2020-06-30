@@ -703,21 +703,10 @@ class CbpitaService implements ICompanyService{
                  */
                 if (limite == 10) {
 
-
                     logginService.putInfoMessage("Nueva alta de " + nombrecia + " con numero de solicitud: " + solicitud.toString() + " se ha procesado pero no se ha dado de alta en CRM")
                     correoUtil.envioEmailErrores("ERROR en alta de HMI-CBP", "Nueva alta de " + nombrecia + " con numero de solicitud: " + solicitud.toString() + " se ha procesado pero no se ha dado de alta en CRM", null)
+                    requestService.insertarError(companyId.toString(), solicitud.toString(), (String)requestBBDD.request, "ALTA", "Peticion procesada para numero de solicitud: " + solicitud.toString() + ". No encontrada en CRM")
 
-                    /**Metemos en errores
-                     *
-                     */
-                    com.scortelemed.Error error = new com.scortelemed.Error()
-                    error.setFecha(new Date())
-                    error.setCia(companyId.toString())
-                    error.setIdentificador(solicitud.toString())
-                    error.setInfo(requestBBDD.request)
-                    error.setOperacion("ALTA")
-                    error.setError("Peticion procesada para numero de solicitud: " + solicitud.toString() + ". No encontrada en CRM")
-                    error.save(flush: true)
                 }
             } catch (Exception e) {
 

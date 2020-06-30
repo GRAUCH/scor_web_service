@@ -22,7 +22,7 @@ import java.util.regex.Pattern
 import grails.transaction.Transactional
 
 @Transactional
-class RequestService implements IRequestService{
+class RequestService implements IRequestService {
 
     def logginService = new LogginService()
     def estadisticasService = new EstadisticasService()
@@ -30,26 +30,26 @@ class RequestService implements IRequestService{
     def getBBDDRequest(Request requestInstance, String opername, String schema, Class<?> myObjectClass) {
         def object = jaxbParser(requestInstance.getRequest(),myObjectClass)
         def requestXML
-        if(schema) {
-            requestXML = marshall(schema,object,myObjectClass)
+        if (schema) {
+            requestXML = marshall(schema, object, myObjectClass)
         } else {
-            requestXML = marshall(object,myObjectClass)
+            requestXML = marshall(object, myObjectClass)
         }
-        def requestBBDD = crear(opername,requestXML)
+        def requestBBDD = crear(opername, requestXML)
         logginService.putInfoMessage("Se ha procesado una request manualmente para: " + requestInstance.company)
         return requestBBDD
     }
 
     def jaxbParser(String entrada, Class<?> myObjectClass) {
         def object = null
-        if (entrada!= null && !entrada.trim().isEmpty()) {
+        if (entrada != null && !entrada.trim().isEmpty()) {
             JAXBContext jaxbContext = JAXBContext.newInstance(myObjectClass)
             Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller()
             StringReader reader = new StringReader(entrada.trim())
             JAXBElement<?> root = jaxbUnmarshaller.unmarshal(new StreamSource(reader), myObjectClass)
             object = root.getValue()
         }
-        return  object
+        return object
     }
 
     def marshall(def objetoRelleno, Class<?> clase) {
@@ -127,30 +127,42 @@ class RequestService implements IRequestService{
     }
 
     void insertarRecibido(Company company, String identificador, String info, String operacion) {
+        insertarRecibido(company.id.toString(), identificador, info, operacion)
+    }
+
+    void insertarRecibido(String companyId, String identificador, String info, String operacion) {
         Recibido recibido = new Recibido()
         recibido.setFecha(new Date())
-        recibido.setCia(company.id.toString())
+        recibido.setCia(companyId)
         recibido.setIdentificador(identificador)
         recibido.setInfo(info)
         recibido.setOperacion(operacion)
-        recibido.save(flush:true)
+        recibido.save(flush: true)
     }
 
     void insertarError(Company company, String identificador, String info, String operacion, String detalleError) {
+        insertarError(company.id.toString(), identificador, info, operacion, detalleError)
+    }
+
+    void insertarError(String companyId, String identificador, String info, String operacion, String detalleError) {
         Error error = new Error()
         error.setFecha(new Date())
-        error.setCia(company.id.toString())
+        error.setCia(companyId)
         error.setIdentificador(identificador)
         error.setInfo(info)
         error.setOperacion(operacion)
         error.setError(detalleError)
-        error.save(flush:true)
+        error.save(flush: true)
     }
 
     void insertarEnvio (Company company, String identificador, String info) {
+        insertarEnvio (company.id.toString(), identificador, info)
+    }
+
+    void insertarEnvio (String companyId, String identificador, String info) {
         Envio envio = new Envio()
         envio.setFecha(new Date())
-        envio.setCia(company.id.toString())
+        envio.setCia(companyId)
         envio.setIdentificador(identificador)
         envio.setInfo(info)
         envio.save(flush:true)

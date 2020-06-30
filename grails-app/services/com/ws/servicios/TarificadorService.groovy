@@ -26,7 +26,7 @@ class TarificadorService {
      */
     def grailsApplication
     def expedienteService
-    def hwSoapClientService
+    def requestService
     def fetchUtil = new FetchUtilLagunaro()
     def soapAlptisRecetteWSPRO
     def soapAlptisRecetteWS
@@ -504,18 +504,8 @@ class TarificadorService {
 
                     logginService.putInfoMessage("Nueva alta de Afiesca con numero de solicitud: " + policyNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM")
                     correoUtil.envioEmailErrores(opername, "Nueva alta de Afiesca con numero de solicitud: " + policyNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM", null)
+                    requestService.insertarError(companyId.toString(), companyCodigoSt.toString(), (String)requestBBDD.request, "ALTA", "Peticion procesada para solitud: " + companyCodigoSt.toString() + ". Error: No encontrada en CRM")
 
-                    /**Metemos en errores
-                     *
-                     */
-                    com.scortelemed.Error error = new com.scortelemed.Error()
-                    error.setFecha(new Date())
-                    error.setCia(companyId.toString())
-                    error.setIdentificador(companyCodigoSt.toString())
-                    error.setInfo(requestBBDD.request)
-                    error.setOperacion("ALTA")
-                    error.setError("Peticion procesada para solitud: " + companyCodigoSt.toString() + ". Error: No encontrada en CRM")
-                    error.save(flush: true)
                 }
 
             } catch (Exception e) {
@@ -592,21 +582,9 @@ class TarificadorService {
 
                     logginService.putInfoMessage("Nueva alta de Alptis con numero de solicitud: " + policyNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM")
                     correoUtil.envioEmailErrores(opername, " Nueva alta de Alptis con numero de solicitud: " + policyNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM", null)
-
-                    /**Metemos en errores
-                     *
-                     */
-                    com.scortelemed.Error error = new com.scortelemed.Error()
-                    error.setFecha(new Date())
-                    error.setCia(companyId.toString())
-                    error.setIdentificador(policyNumber.toString())
-                    error.setInfo(requestBBDD.request)
-                    error.setOperacion("ALTA")
-                    error.setError("Peticion procesada para solitud: " + policyNumber.toString() + ". Error: No encontrada en CRM")
-                    error.save(flush: true)
+                    requestService.insertarError(companyId.toString(), policyNumber.toString(), (String) requestBBDD.request, "ALTA", "Peticion procesada para solitud: " + policyNumber.toString() + ". Error: No encontrada en CRM")
 
                 }
-
 
             } catch (Exception e) {
 
@@ -681,18 +659,7 @@ class TarificadorService {
 
                     logginService.putInfoMessage("Nueva alta automatica de Lifesquare con numero de solicitud: " + policyNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM")
                     correoUtil.envioEmailErrores(opername, "Nueva alta automatica de Lifesquare con numero de solicitud: " + policyNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM", null)
-
-                    /**Metemos en errores
-                     *
-                     */
-                    com.scortelemed.Error error = new com.scortelemed.Error()
-                    error.setFecha(new Date())
-                    error.setCia(companyId.toString())
-                    error.setIdentificador(policyNumber.toString())
-                    error.setInfo(requestBBDD.request)
-                    error.setOperacion("ALTA")
-                    error.setError("Peticion procesada para solitud: " + policyNumber.toString() + ". No encontrada en CRM")
-                    error.save(flush: true)
+                    requestService.insertarError(companyId.toString(), policyNumber.toString(), (String) requestBBDD.request, "ALTA", "Peticion procesada para solitud: " + policyNumber.toString() + ". No encontrada en CRM")
 
                 }
 

@@ -99,8 +99,8 @@ class LifesquareUnderwrittingCasesResultsService {
 					
 					
 					listTuwCases.each { caso ->
-						def identificador = caso.policy_number!=null?caso.policy_number:caso.reference_number
-						requestService.insertarEnvio(company, identificador, "")
+						String identificador = caso.policy_number!=null?caso.policy_number:caso.reference_number
+						requestService.insertarEnvio(company, identificador, requestXML.toString())
 						logginService.putInfoMessage("Informacion expediente " + identificador + " enviado a " + company.nombre + " correctamente")
 						
 					}

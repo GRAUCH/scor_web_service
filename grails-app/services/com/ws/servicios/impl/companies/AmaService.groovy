@@ -1303,17 +1303,8 @@ class AmaService implements ICompanyService{
 
 					logginService.putInfoMessage("BusquedaExpedienteCrm - Nueva alta de " + companyName + " con numero de solicitud: " + requestNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM")
 					correoUtil.envioEmailErrores("BusquedaExpedienteCrm","Nueva alta de " + companyName + " con numero de solicitud: " + requestNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM",null)
-
-					/**Metemos en errores
-					 *
-					 */
-					com.scortelemed.Error error = new com.scortelemed.Error()
-					error.setFecha(new Date())
-					error.setIdentificador(requestNumber.toString())
-					error.setInfo(requestBBDD.request)
-					error.setOperacion("ALTA")
-					error.setError("Peticion procesada para soilicitud: " + requestNumber.toString() + ". Error: No encontrada en CRM")
-					error.save(flush:true)
+					requestService.insertarError(companyId.toString(), requestNumber.toString(), (String)requestBBDD.request, "ALTA", "Peticion procesada para soilicitud: " + requestNumber.toString() + ". Error: No encontrada en CRM")
+					
 				}
 
 			} catch (Exception e) {

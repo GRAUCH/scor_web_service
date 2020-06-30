@@ -660,19 +660,8 @@ class CajamarService implements ICompanyService{
 
 					logginService.putInfoMessage("Nueva alta de Cajamar con numero de solicitud: " + numref.toString() + " se ha procesado pero no se ha dado de alta en CRM")
 					correoUtil.envioEmailErrores("BusquedaExpedienteCrm","Nueva alta de Cajamar con numero de solicitud: " + numref.toString() + " se ha procesado pero no se ha dado de alta en CRM",null)
+					requestService.insertarError(companyId.toString(), numref.toString(), (String)requestBBDD.request, "ALTA", "Peticion procesada para numero de solictud: " + numref.toString() + ". No encontrada en CRM")
 
-
-					/**Metemos en errores
-					 *
-					 */
-					com.scortelemed.Error error = new com.scortelemed.Error()
-					error.setFecha(new Date())
-					error.setCia(companyId.toString())
-					error.setIdentificador(numref.toString())
-					error.setInfo(requestBBDD.request)
-					error.setOperacion("ALTA")
-					error.setError("Peticion procesada para numero de solictud: " + numref.toString() + ". No encontrada en CRM")
-					error.save(flush:true)
 				}
 			} catch (Exception e) {
 
