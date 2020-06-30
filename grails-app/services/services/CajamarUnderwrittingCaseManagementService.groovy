@@ -47,17 +47,11 @@ properties = [@GrailsCxfEndpointProperty(name = "ws-security.enable.nonce.cache"
 class CajamarUnderwrittingCaseManagementService {
 
 	def expedienteService
-
-	@Autowired
-	private CajamarService cajamarService
-	@Autowired
-	private EstadisticasService estadisticasService
-	@Autowired
-	private RequestService requestService
-	@Autowired
-	private LogginService logginService
-	@Autowired
-	private TarificadorService tarificadorService
+	def cajamarService
+	def estadisticasService
+	def requestService
+	def logginService
+	def tarificadorService
 
 	@WebResult(name = "CajamarUnderwrittingCaseManagementResponse")
 	@WebMethod

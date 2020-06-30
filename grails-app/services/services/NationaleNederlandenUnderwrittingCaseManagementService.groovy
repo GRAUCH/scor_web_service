@@ -33,16 +33,11 @@ import java.text.SimpleDateFormat
 class NationaleNederlandenUnderwrittingCaseManagementService {
 
 	def expedienteService
-	@Autowired
-	private NnService nnService
-	@Autowired
-	private EstadisticasService estadisticasService
-	@Autowired
-	private RequestService requestService
-	@Autowired
-	private LogginService logginService
-	@Autowired
-	private TarificadorService tarificadorService
+	def nnService
+	def estadisticasService
+	def requestService
+	def logginService
+	def tarificadorService
 
 	@WebResult(name = "GestionReconocimientoMedicoResponse")
 	GestionReconocimientoMedicoResponse gestionReconocimientoMedico(

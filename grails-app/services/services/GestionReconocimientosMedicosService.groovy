@@ -41,9 +41,7 @@ class GestionReconocimientosMedicosService {
     def logginService
     def expedienteService
     def tarificadorService
-
-    @Autowired
-    private LagunaroService lagunaroService
+    def lagunaroService
 
     @WebResult(name = "GestionReconocimientoMedicoResponse")
     GestionReconocimientoMedicoResponse GestionReconocimientosMedico(

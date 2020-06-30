@@ -52,16 +52,11 @@ expose = EndpointType.JAX_WS,properties = [@GrailsCxfEndpointProperty(name = "ws
 class AmaUnderwrittingCaseManagementService	 {
 
 	def expedienteService
-	@Autowired
-	private AmaService amaService
-	@Autowired
-	private EstadisticasService estadisticasService
-	@Autowired
-	private RequestService requestService
-	@Autowired
-	private LogginService logginService
-	@Autowired
-	private TarificadorService tarificadorService
+	def amaService
+	def estadisticasService
+	def requestService
+	def logginService
+	def tarificadorService
 
 	@WebResult(name = "GestionReconocimientoMedicoResponse")
 	GestionReconocimientoMedicoResponse gestionReconocimientoMedico(

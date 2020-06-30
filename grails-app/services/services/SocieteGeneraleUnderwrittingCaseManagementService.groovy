@@ -43,16 +43,10 @@ class SocieteGeneraleUnderwrittingCaseManagementService	 {
 
 	def requestService
 	def expedienteService
-	@Autowired
-	private SocieteGeneraleService societeGeneraleService
-	@Autowired
-	private EstadisticasService estadisticasService
-	@Autowired
-	private RequestService requestService
-	@Autowired
-	private LogginService logginService
-	@Autowired
-	private TarificadorService tarificadorService
+	def societeGeneraleService
+	def estadisticasService
+	def logginService
+	def tarificadorService
 
 	@WebResult(name = "CaseManagementResponse")
 	SocieteGeneraleUnderwrittingCaseManagementResponse societeGeneraleUnderwrittingCaseManagement(

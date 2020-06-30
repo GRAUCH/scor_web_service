@@ -32,16 +32,11 @@ expose = EndpointType.JAX_WS,properties = [@GrailsCxfEndpointProperty(name = "ws
 class MethislabCFUnderwrittingCaseManagementService {
 
 	def expedienteService
-	@Autowired
-	private MethislabCFService methislabCFService
-	@Autowired
-	private EstadisticasService estadisticasService
-	@Autowired
-	private RequestService requestService
-	@Autowired
-	private LogginService logginService
-	@Autowired
-	private TarificadorService tarificadorService
+	def methislabCFService
+	def estadisticasService
+	def requestService
+	def logginService
+	def tarificadorService
 
 	@WebResult(name = "caseManagementResponse")
 	MethislabCFUnderwrittingCaseManagementResponse MethislabCFUnderwrittingCaseManagementResponse(@WebParam(partName = "CaseManagementRequest",name = "CaseManagementRequest")

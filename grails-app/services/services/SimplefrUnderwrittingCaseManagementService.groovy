@@ -41,14 +41,10 @@ class SimplefrUnderwrittingCaseManagementService	 {
 
 	def expedienteService
 	def requestService
-	@Autowired
-	private SimplefrService simplefrService
-	@Autowired
-	private EstadisticasService estadisticasService
-	@Autowired
-	private LogginService logginService
-	@Autowired
-	private TarificadorService tarificadorService
+	def simplefrService
+	def estadisticasService
+	def logginService
+	def tarificadorService
 
 	@WebResult(name = "CaseManagementResponse")
 	SimplefrUnderwrittingCaseManagementResponse simpleUnderwrittingCaseManagement(

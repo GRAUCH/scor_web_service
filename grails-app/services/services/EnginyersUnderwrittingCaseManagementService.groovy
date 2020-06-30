@@ -44,16 +44,11 @@ expose = EndpointType.JAX_WS,properties = [@GrailsCxfEndpointProperty(name = "ws
 class EnginyersUnderwrittingCaseManagementService {
 
 	def expedienteService = new ExpedienteService()
-	@Autowired
-	private EnginyersService enginyersService
-	@Autowired
-	private EstadisticasService estadisticasService
-	@Autowired
-	private RequestService requestService
-	@Autowired
-	private LogginService logginService
-	@Autowired
-	private TarificadorService tarificadorService
+	def enginyersService
+	def estadisticasService
+	def requestService
+	def logginService
+	def tarificadorService
 
 	@WebResult(name = "addExpResponse")
 	@WebMethod(action = "http://www.scortelemed.com/schemas/enginyers/addExp")

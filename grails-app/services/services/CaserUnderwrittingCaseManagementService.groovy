@@ -34,17 +34,12 @@ import java.text.SimpleDateFormat
 @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
 class CaserUnderwrittingCaseManagementService {
 
-    def expedienteService = new ExpedienteService()
-    @Autowired
-    private CaserService caserService
-    @Autowired
-    private EstadisticasService estadisticasService
-    @Autowired
-    private RequestService requestService
-    @Autowired
-    private LogginService logginService
-    @Autowired
-    private TarificadorService tarificadorService
+    def expedienteService
+    def caserService
+    def estadisticasService
+    def requestService
+    def logginService
+    def tarificadorService
 
     @WebResult(name = "GestionReconocimientoMedicoResponse")
     GestionReconocimientoMedicoResponse gestionReconocimientoMedico(
