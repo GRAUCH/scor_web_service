@@ -691,7 +691,7 @@ class MethislabService implements ICompanyService{
                 correoUtil.envioEmailErrores("BusquedaExpedienteCrm", "Nueva alta de " + companyName + " con numero de solicitud: " + requestNumber.toString() + " y num. certificado: " + certificateNumber.toString(), e)
             }
         }
-    }p
+    }
 
     def devolverStateType(estado) {
 
