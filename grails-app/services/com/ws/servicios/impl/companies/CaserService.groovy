@@ -35,7 +35,7 @@ class CaserService implements ICompanyService{
     def tarificadorService
     CorreoUtil correoUtil = new CorreoUtil()
 
-    @Override
+
     String marshall(def objeto) {
         String nameSpace = "http://www.scortelemed.com/schemas/caser"
         String result
@@ -54,7 +54,7 @@ class CaserService implements ICompanyService{
         }
     }
 
-    @Override
+
     def buildDatos(Request req, String codigoSt) {
         try {
             DATOS dato = new DATOS()
@@ -69,7 +69,7 @@ class CaserService implements ICompanyService{
         }
     }
 
-    @Override
+
     def getCodigoStManual(Request req) {
         return null
     }

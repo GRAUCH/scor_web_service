@@ -30,7 +30,7 @@ class SimplefrService implements ICompanyService{
 	def tarificadorService
 	def grailsApplication
 
-	@Override
+
 	String marshall(def objeto) {
 		String nameSpace = "http://www.scortelemed.com/schemas/simplefr"
 		String result
@@ -45,7 +45,7 @@ class SimplefrService implements ICompanyService{
 		}
 	}
 
-	@Override
+
 	def buildDatos(Request req, String codigoSt) {
 		try {
 			DATOS dato = new DATOS()
@@ -60,7 +60,7 @@ class SimplefrService implements ICompanyService{
 		}
 	}
 
-	@Override
+
 	def getCodigoStManual(Request req) {
 		return null
 	}

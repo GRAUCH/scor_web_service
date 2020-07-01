@@ -35,7 +35,7 @@ class LagunaroService implements ICompanyService{
 	/**
 	 * LAGUNARO  (Beans, sin namespace)
 	 */
-	@Override
+
 	String marshall(def objeto) {
 		String result
 		try{
@@ -49,7 +49,7 @@ class LagunaroService implements ICompanyService{
 		}
 	}
 
-	@Override
+
 	def buildDatos(Request req, String codigoSt) {
 		try {
 			DATOS dato = new DATOS()
@@ -63,7 +63,7 @@ class LagunaroService implements ICompanyService{
 		}
 	}
 
-	@Override
+
 	def getCodigoStManual(Request req) {
 		return null
 	}

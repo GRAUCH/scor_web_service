@@ -35,7 +35,7 @@ class CajamarService implements ICompanyService{
 	/**
 	 * CAJAMAR  (Beans, sin namespace)
 	 */
-	@Override
+
 	String marshall(def objeto) {
 		String nameSpace = "http://www.scortelemed.com/schemas/cajamar"
 		String result
@@ -50,7 +50,7 @@ class CajamarService implements ICompanyService{
 		}
 	}
 
-	@Override
+
 	def buildDatos(Request req, String codigoSt) {
 		try {
 			DATOS dato = new DATOS()
@@ -65,7 +65,7 @@ class CajamarService implements ICompanyService{
 		}
 	}
 
-	@Override
+
 	def getCodigoStManual(Request req) {
 		return null //No tiene particularidades
 	}

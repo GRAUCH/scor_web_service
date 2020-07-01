@@ -40,7 +40,7 @@ class CbpitaService implements ICompanyService{
     ZipUtils zipUtils = new ZipUtils()
     CorreoUtil correoUtil = new CorreoUtil()
 
-    @Override
+
     String marshall(def objeto) {
         String nameSpace = "http://www.scortelemed.com/schemas/cbpita"
         String result
@@ -55,7 +55,7 @@ class CbpitaService implements ICompanyService{
         }
     }
 
-    @Override
+
     def buildDatos(Request req, String codigoSt) {
         try {
             DATOS dato = new DATOS()
@@ -70,7 +70,7 @@ class CbpitaService implements ICompanyService{
         }
     }
 
-    @Override
+
     def getCodigoStManual(Request req) {
         return null
     }

@@ -16,7 +16,7 @@ import org.apache.cxf.annotations.SchemaValidation
 import org.grails.cxf.utils.EndpointType
 import org.grails.cxf.utils.GrailsCxfEndpoint
 import org.grails.cxf.utils.GrailsCxfEndpointProperty
-import org.springframework.beans.factory.annotation.Autowired
+
 import org.springframework.web.context.request.RequestContextHolder
 import servicios.Expediente
 import servicios.Filtro
@@ -88,7 +88,7 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 
 					expedienteService.crearExpediente(requestBBDD, TipoCompany.NET_INSURANCE)
 
-					message = "Il caso � stato elaborato correttamente";
+					message = "Il caso � stato elaborato correttamente"
 					status = StatusType.OK
 
 					requestService.insertarRecibido(company, netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber, requestXML.toString(), "ALTA")
@@ -100,7 +100,7 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 				}
 			} else {
 
-				message = "L'operazione viene disattivata temporaneamente";
+				message = "L'operazione viene disattivata temporaneamente"
 				status = StatusType.OK
 
 				logginService.putInfoEndpoint("GestionReconocimientoMedico","Esta operacion para " + company.nombre + " esta desactivada temporalmente")
@@ -108,7 +108,7 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 			}
 		} catch (Exception e){
 
-			message = "Error: " + e.printStackTrace();
+			message = "Error: " + e.printStackTrace()
 			status = StatusType.ERROR
 
 			requestService.insertarError(company, netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber, requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber + ". Error: " + e.getMessage())
@@ -137,7 +137,7 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 		def opername="NetinsuranceUnderwrittingCaseManagementResponse"
 		def requestXML = ""
 		def requestBBDD
-		List<RespuestaCRMInforme> expedientes = new ArrayList<RespuestaCRMInforme>();
+		List<RespuestaCRMInforme> expedientes = new ArrayList<RespuestaCRMInforme>()
 		TransformacionUtil util = new TransformacionUtil()
 		CorreoUtil correoUtil = new CorreoUtil()
 
@@ -162,17 +162,17 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 					requestBBDD=requestService.crear(opername,requestXML)
 
 					Date date = netInsuranteUnderwrittingCasesResults.dateStart.toGregorianCalendar().getTime()
-					SimpleDateFormat sdfr = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
-					String fechaIni = sdfr.format(date);
+					SimpleDateFormat sdfr = new SimpleDateFormat("yyyyMMdd HH:mm:ss")
+					String fechaIni = sdfr.format(date)
 					date = netInsuranteUnderwrittingCasesResults.dateEnd.toGregorianCalendar().getTime()
-					String fechaFin = sdfr.format(date);
+					String fechaFin = sdfr.format(date)
 
 
 					for (int i = 1; i < 3; i++){
 						if (Environment.current.name.equals("production_wildfly")) {
-							expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1062",null,i,fechaIni,fechaFin,"IT"))
+							expedientes.addAll(expedienteService.obtenerInformeExpedientes("1062",null,i,fechaIni,fechaFin,"IT"))
 						} else {
-							expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1060",null,i,fechaIni,fechaFin,"IT"))
+							expedientes.addAll(expedienteService.obtenerInformeExpedientes("1060",null,i,fechaIni,fechaFin,"IT"))
 						}
 					}
 
@@ -248,7 +248,7 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 		String notes = null
 		StatusType status = null
 
-		RespuestaCRM respuestaCRM = new RespuestaCRM();
+		RespuestaCRM respuestaCRM = new RespuestaCRM()
 		TransformacionUtil util = new TransformacionUtil()
 		CorreoUtil correoUtil = new CorreoUtil()
 

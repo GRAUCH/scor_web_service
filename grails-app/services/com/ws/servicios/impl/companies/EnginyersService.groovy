@@ -34,7 +34,7 @@ class EnginyersService implements ICompanyService{
     def tarificadorService
     TransformacionUtil util = new TransformacionUtil()
 
-    @Override
+
     String marshall(def objeto) {
         String nameSpace = "http://www.scortelemed.com/schemas/enginyers"
         String result
@@ -47,7 +47,7 @@ class EnginyersService implements ICompanyService{
         }
     }
 
-    @Override
+
     def buildDatos(Request req, String codigoSt) {
         try {
             DATOS dato = new DATOS()
@@ -61,7 +61,7 @@ class EnginyersService implements ICompanyService{
         }
     }
 
-    @Override
+
     def getCodigoStManual(Request req) {
         String codigoSt
         //TODO ESTO TIENE SENTIDO?

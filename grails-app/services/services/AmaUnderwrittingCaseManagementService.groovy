@@ -16,7 +16,7 @@ import org.apache.cxf.annotations.SchemaValidation
 import org.grails.cxf.utils.EndpointType
 import org.grails.cxf.utils.GrailsCxfEndpoint
 import org.grails.cxf.utils.GrailsCxfEndpointProperty
-import org.springframework.beans.factory.annotation.Autowired
+
 import org.springframework.web.context.request.RequestContextHolder
 
 import servicios.ClaveFiltro
@@ -180,7 +180,7 @@ class AmaUnderwrittingCaseManagementService	 {
 		CorreoUtil correoUtil = new CorreoUtil()
 		def requestXML = ""
 		def requestBBDD
-		List<RespuestaCRMInforme> expedientes = new ArrayList<RespuestaCRMInforme>();
+		List<RespuestaCRMInforme> expedientes = new ArrayList<RespuestaCRMInforme>()
 		Company company = Company.findByNombre('ama')
 		TransformacionUtil util = new TransformacionUtil()
 
@@ -203,15 +203,15 @@ class AmaUnderwrittingCaseManagementService	 {
 					requestBBDD = requestService.crear(opername,requestXML)
 
 					Date date = resultadoSiniestro.dateStart.toGregorianCalendar().getTime()
-					SimpleDateFormat sdfr = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
-					String fechaIni = sdfr.format(date);
+					SimpleDateFormat sdfr = new SimpleDateFormat("yyyyMMdd HH:mm:ss")
+					String fechaIni = sdfr.format(date)
 					date = resultadoSiniestro.dateEnd.toGregorianCalendar().getTime()
-					String fechaFin = sdfr.format(date);
+					String fechaFin = sdfr.format(date)
 
 					if (Environment.current.name.equals("production_wildfly")) {
-						expedientes=tarificadorService.obtenerInformeExpedientesSiniestros("1060",null,null,fechaIni,fechaFin,"ES")
+						expedientes=expedienteService.obtenerInformeExpedientesSiniestros("1060",null,null,fechaIni,fechaFin,"ES")
 					} else {
-						expedientes=tarificadorService.obtenerInformeExpedientesSiniestros("1061",null,null,fechaIni,fechaFin,"ES")
+						expedientes=expedienteService.obtenerInformeExpedientesSiniestros("1061",null,null,fechaIni,fechaFin,"ES")
 					}
 
 					logginService.putInfoEndpoint("ResultadoSiniestro","Realizando peticion para " + company.nombre + " con fecha " + resultadoSiniestro.dateStart.toString().substring(0,10) +"-"+resultadoSiniestro.dateEnd.toString().substring(0,10))
@@ -308,7 +308,7 @@ class AmaUnderwrittingCaseManagementService	 {
 		int codigo = 0
 
 		Company company = Company.findByNombre("ama")
-		RespuestaCRM expediente = new RespuestaCRM();
+		RespuestaCRM expediente = new RespuestaCRM()
 		TransformacionUtil util = new TransformacionUtil()
 		ConsolidacionPolizaResponse resultado=new ConsolidacionPolizaResponse()
 
@@ -345,7 +345,7 @@ class AmaUnderwrittingCaseManagementService	 {
 							Expediente eModificado = expediente.getListaExpedientes().get(0)
 							eModificado.setNumPoliza(consolidacionPoliza.policyNumber.toString())
 
-							RespuestaCRM respuestaCrmExpediente = tarificadorService.modificaExpediente("ES",eModificado,null,null)
+							RespuestaCRM respuestaCrmExpediente = expedienteService.modificaExpediente("ES",eModificado,null,null)
 
 							if (respuestaCrmExpediente.getErrorCRM() != null && respuestaCrmExpediente.getErrorCRM().getDetalle() != null && !respuestaCrmExpediente.getErrorCRM().getDetalle().isEmpty()){
 
@@ -455,16 +455,16 @@ class AmaUnderwrittingCaseManagementService	 {
 					requestXML=amaService.marshall(consultaExpediente)
 					requestBBDD=requestService.crear(opername,requestXML)
 
-					Filtro filtro = new Filtro();
+					Filtro filtro = new Filtro()
 
 					/**Si numExpediente esta relleno buscamos por codigost que es unico y el resto da igual
 					 *
 					 */
 					if (consultaExpediente.numExpediente != null && !consultaExpediente.numExpediente.isEmpty()) {
 
-						filtro = new Filtro();
-						filtro.setClave(ClaveFiltro.EXPEDIENTE);
-						filtro.setValor(consultaExpediente.numExpediente);
+						filtro = new Filtro()
+						filtro.setClave(ClaveFiltro.EXPEDIENTE)
+						filtro.setValor(consultaExpediente.numExpediente)
 
 						identificador = "numExp: " +consultaExpediente.numExpediente
 					} else if ((consultaExpediente.numSolicitud != null && !consultaExpediente.numSolicitud.isEmpty()) && (consultaExpediente.numSumplemento == null || consultaExpediente.numSumplemento.isEmpty())){
@@ -472,9 +472,9 @@ class AmaUnderwrittingCaseManagementService	 {
 						/** numSolicitud
 						 *
 						 */
-						filtro = new Filtro();
-						filtro.setClave(ClaveFiltro.CLIENTE);
-						filtro.setValor(company.codigoSt);
+						filtro = new Filtro()
+						filtro.setClave(ClaveFiltro.CLIENTE)
+						filtro.setValor(company.codigoSt)
 						Filtro filtroRelacionado = new Filtro()
 						filtroRelacionado.setClave(ClaveFiltro.NUM_SOLICITUD)
 						filtroRelacionado.setValor(consultaExpediente.numSolicitud)
@@ -487,9 +487,9 @@ class AmaUnderwrittingCaseManagementService	 {
 						 *
 						 */
 
-						filtro = new Filtro();
-						filtro.setClave(ClaveFiltro.CLIENTE);
-						filtro.setValor(company.codigoSt);
+						filtro = new Filtro()
+						filtro.setClave(ClaveFiltro.CLIENTE)
+						filtro.setValor(company.codigoSt)
 
 						Filtro filtroRelacionado = new Filtro()
 						filtroRelacionado.setClave(ClaveFiltro.NUM_SOLICITUD)
@@ -591,10 +591,10 @@ class AmaUnderwrittingCaseManagementService	 {
 		def requestBBDD
 		TransformacionUtil util = new TransformacionUtil()
 		CorreoUtil correoUtil = new CorreoUtil()
-		Filtro filtro = new Filtro();
+		Filtro filtro = new Filtro()
 		Company company = Company.findByNombre("ama")
 		String indentificador = null
-		RespuestaCRM respuestaCRM = new RespuestaCRM();
+		RespuestaCRM respuestaCRM = new RespuestaCRM()
 
 		try{
 
@@ -606,9 +606,9 @@ class AmaUnderwrittingCaseManagementService	 {
 
 				if (consultaDocumento && consultaDocumento.codigoSt != null && !consultaDocumento.codigoSt.isEmpty()){
 
-					filtro = new Filtro();
-					filtro.setClave(ClaveFiltro.EXPEDIENTE);
-					filtro.setValor(consultaDocumento.codigoSt);
+					filtro = new Filtro()
+					filtro.setClave(ClaveFiltro.EXPEDIENTE)
+					filtro.setValor(consultaDocumento.codigoSt)
 
 					respuestaCRM = amaService.informeExpedientePorFiltro(filtro,"ES")
 

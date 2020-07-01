@@ -32,7 +32,7 @@ class NnService implements ICompanyService{
     def expedienteService
     def grailsApplication
 
-    @Override
+
     String marshall(def objeto) {
         String nameSpace = "http://www.scortelemed.com/schemas/nn"
         String result
@@ -47,7 +47,7 @@ class NnService implements ICompanyService{
         }
     }
 
-    @Override
+
     def buildDatos(Request req, String codigoSt) {
         try {
             DATOS dato = new DATOS()
@@ -62,7 +62,7 @@ class NnService implements ICompanyService{
         }
     }
 
-    @Override
+
     def getCodigoStManual(Request req) {
         return null
     }

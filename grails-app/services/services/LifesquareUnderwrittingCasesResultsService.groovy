@@ -33,6 +33,7 @@ import org.springframework.web.context.request.RequestContextHolder
 class LifesquareUnderwrittingCasesResultsService {
 	
 	def requestService
+	def expedienteService
 	def estadisticasService
 	def tarificadorService
 	def logginService
@@ -62,11 +63,11 @@ class LifesquareUnderwrittingCasesResultsService {
 				requestBBDD = requestService.crear(opername,requestXML)
 				
 				//PARSEAMOS LA FECHA
-				def fechaHora = new SimpleDateFormat("yyyyMMdd HH:mm");
-				String convertido = fechaHora.format(LifesquareUnderwrittingCasesResultsRequest.date);
+				def fechaHora = new SimpleDateFormat("yyyyMMdd HH:mm")
+				String convertido = fechaHora.format(LifesquareUnderwrittingCasesResultsRequest.date)
 				def fechaFin = convertido
 				fechaFin= fechaFin.toString()+":00"
-				Calendar fecha = Calendar.getInstance();
+				Calendar fecha = Calendar.getInstance()
 				fecha.setTime(LifesquareUnderwrittingCasesResultsRequest.date)
 				fecha.add(Calendar.MINUTE , -120)
 				def fechaIni = fecha.getTime().format ('yyyyMMdd HH:mm')
@@ -74,9 +75,9 @@ class LifesquareUnderwrittingCasesResultsService {
 				
 				//OBTENEMOS TODOS LOS EXPEDIENTES DESDE FECHAINI A FECHAFIN			
 				if (Environment.current.name.equals("production_wildfly")) {
-					expedientes=tarificadorService.obtenerInformeExpedientes("1043",null,1,fechaIni,fechaFin,"FR")
+					expedientes=expedienteService.obtenerInformeExpedientes("1043",null,1,fechaIni,fechaFin,"FR")
 				} else {
-					expedientes=tarificadorService.obtenerInformeExpedientes("1053",null,1,fechaIni,fechaFin,"FR") 
+					expedientes=expedienteService.obtenerInformeExpedientes("1053",null,1,fechaIni,fechaFin,"FR")
 				}
 				
 				StringBuilder sbInfo = new StringBuilder ("Realizando proceso envio de informacion para " + company.nombre + " con fecha ")

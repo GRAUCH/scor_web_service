@@ -15,7 +15,7 @@ import org.apache.cxf.annotations.SchemaValidation
 import org.grails.cxf.utils.EndpointType
 import org.grails.cxf.utils.GrailsCxfEndpoint
 import org.grails.cxf.utils.GrailsCxfEndpointProperty
-import org.springframework.beans.factory.annotation.Autowired
+
 import org.springframework.web.context.request.RequestContextHolder
 import servicios.Expediente
 import servicios.RespuestaCRM
@@ -56,7 +56,7 @@ class CaserUnderwrittingCaseManagementService {
         String notes = null
         StatusType status = null
 
-        RespuestaCRM respuestaCRM = new RespuestaCRM();
+        RespuestaCRM respuestaCRM = new RespuestaCRM()
 
         def company = Company.findByNombre('caser')
         List<servicios.Expediente> expedientes = new ArrayList<servicios.Expediente>()
@@ -139,7 +139,7 @@ class CaserUnderwrittingCaseManagementService {
         String notes = null
         StatusType status = null
 
-        List<RespuestaCRMInforme> expedientes = new ArrayList<RespuestaCRMInforme>();
+        List<RespuestaCRMInforme> expedientes = new ArrayList<RespuestaCRMInforme>()
         TransformacionUtil util = new TransformacionUtil()
         CorreoUtil correoUtil = new CorreoUtil()
 
@@ -160,9 +160,9 @@ class CaserUnderwrittingCaseManagementService {
 
                     Date date = resultadoReconocimientoMedico.dateStart.toGregorianCalendar().getTime()
                     SimpleDateFormat sdfr = new SimpleDateFormat("yyyyMMdd HH:mm:ss")
-                    String fechaIni = sdfr.format(date);
+                    String fechaIni = sdfr.format(date)
                     date = resultadoReconocimientoMedico.dateEnd.toGregorianCalendar().getTime()
-                    String fechaFin = sdfr.format(date);
+                    String fechaFin = sdfr.format(date)
 
                     logginService.putInfoEndpoint("ResultadoReconocimientoMedico", "Realizando peticion para " + company.nombre + " con fecha: " + resultadoReconocimientoMedico.dateStart.toString() + "-" + resultadoReconocimientoMedico.dateEnd.toString())
 
@@ -171,9 +171,9 @@ class CaserUnderwrittingCaseManagementService {
                     for (int i = 1; i < 3; i++) {
 
                         if (Environment.current.name.equals("production_wildfly")) {
-                            expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1061", null, i, fechaIni, fechaFin, "ES"))
+                            expedientes.addAll(expedienteService.obtenerInformeExpedientes("1061", null, i, fechaIni, fechaFin, "ES"))
                         } else {
-                            expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1062", null, i, fechaIni, fechaFin, "ES"))
+                            expedientes.addAll(expedienteService.obtenerInformeExpedientes("1062", null, i, fechaIni, fechaFin, "ES"))
                         }
                     }
 
@@ -356,7 +356,7 @@ class CaserUnderwrittingCaseManagementService {
         int codigo = 0
 
         Company company = Company.findByNombre("caser")
-        RespuestaCRM expediente = new RespuestaCRM();
+        RespuestaCRM expediente = new RespuestaCRM()
         TransformacionUtil util = new TransformacionUtil()
         ConsolidacionPolizaResponse resultado = new ConsolidacionPolizaResponse()
 
@@ -386,7 +386,7 @@ class CaserUnderwrittingCaseManagementService {
                             Expediente eModificado = expediente.getListaExpedientes().get(0)
                             eModificado.setNumPoliza(consolidacionPoliza.policyNumber.toString())
 
-                            RespuestaCRM respuestaCrmExpediente = tarificadorService.modificaExpediente("ES", eModificado, null, null)
+                            RespuestaCRM respuestaCrmExpediente = expedienteService.modificaExpediente("ES", eModificado, null, null)
 
                             if (respuestaCrmExpediente.getErrorCRM() != null && respuestaCrmExpediente.getErrorCRM().getDetalle() != null && !respuestaCrmExpediente.getErrorCRM().getDetalle().isEmpty()) {
 

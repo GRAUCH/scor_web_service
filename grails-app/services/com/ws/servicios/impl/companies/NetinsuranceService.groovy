@@ -38,7 +38,7 @@ class NetinsuranceService implements ICompanyService{
 	def tarificadorService
 	def grailsApplication
 
-	@Override
+
 	String marshall(def objeto) {
 		String nameSpace = "http://www.scortelemed.com/schemas/netinsurance"
 		String result
@@ -55,7 +55,7 @@ class NetinsuranceService implements ICompanyService{
 		}
 	}
 
-	@Override
+
 	def buildDatos(Request req, String codigoSt) {
 		try {
 			DATOS dato = new DATOS()
@@ -71,7 +71,7 @@ class NetinsuranceService implements ICompanyService{
 		}
 	}
 
-	@Override
+
 	def getCodigoStManual(Request req) {
 		return null
 	}

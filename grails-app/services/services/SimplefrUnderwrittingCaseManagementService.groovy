@@ -16,7 +16,7 @@ import org.apache.cxf.annotations.SchemaValidation
 import org.grails.cxf.utils.EndpointType
 import org.grails.cxf.utils.GrailsCxfEndpoint
 import org.grails.cxf.utils.GrailsCxfEndpointProperty
-import org.springframework.beans.factory.annotation.Autowired
+
 import org.springframework.web.context.request.RequestContextHolder
 import servicios.Filtro
 
@@ -124,9 +124,6 @@ class SimplefrUnderwrittingCaseManagementService	 {
 		def requestXML = ""
 		def expedientes
 		def company = Company.findByNombre('simplefr')
-		def estadisticasService = new EstadisticasService()
-		def tarificadorService = new TarificadorService()
-		def logginService = new LogginService()
 		def requestBBDD
 		
 		TransformacionUtil util = new TransformacionUtil()
@@ -153,9 +150,9 @@ class SimplefrUnderwrittingCaseManagementService	 {
 
 				for (int i = 1; i < 3; i++){
 					if (Environment.current.name.equals("production_wildfly")) {
-						expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1060",null,i,fechaIni,fechaFin,"IT"))
+						expedientes.addAll(expedienteService.obtenerInformeExpedientes("1060",null,i,fechaIni,fechaFin,"IT"))
 					} else {
-						expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1060",null,i,fechaIni,fechaFin,"IT"))
+						expedientes.addAll(expedienteService.obtenerInformeExpedientes("1060",null,i,fechaIni,fechaFin,"IT"))
 					}
 				}
 

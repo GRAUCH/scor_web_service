@@ -15,7 +15,7 @@ import org.apache.cxf.annotations.SchemaValidation
 import org.grails.cxf.utils.EndpointType
 import org.grails.cxf.utils.GrailsCxfEndpoint
 import org.grails.cxf.utils.GrailsCxfEndpointProperty
-import org.springframework.beans.factory.annotation.Autowired
+
 import org.springframework.web.context.request.RequestContextHolder
 import servicios.*
 
@@ -177,10 +177,10 @@ class NationaleNederlandenUnderwrittingCaseManagementService {
 					requestBBDD=requestService.crear(opername,requestXML)
 
 					Date date = resultadoReconocimientoMedico.dateStart.toGregorianCalendar().getTime()
-					SimpleDateFormat sdfr = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
-					String fechaIni = sdfr.format(date);
+					SimpleDateFormat sdfr = new SimpleDateFormat("yyyyMMdd HH:mm:ss")
+					String fechaIni = sdfr.format(date)
 					date = resultadoReconocimientoMedico.dateEnd.toGregorianCalendar().getTime()
-					String fechaFin = sdfr.format(date);
+					String fechaFin = sdfr.format(date)
 
 					logginService.putInfoEndpoint("ResultadoReconocimientoMedico","Realizando peticion para " + company.nombre + " con fecha: " + resultadoReconocimientoMedico.dateStart.toString() + "-" + resultadoReconocimientoMedico.dateEnd.toString())
 
@@ -189,9 +189,9 @@ class NationaleNederlandenUnderwrittingCaseManagementService {
 					for (int i = 1; i < 3; i++){
 
 						if (Environment.current.name.equals("production_wildfly")) {
-							expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1061",null,i,fechaIni,fechaFin,"ES"))
+							expedientes.addAll(expedienteService.obtenerInformeExpedientes("1061",null,i,fechaIni,fechaFin,"ES"))
 						} else {
-							expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1062",null,i,fechaIni,fechaFin,"ES"))
+							expedientes.addAll(expedienteService.obtenerInformeExpedientes("1062",null,i,fechaIni,fechaFin,"ES"))
 						}
 					}
 

@@ -12,6 +12,7 @@ import com.ws.servicios.IExpedienteService
 import com.ws.servicios.LogginService
 import grails.transaction.Transactional
 import servicios.ClaveFiltro
+import servicios.Expediente
 import servicios.Filtro
 
 import java.text.SimpleDateFormat
@@ -19,12 +20,13 @@ import java.text.SimpleDateFormat
 @Transactional
 class ExpedienteService implements IExpedienteService {
 
-    def logginService = new LogginService()
+    def logginService
+    def correoUtil
     def tarificadorService
     def grailsApplication
     ICompanyService companyService
 
-    @Override
+
     def consultaExpediente(String unidadOrganizativa, Filtro filtro) {
         try {
             def ctx = grailsApplication.mainContext
@@ -33,12 +35,12 @@ class ExpedienteService implements IExpedienteService {
             def salida=grailsApplication.mainContext.soapClientAlptis.consultaExpediente(tarificadorService.obtenerUsuarioFrontal(unidadOrganizativa),filtro)
             return salida
         } catch (Exception e) {
-            logginService.putError("obtenerInformeExpedientes","No se ha podido obtener el informe de expediente : " + e)
+            logginService.putError("consultaExpediente","No se ha podido consultar el expediente " + e)
+            correoUtil.envioEmailErrores("consultaExpediente", "No se ha podido consultar el expediente ", e)
             return null
         }
     }
 
-    @Override
     def consultaExpedienteCodigoST(String codigoST, String unidadOrganizativa) {
         Filtro filtro = new Filtro()
         filtro.setClave(ClaveFiltro.EXPEDIENTE)
@@ -46,7 +48,6 @@ class ExpedienteService implements IExpedienteService {
         return consultaExpediente(unidadOrganizativa, filtro)
     }
 
-    @Override
     def consultaExpedienteNumSolicitud(String requestNumber, String unidadOrganizativa, String codigoST) {
         Filtro filtro = new Filtro()
         filtro.setClave(ClaveFiltro.CLIENTE)
@@ -58,7 +59,57 @@ class ExpedienteService implements IExpedienteService {
         return consultaExpediente(unidadOrganizativa, filtro)
     }
 
-    @Override
+    def obtenerInformeExpedientes(String companya, String servicioScor, int estado, String fechaIni, String fechaFin, String pais) {
+        try {
+            //SOBREESCRIBIMOS LA URL A LA QUE TIENE QUE LLAMAR EL WSDL
+            def ctx = grailsApplication.mainContext
+            def bean = ctx.getBean("soapClientAlptis")
+            bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("frontal.wsdl")?.value)
+            def salida = grailsApplication.mainContext.soapClientAlptis.informeExpedientes(tarificadorService.obtenerUsuarioFrontal(pais), companya, servicioScor, estado, fechaIni, fechaFin)
+            return salida.listaExpedientesInforme
+        } catch (Throwable e) {
+            logginService.putError("obtenerInformeExpedientes", "No se ha podido obtener el informe de expediente " + e)
+            correoUtil.envioEmailErrores("obtenerInformeExpedientes", "No se ha podido obtener el informe de expediente", e)
+            return null
+        }
+    }
+
+    def obtenerInformeExpedientesSiniestros(String companya, String producto, String estado, String fechaIni, String fechaFin, String pais) {
+        try {
+            def ctx = grailsApplication.mainContext
+            def bean = ctx.getBean("soapClientAlptis")
+            bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("frontal.wsdl")?.value)
+            def salida = grailsApplication.mainContext.soapClientAlptis.informeExpedientesSiniestros(tarificadorService.obtenerUsuarioFrontal(pais), companya, producto, estado, fechaIni, fechaFin)
+            return salida.listaExpedientes
+        } catch (Exception e) {
+            logginService.putError("obtenerInformeExpedientesSiniestros", "No se ha podido obtener el informe de expediente " + e)
+            correoUtil.envioEmailErrores("obtenerInformeExpedientesSiniestros", "No se ha podido obtener el informe de expediente ->   Error msg: "  + e.getMessage()+"    Causa : " + e.getCause())
+            return null
+        }
+    }
+
+
+    def modificaExpediente(String arg1, Expediente arg2, String arg3, String arg4) {
+        try {
+            def ctx = grailsApplication.mainContext
+            def bean = ctx.getBean("soapClientAlptis")
+            bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("frontal.wsdl")?.value)
+            def salida = grailsApplication.mainContext.soapClientAlptis.modificaExpediente(tarificadorService.obtenerUsuarioFrontal(arg1), arg2, arg3, arg4)
+            return salida
+        } catch (Exception e) {
+            logginService.putError("modificaExpediente", "No se ha podido ejecutar la operacion de modificacion : " + e)
+            correoUtil.envioEmailErrores("modificaExpediente", "No se ha podido ejecutar la operacion de modificacion ->   Error msg: "  + e.getMessage()+"    Causa : " + e.getCause())
+            return null
+        }
+    }
+
+    /**
+     * MÉTODO PARA LA CREACIÓN DE EXPEDIENTES
+     *
+     * @param Request req
+     * @param TipoCompany comp
+     * @return
+     */
     def crearExpediente(Request req, TipoCompany comp) {
         try {
             //SOBREESCRIBIMOS LA URL A LA QUE TIENE QUE LLAMAR EL WSDL

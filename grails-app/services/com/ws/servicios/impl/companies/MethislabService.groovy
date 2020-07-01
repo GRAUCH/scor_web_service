@@ -33,7 +33,7 @@ class MethislabService implements ICompanyService{
     def logginService
     def tarificadorService
 
-    @Override
+
     String marshall(def objeto) {
         String nameSpace = "http://www.scortelemed.com/schemas/methislab"
         String result
@@ -48,7 +48,7 @@ class MethislabService implements ICompanyService{
         }
     }
 
-    @Override
+
     def buildDatos(Request req, String codigoSt) {
         try {
             DATOS dato = new DATOS()
@@ -63,7 +63,7 @@ class MethislabService implements ICompanyService{
         }
     }
 
-    @Override
+
     def getCodigoStManual(Request req) {
         return null
     }

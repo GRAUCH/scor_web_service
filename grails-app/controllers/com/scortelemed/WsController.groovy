@@ -80,7 +80,7 @@ class WsController {
                 fechaIni = LogUtil.paramsToDateIni(params)
                 fechaFin = LogUtil.paramsToDateFin(params)
                 sbInfo.append(" con fecha inicio ").append(fechaIni).append("-").append(" con fecha fin ").append(fechaFin)
-                resulExpedienteSoap = tarificadorService.obtenerInformeExpedientes("1019", null, 1, fechaIni, fechaFin, "FR")
+                resulExpedienteSoap = expedienteService.obtenerInformeExpedientes("1019", null, 1, fechaIni, fechaFin, "FR")
             }
             if (Environment.current.name.equals("production_wildfly")) {
                 logginService.putInfoMessage("WS PRD")
@@ -229,11 +229,11 @@ class WsController {
                 sbInfo.append(" con fecha inicio ").append(fechaIni).append("-").append(" con fecha fin ").append(fechaFin)
                 if (!Environment.current.name.equals("production_wildfly")) {
                     for (int i = 0; i < 3; i++) {
-                        resulExpedienteSoap.addAll(tarificadorService.obtenerInformeExpedientes("1035", null, i, fechaIni, fechaFin, "ES"))
+                        resulExpedienteSoap.addAll(expedienteService.obtenerInformeExpedientes("1035", null, i, fechaIni, fechaFin, "ES"))
                     }
                 } else {
                     for (int i = 0; i < 3; i++) {
-                        resulExpedienteSoap.addAll(tarificadorService.obtenerInformeExpedientes("1018", null, i, fechaIni, fechaFin, "ES"))
+                        resulExpedienteSoap.addAll(expedienteService.obtenerInformeExpedientes("1018", null, i, fechaIni, fechaFin, "ES"))
                     }
                 }
             }
@@ -459,12 +459,12 @@ class WsController {
                 if (Environment.current.name.equals("production_wildfly")) {
                     sbInfo.append("** compania 1061 **")
                     for (int i = 0; i < 3; i++) {
-                        expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1061", null, i, fechaIni, fechaFin, "ES"))
+                        expedientes.addAll(expedienteService.obtenerInformeExpedientes("1061", null, i, fechaIni, fechaFin, "ES"))
                     }
                 } else {
                     sbInfo.append("** compania 1062 **")
                     for (int i = 0; i < 3; i++) {
-                        expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1062", null, i, fechaIni, fechaFin, "ES"))
+                        expedientes.addAll(expedienteService.obtenerInformeExpedientes("1062", null, i, fechaIni, fechaFin, "ES"))
                     }
                 }
             }
@@ -588,14 +588,14 @@ class WsController {
                     logginService.putInfoMessage(" ** Codigo ST PRD   1059 y 1065**")
                     for (int i = 1; i < 3; i++) {
                         //Ambas son companias de AMA en PRODUCCION.
-                        expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1059", null, i, fechaIni, fechaFin, "ES"))
-                        expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1065", null, i, fechaIni, fechaFin, "ES"))
+                        expedientes.addAll(expedienteService.obtenerInformeExpedientes("1059", null, i, fechaIni, fechaFin, "ES"))
+                        expedientes.addAll(expedienteService.obtenerInformeExpedientes("1065", null, i, fechaIni, fechaFin, "ES"))
                     }
                 } else {
                     for (int i = 1; i < 3; i++) {
                         //Ambas son companias de AMA en PRE PRODUCCION.
-                        expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1059", null, i, fechaIni, fechaFin, "ES"))
-                        expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1064", null, i, fechaIni, fechaFin, "ES"))
+                        expedientes.addAll(expedienteService.obtenerInformeExpedientes("1059", null, i, fechaIni, fechaFin, "ES"))
+                        expedientes.addAll(expedienteService.obtenerInformeExpedientes("1064", null, i, fechaIni, fechaFin, "ES"))
                     }
                 }
             }

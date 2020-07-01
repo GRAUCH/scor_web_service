@@ -247,36 +247,6 @@ class TarificadorService {
         return response
     }
 
-    def obtenerInformeExpedientes(String codigost, String arg2, int arg3, String fechaIni, String fechaFin, String pais) {
-        try {
-            //SOBREESCRIBIMOS LA URL A LA QUE TIENE QUE LLAMAR EL WSDL
-            def ctx = grailsApplication.mainContext
-            def bean = ctx.getBean("soapClientAlptis")
-            bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("frontal.wsdl")?.value)
-            def salida = grailsApplication.mainContext.soapClientAlptis.informeExpedientes(obtenerUsuarioFrontal(pais), codigost, arg2, arg3, fechaIni, fechaFin)
-            return salida.listaExpedientesInforme
-        } catch (Throwable e) {
-            logginService.putError("obtenerInformeExpedientes", "No se ha podido obtener el informe de expediente : " + e)
-            correoUtil.envioEmailErrores("obtenerInformeExpedientes", "No se ha podido obtener el informe de expediente", e)
-            return false
-        }
-    }
-
-    def obtenerInformeExpedientesSiniestros(String arg1, String arg2, String arg3, String arg4, String arg5, String arg6) {
-
-        try {
-            def ctx = grailsApplication.mainContext
-            def bean = ctx.getBean("soapClientAlptis")
-            bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("frontal.wsdl")?.value)
-            def salida = grailsApplication.mainContext.soapClientAlptis.informeExpedientesSiniestros(obtenerUsuarioFrontal(arg6), arg1, arg2, arg3, arg4, arg5)
-            return salida.listaExpedientes
-        } catch (Exception e) {
-            logginService.putError("obtenerInformeExpedientes", "No se ha podido obtener el informe de expediente : " + e)
-            correoUtil.envioEmailErrores("obtenerInformeExpedientes", "No se ha podido obtener el informe de expediente ->   Error msg: "  + e.getMessage()+"    Causa : " + e.getCause())
-            return false
-        }
-    }
-
     def obtenerInformeCitas(String arg1, String arg2, String arg3, String arg4, String arg5) {
 
         def response
@@ -315,25 +285,6 @@ class TarificadorService {
         }
     }
 
-    def modificaExpediente(String arg1, Expediente arg2, String arg3, String arg4) {
-
-        def response
-
-        try {
-
-            def ctx = grailsApplication.mainContext
-            def bean = ctx.getBean("soapClientAlptis")
-            bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("frontal.wsdl")?.value)
-
-            def salida = grailsApplication.mainContext.soapClientAlptis.modificaExpediente(obtenerUsuarioFrontal(arg1), arg2, arg3, arg4)
-
-            return salida
-        } catch (Exception e) {
-            logginService.putError("obtenerInformeExpedientes", "No se ha podido ejecutar la operacion de modificacion : " + e)
-            response = false
-        }
-    }
-
     def obtenerXMLExpedientePorZip(resultComprimidos) {
         StringBuilder sb = new StringBuilder()
         byte[] decodedBytes = Base64.decodeBase64(resultComprimidos.getBytes("UTF-8"))
@@ -361,6 +312,9 @@ class TarificadorService {
         return sb.toString().replace('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>', "")
     }
 
+    /**
+     * NO UTILIZADO
+     *
     def notificarCaseResultsAlptis() {
         def contadorResultados = 0
         def i = 0
@@ -388,7 +342,7 @@ class TarificadorService {
                 }
             }
         }
-    }
+    }*/
 
     def obtenerUsuarioFrontal(String unidadOrganizativa) {
         def usuario = new UsuarioGorm()

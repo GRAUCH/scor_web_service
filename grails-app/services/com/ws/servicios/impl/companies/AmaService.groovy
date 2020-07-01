@@ -41,7 +41,7 @@ class AmaService implements ICompanyService{
 	def grailsApplication
 	ContentResult contentResult = new ContentResult()
 
-	@Override
+
 	String marshall(def objeto) {
 		String nameSpace = "http://www.scortelemed.com/schemas/ama"
 		String result
@@ -64,7 +64,7 @@ class AmaService implements ICompanyService{
 		}
 	}
 
-	@Override
+
 	def buildDatos(Request req, String codigoCia) {
 		try {
 			DATOS dato = new DATOS()
@@ -81,7 +81,7 @@ class AmaService implements ICompanyService{
 	/**
 	 * Ama usa el mismo wb para dos cias distintas, asi que tenemos que sacar el id del campo ciaCode del xml
 	 */
-	@Override
+
 	def getCodigoStManual(Request req) {
 
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
@@ -1304,7 +1304,7 @@ class AmaService implements ICompanyService{
 					logginService.putInfoMessage("BusquedaExpedienteCrm - Nueva alta de " + companyName + " con numero de solicitud: " + requestNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM")
 					correoUtil.envioEmailErrores("BusquedaExpedienteCrm","Nueva alta de " + companyName + " con numero de solicitud: " + requestNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM",null)
 					requestService.insertarError(companyId.toString(), requestNumber.toString(), (String)requestBBDD.request, "ALTA", "Peticion procesada para soilicitud: " + requestNumber.toString() + ". Error: No encontrada en CRM")
-					
+
 				}
 
 			} catch (Exception e) {

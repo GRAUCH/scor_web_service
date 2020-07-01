@@ -15,7 +15,7 @@ import javax.jws.soap.SOAPBinding
 import org.grails.cxf.utils.EndpointType
 import org.grails.cxf.utils.GrailsCxfEndpoint
 import org.grails.cxf.utils.GrailsCxfEndpointProperty
-import org.springframework.beans.factory.annotation.Autowired
+
 import org.springframework.web.context.request.RequestContextHolder
 
 import servicios.Expediente
@@ -190,7 +190,7 @@ class CajamarUnderwrittingCaseManagementService {
 		def requestBBDD
 
 		Company company = Company.findByNombre("cajamar")
-		RespuestaCRM expediente = new RespuestaCRM();
+		RespuestaCRM expediente = new RespuestaCRM()
 		TransformacionUtil util = new TransformacionUtil()
 		ConsolidacionPolizaResponse resultado=new ConsolidacionPolizaResponse()
 
@@ -215,7 +215,7 @@ class CajamarUnderwrittingCaseManagementService {
 						Expediente eModificado = expediente.getListaExpedientes().get(0)
 						eModificado.setNumPoliza(consolidacionPoliza.policyNumber.toString())
 
-						RespuestaCRM respuestaCrmExpediente = tarificadorService.modificaExpediente("ES",eModificado,null,null)
+						RespuestaCRM respuestaCrmExpediente = expedienteService.modificaExpediente("ES",eModificado,null,null)
 
 						if (respuestaCrmExpediente.getErrorCRM() != null && respuestaCrmExpediente.getErrorCRM().getDetalle() != null && !respuestaCrmExpediente.getErrorCRM().getDetalle().isEmpty()){
 

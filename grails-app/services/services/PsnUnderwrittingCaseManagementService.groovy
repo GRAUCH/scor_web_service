@@ -15,7 +15,7 @@ import org.apache.cxf.annotations.SchemaValidation
 import org.grails.cxf.utils.EndpointType
 import org.grails.cxf.utils.GrailsCxfEndpoint
 import org.grails.cxf.utils.GrailsCxfEndpointProperty
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.web.context.request.RequestContextHolder
 
 import com.scortelemed.Company
@@ -204,7 +204,7 @@ class PsnUnderwrittingCaseManagementService	 {
 		def opername="PsnResultadoReconocimientoMedicoResponse"
 		def requestXML = ""
 		def requestBBDD
-		List<RespuestaCRMInforme> expedientes = new ArrayList<RespuestaCRMInforme>();
+		List<RespuestaCRMInforme> expedientes = new ArrayList<RespuestaCRMInforme>()
 		TransformacionUtil util = new TransformacionUtil()
 		CorreoUtil correoUtil = new CorreoUtil()
 		RespuestaCRM respuestaCRM = new RespuestaCRM()
@@ -235,11 +235,11 @@ class PsnUnderwrittingCaseManagementService	 {
 					/** numSolicitud
 					 *
 					 */
-					Filtro filtro = new Filtro();
+					Filtro filtro = new Filtro()
 
-					filtro = new Filtro();
-					filtro.setClave(ClaveFiltro.CLIENTE);
-					filtro.setValor(company.codigoSt);
+					filtro = new Filtro()
+					filtro.setClave(ClaveFiltro.CLIENTE)
+					filtro.setValor(company.codigoSt)
 					Filtro filtroRelacionado = new Filtro()
 					filtroRelacionado.setClave(ClaveFiltro.NUM_SOLICITUD)
 					filtroRelacionado.setValor(resultadoReconocimientoMedico.numSolicitud)
@@ -356,7 +356,7 @@ class PsnUnderwrittingCaseManagementService	 {
 		StatusType status = null
 
 		Company company = Company.findByNombre("psn")
-		RespuestaCRM expediente = new RespuestaCRM();
+		RespuestaCRM expediente = new RespuestaCRM()
 		TransformacionUtil util = new TransformacionUtil()
 		ConsolidacionPolizaResponse resultado=new ConsolidacionPolizaResponse()
 		String identificador = ""
@@ -374,9 +374,9 @@ class PsnUnderwrittingCaseManagementService	 {
 
 				if (consolidacionPoliza.requestNumber != null && !consolidacionPoliza.requestNumber.isEmpty() && consolidacionPoliza.policyNumber != null && !consolidacionPoliza.policyNumber.isEmpty()){
 
-					Filtro filtro = new Filtro();
-					filtro.setClave(ClaveFiltro.CLIENTE);
-					filtro.setValor(company.getCodigoSt());
+					Filtro filtro = new Filtro()
+					filtro.setClave(ClaveFiltro.CLIENTE)
+					filtro.setValor(company.getCodigoSt())
 					Filtro filtroRelacionado = new Filtro()
 					filtroRelacionado.setClave(ClaveFiltro.NUM_SOLICITUD)
 					filtroRelacionado.setValor(consolidacionPoliza.requestNumber)
@@ -408,7 +408,7 @@ class PsnUnderwrittingCaseManagementService	 {
 
 							logginService.putInfoEndpoint("ConsolidacionPoliza","Se procede a la modificacion de " + company.nombre + " con " + identificador)
 
-							RespuestaCRM respuestaCrmExpediente = tarificadorService.modificaExpediente("ES",eModificado,null,null)
+							RespuestaCRM respuestaCrmExpediente = expedienteService.modificaExpediente("ES",eModificado,null,null)
 
 							if (respuestaCrmExpediente.getErrorCRM() != null && respuestaCrmExpediente.getErrorCRM().getDetalle() != null && !respuestaCrmExpediente.getErrorCRM().getDetalle().isEmpty()){
 
@@ -488,7 +488,7 @@ class PsnUnderwrittingCaseManagementService	 {
 		def opername="PsnConsultaExpediente"
 		def requestXML = ""
 		def requestBBDD
-		RespuestaCRM respuestaCRM = new RespuestaCRM();
+		RespuestaCRM respuestaCRM = new RespuestaCRM()
 		TransformacionUtil util = new TransformacionUtil()
 		CorreoUtil correoUtil = new CorreoUtil()
 		String identificador = ""
@@ -513,16 +513,16 @@ class PsnUnderwrittingCaseManagementService	 {
 					requestXML=psnService.marshall(consultaExpediente)
 					requestBBDD=requestService.crear(opername,requestXML)
 
-					Filtro filtro = new Filtro();
+					Filtro filtro = new Filtro()
 
 					/**Si numExpediente esta relleno buscamos por codigost que es unico y el resto da igual
 					 *
 					 */
 					if (consultaExpediente.numExpediente != null && !consultaExpediente.numExpediente.isEmpty()) {
 
-						filtro = new Filtro();
-						filtro.setClave(ClaveFiltro.EXPEDIENTE);
-						filtro.setValor(consultaExpediente.numExpediente);
+						filtro = new Filtro()
+						filtro.setClave(ClaveFiltro.EXPEDIENTE)
+						filtro.setValor(consultaExpediente.numExpediente)
 
 						identificador = "numExp: " +consultaExpediente.numExpediente
 					} else if ((consultaExpediente.numSolicitud != null && !consultaExpediente.numSolicitud.isEmpty()) && (consultaExpediente.numSumplemento == null || consultaExpediente.numSumplemento.isEmpty())){
@@ -530,9 +530,9 @@ class PsnUnderwrittingCaseManagementService	 {
 						/** numSolicitud
 						 * 
 						 */
-						filtro = new Filtro();
-						filtro.setClave(ClaveFiltro.CLIENTE);
-						filtro.setValor(company.codigoSt);
+						filtro = new Filtro()
+						filtro.setClave(ClaveFiltro.CLIENTE)
+						filtro.setValor(company.codigoSt)
 						Filtro filtroRelacionado = new Filtro()
 						filtroRelacionado.setClave(ClaveFiltro.NUM_SOLICITUD)
 						filtroRelacionado.setValor(consultaExpediente.numSolicitud)
@@ -545,9 +545,9 @@ class PsnUnderwrittingCaseManagementService	 {
 						 *
 						 */
 
-						filtro = new Filtro();
-						filtro.setClave(ClaveFiltro.CLIENTE);
-						filtro.setValor(company.codigoSt);
+						filtro = new Filtro()
+						filtro.setClave(ClaveFiltro.CLIENTE)
+						filtro.setValor(company.codigoSt)
 
 						Filtro filtroRelacionado = new Filtro()
 						filtroRelacionado.setClave(ClaveFiltro.NUM_SOLICITUD)
@@ -656,10 +656,10 @@ class PsnUnderwrittingCaseManagementService	 {
 		def requestBBDD
 		TransformacionUtil util = new TransformacionUtil()
 		CorreoUtil correoUtil = new CorreoUtil()
-		Filtro filtro = new Filtro();
+		Filtro filtro = new Filtro()
 		Company company = Company.findByNombre("psn")
 		String indentificador = null
-		RespuestaCRM respuestaCRM = new RespuestaCRM();
+		RespuestaCRM respuestaCRM = new RespuestaCRM()
 		String identificador = ""
 		String messages = null
 		StatusType status = null
@@ -674,9 +674,9 @@ class PsnUnderwrittingCaseManagementService	 {
 
 				if (consultaDocumento && consultaDocumento.codigoSt != null && !consultaDocumento.codigoSt.isEmpty()){
 
-					filtro = new Filtro();
-					filtro.setClave(ClaveFiltro.EXPEDIENTE);
-					filtro.setValor(consultaDocumento.codigoSt);
+					filtro = new Filtro()
+					filtro.setClave(ClaveFiltro.EXPEDIENTE)
+					filtro.setValor(consultaDocumento.codigoSt)
 
 					respuestaCRM = psnService.informeExpedientePorFiltro(filtro,"ES")
 

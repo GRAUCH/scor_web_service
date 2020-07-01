@@ -28,7 +28,7 @@ class FrancesasService implements ICompanyService{
 	/**
 	 * AFI_ESCA, ALPTIS, ZEN_UP(Lifesquare) (Beans, sin namespace)
 	 */
-	@Override
+
 	String marshall(Object objeto) {
 		String result
 		try {
@@ -48,7 +48,7 @@ class FrancesasService implements ICompanyService{
 		}
 	}
 
-	@Override
+
 	def buildDatos(Request req, String codigoSt) {
 		try {
 			DATOS dato = new DATOS()
@@ -63,7 +63,7 @@ class FrancesasService implements ICompanyService{
 		}
 	}
 
-	@Override
+
 	def getCodigoStManual(Request req) {
 		return null
 	}

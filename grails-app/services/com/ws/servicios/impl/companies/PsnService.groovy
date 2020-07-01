@@ -37,7 +37,7 @@ class PsnService implements ICompanyService{
 	def grailsApplication
 	ContentResult contentResult = new ContentResult()
 
-	@Override
+
 	String marshall(def objeto) {
 		String nameSpace = "http://www.scortelemed.com/schemas/psn"
 		String result
@@ -58,7 +58,7 @@ class PsnService implements ICompanyService{
 		}
 	}
 
-	@Override
+
 	def buildDatos(Request req, String codigoSt) {
 		try {
 			DATOS dato = new DATOS()
@@ -73,7 +73,7 @@ class PsnService implements ICompanyService{
 		}
 	}
 
-	@Override
+
 	String getCodigoStManual(Request req) {
 		def pais
 		def codigoCia
@@ -330,23 +330,6 @@ class PsnService implements ICompanyService{
 		}
 
 		return expediente
-	}
-
-	def obtenerInformeExpedientes (String arg1,String arg2,int arg3,String arg4,String arg5, String arg6) {
-		def response
-		try {
-			//SOBREESCRIBIMOS LA URL A LA QUE TIENE QUE LLAMAR EL WSDL
-			def ctx = grailsApplication.mainContext
-			def bean = ctx.getBean("soapClientAlptis")
-			bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY,Conf.findByName("frontal.wsdl")?.value)
-
-			def salida=grailsApplication.mainContext.soapClientAlptis.informeExpedientes(obtenerUsuarioFrontal(arg6),arg1,arg2,arg3,arg4,arg5)
-
-			return salida.listaExpedientesInforme
-		} catch (Exception e) {
-			logginService.putError("obtenerInformeExpedientes","No se ha podido obtener el informe de expediente : " + e)
-			response = false
-		}
 	}
 
 	def rellenaDatos (req, company) {

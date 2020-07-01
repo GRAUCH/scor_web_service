@@ -89,7 +89,7 @@ class AlptisUnderwrittingCaseManagementService {
 				}
 			} else {
 
-				Calendar fecha = Calendar.getInstance();
+				Calendar fecha = Calendar.getInstance()
 				fecha.setTime(new Date())
 
 				def fechaIni = fecha.getTime().format ('yyyyMMdd HH:mm')

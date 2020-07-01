@@ -17,7 +17,7 @@ import org.apache.cxf.annotations.SchemaValidation
 import org.grails.cxf.utils.EndpointType
 import org.grails.cxf.utils.GrailsCxfEndpoint
 import org.grails.cxf.utils.GrailsCxfEndpointProperty
-import org.springframework.beans.factory.annotation.Autowired
+
 import org.springframework.web.context.request.RequestContextHolder
 import servicios.Documentacion
 import servicios.RespuestaCRMInforme
@@ -85,7 +85,7 @@ class CbpitaUnderwrittingCaseManagementService {
 
                         if (expedientes != null && expedientes.size() == 0) {
 
-                            message = "Il caso e stato elaborato correttamente";
+                            message = "Il caso e stato elaborato correttamente"
                             status = StatusType.OK
                             code = 0
 
@@ -167,7 +167,7 @@ class CbpitaUnderwrittingCaseManagementService {
                 }
             } else {
 
-                message = "L'operazione viene disattivata temporaneamente";
+                message = "L'operazione viene disattivata temporaneamente"
                 status = StatusType.OK
                 code = 1
 
@@ -218,7 +218,7 @@ class CbpitaUnderwrittingCaseManagementService {
         StatusType status = null
         int code = 0
         ZipUtils zipUtils = new ZipUtils()
-        boolean audioEncontrado = false;
+        boolean audioEncontrado = false
 
         CbpitaUnderwrittingCasesResultsResponse resultado = new CbpitaUnderwrittingCasesResultsResponse()
 
@@ -243,18 +243,18 @@ class CbpitaUnderwrittingCaseManagementService {
                         Date date = cbpitaUnderwrittingCasesResultsRequest.dateStart.toGregorianCalendar().getTime()
                         calendarIni.setTime(date)
                         calendarIni.add(Calendar.HOUR, -1)
-                        SimpleDateFormat sdfr = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
-                        String fechaIni = sdfr.format(calendarIni.getTime());
+                        SimpleDateFormat sdfr = new SimpleDateFormat("yyyyMMdd HH:mm:ss")
+                        String fechaIni = sdfr.format(calendarIni.getTime())
 
-                        Calendar calendarFin = Calendar.getInstance();
+                        Calendar calendarFin = Calendar.getInstance()
                         date = cbpitaUnderwrittingCasesResultsRequest.dateEnd.toGregorianCalendar().getTime()
                         calendarFin.setTime(date)
                         calendarFin.add(Calendar.HOUR, -1)
-                        String fechaFin = sdfr.format(calendarFin.getTime());
+                        String fechaFin = sdfr.format(calendarFin.getTime())
 
 
                         for (int i = 1; i < 3; i++) {
-                            expedientes.addAll(tarificadorService.obtenerInformeExpedientes(company.getCodigoSt().toString(), null, i, fechaIni, fechaFin, company.getOu().toString()))
+                            expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.getCodigoSt().toString(), null, i, fechaIni, fechaFin, company.getOu().toString()))
                         }
 
                         requestService.insertarEnvio(company, cbpitaUnderwrittingCasesResultsRequest.dateStart.toString().substring(0, 10) + "-" + cbpitaUnderwrittingCasesResultsRequest.dateEnd.toString().substring(0, 10), requestXML.toString())
@@ -266,9 +266,9 @@ class CbpitaUnderwrittingCaseManagementService {
                                 if (!expedientePoliza.getCodigoEstado().toString().equals("ANULADO")) {
 
                                     List<Documentacion> listaDocumentosAudio = new ArrayList<Documentacion>()
-                                    audioEncontrado = false;
+                                    audioEncontrado = false
 
-                                    listaDocumentosAudio = zipUtils.obtenerAudios(expedientePoliza, null);
+                                    listaDocumentosAudio = zipUtils.obtenerAudios(expedientePoliza, null)
 
                                     if (listaDocumentosAudio != null && listaDocumentosAudio.size() > 0) {
 
@@ -283,7 +283,7 @@ class CbpitaUnderwrittingCaseManagementService {
                                     if (audioEncontrado) {
                                         resultado.getExpediente().add(cbpitaService.rellenaDatosSalidaConsulta(expedientePoliza, "CBP", cbpitaUnderwrittingCasesResultsRequest.dateStart, Conf.findByName("rutaFicheroZip")?.value, Conf.findByName("usuarioZip")?.value, Conf.findByName("passwordZip")?.value))
                                         requestService.insertarEnvio(company, cbpitaUnderwrittingCasesResultsRequest.dateStart.toString().substring(0, 10) + "-" + cbpitaUnderwrittingCasesResultsRequest.dateEnd.toString().substring(0, 10), "ST:" + expedientePoliza.getCodigoST() + "#CIA:" + expedientePoliza.getNumSolicitud())
-                                        logginService.putInfoEndpoint("ResultadoReconocimientoMedico", "Expediente  con codigo ST: " + expedientePoliza.getCodigoST() + " y codigo cia: " + expedientePoliza.getNumSolicitud() + " para la cia: " + company.nombre + " se ha enviado correctamente");
+                                        logginService.putInfoEndpoint("ResultadoReconocimientoMedico", "Expediente  con codigo ST: " + expedientePoliza.getCodigoST() + " y codigo cia: " + expedientePoliza.getNumSolicitud() + " para la cia: " + company.nombre + " se ha enviado correctamente")
 
                                     } else {
                                         logginService.putInfoEndpoint("ResultadoReconocimientoMedico", "No se han encontardo audio necesarios para completar ZIP para " + company.nombre + " con expediente " + expedientePoliza.getCodigoST())
@@ -295,7 +295,7 @@ class CbpitaUnderwrittingCaseManagementService {
                                 } else {
                                     resultado.getExpediente().add(cbpitaService.rellenaDatosSalidaConsulta(expedientePoliza, "CBP", cbpitaUnderwrittingCasesResultsRequest.dateStart, Conf.findByName("rutaFicheroZip")?.value, Conf.findByName("usuarioZip")?.value, Conf.findByName("passwordZip")?.value))
                                     requestService.insertarEnvio(company, cbpitaUnderwrittingCasesResultsRequest.dateStart.toString().substring(0, 10) + "-" + cbpitaUnderwrittingCasesResultsRequest.dateEnd.toString().substring(0, 10), "ST:" + expedientePoliza.getCodigoST() + "#CIA:" + expedientePoliza.getNumSolicitud())
-                                    logginService.putInfoEndpoint("ResultadoReconocimientoMedico", "Expediente  con codigo ST: " + expedientePoliza.getCodigoST() + " y codigo cia: " + expedientePoliza.getNumSolicitud() + " para la cia: " + company.nombre + " se ha enviado correctamente sin zip porque esta ANULADO");
+                                    logginService.putInfoEndpoint("ResultadoReconocimientoMedico", "Expediente  con codigo ST: " + expedientePoliza.getCodigoST() + " y codigo cia: " + expedientePoliza.getNumSolicitud() + " para la cia: " + company.nombre + " se ha enviado correctamente sin zip porque esta ANULADO")
                                 }
                             }
 

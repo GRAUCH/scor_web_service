@@ -29,6 +29,7 @@ import org.springframework.web.context.request.RequestContextHolder
 class AfiEscaUnderwrittingCasesResultsService {
 	
 	def requestService
+	def expedienteService
 	def estadisticasService
 	def tarificadorService
 	def logginService
@@ -58,20 +59,20 @@ class AfiEscaUnderwrittingCasesResultsService {
 				requestBBDD = requestService.crear(opername,requestXML)
 				
 				//PARSEAMOS LA FECHA
-				def fechaHora = new SimpleDateFormat("yyyyMMdd HH:mm");
-				String convertido = fechaHora.format(afiEscaUnderwrittingCasesResultsRequest.date);
+				def fechaHora = new SimpleDateFormat("yyyyMMdd HH:mm")
+				String convertido = fechaHora.format(afiEscaUnderwrittingCasesResultsRequest.date)
 				def fechaFin = convertido
 				fechaFin= fechaFin.toString()+":00"
-				Calendar fecha = Calendar.getInstance();
+				Calendar fecha = Calendar.getInstance()
 				fecha.setTime(afiEscaUnderwrittingCasesResultsRequest.date)
 				fecha.add(Calendar.MINUTE , -120)
 				def fechaIni = fecha.getTime().format ('yyyyMMdd HH:mm')
 				fechaIni= fechaIni.toString()+":00"
 					
 				if (Environment.current.name.equals("production_wildfly")) {
-					expedientes=tarificadorService.obtenerInformeExpedientes("1035",null,1,fechaIni,fechaFin,"FR")
+					expedientes=expedienteService.obtenerInformeExpedientes("1035",null,1,fechaIni,fechaFin,"FR")
 				} else {
-					expedientes=tarificadorService.obtenerInformeExpedientes("1048",null,1,fechaIni,fechaFin,"FR") 
+					expedientes=expedienteService.obtenerInformeExpedientes("1048",null,1,fechaIni,fechaFin,"FR")
 				}
 				requestService.insertarEnvio(company, afiEscaUnderwrittingCasesResultsRequest.date.toString(), requestXML.toString())
 

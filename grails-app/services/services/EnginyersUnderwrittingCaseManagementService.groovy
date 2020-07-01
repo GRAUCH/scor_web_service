@@ -1,39 +1,24 @@
 package services
 
+import com.scortelemed.Company
 import com.scortelemed.TipoCompany
+import com.scortelemed.schemas.enginyers.*
 import com.ws.servicios.impl.ExpedienteService
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
 import hwsol.webservices.WsError
-import org.springframework.web.context.request.RequestContextHolder
-
-import java.text.SimpleDateFormat
-
 import org.apache.cxf.annotations.SchemaValidation
 import org.grails.cxf.utils.EndpointType
 import org.grails.cxf.utils.GrailsCxfEndpoint
 import org.grails.cxf.utils.GrailsCxfEndpointProperty
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.request.RequestContextHolder
 
+import javax.jws.WebMethod
 import javax.jws.WebParam
 import javax.jws.WebResult
 import javax.jws.WebService
 import javax.jws.soap.SOAPBinding
-import javax.jws.WebMethod;
-
-import com.scortelemed.Company
-import com.scortelemed.schemas.enginyers.ArrayOfFaultElement;
-import com.scortelemed.schemas.enginyers.ErrorElement;
-import com.scortelemed.schemas.enginyers.Expedient
-import com.scortelemed.schemas.enginyers.AddExpResponse
-import com.scortelemed.schemas.enginyers.AddExp
-import com.scortelemed.schemas.enginyers.FaultElement;
-import com.ws.servicios.impl.companies.EnginyersService
-import com.ws.servicios.EstadisticasService
-import com.ws.servicios.LogginService;
-import com.ws.servicios.impl.RequestService
-import com.ws.servicios.TarificadorService
-
+import java.text.SimpleDateFormat
 
 @WebService(targetNamespace = "http://www.scortelemed.com/schemas/enginyers")
 @SchemaValidation
@@ -66,10 +51,10 @@ class EnginyersUnderwrittingCaseManagementService {
 			AddExpResponse resultado=new AddExpResponse()
 
 			ArrayOfFaultElement array = new ArrayOfFaultElement()
-			FaultElement fault = new FaultElement();
-			Expedient expedient = new Expedient();
+			FaultElement fault = new FaultElement()
+			Expedient expedient = new Expedient()
 			expedient.setIdExpedient(Integer.valueOf(addExp.getD().getPolicyNumber()))
-			List<FaultElement> faultList = new ArrayList<FaultElement>();
+			List<FaultElement> faultList = new ArrayList<FaultElement>()
 			ErrorElement errorElement = new ErrorElement()
 
 			try{

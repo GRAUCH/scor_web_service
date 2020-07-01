@@ -14,7 +14,7 @@ import org.apache.cxf.annotations.SchemaValidation
 import org.grails.cxf.utils.EndpointType
 import org.grails.cxf.utils.GrailsCxfEndpoint
 import org.grails.cxf.utils.GrailsCxfEndpointProperty
-import org.springframework.beans.factory.annotation.Autowired
+
 import org.springframework.web.context.request.RequestContextHolder
 import servicios.RespuestaCRMInforme
 
@@ -74,7 +74,7 @@ class MethislabUnderwrittingCaseManagementService {
 
 					if (wsErrors != null && wsErrors.size() == 0) {
 
-						message = "Il caso e stato elaborato correttamente";
+						message = "Il caso e stato elaborato correttamente"
 						status = StatusType.OK
 						code = 0
 
@@ -106,7 +106,7 @@ class MethislabUnderwrittingCaseManagementService {
 				
 			} else {
 
-				message = "L'operazione viene disattivata temporaneamente";
+				message = "L'operazione viene disattivata temporaneamente"
 				status = StatusType.OK
 				code = 1
 
@@ -115,7 +115,7 @@ class MethislabUnderwrittingCaseManagementService {
 			}
 		} catch (Exception e){
 
-			message = "Error: " + e.printStackTrace();
+			message = "Error: " + e.printStackTrace()
 			status = StatusType.ERROR
 			code = 2
 
@@ -147,7 +147,7 @@ class MethislabUnderwrittingCaseManagementService {
 		def opername="MethislabUnderwrittingCaseManagementResponse"
 		def requestXML = ""
 		def requestBBDD
-		List<RespuestaCRMInforme> expedientes = new ArrayList<RespuestaCRMInforme>();
+		List<RespuestaCRMInforme> expedientes = new ArrayList<RespuestaCRMInforme>()
 		TransformacionUtil util = new TransformacionUtil()
 		CorreoUtil correoUtil = new CorreoUtil()
 
@@ -171,14 +171,14 @@ class MethislabUnderwrittingCaseManagementService {
 					requestBBDD = requestService.crear(opername,requestXML)
 
 					Date date = methislabUnderwrittingCasesResults.dateStart.toGregorianCalendar().getTime()
-					SimpleDateFormat sdfr = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
-					String fechaIni = sdfr.format(date);
+					SimpleDateFormat sdfr = new SimpleDateFormat("yyyyMMdd HH:mm:ss")
+					String fechaIni = sdfr.format(date)
 					date = methislabUnderwrittingCasesResults.dateEnd.toGregorianCalendar().getTime()
-					String fechaFin = sdfr.format(date);
+					String fechaFin = sdfr.format(date)
 
 
 					for (int i = 1; i < 3; i++){
-						expedientes.addAll(tarificadorService.obtenerInformeExpedientes(company.codigoSt,null,i,fechaIni,fechaFin,"IT"))
+						expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt,null,i,fechaIni,fechaFin,"IT"))
 					}
 
 					requestService.insertarEnvio(company, methislabUnderwrittingCasesResults.dateStart.toString().substring(0,10) + "-" + methislabUnderwrittingCasesResults.dateEnd.toString().substring(0,10), requestXML.toString())

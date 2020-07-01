@@ -14,9 +14,9 @@ import org.apache.cxf.annotations.SchemaValidation
 import org.grails.cxf.utils.EndpointType
 import org.grails.cxf.utils.GrailsCxfEndpoint
 import org.grails.cxf.utils.GrailsCxfEndpointProperty
-import org.springframework.beans.factory.annotation.Autowired
 
-//import org.jboss.ws.annotation.SchemaValidation;
+
+//import org.jboss.ws.annotation.SchemaValidation
 import org.springframework.web.context.request.RequestContextHolder
 import servicios.Filtro
 
@@ -198,9 +198,9 @@ class GestionReconocimientosMedicosService {
                         def pmedica = new Prueba_Medica()
                         pmedica.codigo_prueba_medica = pm.codigo
 
-                        def formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-                        formatter.setTimeZone(TimeZone.getTimeZone("GMT+2:00"));
-                        Date date = formatter.parse(pm.fecha.toString());
+                        def formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+                        formatter.setTimeZone(TimeZone.getTimeZone("GMT+2:00"))
+                        Date date = formatter.parse(pm.fecha.toString())
                         pmedica.fecha_realizacion = date
 
                         pmedica.candidato_aporta_pruebas = pm.aportaPruebas
