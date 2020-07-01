@@ -6,6 +6,7 @@ import com.scor.srpfileinbound.DATOS
 import com.scor.srpfileinbound.REGISTRODATOS
 import com.scortelemed.Company
 import com.scortelemed.Request
+import com.scortelemed.TipoOperacion
 import com.scortelemed.schemas.methislabCF.*
 import com.ws.servicios.ICompanyService
 import hwsol.webservices.CorreoUtil
@@ -658,7 +659,7 @@ class MethislabCFService implements ICompanyService{
 
                     logginService.putInfoMessage("BusquedaExpedienteCrm - Nueva alta de " + companyName + " con numero de solicitud: " + requestNumber.toString() + " y num. certificado: " + certificateNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM")
                     correoUtil.envioEmailErrores("BusquedaExpedienteCrm", "Nueva alta de " + companyName + " con numero de solicitud: " + requestNumber.toString() + " y num. certificado: " + certificateNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM", null)
-                    requestService.insertarError(companyId.toString(), requestNumber.toString(), (String)requestBBDD.request, "ALTA", "Peticion procesada para numero de solicitud: " + requestNumber.toString() + " y num. certificado: " + certificateNumber.toString() + ". No encontrada en CRM")
+                    requestService.insertarError(companyId.toString(), requestNumber.toString(), (String)requestBBDD.request, TipoOperacion.ALTA, "Peticion procesada para numero de solicitud: " + requestNumber.toString() + " y num. certificado: " + certificateNumber.toString() + ". No encontrada en CRM")
                 }
             } catch (Exception e) {
 

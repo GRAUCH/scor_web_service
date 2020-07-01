@@ -784,7 +784,7 @@ class NetinsuranceService implements ICompanyService{
 
 					logginService.putInfoMessage("BusquedaExpedienteCrm - Nueva alta de " + companyName + " con numero de solicitud: " + certificado.toString() + " se ha procesado pero no se ha dado de alta en CRM")
 					correoUtil.envioEmailErrores("BusquedaExpedienteCrm","Nueva alta de " + companyName + " con numero de solicitud: " + certificado.toString() + " se ha procesado pero no se ha dado de alta en CRM",null)
-					requestService.insertarError(companyId.toString(), certificado.toString(), (String) requestBBDD.request, "ALTA", "Peticion procesada para numero de solicitud: " + certificado.toString() + ". No encontrada en CRM")
+					requestService.insertarError(companyId.toString(), certificado.toString(), (String) requestBBDD.request, TipoOperacion.ALTA, "Peticion procesada para numero de solicitud: " + certificado.toString() + ". No encontrada en CRM")
 
 				}
 			} catch (Exception e) {

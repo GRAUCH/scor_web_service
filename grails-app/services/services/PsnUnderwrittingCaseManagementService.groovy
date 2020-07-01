@@ -1,6 +1,7 @@
 package services
 
 import com.scortelemed.TipoCompany
+import com.scortelemed.TipoOperacion
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
 import hwsol.webservices.WsError
@@ -107,7 +108,7 @@ class PsnUnderwrittingCaseManagementService	 {
 							status = StatusType.OK
 							code = 0
 
-							requestService.insertarRecibido(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), "ALTA")
+							requestService.insertarRecibido(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), TipoOperacion.ALTA)
 
 							/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
 							 *                                */
@@ -120,7 +121,7 @@ class PsnUnderwrittingCaseManagementService	 {
 
 							requestXML = psnService.marshall(gestionReconocimientoMedico)
 							requestBBDD = requestService.crear(opername, requestXML)
-							requestService.insertarRecibido(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestBBDD.request, "BAJA")
+							requestService.insertarRecibido(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestBBDD.request, TipoOperacion.BAJA)
 
 							message = "La baja se ha procesado correctamente"
 							status = StatusType.OK
@@ -135,7 +136,7 @@ class PsnUnderwrittingCaseManagementService	 {
 
 							requestXML = psnService.marshall(gestionReconocimientoMedico)
 							requestBBDD = requestService.crear(opername, requestXML)
-							requestService.insertarRecibido(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestBBDD.request, "MODIFICACION")
+							requestService.insertarRecibido(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestBBDD.request, TipoOperacion.MODIFICACION)
 
 							message = "La modificacion se ha procesado correctamente"
 							status = StatusType.OK
@@ -154,7 +155,7 @@ class PsnUnderwrittingCaseManagementService	 {
 						status = StatusType.ERROR
 						code = 8
 
-						requestService.insertarError(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber + ". Error de validacion: " + error)
+						requestService.insertarError(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), TipoOperacion.ALTA, "Peticion no realizada para solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber + ". Error de validacion: " + error)
 						logginService.putErrorEndpoint("GestionReconocimientoMedico", "Peticion no realizada de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber + ". Error de validacion: " + error)
 
 					}
@@ -174,7 +175,7 @@ class PsnUnderwrittingCaseManagementService	 {
 			status = StatusType.ERROR
 			code = 2
 
-			requestService.insertarError(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber + ". Error: " + e.getMessage())
+			requestService.insertarError(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), TipoOperacion.ALTA, "Peticion no realizada para solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber + ". Error: " + e.getMessage())
 
 			logginService.putErrorEndpoint("GestionReconocimientoMedico","Peticion no realizada de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber + ". Error: " + e.getMessage())
 			correoUtil.envioEmailErrores("GestionReconocimientoMedico","Peticion de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber, e)
@@ -325,7 +326,7 @@ class PsnUnderwrittingCaseManagementService	 {
 			status = StatusType.ERROR
 			code = 2
 
-			requestService.insertarError(company,resultadoReconocimientoMedico.numSolicitud.toString(), requestXML.toString(), "CONSULTA", "Peticion no realizada para solicitud: " + resultadoReconocimientoMedico.numSolicitud.toString() + ". Error: " + e.getMessage())
+			requestService.insertarError(company,resultadoReconocimientoMedico.numSolicitud.toString(), requestXML.toString(), TipoOperacion.CONSULTA, "Peticion no realizada para solicitud: " + resultadoReconocimientoMedico.numSolicitud.toString() + ". Error: " + e.getMessage())
 		}finally{
 
 			def sesion=RequestContextHolder.currentRequestAttributes().getSession()
@@ -395,7 +396,7 @@ class PsnUnderwrittingCaseManagementService	 {
 
 					filtro.setFiltroRelacionado(filtroRelacionado)
 
-					requestService.insertarRecibido(company, identificador, requestXML.toString(), "CONSOLIDACION")
+					requestService.insertarRecibido(company, identificador, requestXML.toString(), TipoOperacion.CONSOLIDACION)
 
 					expediente = psnService.informeExpedientePorFiltro(filtro,"ES")
 
@@ -418,7 +419,7 @@ class PsnUnderwrittingCaseManagementService	 {
 								correoUtil.envioEmail("ConsolidacionPoliza","Error en la modificacion de " + company.nombre + " con " + identificador + ". Error: " + respuestaCrmExpediente.getErrorCRM().getDetalle(), null)
 								logginService.putInfoEndpoint("ConsolidacionPoliza","Error en la modificacion de " + company.nombre + " con " + identificador + ". Error: " + respuestaCrmExpediente.getErrorCRM().getDetalle())
 
-								requestService.insertarError(company, identificador, requestXML.toString(), "CONSOLIDACION", "Peticion no realizada para solicitud: " + identificador + ". Error: " + respuestaCrmExpediente.getErrorCRM().getDetalle())
+								requestService.insertarError(company, identificador, requestXML.toString(), TipoOperacion.CONSOLIDACION, "Peticion no realizada para solicitud: " + identificador + ". Error: " + respuestaCrmExpediente.getErrorCRM().getDetalle())
 							} else {
 
 								notes = "El caso se ha procesado correctamente"
@@ -463,7 +464,7 @@ class PsnUnderwrittingCaseManagementService	 {
 			logginService.putErrorEndpoint("ConsolidacionPoliza","Peticion realizada para " + company.nombre + " con con numero de expiente: " + consolidacionPoliza.requestNumber + ". Error: " + e.getMessage())
 			correoUtil.envioEmailErrores("ConsolidacionPoliza","Peticion realizada para " + company.nombre + " con numero de expiente: " + consolidacionPoliza.requestNumber, e)
 
-			requestService.insertarError(company, identificador, requestXML.toString(), "CONSOLIDACION", "Peticion no realizada para solicitud: " + consolidacionPoliza.requestNumber + ". Error: " + e.getMessage())
+			requestService.insertarError(company, identificador, requestXML.toString(), TipoOperacion.CONSOLIDACION, "Peticion no realizada para solicitud: " + consolidacionPoliza.requestNumber + ". Error: " + e.getMessage())
 		}finally{
 
 			def sesion=RequestContextHolder.currentRequestAttributes().getSession()
@@ -628,7 +629,7 @@ class PsnUnderwrittingCaseManagementService	 {
 			status = StatusType.ERROR
 			code = 2
 
-			requestService.insertarError(company, identificador, requestXML.toString(), "CONSULTA", "Peticion no realizada para " + identificador + ". Error: " + e.getMessage())
+			requestService.insertarError(company, identificador, requestXML.toString(), TipoOperacion.CONSULTA, "Peticion no realizada para " + identificador + ". Error: " + e.getMessage())
 		}finally{
 			//BORRAMOS VARIABLES DE SESION
 			def sesion=RequestContextHolder.currentRequestAttributes().getSession()
@@ -781,7 +782,7 @@ class PsnUnderwrittingCaseManagementService	 {
 			messages = "Error en ConsultaExpediente: " + e.getMessage()
 			status = StatusType.ERROR
 
-			requestService.insertarError(company, identificador, requestXML.toString(), "CONSULTA", "Peticion no realizada para solicitud: " + identificador + ". Error: " + e.getMessage())
+			requestService.insertarError(company, identificador, requestXML.toString(), TipoOperacion.CONSULTA, "Peticion no realizada para solicitud: " + identificador + ". Error: " + e.getMessage())
 			
 		}finally{
 			//BORRAMOS VARIABLES DE SESION

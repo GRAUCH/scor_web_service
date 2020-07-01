@@ -6,6 +6,7 @@ import com.scor.srpfileinbound.DATOS
 import com.scor.srpfileinbound.REGISTRODATOS
 import com.scortelemed.Company
 import com.scortelemed.Request
+import com.scortelemed.TipoOperacion
 import com.scortelemed.schemas.methislab.*
 import com.scortelemed.schemas.methislab.MethislabUnderwrittingCasesResultsResponse.Expediente
 import com.ws.servicios.ICompanyService
@@ -682,7 +683,7 @@ class MethislabService implements ICompanyService{
                 if (limite == 10) {
                     logginService.putInfoMessage("BusquedaExpedienteCrm - Nueva alta de " + companyName + " con numero de solicitud: " + requestNumber.toString() + " y num. certificado: " + certificateNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM")
                     correoUtil.envioEmailErrores("BusquedaExpedienteCrm", "Nueva alta de " + companyName + " con numero de solicitud: " + requestNumber.toString() + " y num. certificado: " + certificateNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM", null)
-                    requestService.insertarError(companyId, requestNumber.toString(), requestBBDD.request, "ALTA", "Peticion procesada para numero de solicitud: " + requestNumber.toString() + " y num. certificado: " + certificateNumber.toString() + ". No encontrada en CRM")
+                    requestService.insertarError(companyId, requestNumber.toString(), requestBBDD.request, TipoOperacion.ALTA, "Peticion procesada para numero de solicitud: " + requestNumber.toString() + " y num. certificado: " + certificateNumber.toString() + ". No encontrada en CRM")
                 }
             } catch (Exception e) {
 
@@ -690,7 +691,7 @@ class MethislabService implements ICompanyService{
                 correoUtil.envioEmailErrores("BusquedaExpedienteCrm", "Nueva alta de " + companyName + " con numero de solicitud: " + requestNumber.toString() + " y num. certificado: " + certificateNumber.toString(), e)
             }
         }
-    }
+    }p
 
     def devolverStateType(estado) {
 

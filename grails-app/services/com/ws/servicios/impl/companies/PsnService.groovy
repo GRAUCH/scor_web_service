@@ -791,7 +791,7 @@ class PsnService implements ICompanyService{
 
 					logginService.putInfoMessage("BusquedaExpedienteCrm - Nueva alta de " + companyName + " con numero de solicitud: " + policyNumber.toString() + " y referencia: " + certificado.toString() + " se ha procesado pero no se ha dado de alta en CRM")
 					correoUtil.envioEmailErrores("BusquedaExpedienteCrm","Nueva alta de " + companyName + " con numero de solicitud: " + policyNumber.toString() + " y referencia: " + certificado.toString() + " se ha procesado pero no se ha dado de alta en CRM",null)
-					requestService.insertarError(companyId.toString(), policyNumber.toString(), (String)requestBBDD.request, "ALTA", "Peticion procesada para numero de solicitud: " + policyNumber.toString() + ". No encontrada en CRM")
+					requestService.insertarError(companyId.toString(), policyNumber.toString(), (String)requestBBDD.request, TipoOperacion.ALTA, "Peticion procesada para numero de solicitud: " + policyNumber.toString() + ". No encontrada en CRM")
 
 				}
 			} catch (Exception e) {

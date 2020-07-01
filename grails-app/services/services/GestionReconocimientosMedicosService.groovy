@@ -2,6 +2,7 @@ package services
 
 import com.scortelemed.Company
 import com.scortelemed.TipoCompany
+import com.scortelemed.TipoOperacion
 import com.ws.enumeration.StatusType
 import com.ws.enumeration.TipoDictamenType
 import com.ws.enumeration.TipoDocumentoType
@@ -76,7 +77,7 @@ class GestionReconocimientosMedicosService {
                     requestBBDD = requestService.crear(opername, requestXML)
 
                     expedienteService.crearExpediente(requestBBDD, TipoCompany.LAGUN_ARO)
-                    requestService.insertarRecibido(company, gestionReconocimientoMedicoRequest.poliza.cod_poliza, requestBBDD.request, "ALTA")
+                    requestService.insertarRecibido(company, gestionReconocimientoMedicoRequest.poliza.cod_poliza, requestBBDD.request, TipoOperacion.ALTA)
 
                     resultado.setMensaje("El caso se ha procesado correctamente")
                     resultado.setFecha(new Date())
@@ -101,7 +102,7 @@ class GestionReconocimientosMedicosService {
 
                     requestXML = requestService.marshall(gestionReconocimientoMedicoRequest, GestionReconocimientoMedicoRequest.class)
                     requestBBDD = requestService.crear(opername, requestXML)
-                    requestService.insertarRecibido(company, gestionReconocimientoMedicoRequest.poliza.cod_poliza, requestBBDD.request, "CANCELACION")
+                    requestService.insertarRecibido(company, gestionReconocimientoMedicoRequest.poliza.cod_poliza, requestBBDD.request, TipoOperacion.CANCELACION)
 
                     resultado.setMensaje("El baja se ha procesado correctamente")
                     resultado.setFecha(new Date())
@@ -129,7 +130,7 @@ class GestionReconocimientosMedicosService {
             resultado.setMensaje("Error: " + "Peticion no realizada para solicitud: " + gestionReconocimientoMedicoRequest.poliza.cod_poliza + " y certificado: " + gestionReconocimientoMedicoRequest.poliza.certificado)
             resultado.setFecha(new Date())
             resultado.setStatusType(StatusType.error)
-            requestService.insertarError(company, gestionReconocimientoMedicoRequest.poliza.cod_poliza, requestBBDD.request, "ALTA", "Peticion no realizada para solicitud: " + gestionReconocimientoMedicoRequest.poliza.cod_poliza + " y certificado: " + gestionReconocimientoMedicoRequest.poliza.certificado + ". Error: " + e.getMessage())
+            requestService.insertarError(company, gestionReconocimientoMedicoRequest.poliza.cod_poliza, requestBBDD.request, TipoOperacion.ALTA, "Peticion no realizada para solicitud: " + gestionReconocimientoMedicoRequest.poliza.cod_poliza + " y certificado: " + gestionReconocimientoMedicoRequest.poliza.certificado + ". Error: " + e.getMessage())
 
         } finally {
 
@@ -246,13 +247,13 @@ class GestionReconocimientosMedicosService {
             } else {
                 result.setStatusType(StatusType.error)
                 result.setObservaciones("La operacion esta desactivada temporalmente.")
-                requestService.insertarError(company, "", tramitacionReconocimientoMedicoRequest.fecha.toString(), "CONSULTA", "La operacion esta desactivada temporalmente")
+                requestService.insertarError(company, "", tramitacionReconocimientoMedicoRequest.fecha.toString(), TipoOperacion.CONSULTA, "La operacion esta desactivada temporalmente")
 
                 logginService.putInfoEndpoint("Endpoint-" + opername, "Peticion no realizada para fecha: " + tramitacionReconocimientoMedicoRequest.fecha)
 
             }
         } catch (Exception e) {
-            requestService.insertarError(company, "", tramitacionReconocimientoMedicoRequest.fecha.toString(), "CONSULTA", "Peticion no realizada para fecha: " + tramitacionReconocimientoMedicoRequest.fecha.toString() + "- Error: " + e.getMessage())
+            requestService.insertarError(company, "", tramitacionReconocimientoMedicoRequest.fecha.toString(), TipoOperacion.CONSULTA, "Peticion no realizada para fecha: " + tramitacionReconocimientoMedicoRequest.fecha.toString() + "- Error: " + e.getMessage())
             logginService.putErrorEndpoint("Endpoint-" + opername, "Peticion no realizada para fecha: " + tramitacionReconocimientoMedicoRequest.fecha + "- Error: " + e)
             correoUtil.envioEmailErrores("TramitacionReconocimientoMedicoRequest", "Peticion no realizada para fecha: " + tramitacionReconocimientoMedicoRequest.fecha, e)
             result.setStatusType(StatusType.error)

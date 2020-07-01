@@ -1,5 +1,6 @@
 package services
 
+import com.scortelemed.TipoOperacion
 import org.grails.cxf.utils.EndpointType
 import org.grails.cxf.utils.GrailsCxfEndpoint
 import org.grails.cxf.utils.GrailsCxfEndpointProperty
@@ -118,7 +119,7 @@ class AfiEscaUnderwrittingCasesResultsService {
 			logginService.putErrorEndpoint("Endpoint-"+opername,"Peticion no realizada para fecha: " + afiEscaUnderwrittingCasesResultsRequest.date + ". Error: "+e.getMessage())
 			correoUtil.envioEmailErrores(opername,"Peticion no realizada para fecha: " + afiEscaUnderwrittingCasesResultsRequest.date,e)
 			result.setComments("Error en AfiEscaUnderwrittingCasesResultsRequest: "+e.getMessage())
-			requestService.insertarError(company, afiEscaUnderwrittingCasesResultsRequest.date.toString(), requestXML.toString(), "CONSULTA", e.getMessage())
+			requestService.insertarError(company, afiEscaUnderwrittingCasesResultsRequest.date.toString(), requestXML.toString(), TipoOperacion.CONSULTA, e.getMessage())
 
 		}finally{
 			

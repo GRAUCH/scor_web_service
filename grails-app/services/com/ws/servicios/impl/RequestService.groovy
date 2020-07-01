@@ -5,6 +5,7 @@ import com.scortelemed.Envio
 import com.scortelemed.Recibido
 import com.scortelemed.Request
 import com.scortelemed.Error
+import com.scortelemed.TipoOperacion
 import com.ws.servicios.EstadisticasService
 import com.ws.servicios.IRequestService
 import com.ws.servicios.LogginService
@@ -126,31 +127,31 @@ class RequestService implements IRequestService {
         return result
     }
 
-    void insertarRecibido(Company company, String identificador, String info, String operacion) {
+    void insertarRecibido(Company company, String identificador, String info, TipoOperacion operacion) {
         insertarRecibido(company.id.toString(), identificador, info, operacion)
     }
 
-    void insertarRecibido(String companyId, String identificador, String info, String operacion) {
+    void insertarRecibido(String companyId, String identificador, String info, TipoOperacion operacion) {
         Recibido recibido = new Recibido()
         recibido.setFecha(new Date())
         recibido.setCia(companyId)
         recibido.setIdentificador(identificador)
         recibido.setInfo(info)
-        recibido.setOperacion(operacion)
+        recibido.setOperacion(operacion.name())
         recibido.save(flush: true)
     }
 
-    void insertarError(Company company, String identificador, String info, String operacion, String detalleError) {
+    void insertarError(Company company, String identificador, String info, TipoOperacion operacion, String detalleError) {
         insertarError(company.id.toString(), identificador, info, operacion, detalleError)
     }
 
-    void insertarError(String companyId, String identificador, String info, String operacion, String detalleError) {
+    void insertarError(String companyId, String identificador, String info, TipoOperacion operacion, String detalleError) {
         Error error = new Error()
         error.setFecha(new Date())
         error.setCia(companyId)
         error.setIdentificador(identificador)
         error.setInfo(info)
-        error.setOperacion(operacion)
+        error.setOperacion(operacion.name())
         error.setError(detalleError)
         error.save(flush: true)
     }

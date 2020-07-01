@@ -6,6 +6,7 @@ import com.scor.srpfileinbound.DATOS
 import com.scor.srpfileinbound.REGISTRODATOS
 import com.scortelemed.Company
 import com.scortelemed.Request
+import com.scortelemed.TipoOperacion
 import com.ws.cajamar.beans.CajamarUnderwrittingCaseManagementRequest
 import com.ws.cajamar.beans.ConsolidacionPolizaRequest
 import com.ws.servicios.ICompanyService
@@ -660,7 +661,7 @@ class CajamarService implements ICompanyService{
 
 					logginService.putInfoMessage("Nueva alta de Cajamar con numero de solicitud: " + numref.toString() + " se ha procesado pero no se ha dado de alta en CRM")
 					correoUtil.envioEmailErrores("BusquedaExpedienteCrm","Nueva alta de Cajamar con numero de solicitud: " + numref.toString() + " se ha procesado pero no se ha dado de alta en CRM",null)
-					requestService.insertarError(companyId.toString(), numref.toString(), (String)requestBBDD.request, "ALTA", "Peticion procesada para numero de solictud: " + numref.toString() + ". No encontrada en CRM")
+					requestService.insertarError(companyId.toString(), numref.toString(), (String)requestBBDD.request, TipoOperacion.ALTA, "Peticion procesada para numero de solictud: " + numref.toString() + ". No encontrada en CRM")
 
 				}
 			} catch (Exception e) {

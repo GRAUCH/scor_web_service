@@ -1,6 +1,7 @@
 package services
 
 import com.scortelemed.TipoCompany
+import com.scortelemed.TipoOperacion
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
 
@@ -95,7 +96,7 @@ class CajamarUnderwrittingCaseManagementService {
 					resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 
 					logginService.putInfoMessage("Se procede el alta automatica de " + company.nombre + " con numero de solicitud " + cajamarUnderwrittingCaseManagementRequest.regScor.numref)
-					requestService.insertarRecibido(company, cajamarUnderwrittingCaseManagementRequest.regScor.numref, requestBBDD.request, "ALTA")
+					requestService.insertarRecibido(company, cajamarUnderwrittingCaseManagementRequest.regScor.numref, requestBBDD.request, TipoOperacion.ALTA)
 
 					/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
 					 * 
@@ -113,7 +114,7 @@ class CajamarUnderwrittingCaseManagementService {
 
 					requestXML=cajamarService.marshall(cajamarUnderwrittingCaseManagementRequest)
 					requestBBDD = requestService.crear(opername,requestXML)
-					requestService.insertarRecibido(company, cajamarUnderwrittingCaseManagementRequest.regScor.numref, requestBBDD.request, "ANULACION")
+					requestService.insertarRecibido(company, cajamarUnderwrittingCaseManagementRequest.regScor.numref, requestBBDD.request, TipoOperacion.ANULACION)
 					
 					resultado.setComments("El caso se ha procesado correctamente")
 					resultado.setStatus(StatusType.OK)
@@ -135,7 +136,7 @@ class CajamarUnderwrittingCaseManagementService {
 
 					requestXML=cajamarService.marshall(cajamarUnderwrittingCaseManagementRequest)
 					requestBBDD = requestService.crear(opername,requestXML)
-					requestService.insertarRecibido(company, cajamarUnderwrittingCaseManagementRequest.regScor.numref, requestBBDD.request, "MODIFICACION")
+					requestService.insertarRecibido(company, cajamarUnderwrittingCaseManagementRequest.regScor.numref, requestBBDD.request, TipoOperacion.MODIFICACION)
 					
 					resultado.setComments("El caso se ha procesado correctamente")
 					resultado.setStatus(StatusType.OK)
@@ -165,7 +166,7 @@ class CajamarUnderwrittingCaseManagementService {
 			resultado.setComments("Error: " + e.printStackTrace())
 			resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 			resultado.setStatus(StatusType.ERROR)
-			requestService.insertarError(company, cajamarUnderwrittingCaseManagementRequest.regScor.numref, requestBBDD.request, "ALTA", "Peticion no realizada para solicitud: " + cajamarUnderwrittingCaseManagementRequest.regScor.numref + "- Error: "+e.getMessage())
+			requestService.insertarError(company, cajamarUnderwrittingCaseManagementRequest.regScor.numref, requestBBDD.request, TipoOperacion.ALTA, "Peticion no realizada para solicitud: " + cajamarUnderwrittingCaseManagementRequest.regScor.numref + "- Error: "+e.getMessage())
 
 		}finally{
 
@@ -204,7 +205,7 @@ class CajamarUnderwrittingCaseManagementService {
 
 				requestXML=cajamarService.marshall(consolidacionPoliza)
 				requestBBDD = requestService.crear(opername,requestXML)
-				requestService.insertarRecibido(company, consolidacionPoliza.requestNumber, requestXML.toString(), "CONSOLIDACION")
+				requestService.insertarRecibido(company, consolidacionPoliza.requestNumber, requestXML.toString(), TipoOperacion.CONSOLIDACION)
 
 				if (consolidacionPoliza.requestNumber != null && !consolidacionPoliza.requestNumber.isEmpty() != null && consolidacionPoliza.ciaCode !=null && !consolidacionPoliza.ciaCode.isEmpty() && consolidacionPoliza.policyNumber != null && !consolidacionPoliza.policyNumber.isEmpty()){
 
@@ -225,7 +226,7 @@ class CajamarUnderwrittingCaseManagementService {
 							resultado.setCodigo(0)
 
 							logginService.putInfoEndpoint("Endpoint-"+opername,"Error en la modificacion para NUM_SOLICITUD: " + consolidacionPoliza.requestNumber + ", ciaCode: " + consolidacionPoliza.ciaCode +". Error: " + respuestaCrmExpediente.getErrorCRM().getDetalle())
-							requestService.insertarError(company, consolidacionPoliza.requestNumber, requestXML.toString(), opername, respuestaCrmExpediente.getErrorCRM().getDetalle())
+							requestService.insertarError(company, consolidacionPoliza.requestNumber, requestXML.toString(), TipoOperacion.MODIFICACION, respuestaCrmExpediente.getErrorCRM().getDetalle())
 
 						} else {
 
@@ -267,7 +268,7 @@ class CajamarUnderwrittingCaseManagementService {
 			resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 			resultado.setStatus(StatusType.ERROR)
 			resultado.setCodigo(4)
-			requestService.insertarError(company, consolidacionPoliza.requestNumber, requestXML.toString(), opername, e.getMessage())
+			requestService.insertarError(company, consolidacionPoliza.requestNumber, requestXML.toString(), TipoOperacion.MODIFICACION, e.getMessage())
 
 		}finally{
 

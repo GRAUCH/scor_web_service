@@ -1,6 +1,7 @@
 package services
 
 import com.scortelemed.TipoCompany
+import com.scortelemed.TipoOperacion
 import grails.util.Environment
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
@@ -80,7 +81,7 @@ class SocieteGeneraleUnderwrittingCaseManagementService	 {
 				resultado.setMessage("The case has been successfully processed")
 				resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 				resultado.setStatus(StatusType.OK)
-				requestService.insertarRecibido(company, societeGeneraleUnderwrittingCaseManagement.candidateInformation.requestNumber, requestBBDD.request, "ALTA")
+				requestService.insertarRecibido(company, societeGeneraleUnderwrittingCaseManagement.candidateInformation.requestNumber, requestBBDD.request, TipoOperacion.ALTA)
 
 				/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
 				 *
@@ -103,7 +104,7 @@ class SocieteGeneraleUnderwrittingCaseManagementService	 {
 			resultado.setMessage("Error: " + e.printStackTrace())
 			resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 			resultado.setStatus(StatusType.ERROR)
-			requestService.insertarError(company, societeGeneraleUnderwrittingCaseManagement.candidateInformation.requestNumber, requestBBDD.request, "ALTA", "Peticion no realizada para solicitud: " + societeGeneraleUnderwrittingCaseManagement.candidateInformation.requestNumber + ". Error: "+e.getMessage())
+			requestService.insertarError(company, societeGeneraleUnderwrittingCaseManagement.candidateInformation.requestNumber, requestBBDD.request, TipoOperacion.ALTA, "Peticion no realizada para solicitud: " + societeGeneraleUnderwrittingCaseManagement.candidateInformation.requestNumber + ". Error: "+e.getMessage())
 
 		}finally{
 			
@@ -196,7 +197,7 @@ class SocieteGeneraleUnderwrittingCaseManagementService	 {
 			resultado.setNotes("Errore nel " + opername + ": " + e.getMessage())
 			resultado.setDate(societeGeneraleUnderwrittingCasesResults.dateStart)
 			resultado.setStatus(StatusType.ERROR)
-			requestService.insertarError(company, societeGeneraleUnderwrittingCasesResults.dateStart.toString() + "-" + societeGeneraleUnderwrittingCasesResults.dateEnd.toString(), requestXML.toString(), "CONSULTA", e.getMessage())
+			requestService.insertarError(company, societeGeneraleUnderwrittingCasesResults.dateStart.toString() + "-" + societeGeneraleUnderwrittingCasesResults.dateEnd.toString(), requestXML.toString(), TipoOperacion.CONSULTA, e.getMessage())
 
 		}finally{
 			

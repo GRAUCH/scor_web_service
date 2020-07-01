@@ -9,7 +9,6 @@ import com.scortelemed.TipoCompany
 import com.ws.servicios.CompanyFactory
 import com.ws.servicios.ICompanyService
 import com.ws.servicios.IExpedienteService
-import com.ws.servicios.LogginService
 import grails.transaction.Transactional
 import servicios.ClaveFiltro
 import servicios.Expediente
@@ -74,7 +73,7 @@ class ExpedienteService implements IExpedienteService {
         }
     }
 
-    def obtenerInformeExpedientesSiniestros(String companya, String producto, String estado, String fechaIni, String fechaFin, String pais) {
+    def obtenerInformeExpedientesSiniestros(String companya, String producto, int estado, String fechaIni, String fechaFin, String pais) {
         try {
             def ctx = grailsApplication.mainContext
             def bean = ctx.getBean("soapClientAlptis")
@@ -89,12 +88,12 @@ class ExpedienteService implements IExpedienteService {
     }
 
 
-    def modificaExpediente(String arg1, Expediente arg2, String arg3, String arg4) {
+    def modificaExpediente(String pais, Expediente expediente, def servicioScorList, def paqueteScorList) {
         try {
             def ctx = grailsApplication.mainContext
             def bean = ctx.getBean("soapClientAlptis")
             bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("frontal.wsdl")?.value)
-            def salida = grailsApplication.mainContext.soapClientAlptis.modificaExpediente(tarificadorService.obtenerUsuarioFrontal(arg1), arg2, arg3, arg4)
+            def salida = grailsApplication.mainContext.soapClientAlptis.modificaExpediente(tarificadorService.obtenerUsuarioFrontal(pais), expediente, servicioScorList, paqueteScorList)
             return salida
         } catch (Exception e) {
             logginService.putError("modificaExpediente", "No se ha podido ejecutar la operacion de modificacion : " + e)

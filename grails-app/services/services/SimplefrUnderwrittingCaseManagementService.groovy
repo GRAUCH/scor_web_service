@@ -1,6 +1,7 @@
 package services
 
 import com.scortelemed.TipoCompany
+import com.scortelemed.TipoOperacion
 import grails.util.Environment
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
@@ -78,7 +79,7 @@ class SimplefrUnderwrittingCaseManagementService	 {
 				resultado.setMessage("The case has been successfully processed")
 				resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 				resultado.setStatus(StatusType.OK)
-				requestService.insertarRecibido(company, simplefrUnderwrittingCaseManagement.candidateInformation.requestNumber, requestBBDD.request, "ALTA")
+				requestService.insertarRecibido(company, simplefrUnderwrittingCaseManagement.candidateInformation.requestNumber, requestBBDD.request, TipoOperacion.ALTA)
 
 				/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
 				 *
@@ -101,7 +102,7 @@ class SimplefrUnderwrittingCaseManagementService	 {
 			resultado.setMessage("Error: " + e.printStackTrace())
 			resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 			resultado.setStatus(StatusType.ERROR)
-			requestService.insertarError(company, simplefrUnderwrittingCaseManagement.candidateInformation.requestNumber, requestBBDD.request, "ALTA",
+			requestService.insertarError(company, simplefrUnderwrittingCaseManagement.candidateInformation.requestNumber, requestBBDD.request, TipoOperacion.ALTA,
 										  "Peticion no realizada para solicitud: " + simplefrUnderwrittingCaseManagement.candidateInformation.requestNumber + ". Error: "+e.getMessage())
 
 		}finally{
@@ -192,7 +193,7 @@ class SimplefrUnderwrittingCaseManagementService	 {
 			resultado.setNotes("Errore nel " + opername + ": " + e.getMessage())
 			resultado.setDate(simpleUnderwrittingCasesResults.dateStart)
 			resultado.setStatus(StatusType.ERROR)
-			requestService.insertarError(company, simpleUnderwrittingCasesResults.dateStart.toString() + "-" + simpleUnderwrittingCasesResults.dateEnd.toString(), requestXML.toString(), "CONSULTA", e.getMessage())
+			requestService.insertarError(company, simpleUnderwrittingCasesResults.dateStart.toString() + "-" + simpleUnderwrittingCasesResults.dateEnd.toString(), requestXML.toString(), TipoOperacion.CONSULTA, e.getMessage())
 
 		}finally{
 			

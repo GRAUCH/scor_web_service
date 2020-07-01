@@ -1,6 +1,7 @@
 package services
 
 import com.scortelemed.TipoCompany
+import com.scortelemed.TipoOperacion
 import hwsol.webservices.CorreoUtil
 
 import java.text.SimpleDateFormat
@@ -71,7 +72,7 @@ class AlptisUnderwrittingCaseManagementService {
 
 						logginService.putInfoMessage("Se procede el alta automatica de Alptis con numero de solicitud " + alptisUnderwrittingCaseManagementRequest.policy.BasicPolicyGroup.policy_number)
 						expedienteService.crearExpediente(requestBBDD, TipoCompany.ALPTIS)
-						requestService.insertarRecibido(company, alptisUnderwrittingCaseManagementRequest.policy.BasicPolicyGroup.policy_number, requestBBDD.request, "ALTA")
+						requestService.insertarRecibido(company, alptisUnderwrittingCaseManagementRequest.policy.BasicPolicyGroup.policy_number, requestBBDD.request, TipoOperacion.ALTA)
 
 						/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
 						 *
@@ -103,7 +104,7 @@ class AlptisUnderwrittingCaseManagementService {
 			correoUtil.envioEmailErrores(opername," Peticion no realizada para solicitud "+ alptisUnderwrittingCaseManagementRequest.policy.BasicPolicyGroup.policy_number.toString(),e)
 			resultado.setStatusType(StatusType.error)
 			resultado.setComments(opername+": "+e.getMessage())
-			requestService.insertarError(company, alptisUnderwrittingCaseManagementRequest.policy.BasicPolicyGroup.policy_number, requestBBDD.request, "ALTA", "Peticion no realizada para solicitud: " + alptisUnderwrittingCaseManagementRequest.policy.BasicPolicyGroup.policy_number + ". Error: "+e.getMessage())
+			requestService.insertarError(company, alptisUnderwrittingCaseManagementRequest.policy.BasicPolicyGroup.policy_number, requestBBDD.request, TipoOperacion.ALTA, "Peticion no realizada para solicitud: " + alptisUnderwrittingCaseManagementRequest.policy.BasicPolicyGroup.policy_number + ". Error: "+e.getMessage())
 
 		} finally {
 

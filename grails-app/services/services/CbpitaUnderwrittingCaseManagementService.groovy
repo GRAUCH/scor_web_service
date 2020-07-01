@@ -5,6 +5,7 @@ import com.scortelemed.Company
 import com.scortelemed.Conf
 import com.scortelemed.Operacion
 import com.scortelemed.TipoCompany
+import com.scortelemed.TipoOperacion
 import com.scortelemed.schemas.cbpita.*
 import com.ws.servicios.*
 import com.ws.servicios.impl.ExpedienteService
@@ -92,7 +93,7 @@ class CbpitaUnderwrittingCaseManagementService {
                             expedienteService.crearExpediente(requestBBDD, TipoCompany.CBP_ITALIA)
 
                             logginService.putInfoMessage("Se procede el alta automatica de " + company.nombre + " con numero de solicitud " + cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber)
-                            requestService.insertarRecibido(company, cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, requestXML.toString(), "ALTA")
+                            requestService.insertarRecibido(company, cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, requestXML.toString(), TipoOperacion.ALTA)
 
                             /**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
                              *                    */
@@ -123,7 +124,7 @@ class CbpitaUnderwrittingCaseManagementService {
                                     status = StatusType.OK
                                     code = 0
 
-                                    requestService.insertarRecibido(company, cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, requestXML.toString(), "MODIFICACION")
+                                    requestService.insertarRecibido(company, cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, requestXML.toString(), TipoOperacion.MODIFICACION)
                                     logginService.putInfoMessage("Modificacion realizada para " + company.nombre + " con numero de solicitud: " + cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber)
                                     correoUtil.envioEmailNoTratados("Modificacion webservices " + company.nombre, "Se ha procesado una modificacion para " + company.nombre + "con numero de solicitud: " + cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber)
 
@@ -135,7 +136,7 @@ class CbpitaUnderwrittingCaseManagementService {
                                 status = StatusType.ERROR
                                 code = 2
 
-                                requestService.insertarError(company, cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, requestXML.toString(), "MODIFICACION", "Peticion no realizada para solicitud: " + cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber + ". Error: " + e.getMessage())
+                                requestService.insertarError(company, cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, requestXML.toString(), TipoOperacion.MODIFICACION, "Peticion no realizada para solicitud: " + cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber + ". Error: " + e.getMessage())
 
                                 logginService.putErrorEndpoint("Modificacion expediente para " + company.nombre, "Modificaición no realizada de " + company.nombre + " con numero de solicitud: " + cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber + ". Error: " + e.getMessage())
                                 correoUtil.envioEmailErrores("ERROR en modificación de " + company.nombre, "Modificacion de " + company.nombre + " con numero de solicitud: " + cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber + " se ha procesado pero no se ha modificado en CRM", null)
@@ -146,7 +147,7 @@ class CbpitaUnderwrittingCaseManagementService {
                             status = StatusType.ERROR
                             code = 5
 
-                            requestService.insertarError(company, cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, requestXML.toString(), "MODIFICACION", "Peticion no realizada para solicitud: " + cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber + ". Error: Existe mas de un expediente")
+                            requestService.insertarError(company, cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, requestXML.toString(), TipoOperacion.MODIFICACION, "Peticion no realizada para solicitud: " + cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber + ". Error: Existe mas de un expediente")
 
                             logginService.putErrorEndpoint("Modificacion expediente para " + company.nombre, "Modificaición no realizada de " + company.nombre + " con numero de solicitud: " + cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber + ". Error: Exiete mas de un expediente")
                             correoUtil.envioEmailErrores("ERROR en modificación de " + company.nombre, "Modificacion de " + company.nombre + " con numero de solicitud: " + cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber + " se ha procesado pero no se ha modificado en CRM porque existe mas de un expediente", null)
@@ -160,7 +161,7 @@ class CbpitaUnderwrittingCaseManagementService {
                         status = StatusType.ERROR
                         code = 8
 
-                        requestService.insertarError(company, cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber + ". Error de validacion: " + error)
+                        requestService.insertarError(company, cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, requestXML.toString(), TipoOperacion.ALTA, "Peticion no realizada para solicitud: " + cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber + ". Error de validacion: " + error)
                         logginService.putErrorEndpoint("GestionReconocimientoMedico", "Peticion no realizada de " + company.nombre + " con numero de solicitud: " + cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber + ". Error de validacion: " + error)
 
                     }
@@ -182,7 +183,7 @@ class CbpitaUnderwrittingCaseManagementService {
             status = StatusType.ERROR
             code = 2
 
-            requestService.insertarError(company, cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber + ". Error: " + e.getMessage())
+            requestService.insertarError(company, cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, requestXML.toString(), TipoOperacion.ALTA, "Peticion no realizada para solicitud: " + cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber + ". Error: " + e.getMessage())
 
             logginService.putErrorEndpoint("GestionReconocimientoMedico", "Peticion no realizada de " + company.nombre + " con numero de solicitud: " + cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber + ". Error: " + e.getMessage())
             correoUtil.envioEmailErrores("GestionReconocimientoMedico", "Peticion de " + company.nombre + " con numero de solicitud: " + cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, e)
@@ -287,7 +288,7 @@ class CbpitaUnderwrittingCaseManagementService {
 
                                     } else {
                                         logginService.putInfoEndpoint("ResultadoReconocimientoMedico", "No se han encontardo audio necesarios para completar ZIP para " + company.nombre + " con expediente " + expedientePoliza.getCodigoST())
-                                        requestService.insertarError(company, cbpitaUnderwrittingCasesResultsRequest.dateStart.toString().substring(0, 10) + "-" + cbpitaUnderwrittingCasesResultsRequest.dateEnd.toString().substring(0, 10), requestXML.toString(), "CONSULTA", (String)"No se han encontardo audio necesarios para completar ZIP para " + company.nombre + " con expediente " + expedientePoliza.getCodigoST())
+                                        requestService.insertarError(company, cbpitaUnderwrittingCasesResultsRequest.dateStart.toString().substring(0, 10) + "-" + cbpitaUnderwrittingCasesResultsRequest.dateEnd.toString().substring(0, 10), requestXML.toString(), TipoOperacion.CONSULTA, (String)"No se han encontardo audio necesarios para completar ZIP para " + company.nombre + " con expediente " + expedientePoliza.getCodigoST())
                                         correoUtil.envioEmailNoTratados("Error en generacion de zip " + company.nombre, "El expediente : " + expedientePoliza.getCodigoST() + " no se ha enviado porque no tiene el audio requerido")
 
                                     }
@@ -338,7 +339,7 @@ class CbpitaUnderwrittingCaseManagementService {
             logginService.putErrorEndpoint("ResultadoReconocimientoMedico", "Peticion realizada para " + company.nombre + " con fecha: " + cbpitaUnderwrittingCasesResultsRequest.dateStart.toString() + "-" + cbpitaUnderwrittingCasesResultsRequest.dateEnd.toString() + ". Error: " + e.getMessage())
             correoUtil.envioEmailErrores("ResultadoReconocimientoMedico", "Peticion realizada para " + company.nombre + " con fecha: " + cbpitaUnderwrittingCasesResultsRequest.dateStart.toString() + "-" + cbpitaUnderwrittingCasesResultsRequest.dateEnd.toString() + ". Error: " + e.getMessage(),e)
 
-            requestService.insertarError(company, cbpitaUnderwrittingCasesResultsRequest.dateStart.toString().substring(0, 10) + "-" + cbpitaUnderwrittingCasesResultsRequest.dateEnd.toString().substring(0, 10), requestXML.toString(), "CONSULTA", "Peticion no realizada para solicitud: " + cbpitaUnderwrittingCasesResultsRequest.dateStart.toString() + "-" + cbpitaUnderwrittingCasesResultsRequest.dateEnd.toString() + ". Error: " + e.getMessage())
+            requestService.insertarError(company, cbpitaUnderwrittingCasesResultsRequest.dateStart.toString().substring(0, 10) + "-" + cbpitaUnderwrittingCasesResultsRequest.dateEnd.toString().substring(0, 10), requestXML.toString(), TipoOperacion.CONSULTA, "Peticion no realizada para solicitud: " + cbpitaUnderwrittingCasesResultsRequest.dateStart.toString() + "-" + cbpitaUnderwrittingCasesResultsRequest.dateEnd.toString() + ". Error: " + e.getMessage())
 
         } finally {
 
