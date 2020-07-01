@@ -73,13 +73,8 @@ class LifesquareUnderwrittingCasesResultsService {
 				fecha.add(Calendar.MINUTE , -120)
 				def fechaIni = fecha.getTime().format ('yyyyMMdd HH:mm')
 				fechaIni= fechaIni.toString()+":00"
-				
-				//OBTENEMOS TODOS LOS EXPEDIENTES DESDE FECHAINI A FECHAFIN			
-				if (Environment.current.name.equals("production_wildfly")) {
-					expedientes=expedienteService.obtenerInformeExpedientes("1043",null,1,fechaIni,fechaFin,"FR")
-				} else {
-					expedientes=expedienteService.obtenerInformeExpedientes("1053",null,1,fechaIni,fechaFin,"FR")
-				}
+
+				expedientes=expedienteService.obtenerInformeExpedientes(company.codigoSt,null,1,fechaIni,fechaFin,"FR")
 				
 				StringBuilder sbInfo = new StringBuilder ("Realizando proceso envio de informacion para " + company.nombre + " con fecha ")
 				sbInfo.append(fechaIni).append("-").append(fechaIni)

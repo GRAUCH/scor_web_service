@@ -153,13 +153,8 @@ class SocieteGeneraleUnderwrittingCaseManagementService	 {
 				String fechaFin = sdfr.format(date)
 				requestService.insertarEnvio(company, societeGeneraleUnderwrittingCasesResults.dateStart.toString() + "-" + societeGeneraleUnderwrittingCasesResults.dateEnd.toString(), requestXML.toString())
 
-				for (int i = 1; i < 3; i++){
-					if (Environment.current.name.equals("production_wildfly")) {
-						expedientes.addAll(expedienteService.obtenerInformeExpedientes("xxxx",null,i,fechaIni,fechaFin,"FR"))
-					} else {
-						expedientes.addAll(expedienteService.obtenerInformeExpedientes("xxxx",null,i,fechaIni,fechaFin,"FR"))
-					}
-				}
+				expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt,null,1,fechaIni,fechaFin,"FR"))
+				expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt,null,2,fechaIni,fechaFin,"FR"))
 
 				if(expedientes){
 

@@ -253,10 +253,9 @@ class CbpitaUnderwrittingCaseManagementService {
                         calendarFin.add(Calendar.HOUR, -1)
                         String fechaFin = sdfr.format(calendarFin.getTime())
 
+                        expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt, null, 1, fechaIni, fechaFin, company.getOu().toString()))
+                        expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt, null, 2, fechaIni, fechaFin, company.getOu().toString()))
 
-                        for (int i = 1; i < 3; i++) {
-                            expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.getCodigoSt().toString(), null, i, fechaIni, fechaFin, company.getOu().toString()))
-                        }
 
                         requestService.insertarEnvio(company, cbpitaUnderwrittingCasesResultsRequest.dateStart.toString().substring(0, 10) + "-" + cbpitaUnderwrittingCasesResultsRequest.dateEnd.toString().substring(0, 10), requestXML.toString())
 

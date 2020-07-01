@@ -177,10 +177,8 @@ class MethislabUnderwrittingCaseManagementService {
 					date = methislabUnderwrittingCasesResults.dateEnd.toGregorianCalendar().getTime()
 					String fechaFin = sdfr.format(date)
 
-
-					for (int i = 1; i < 3; i++){
-						expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt,null,i,fechaIni,fechaFin,"IT"))
-					}
+					expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt,null,1,fechaIni,fechaFin,"IT"))
+					expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt,null,2,fechaIni,fechaFin,"IT"))
 
 					requestService.insertarEnvio(company, methislabUnderwrittingCasesResults.dateStart.toString().substring(0,10) + "-" + methislabUnderwrittingCasesResults.dateEnd.toString().substring(0,10), requestXML.toString())
 

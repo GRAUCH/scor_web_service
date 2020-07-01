@@ -70,12 +70,7 @@ class AfiEscaUnderwrittingCasesResultsService {
 				fecha.add(Calendar.MINUTE , -120)
 				def fechaIni = fecha.getTime().format ('yyyyMMdd HH:mm')
 				fechaIni= fechaIni.toString()+":00"
-					
-				if (Environment.current.name.equals("production_wildfly")) {
-					expedientes=expedienteService.obtenerInformeExpedientes("1035",null,1,fechaIni,fechaFin,"FR")
-				} else {
-					expedientes=expedienteService.obtenerInformeExpedientes("1048",null,1,fechaIni,fechaFin,"FR")
-				}
+				expedientes=expedienteService.obtenerInformeExpedientes(company.codigoSt,null,1,fechaIni,fechaFin,"FR")
 				requestService.insertarEnvio(company, afiEscaUnderwrittingCasesResultsRequest.date.toString(), requestXML.toString())
 
 				if(expedientes){

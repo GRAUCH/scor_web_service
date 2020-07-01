@@ -149,13 +149,8 @@ class SimplefrUnderwrittingCaseManagementService	 {
 				String fechaFin = sdfr.format(date)
 				requestService.insertarEnvio(company, simpleUnderwrittingCasesResults.dateStart.toString() + "-" + simpleUnderwrittingCasesResults.dateEnd.toString(), requestXML.toString())
 
-				for (int i = 1; i < 3; i++){
-					if (Environment.current.name.equals("production_wildfly")) {
-						expedientes.addAll(expedienteService.obtenerInformeExpedientes("1060",null,i,fechaIni,fechaFin,"IT"))
-					} else {
-						expedientes.addAll(expedienteService.obtenerInformeExpedientes("1060",null,i,fechaIni,fechaFin,"IT"))
-					}
-				}
+				expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt,null,1,fechaIni,fechaFin,"IT"))
+				expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt,null,2,fechaIni,fechaFin,"IT"))
 
 				if(expedientes){
 

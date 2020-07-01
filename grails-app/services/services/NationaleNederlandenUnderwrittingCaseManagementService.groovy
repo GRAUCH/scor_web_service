@@ -187,14 +187,8 @@ class NationaleNederlandenUnderwrittingCaseManagementService {
 
 					requestService.insertarEnvio (company, resultadoReconocimientoMedico.dateStart.toString().substring(0,10) + "-" + resultadoReconocimientoMedico.dateEnd.toString().substring(0,10), requestXML.toString())
 
-					for (int i = 1; i < 3; i++){
-
-						if (Environment.current.name.equals("production_wildfly")) {
-							expedientes.addAll(expedienteService.obtenerInformeExpedientes("1061",null,i,fechaIni,fechaFin,"ES"))
-						} else {
-							expedientes.addAll(expedienteService.obtenerInformeExpedientes("1062",null,i,fechaIni,fechaFin,"ES"))
-						}
-					}
+					expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt,null,1,fechaIni,fechaFin,"ES"))
+					expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt,null,2,fechaIni,fechaFin,"ES"))
 
 					if(expedientes){
 
