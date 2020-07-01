@@ -59,7 +59,7 @@ class SimplefrUnderwrittingCaseManagementService	 {
 		def requestBBDD
 		def respuestaCrm
 		
-		Company company = Company.findByNombre("simplefr")
+		Company company = Company.findByNombre(TipoCompany.MALAKOFF_MEDERIC.getNombre())
 		Filtro filtro = new Filtro()
 		SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
 		TransformacionUtil util = new TransformacionUtil()
@@ -124,7 +124,7 @@ class SimplefrUnderwrittingCaseManagementService	 {
 		def correoUtil = new CorreoUtil()
 		def requestXML = ""
 		def expedientes
-		def company = Company.findByNombre('simplefr')
+		def company = Company.findByNombre(TipoCompany.MALAKOFF_MEDERIC.getNombre())
 		def requestBBDD
 		
 		TransformacionUtil util = new TransformacionUtil()

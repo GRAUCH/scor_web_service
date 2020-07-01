@@ -65,7 +65,7 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 		def requestBBDD
 		def respuestaCrm
 
-		Company company = Company.findByNombre("netinsurance")
+		Company company = Company.findByNombre(TipoCompany.NET_INSURANCE.getNombre())
 		Filtro filtro = new Filtro()
 		SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
 		TransformacionUtil util = new TransformacionUtil()
@@ -82,7 +82,7 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 
 			if (operacion && operacion.activo){
 
-				if (Company.findByNombre("netinsurance").generationAutomatic) {
+				if (company.generationAutomatic) {
 
 					requestXML=netinsuranceService.marshall(netInsuranteUnderwrittingCaseManagement)
 					requestBBDD = requestService.crear(opername,requestXML)
@@ -147,7 +147,7 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 
 		NetinsuranteUnderwrittingCasesResultsResponse resultado =new NetinsuranteUnderwrittingCasesResultsResponse()
 
-		Company company = Company.findByNombre("netinsurance")
+		Company company = Company.findByNombre(TipoCompany.NET_INSURANCE.getNombre())
 
 		try{
 
@@ -253,7 +253,7 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 		TransformacionUtil util = new TransformacionUtil()
 		CorreoUtil correoUtil = new CorreoUtil()
 
-		Company company = Company.findByNombre("netinsurance")
+		Company company = Company.findByNombre(TipoCompany.NET_INSURANCE.getNombre())
 
 		logginService.putInfoMessage("Realizando peticion de informacion de servicio ConsultaExpediente para la cia " + company.nombre)
 

@@ -56,7 +56,7 @@ class MethislabCFUnderwrittingCaseManagementService {
 		StatusType status = null
 		String code = 0
 
-		def company = Company.findByNombre('methislabCF')
+		def company = Company.findByNombre(TipoCompany.CF_LIFE.getNombre())
 
         logginService.putInfoMessage("Realizando peticion de informacion de servicio GestionReconocimientoMedico para la cia " + company.nombre)
 
@@ -66,7 +66,7 @@ class MethislabCFUnderwrittingCaseManagementService {
 
 			if (operacion && operacion.activo){
 
-				if (Company.findByNombre("methislabCF").generationAutomatic) {
+				if (company.generationAutomatic) {
 
 					requestXML=methislabCFService.marshall(MethislabCFUnderwrittingCaseManagementRequest)
 					requestBBDD = requestService.crear(opername,requestXML)
@@ -150,7 +150,7 @@ class MethislabCFUnderwrittingCaseManagementService {
 
 		MethislabCFUnderwrittingCasesResultsResponse resultado =new MethislabCFUnderwrittingCasesResultsResponse()
 
-		Company company = Company.findByNombre("methislabCF")
+		Company company = Company.findByNombre(TipoCompany.CF_LIFE.getNombre())
 
 		try{
 

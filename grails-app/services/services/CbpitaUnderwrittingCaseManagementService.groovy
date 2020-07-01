@@ -64,7 +64,7 @@ class CbpitaUnderwrittingCaseManagementService {
 
         try {
 
-            company = Company.findByNombre('cbp-italia')
+            company = Company.findByNombre(TipoCompany.CBP_ITALIA.getNombre())
 
             def operacion = estadisticasService.obtenerObjetoOperacion(opername)
 
@@ -225,7 +225,7 @@ class CbpitaUnderwrittingCaseManagementService {
 
         try {
 
-            company = Company.findByNombre("cbp-italia")
+            company = Company.findByNombre(TipoCompany.CBP_ITALIA.getNombre())
 
             Operacion operacion = estadisticasService.obtenerObjetoOperacion(opername)
 
@@ -233,7 +233,7 @@ class CbpitaUnderwrittingCaseManagementService {
 
             if (operacion && operacion.activo) {
 
-                if (Company.findByNombre("cbp-italia").generationAutomatic) {
+                if (company.generationAutomatic) {
 
                     if (cbpitaUnderwrittingCasesResultsRequest && cbpitaUnderwrittingCasesResultsRequest.dateStart && cbpitaUnderwrittingCasesResultsRequest.dateEnd) {
 

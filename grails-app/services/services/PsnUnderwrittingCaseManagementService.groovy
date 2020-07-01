@@ -75,7 +75,7 @@ class PsnUnderwrittingCaseManagementService	 {
 		StatusType status = null
 		int code = 0
 
-		Company company = Company.findByNombre("psn")
+		Company company = Company.findByNombre(TipoCompany.PSN.getNombre())
 		SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
 		TransformacionUtil util = new TransformacionUtil()
 		GestionReconocimientoMedicoResponse resultado=new GestionReconocimientoMedicoResponse()
@@ -88,7 +88,7 @@ class PsnUnderwrittingCaseManagementService	 {
 
 			if (operacion && operacion.activo) {
 
-				if (Company.findByNombre("psn").generationAutomatic) {
+				if (company.generationAutomatic) {
 
 					logginService.putErrorEndpoint("GestionReconocimientoMedico", "Realizando peticion " + gestionReconocimientoMedico.getCandidateInformation().getOperation().toString() + " para " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber)
 
@@ -214,7 +214,7 @@ class PsnUnderwrittingCaseManagementService	 {
 		StatusType status = null
 		int code = 0
 
-		Company company = Company.findByNombre("psn")
+		Company company = Company.findByNombre(TipoCompany.PSN.getNombre())
 
 		logginService.putInfoMessage("Realizando peticion de informacion de servicio ResultadoReconocimientoMedico para la cia " + company.nombre)
 
@@ -356,7 +356,7 @@ class PsnUnderwrittingCaseManagementService	 {
 		String notes = null
 		StatusType status = null
 
-		Company company = Company.findByNombre("psn")
+		Company company = Company.findByNombre(TipoCompany.PSN.getNombre())
 		RespuestaCRM expediente = new RespuestaCRM()
 		TransformacionUtil util = new TransformacionUtil()
 		ConsolidacionPolizaResponse resultado=new ConsolidacionPolizaResponse()
@@ -498,7 +498,7 @@ class PsnUnderwrittingCaseManagementService	 {
 		StatusType status = null
 		int code = 0
 
-		Company company = Company.findByNombre("psn")
+		Company company = Company.findByNombre(TipoCompany.PSN.getNombre())
 
 		logginService.putInfoMessage("Realizando peticion de informacion de servicio ConsultaExpediente para la cia " + company.nombre)
 
@@ -658,7 +658,7 @@ class PsnUnderwrittingCaseManagementService	 {
 		TransformacionUtil util = new TransformacionUtil()
 		CorreoUtil correoUtil = new CorreoUtil()
 		Filtro filtro = new Filtro()
-		Company company = Company.findByNombre("psn")
+		Company company = Company.findByNombre(TipoCompany.PSN.getNombre())
 		String indentificador = null
 		RespuestaCRM respuestaCRM = new RespuestaCRM()
 		String identificador = ""

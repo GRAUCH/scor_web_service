@@ -56,7 +56,7 @@ class GestionReconocimientosMedicosService {
         def requestBBDD
         def respuestaCrm
 
-        Company company = Company.findByNombre("lagunaro")
+        Company company = Company.findByNombre(TipoCompany.LAGUN_ARO.getNombre())
         Filtro filtro = new Filtro()
         SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
         TransformacionUtil util = new TransformacionUtil()
@@ -71,7 +71,7 @@ class GestionReconocimientosMedicosService {
             if (operacion && operacion.activo) {
 
 
-                if (Company.findByNombre("lagunaro").generationAutomatic && gestionReconocimientoMedicoRequest.getDatos_envio().getMovimiento().getNombre().equals("A")) {
+                if (company.generationAutomatic && gestionReconocimientoMedicoRequest.getDatos_envio().getMovimiento().getNombre().equals("A")) {
 
                     requestXML = requestService.marshall(gestionReconocimientoMedicoRequest, GestionReconocimientoMedicoRequest.class)
                     requestBBDD = requestService.crear(opername, requestXML)
@@ -96,7 +96,7 @@ class GestionReconocimientosMedicosService {
                  *
                  */
 
-                if (Company.findByNombre("lagunaro").generationAutomatic && gestionReconocimientoMedicoRequest.getDatos_envio().getMovimiento().getNombre().equals("B")) {
+                if (company.generationAutomatic && gestionReconocimientoMedicoRequest.getDatos_envio().getMovimiento().getNombre().equals("B")) {
 
                     def msg = "Ha llegado una cancelacion de Lagunaro con n�mero de solicitud: " + gestionReconocimientoMedicoRequest.poliza.cod_poliza + ", certificado: " + gestionReconocimientoMedicoRequest.poliza.certificado + ", numero de suplemento: " + gestionReconocimientoMedicoRequest.poliza.movimiento
 
@@ -159,7 +159,7 @@ class GestionReconocimientosMedicosService {
         def timedelay = System.currentTimeMillis()
         logginService.putInfoEndpoint("Endpoint-" + opername, "Peticion para fecha: " + tramitacionReconocimientoMedicoRequest.fecha)
         logginService.putInfoEndpoint("Endpoint-" + opername + "Tiempo inicial: ", timedelay)
-        Company company = Company.findByNombre("lagunaro")
+        Company company = Company.findByNombre(TipoCompany.LAGUN_ARO.getNombre())
 
         try {
             def listaExpedientes

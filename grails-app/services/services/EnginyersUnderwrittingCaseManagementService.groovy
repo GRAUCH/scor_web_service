@@ -60,7 +60,7 @@ class EnginyersUnderwrittingCaseManagementService {
 
 			try{
 
-				company = Company.findByNombre('enginyers')
+				company = Company.findByNombre(TipoCompany.ENGINYERS.getNombre())
 
 				def operacion = estadisticasService.obtenerObjetoOperacion(opername)
 

@@ -51,9 +51,8 @@ class LifesquareUnderwrittingCaseManagementService {
 		def correoUtil = new CorreoUtil()
 		def requestXML = ""
 		def requestBBDD
-		def company = Company.findByNombre('lifesquare')
-		def respuestaCrm
-		
+		def company = Company.findByNombre(TipoCompany.ZEN_UP.getNombre())
+
 		Filtro filtro = new Filtro()
 		SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
 		LifesquareUnderwrittingCaseManagementResponse resultado = new LifesquareUnderwrittingCaseManagementResponse()
@@ -74,7 +73,7 @@ class LifesquareUnderwrittingCaseManagementService {
 					resultado.setStatusType(StatusType.ok)
 					resultado.setComments("ok mensaje")
 
-					if (Company.findByNombre("lifesquare").generationAutomatic) {
+					if (company.generationAutomatic) {
 
 						logginService.putInfoMessage("Se procede el alta automatica de Lifesquare con numero de solicitud " + lifesquareUnderwrittingCaseManagementRequest.policy.policy_number)
 						expedienteService.crearExpediente(requestBBDD, TipoCompany.ZEN_UP)

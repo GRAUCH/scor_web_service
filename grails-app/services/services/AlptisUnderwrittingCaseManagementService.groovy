@@ -45,7 +45,7 @@ class AlptisUnderwrittingCaseManagementService {
 		def correoUtil = new CorreoUtil()
 		def requestXML = ""
 		def requestBBDD
-		def company = Company.findByNombre('alptis')
+		def company = Company.findByNombre(TipoCompany.ALPTIS.getNombre())
 		def respuestaCrm
 		Filtro filtro = new Filtro()
 		SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
@@ -68,7 +68,7 @@ class AlptisUnderwrittingCaseManagementService {
 					resultado.setStatusType(StatusType.ok)
 					resultado.setComments("ok mensaje")
 
-					if (Company.findByNombre("alptis").generationAutomatic) {
+					if (company.generationAutomatic) {
 
 						logginService.putInfoMessage("Se procede el alta automatica de Alptis con numero de solicitud " + alptisUnderwrittingCaseManagementRequest.policy.BasicPolicyGroup.policy_number)
 						expedienteService.crearExpediente(requestBBDD, TipoCompany.ALPTIS)

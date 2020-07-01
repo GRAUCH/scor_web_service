@@ -46,7 +46,7 @@ class AfiEscaUnderwrittingCaseManagementService {
 		def correoUtil = new CorreoUtil()
 		def requestXML = ""
 		def requestBBDD
-		def company = Company.findByNombre('afiesca')
+		def company = Company.findByNombre(TipoCompany.AFI_ESCA.getNombre())
 		def respuestaCrm
 
 		Filtro filtro = new Filtro()
@@ -58,7 +58,7 @@ class AfiEscaUnderwrittingCaseManagementService {
 
 			def operacion = estadisticasService.obtenerObjetoOperacion(opername)
 
-			if(operacion && operacion.activo && afiEscaUnderwrittingCaseManagementRequest && Company.findByNombre("afiesca").generationAutomatic) {
+			if(operacion && operacion.activo && afiEscaUnderwrittingCaseManagementRequest && company.generationAutomatic) {
 
 				requestXML=requestService.marshall(afiEscaUnderwrittingCaseManagementRequest,AfiEscaUnderwrittingCaseManagementRequest.class)
 				requestBBDD = requestService.crear(opername,requestXML)

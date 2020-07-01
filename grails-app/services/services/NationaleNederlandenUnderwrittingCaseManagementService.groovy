@@ -57,7 +57,7 @@ class NationaleNederlandenUnderwrittingCaseManagementService {
 		StatusType status = null
 		int code = 0
 
-		Company company = Company.findByNombre("Nn")
+		Company company = Company.findByNombre(TipoCompany.NATIONALE_NETHERLANDEN.getNombre())
 		SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
 		TransformacionUtil util = new TransformacionUtil()
 		GestionReconocimientoMedicoResponse resultado=new GestionReconocimientoMedicoResponse()
@@ -70,7 +70,7 @@ class NationaleNederlandenUnderwrittingCaseManagementService {
 
 			if (operacion && operacion.activo){
 
-				if (Company.findByNombre("Nn").generationAutomatic) {
+				if (company.generationAutomatic) {
 
 					logginService.putErrorEndpoint("GestionReconocimientoMedico","Realizando peticion " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber)
 
@@ -162,7 +162,7 @@ class NationaleNederlandenUnderwrittingCaseManagementService {
 		StatusType status = null
 		int code = 0
 
-		Company company = Company.findByNombre("nn")
+		Company company = Company.findByNombre(TipoCompany.NATIONALE_NETHERLANDEN.getNombre())
 
 		logginService.putInfoMessage("Realizando peticion de informacion de servicio ResultadoReconocimientoMedico para la cia " + company.nombre)
 

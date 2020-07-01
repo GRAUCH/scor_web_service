@@ -1,5 +1,6 @@
 package services
 
+import com.scortelemed.TipoCompany
 import org.grails.cxf.utils.EndpointType
 import org.grails.cxf.utils.GrailsCxfEndpoint
 import org.grails.cxf.utils.GrailsCxfEndpointProperty
@@ -49,7 +50,7 @@ class LifesquareUnderwrittingCasesResultsService {
 		def requestXML = ""
 		def requestBBDD
 		def expedientes
-		def company = Company.findByNombre('lifesquare')
+		def company = Company.findByNombre(TipoCompany.ZEN_UP.getNombre())
 		
 		LifesquareUnderwrittingCasesResultsResponse result=new LifesquareUnderwrittingCasesResultsResponse()
 		logginService.putInfoEndpoint("Endpoint-"+opername,"Peticion para fecha: " + LifesquareUnderwrittingCasesResultsRequest.date)

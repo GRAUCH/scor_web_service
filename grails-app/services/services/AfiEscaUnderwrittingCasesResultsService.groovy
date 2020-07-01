@@ -1,5 +1,6 @@
 package services
 
+import com.scortelemed.TipoCompany
 import com.scortelemed.TipoOperacion
 import org.grails.cxf.utils.EndpointType
 import org.grails.cxf.utils.GrailsCxfEndpoint
@@ -45,7 +46,7 @@ class AfiEscaUnderwrittingCasesResultsService {
 		def requestXML = ""
 		def expedientes
 		def requestBBDD
-		def company = Company.findByNombre('afiesca')
+		def company = Company.findByNombre(TipoCompany.AFI_ESCA.getNombre())
 		
 		AfiEscaUnderwrittingCasesResultsResponse result=new AfiEscaUnderwrittingCasesResultsResponse()
 	

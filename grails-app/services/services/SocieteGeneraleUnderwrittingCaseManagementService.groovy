@@ -61,7 +61,7 @@ class SocieteGeneraleUnderwrittingCaseManagementService	 {
 		def requestBBDD
 		def respuestaCrm
 		
-		Company company = Company.findByNombre("societeGenerale")
+		Company company = Company.findByNombre(TipoCompany.SOCIETE_GENERALE.getNombre())
 		Filtro filtro = new Filtro()
 		SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
 		TransformacionUtil util = new TransformacionUtil()
@@ -125,7 +125,7 @@ class SocieteGeneraleUnderwrittingCaseManagementService	 {
 		def correoUtil = new CorreoUtil()
 		def requestXML = ""
 		def expedientes
-		def company = Company.findByNombre('simplefr')
+		def company = Company.findByNombre(TipoCompany.SOCIETE_GENERALE.getNombre())
 		def estadisticasService = new EstadisticasService()
 		def tarificadorService = new TarificadorService()
 		def logginService = new LogginService()

@@ -59,7 +59,7 @@ class CaserUnderwrittingCaseManagementService {
 
         RespuestaCRM respuestaCRM = new RespuestaCRM()
 
-        def company = Company.findByNombre('caser')
+        def company = Company.findByNombre(TipoCompany.CASER.getNombre())
         List<servicios.Expediente> expedientes = new ArrayList<servicios.Expediente>()
         logginService.putInfoMessage("Realizando peticion de informacion de servicio GestionReconocimientoMedico para la cia " + company.nombre)
 
@@ -69,7 +69,7 @@ class CaserUnderwrittingCaseManagementService {
 
             if (operacion && operacion.activo) {
 
-                if (Company.findByNombre("caser").generationAutomatic) {
+                if (company.generationAutomatic) {
 
                     requestXML = caserService.marshall(gestionReconocimientoMedico)
                     requestBBDD = requestService.crear(opername, requestXML)
@@ -144,7 +144,7 @@ class CaserUnderwrittingCaseManagementService {
         TransformacionUtil util = new TransformacionUtil()
         CorreoUtil correoUtil = new CorreoUtil()
 
-        Company company = Company.findByNombre("caser")
+        Company company = Company.findByNombre(TipoCompany.CASER.getNombre())
 
         logginService.putInfoMessage("Realizando peticion de informacion de servicio ResultadoReconocimientoMedico para la cia " + company.nombre)
 
@@ -251,7 +251,7 @@ class CaserUnderwrittingCaseManagementService {
         TransformacionUtil util = new TransformacionUtil()
         CorreoUtil correoUtil = new CorreoUtil()
 
-        Company company = Company.findByNombre("caser")
+        Company company = Company.findByNombre(TipoCompany.CASER.getNombre())
 
         logginService.putInfoMessage("Realizando peticion de informacion de servicio ConsultaExpediente para la cia " + company.nombre)
 
@@ -356,7 +356,7 @@ class CaserUnderwrittingCaseManagementService {
         StatusType status = null
         int codigo = 0
 
-        Company company = Company.findByNombre("caser")
+        Company company = Company.findByNombre(TipoCompany.CASER.getNombre())
         RespuestaCRM expediente = new RespuestaCRM()
         TransformacionUtil util = new TransformacionUtil()
         ConsolidacionPolizaResponse resultado = new ConsolidacionPolizaResponse()

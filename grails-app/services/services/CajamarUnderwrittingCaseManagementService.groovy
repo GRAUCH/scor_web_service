@@ -74,7 +74,7 @@ class CajamarUnderwrittingCaseManagementService {
 		def tarificadorService
 		def respuestaCrm
 
-		def company = Company.findByNombre('cajamar')
+		def company = Company.findByNombre(TipoCompany.CAJAMAR.getNombre())
 
 
 		logginService.putInfoEndpoint("Endpoint-"+opername,"Peticion de Cajamar para solicitud: " + cajamarUnderwrittingCaseManagementRequest.regScor.numref)
@@ -85,7 +85,7 @@ class CajamarUnderwrittingCaseManagementService {
 
 			if (operacion && operacion.activo){
 
-				if (Company.findByNombre("cajamar").generationAutomatic && cajamarUnderwrittingCaseManagementRequest.getRegScor().getYtipo().toString().equals("1")) {
+				if (company.generationAutomatic && cajamarUnderwrittingCaseManagementRequest.getRegScor().getYtipo().toString().equals("1")) {
 
 					requestXML=cajamarService.marshall(cajamarUnderwrittingCaseManagementRequest)
 					requestBBDD = requestService.crear(opername,requestXML)
@@ -190,7 +190,7 @@ class CajamarUnderwrittingCaseManagementService {
 		def crearExpedienteService
 		def requestBBDD
 
-		Company company = Company.findByNombre("cajamar")
+		Company company = Company.findByNombre(TipoCompany.CAJAMAR.getNombre())
 		RespuestaCRM expediente = new RespuestaCRM()
 		TransformacionUtil util = new TransformacionUtil()
 		ConsolidacionPolizaResponse resultado=new ConsolidacionPolizaResponse()

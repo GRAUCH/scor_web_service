@@ -73,7 +73,7 @@ class AmaUnderwrittingCaseManagementService	 {
 		String notes = null
 		StatusType status = null
 
-		Company company = Company.findByNombre("ama")
+		Company company = Company.findByNombre(TipoCompany.AMA.getNombre())
 		Filtro filtro = new Filtro()
 		SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
 		TransformacionUtil util = new TransformacionUtil()
@@ -86,7 +86,7 @@ class AmaUnderwrittingCaseManagementService	 {
 
 			if (operacion && operacion.activo){
 
-				if (Company.findByNombre("ama").generationAutomatic) {
+				if (company.generationAutomatic) {
 
 					requestXML=amaService.marshall(gestionReconocimientoMedico)
 					requestBBDD = requestService.crear(opername,requestXML)
@@ -182,7 +182,7 @@ class AmaUnderwrittingCaseManagementService	 {
 		def requestXML = ""
 		def requestBBDD
 		List<RespuestaCRMInforme> expedientes = new ArrayList<RespuestaCRMInforme>()
-		Company company = Company.findByNombre('ama')
+		Company company = Company.findByNombre(TipoCompany.AMA.getNombre())
 		TransformacionUtil util = new TransformacionUtil()
 
 		String notes = null
@@ -308,7 +308,7 @@ class AmaUnderwrittingCaseManagementService	 {
 		StatusType status = null
 		int codigo = 0
 
-		Company company = Company.findByNombre("ama")
+		Company company = Company.findByNombre(TipoCompany.AMA.getNombre())
 		RespuestaCRM expediente = new RespuestaCRM()
 		TransformacionUtil util = new TransformacionUtil()
 		ConsolidacionPolizaResponse resultado=new ConsolidacionPolizaResponse()
@@ -440,7 +440,7 @@ class AmaUnderwrittingCaseManagementService	 {
 		CorreoUtil correoUtil = new CorreoUtil()
 		String identificador = ""
 
-		Company company = Company.findByNombre("ama")
+		Company company = Company.findByNombre(TipoCompany.AMA.getNombre())
 
 		try{
 
@@ -593,7 +593,7 @@ class AmaUnderwrittingCaseManagementService	 {
 		TransformacionUtil util = new TransformacionUtil()
 		CorreoUtil correoUtil = new CorreoUtil()
 		Filtro filtro = new Filtro()
-		Company company = Company.findByNombre("ama")
+		Company company = Company.findByNombre(TipoCompany.AMA.getNombre())
 		String indentificador = null
 		RespuestaCRM respuestaCRM = new RespuestaCRM()
 

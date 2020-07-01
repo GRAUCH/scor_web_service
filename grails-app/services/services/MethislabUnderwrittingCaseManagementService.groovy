@@ -56,7 +56,7 @@ class MethislabUnderwrittingCaseManagementService {
 		StatusType status = null
 		String code = 0
 
-		def company = Company.findByNombre('methislab')
+		def company = Company.findByNombre(TipoCompany.METHIS_LAB.getNombre())
 
         logginService.putInfoMessage("Realizando peticion de informacion de servicio GestionReconocimientoMedico para la cia " + company.nombre)
 
@@ -66,7 +66,7 @@ class MethislabUnderwrittingCaseManagementService {
 
 			if (operacion && operacion.activo){
 
-				if (Company.findByNombre("methislab").generationAutomatic) {
+				if (company.generationAutomatic) {
 
 					requestXML=methislabService.marshall(methislabUnderwrittingCaseManagementRequest)
 					requestBBDD = requestService.crear(opername,requestXML)
@@ -157,7 +157,7 @@ class MethislabUnderwrittingCaseManagementService {
 		int code = 0
 
 		MethislabUnderwrittingCasesResultsResponse resultado =new MethislabUnderwrittingCasesResultsResponse()
-		Company company = Company.findByNombre("methislab")
+		Company company = Company.findByNombre(TipoCompany.METHIS_LAB.getNombre())
 
 		def timedelay = System.currentTimeMillis()
 		logginService.putInfoEndpoint("Endpoint-" + opername + "Tiempo inicial: ", timedelay)
