@@ -4,6 +4,7 @@ import com.scor.global.ZipUtils
 import com.scortelemed.Company
 import com.scortelemed.Conf
 import com.scortelemed.Operacion
+import com.scortelemed.Request
 import com.scortelemed.TipoCompany
 import com.scortelemed.TipoOperacion
 import com.scortelemed.schemas.cbpita.*
