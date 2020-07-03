@@ -428,6 +428,11 @@ class CajamarService implements ICompanyService{
 						pregunta.respuesta = eElement.getElementsByTagName("estatu").item(0).getTextContent()
 						listadoPreguntas.add(pregunta)
 					}
+					DATOS.Pregunta preguntaDeporte = new DATOS.Pregunta()
+					preguntaDeporte.codigoPregunta = "13"
+					preguntaDeporte.tipoDatos = "BOLEAN"
+					preguntaDeporte.respuesta = doc.getElementsByTagName("deportType").item(0) ? "SI" : "NO"
+					listadoPreguntas.add(preguntaDeporte)
 				}
 			}
 

@@ -104,7 +104,7 @@ class RequestController {
 				def version = params.version.toLong()
 				if (requestInstance.version > version) {
 					requestInstance.errors.rejectValue("version", "default.optimistic.locking.failure", [
-						message(code: 'request.label', default: 'Request')] as Object[], "Another user has updated this Request while you were editing")
+							message(code: 'request.label', default: 'Request')] as Object[], "Another user has updated this Request while you were editing")
 					render(view: "edit", model: [requestInstance: requestInstance])
 					return
 				}
@@ -482,6 +482,4 @@ class RequestController {
 			}
 		}
 	}
-
-
 }
