@@ -41,7 +41,6 @@ class AmaService implements ICompanyService{
 	def grailsApplication
 	ContentResult contentResult = new ContentResult()
 
-
 	String marshall(def objeto) {
 		String nameSpace = "http://www.scortelemed.com/schemas/ama"
 		String result
@@ -63,7 +62,6 @@ class AmaService implements ICompanyService{
 			return result
 		}
 	}
-
 
 	def buildDatos(Request req, String codigoCia) {
 		try {
@@ -112,10 +110,10 @@ class AmaService implements ICompanyService{
 					codigoCiaAma = eElement.getElementsByTagName("ciaCode").item(0).getTextContent()
 					if (codigoCiaAma != null && !codigoCiaAma.isEmpty()){
 						if (codigoCiaAma.equals("C0803")){
-							codigoCia = "1065"
+							codigoCia = Company.findByNombre(TipoCompany.AMA_VIDA.nombre)
 						}
 						if (codigoCiaAma.equals("M0328")){
-							codigoCia = "1059"
+							codigoCia = Company.findByNombre(TipoCompany.AMA.nombre)
 						}
 					}
 				}
@@ -254,69 +252,6 @@ class AmaService implements ICompanyService{
 				document.setNombre(documento.getNombre())
 
 				expediente.getDocuments().add(document)
-			}
-		}
-
-		return expediente
-	}
-
-	def rellenaDatosSalidaSRP(expedientePoliza, requestDate, logginService) {
-
-		Resultado expediente = new Resultado()
-
-		expediente.setRequestDate(requestDate)
-		expediente.setRequestNumber(util.devolverDatos(expedientePoliza.getNumSolicitud()))
-		expediente.setRequestState(util.devolverStateTypeAma(expedientePoliza.getCodigoEstado().toString()))
-		expediente.setRequestDate(util.fromStringToXmlCalendar(expedientePoliza.getFechaUltimoCambioEstado()))
-		expediente.setProductCode(util.devolverDatos(expedientePoliza.getProducto().getCodigoProductoCompanya()))
-		expediente.setPolicyNumber(util.devolverDatos(expedientePoliza.getNumPoliza()))
-		expediente.setCertificateNumber(util.devolverDatos(expedientePoliza.getNumCertificado()))
-
-		if (expedientePoliza.getCandidato() != null) {
-			expediente.setFiscalIdentificationNumber(expedientePoliza.getCandidato().getNumeroDocumento())
-			expediente.setMobilePhone(util.devolverTelefonoMovil(expedientePoliza.getCandidato()))
-			expediente.setPhoneNumber1(util.devolverTelefono1(expedientePoliza.getCandidato()))
-			expediente.setPhoneNumber2(util.devolverTelefono2(expedientePoliza.getCandidato()))
-		} else {
-			expediente.setFiscalIdentificationNumber("")
-			expediente.setMobilePhone("")
-			expediente.setPhoneNumber1("")
-			expediente.setPhoneNumber2("")
-		}
-
-		byte[] compressedData=tarificadorService.obtenerZip(expedientePoliza.getNodoAlfresco())
-
-		expediente.setZip(compressedData)
-
-		if (expedientePoliza.getCoberturasExpediente() != null && expedientePoliza.getCoberturasExpediente().size() > 0) {
-
-			expedientePoliza.getCoberturasExpediente().each { coberturasPoliza ->
-
-				BenefitsType benefitsType = new BenefitsType()
-
-				benefitsType.setBenefictName(BenefictNameType.DEAD)
-				benefitsType.setBenefictCode(util.devolverDatos(coberturasPoliza.getCodigoCobertura()))
-				benefitsType.setBenefictCapital(util.devolverDatos(coberturasPoliza.getCapitalCobertura()))
-
-				BenefictResultType benefictResultType = new BenefictResultType()
-
-				benefictResultType.setDescResult(util.devolverDatos(coberturasPoliza.getResultadoCobertura()))
-				benefictResultType.setResultCode(util.devolverDatos(coberturasPoliza.getCodResultadoCobertura()))
-
-				benefictResultType.setPremiumLoading(util.devolverDatos(coberturasPoliza.getValoracionPrima()))
-				benefictResultType.setCapitalLoading(util.devolverDatos(coberturasPoliza.getValoracionCapital()))
-				benefictResultType.setDescPremiumLoading("")
-				benefictResultType.setDescCapitalLoading("")
-
-				benefictResultType.exclusions = util.fromStringLoList(coberturasPoliza.getExclusiones())
-				benefictResultType.temporalLoading = util.fromStringLoList(coberturasPoliza.getValoracionTemporal())
-				benefictResultType.medicalReports = util.fromStringLoList(coberturasPoliza.getInformesMedicos())
-				benefictResultType.medicalTest = null
-				benefictResultType.notes = util.fromStringLoList(coberturasPoliza.getNotas())
-
-				benefitsType.setBenefictResult(benefictResultType)
-
-				expediente.getBenefitsList().add(benefitsType)
 			}
 		}
 
@@ -1069,30 +1004,6 @@ class AmaService implements ICompanyService{
 		}
 	}
 
-	static String getCodeResult(String code) {
-
-		String result = null
-
-		switch(code){
-			case "1": result="Estandar";break
-			case "2": result="Rechazo Poliza";break
-			case "3": result="Sobreprima";break
-			case "4": result="Exclusion";break
-			case "5": result="Informe Medico";break
-			case "6": result="Prueba Medica";break
-			case "7": result="Rechazo Cobertura";break
-			case "8": result="Postponer";break
-			case "9": result="Consultar Tarificador";break
-			case "10": result="Aceptado";break
-			case "11": result="Teleseleccion";break
-			case "12": result="Valor Absoluto";break
-			case "20": result="No Tarificado";break
-			default: result=""
-		}
-
-		return result
-	}
-
 	/**METODO QUE VALIDA QUE LOS CAMPOS NECESARIOS PARA EL ENVIO A AMA ESTAN RELLENOS. CAMPOS QUE TIENEN QUE ESTAR RELLENOS
 	 * 
 	 * 
@@ -1266,7 +1177,7 @@ class AmaService implements ICompanyService{
 					filtroRelacionado.setValor(requestNumber.toString())
 					filtro.setFiltroRelacionado(filtroRelacionado)
 
-					respuestaCrm = expedienteService.consultaExpediente(ou.toString(),filtro)
+					respuestaCrm = expedienteService.consultaExpediente(ou,filtro)
 
 					if (respuestaCrm != null && respuestaCrm.getListaExpedientes() != null && respuestaCrm.getListaExpedientes().size() > 0) {
 

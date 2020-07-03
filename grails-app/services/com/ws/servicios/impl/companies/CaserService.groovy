@@ -843,7 +843,7 @@ class CaserService implements ICompanyService{
             filtroRelacionado1.setValor(numeroSolicitud)
             filtro.setFiltroRelacionado(filtroRelacionado1)
 
-            respuestaCrm = expedienteService.consultaExpediente(unidadOrganizativa.toString(), filtro)
+            respuestaCrm = expedienteService.consultaExpediente(unidadOrganizativa, filtro)
 
             if (respuestaCrm != null && respuestaCrm.getListaExpedientes() != null && respuestaCrm.getListaExpedientes().size() > 0) {
 
@@ -898,7 +898,7 @@ class CaserService implements ICompanyService{
 
                     filtro.setFiltroRelacionado(filtroRelacionado1)
 
-                    respuestaCrm = expedienteService.consultaExpediente(ou.toString(), filtro)
+                    respuestaCrm = expedienteService.consultaExpediente(ou, filtro)
 
                     if (respuestaCrm != null && respuestaCrm.getListaExpedientes() != null && respuestaCrm.getListaExpedientes().size() > 0) {
 

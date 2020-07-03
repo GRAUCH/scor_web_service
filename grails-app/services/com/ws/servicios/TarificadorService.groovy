@@ -3,6 +3,7 @@ package com.ws.servicios
 import com.scor.comprimirdocumentos.ParametrosEntrada
 import com.scortelemed.Conf
 import com.scortelemed.TipoOperacion
+import com.ws.enumeration.UnidadOrganizativa
 import grails.util.Environment
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.FetchUtilLagunaro
@@ -33,6 +34,7 @@ class TarificadorService {
     def soapAlptisRecetteWS
     def logginService = new LogginService()
     CorreoUtil correoUtil = new CorreoUtil()
+
     def tarificador = { fecha ->
         def listaExpedientes = []
         try {
@@ -43,7 +45,7 @@ class TarificadorService {
             tarificador = tarificador.trim().toLowerCase()
 
             /////////////////////////////////////////////////////////////////////////
-            def sqlXml = fetchUtil.dameExpedientesTarificados(fecha, "1004")
+            def sqlXml = fetchUtil.dameExpedientesTarificados(fecha, "1004") //Lagunaro
             def crmService = new ServiceCrmService()
             xmlResultado = crmService.conexion(sqlXml)
             listaExpedientes = fetchUtil.rellenaExpedientesTarificados(xmlResultado)
@@ -70,7 +72,7 @@ class TarificadorService {
                 xmlResultado = crmService.conexion(sqlXml)
                 listaExpedientes[i] = fetchUtil.rellenaExpedienteServicio(xmlResultado, expediente)
 
-                def nodo = obtenerNodoConsultaExpediente(expediente.scorName.toString())
+                def nodo = obtenerNodoConsultaExpediente(expediente.scorName.toString(), UnidadOrganizativa.ES)
                 if (nodo) {
                     expediente = asignarZipExpediente(expediente, nodo)
                 }
@@ -186,29 +188,13 @@ class TarificadorService {
         return result
     }
 
-    def obtenerNodoConsultaExpediente(String idExpediente) {
+    private def obtenerNodoConsultaExpediente(String idExpediente, UnidadOrganizativa pais) {
         try {
-            def usuario = new UsuarioGorm()
-            usuario.clave = Conf.findByName("frontal.clave")?.value
-            usuario.dominio = Conf.findByName("frontal.dominio")?.value
-            usuario.usuario = Conf.findByName("frontal.usuario")?.value
-
-            def filtro = new FiltroGorm()
-            filtro.clave = "EXPEDIENTE"
-            filtro.valor = idExpediente
-
-            //SOBREESCRIBIMOS LA URL A LA QUE TIENE QUE LLAMAR EL WSDL
-            def ctx = grailsApplication.mainContext
-            def bean = ctx.getBean("soapClientAlptis")
-            bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("frontal.wsdl")?.value)
-
-            def salida = grailsApplication.mainContext.soapClientAlptis.consultaExpediente(usuario, filtro)
-//(countryName:"Spain")
-
+            def salida = expedienteService.consultaExpedienteCodigoST(idExpediente, pais)
             if (salida.listaExpedientes) {
                 return salida.listaExpedientes[0].nodoAlfresco
             } else {
-                return false
+                return null
             }
         } catch (Exception e) {
             logginService.putError("obtenerNodoConsultaExpediente", "No se ha podido obtener el nodo de expedientes " + idExpediente + ": " + e)
@@ -419,7 +405,7 @@ class TarificadorService {
                     filtroRelacionado.setValor(policyNumber.toString())
                     filtro.setFiltroRelacionado(filtroRelacionado)
 
-                    respuestaCrm = expedienteService.consultaExpediente(ou.toString(), filtro)
+                    respuestaCrm = expedienteService.consultaExpediente(ou, filtro)
 
                     if (respuestaCrm != null && respuestaCrm.getListaExpedientes() != null && respuestaCrm.getListaExpedientes().size() > 0) {
 
@@ -496,7 +482,7 @@ class TarificadorService {
                     filtro.setClave(servicios.ClaveFiltro.NUM_POLIZA);
                     filtro.setValor(policyNumber.toString());
 
-                    respuestaCrm = expedienteService.consultaExpediente(ou.toString(), filtro)
+                    respuestaCrm = expedienteService.consultaExpediente(ou, filtro)
 
                     if (respuestaCrm != null && respuestaCrm.getListaExpedientes() != null && respuestaCrm.getListaExpedientes().size() > 0) {
 
@@ -575,7 +561,7 @@ class TarificadorService {
                     filtro.setClave(servicios.ClaveFiltro.NUM_POLIZA);
                     filtro.setValor(policyNumber.toString());
 
-                    respuestaCrm = expedienteService.consultaExpediente(ou.toString(), filtro)
+                    respuestaCrm = expedienteService.consultaExpediente(ou, filtro)
 
                     if (respuestaCrm != null && respuestaCrm.getListaExpedientes() != null && respuestaCrm.getListaExpedientes().size() > 0) {
 

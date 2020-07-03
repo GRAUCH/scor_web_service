@@ -207,76 +207,6 @@ class NetinsuranceService implements ICompanyService{
 
 	}
 
-	ZipResponse obtenerZip(String expediente, String nodo, String cia){
-
-		ZipResponse response = new ZipResponse()
-
-		try {
-			def parametrosEntrada = new ParametrosEntrada()
-			parametrosEntrada.usuario = Conf.findByName("orabpel.usuario")?.value
-			parametrosEntrada.clave = Conf.findByName("orabpel.clave")?.value
-			parametrosEntrada.refNodo = nodo
-
-			//SOBREESCRIBIMOS LA URL A LA QUE TIENE QUE LLAMAR EL WSDL
-			def ctx = grailsApplication.mainContext
-			def bean = ctx.getBean("soapClientComprimidoAlptis")
-			bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("orabpel.wsdl")?.value)
-
-			def salida=grailsApplication.mainContext.soapClientComprimidoAlptis.process(parametrosEntrada)
-
-			// salida.datosRespuesta.content
-
-			if (salida.codigo.equals("0")) {
-
-				response.setError(false);
-				response.setCodigo(salida.codigo)
-				response.setDescripcion(salida.descripcion)
-				response.setDatosRespuesta(salida.datosRespuesta.content)
-
-			} else {
-
-				response.setError(true);
-				response.setCodigo(salida.codigo)
-				response.setDescripcion(salida.descripcion)
-				response.setDatosRespuesta(salida.datosRespuesta.content)
-
-			}
-
-
-		} catch (Exception e) {
-
-			response.setError(true);
-			response.setCodigo("-1")
-			response.setDescripcion(e.getMessage().toString())
-			response.setDatosRespuesta(null)
-		}
-
-		return response
-	}
-
-    com.scortelemed.servicios.RespuestaCRM modificarExpediente (com.scortelemed.servicios.Expediente expediente, String ou) {
-
-        Frontal frontal = instanciarFrontal(Conf.findByName("frontal.wsdl")?.value)
-
-        com.scortelemed.servicios.Usuario usuario = new com.scortelemed.servicios.Usuario()
-
-        usuario.clave = "P@ssword"
-        usuario.dominio = "scor.local"
-        usuario.unidadOrganizativa = "IT"
-        usuario.usuario = "admin-ITA"
-
-        return  frontal.modificaExpediente(usuario,expediente,null,null)
-	}
-
-    def instanciarFrontal(String frontalPortAddress){
-
-        FrontalServiceLocator fs = new FrontalServiceLocator();
-        fs.setFrontalPortEndpointAddress(frontalPortAddress);
-        Frontal frontal = fs.getFrontalPort();
-
-        return frontal;
-    }
-
 	def rellenaDatos (req, company) {
 
 		def mapDatos = [:]
@@ -748,7 +678,7 @@ class NetinsuranceService implements ICompanyService{
 
 					filtro.setFiltroRelacionado(filtroRelacionado1)
 
-					respuestaCrm = expedienteService.consultaExpediente(ou.toString(),filtro)
+					respuestaCrm = expedienteService.consultaExpediente(ou,filtro)
 
 					if (respuestaCrm != null && respuestaCrm.getListaExpedientes() != null && respuestaCrm.getListaExpedientes().size() > 0) {
 
@@ -888,7 +818,7 @@ class NetinsuranceService implements ICompanyService{
 
 			filtro.setFiltroRelacionado(filtroRelacionado1)
 
-			respuestaCrm = expedienteService.consultaExpediente(ou.toString(), filtro)
+			respuestaCrm = expedienteService.consultaExpediente(ou, filtro)
 
 			if (respuestaCrm != null && respuestaCrm.getListaExpedientes() != null && respuestaCrm.getListaExpedientes().size() > 0) {
 
@@ -916,31 +846,4 @@ class NetinsuranceService implements ICompanyService{
 
 		return expediente
 	}
-
-    com.scortelemed.servicios.Expediente componerExpedienteModificado(servicios.Expediente expediente, NetinsuranteUnderwrittingCaseManagementRequest.CandidateInformation infoCandidato) {
-
-        com.scortelemed.servicios.Expediente expedienteModificado = new com.scortelemed.servicios.Expediente()
-
-        expedienteModificado.setCodigoST(expediente.getCodigoST())
-        expedienteModificado.setCandidato(new Candidato())
-        expedienteModificado.getCandidato().setDireccion(infoCandidato.getAddress())
-        expedienteModificado.getCandidato().setCodigoPostal(infoCandidato.getPostalCode())
-        expedienteModificado.getCandidato().setProvincia(infoCandidato.getProvince())
-        expedienteModificado.getCandidato().setLocalidad(infoCandidato.getCity())
-
-        if (infoCandidato.getPhoneNumber1() != null && !infoCandidato.getPhoneNumber1().toString().isEmpty()) {
-            expedienteModificado.getCandidato().setTelefono1(infoCandidato.getPhoneNumber1().toString())
-        }
-        if (infoCandidato.getPhoneNumber2() != null && !infoCandidato.getPhoneNumber2().toString().isEmpty()) {
-            expedienteModificado.getCandidato().setTelefono2(infoCandidato.getPhoneNumber2().toString())
-        }
-        if (infoCandidato.getMobileNumber() != null && !infoCandidato.getMobileNumber().toString().isEmpty()) {
-            expedienteModificado.getCandidato().setTelefono3(infoCandidato.getMobileNumber())
-        }
-
-        return expedienteModificado
-
-
-    }
-
 }

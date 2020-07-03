@@ -646,7 +646,7 @@ class MethislabService implements ICompanyService{
 
                     filtro.setFiltroRelacionado(filtroRelacionado1)
 
-                    respuestaCrm = expedienteService.consultaExpediente(ou.toString(), filtro)
+                    respuestaCrm = expedienteService.consultaExpediente(ou, filtro)
 
                     if (respuestaCrm != null && respuestaCrm.getListaExpedientes() != null && respuestaCrm.getListaExpedientes().size() > 0) {
 

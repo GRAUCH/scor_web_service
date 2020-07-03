@@ -6,12 +6,14 @@ import com.scor.srpfileinbound.RootElement
 import com.scortelemed.Conf
 import com.scortelemed.Request
 import com.scortelemed.TipoCompany
+import com.scortelemed.TipoOperacion
 import com.ws.enumeration.UnidadOrganizativa
 import com.ws.servicios.CompanyFactory
 import com.ws.servicios.ICompanyService
 import com.ws.servicios.IExpedienteService
 import grails.transaction.Transactional
 import grails.util.Environment
+import hwsol.webservices.CorreoUtil
 import servicios.ClaveFiltro
 import servicios.Expediente
 import servicios.Filtro
@@ -19,13 +21,16 @@ import servicios.Usuario
 
 import java.text.SimpleDateFormat
 
+import static grails.async.Promises.task
+
 @Transactional
 class ExpedienteService implements IExpedienteService {
 
     def logginService
-    def correoUtil
+    def requestService
     def tarificadorService
     def grailsApplication
+    CorreoUtil correoUtil = new CorreoUtil()
     ICompanyService companyService
 
 
@@ -245,5 +250,50 @@ class ExpedienteService implements IExpedienteService {
                 break
         }
         return usuario
+    }
+
+    def busquedaCrm (String requestNumber, UnidadOrganizativa ou, TipoOperacion opername, String comapanyCodigoSt, String companyId, Request requestBBDD, String companyName) {
+        task {
+            logginService.putInfoMessage("BusquedaExpedienteCrm - Buscando en CRM solicitud de " + companyName + " con numSolicitud: " + requestNumber)
+            def respuestaCrm
+            int limite = 0
+            boolean encontrado = false
+            SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
+            Thread.sleep(90000)
+
+            try {
+                while( !encontrado && limite < 10) {
+                    respuestaCrm = consultaExpedienteNumSolicitud(requestNumber, ou, comapanyCodigoSt)
+
+                    if (respuestaCrm != null && respuestaCrm.getListaExpedientes() != null && respuestaCrm.getListaExpedientes().size() > 0) {
+                        for (int i = 0; i < respuestaCrm.getListaExpedientes().size(); i++) {
+                            servicios.Expediente exp = respuestaCrm.getListaExpedientes().get(i)
+                            logginService.putInfoMessage("BusquedaExpedienteCrm - Expediente encontrado: " + exp.getCodigoST() + " para " + companyName)
+
+                            String fechaCreacion = format.format(new Date())
+                            if (exp.getCandidato() != null && exp.getCandidato().getCompanya() != null && exp.getCandidato().getCompanya().getCodigoST().equals(comapanyCodigoSt.toString()) &&
+                                    exp.getNumSolicitud() != null && exp.getNumSolicitud() != null && exp.getNumSolicitud().equals(requestNumber)
+                                    && fechaCreacion != null && fechaCreacion.equals(exp.getFechaApertura())){
+                                /**Alta procesada correctamente*/
+                                encontrado = true
+                                logginService.putInfoMessage("BusquedaExpedienteCrm - Nueva alta automatica de " + companyName + " con numero de solicitud: " + requestNumber + " procesada correctamente")
+                            }
+                        }
+                    }
+                    limite++
+                    Thread.sleep(10000)
+                }
+
+                /**Alta procesada pero no se ha encontrado en CRM.*/
+                if (limite == 10) {
+                    logginService.putInfoMessage("BusquedaExpedienteCrm - Nueva alta de " + companyName + " con numero de solicitud: " + requestNumber + " se ha procesado pero no se ha dado de alta en CRM")
+                    correoUtil.envioEmailErrores("BusquedaExpedienteCrm","Nueva alta de " + companyName + " con numero de solicitud: " + requestNumber + " se ha procesado pero no se ha dado de alta en CRM",null)
+                    requestService.insertarError(companyId, requestNumber, requestBBDD.request, opername, "Peticion procesada para solicitud: " + requestNumber + ". Error: No encontrada en CRM")
+                }
+            } catch (Exception e) {
+                logginService.putInfoMessage("BusquedaExpedienteCrm - Nueva alta de " + companyName + " con numero de solicitud: " + requestNumber + ". Error: " + e.getMessage())
+                correoUtil.envioEmailErrores("BusquedaExpedienteCrm","Nueva alta de " + companyName + " con numero de solicitud: " + requestNumber,e)
+            }
+        }
     }
 }
