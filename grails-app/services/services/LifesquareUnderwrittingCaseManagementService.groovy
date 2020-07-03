@@ -1,5 +1,6 @@
 package services
 
+import com.scortelemed.Request
 import com.scortelemed.TipoCompany
 import com.scortelemed.TipoOperacion
 import hwsol.webservices.CorreoUtil
@@ -50,7 +51,7 @@ class LifesquareUnderwrittingCaseManagementService {
 		def opername = "LifesquareUnderwrittingCaseManagementRequest"
 		def correoUtil = new CorreoUtil()
 		def requestXML = ""
-		def requestBBDD
+		Request requestBBDD
 		def company = Company.findByNombre(TipoCompany.ZEN_UP.getNombre())
 
 		Filtro filtro = new Filtro()
@@ -83,7 +84,7 @@ class LifesquareUnderwrittingCaseManagementService {
 						 *
 						 */
 						correoUtil.envioEmail(opername, null, 1)
-						tarificadorService.busquedaLifesquareCrm(lifesquareUnderwrittingCaseManagementRequest.policy.policy_number, company.ou, opername, company.codigoSt, company.id, requestBBDD)
+						expedienteService.busquedaCrm(requestBBDD, company, null, null, lifesquareUnderwrittingCaseManagementRequest.policy.policy_number)
 						
 					}
 					

@@ -3,10 +3,10 @@ package com.ws.servicios.impl
 import com.scor.global.ExceptionUtils
 import com.scor.global.WSException
 import com.scor.srpfileinbound.RootElement
+import com.scortelemed.Company
 import com.scortelemed.Conf
 import com.scortelemed.Request
 import com.scortelemed.TipoCompany
-import com.scortelemed.TipoOperacion
 import com.ws.enumeration.UnidadOrganizativa
 import com.ws.servicios.CompanyFactory
 import com.ws.servicios.ICompanyService
@@ -252,31 +252,33 @@ class ExpedienteService implements IExpedienteService {
         return usuario
     }
 
-    def busquedaCrm (String requestNumber, UnidadOrganizativa ou, TipoOperacion opername, String comapanyCodigoSt, String companyId, Request requestBBDD, String companyName) {
+    def busquedaCrm(Request requestBBDD, Company company, String requestNumber, String certificateNumber, String policyNumber) {
         task {
-            logginService.putInfoMessage("BusquedaExpedienteCrm - Buscando en CRM solicitud de " + companyName + " con numSolicitud: " + requestNumber)
+            String opername = "ExpedienteService BusquedaCrm"
+            logginService.putInfoMessage(opername+" - Buscando en CRM solicitud de " + company.nombre + " con numSolicitud: " + requestNumber)
             def respuestaCrm
             int limite = 0
             boolean encontrado = false
             SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
+            Filtro filtro = getFiltradoCRM(policyNumber, requestNumber, certificateNumber, company.codigoSt)
             Thread.sleep(90000)
 
             try {
                 while( !encontrado && limite < 10) {
-                    respuestaCrm = consultaExpedienteNumSolicitud(requestNumber, ou, comapanyCodigoSt)
+                    respuestaCrm = consultaExpediente(company.ou, filtro)
 
                     if (respuestaCrm != null && respuestaCrm.getListaExpedientes() != null && respuestaCrm.getListaExpedientes().size() > 0) {
                         for (int i = 0; i < respuestaCrm.getListaExpedientes().size(); i++) {
                             servicios.Expediente exp = respuestaCrm.getListaExpedientes().get(i)
-                            logginService.putInfoMessage("BusquedaExpedienteCrm - Expediente encontrado: " + exp.getCodigoST() + " para " + companyName)
+                            logginService.putInfoMessage(opername+" - Expediente encontrado: " + exp.getCodigoST() + " para " + company.nombre)
 
                             String fechaCreacion = format.format(new Date())
-                            if (exp.getCandidato() != null && exp.getCandidato().getCompanya() != null && exp.getCandidato().getCompanya().getCodigoST().equals(comapanyCodigoSt.toString()) &&
+                            if (exp.getCandidato() != null && exp.getCandidato().getCompanya() != null && exp.getCandidato().getCompanya().getCodigoST().equals(company.codigoSt) &&
                                     exp.getNumSolicitud() != null && exp.getNumSolicitud() != null && exp.getNumSolicitud().equals(requestNumber)
                                     && fechaCreacion != null && fechaCreacion.equals(exp.getFechaApertura())){
                                 /**Alta procesada correctamente*/
                                 encontrado = true
-                                logginService.putInfoMessage("BusquedaExpedienteCrm - Nueva alta automatica de " + companyName + " con numero de solicitud: " + requestNumber + " procesada correctamente")
+                                logginService.putInfoMessage(opername+" - Nueva alta automatica de " + company.nombre + " con numero de solicitud: " + requestNumber + " procesada correctamente")
                             }
                         }
                     }
@@ -286,14 +288,36 @@ class ExpedienteService implements IExpedienteService {
 
                 /**Alta procesada pero no se ha encontrado en CRM.*/
                 if (limite == 10) {
-                    logginService.putInfoMessage("BusquedaExpedienteCrm - Nueva alta de " + companyName + " con numero de solicitud: " + requestNumber + " se ha procesado pero no se ha dado de alta en CRM")
-                    correoUtil.envioEmailErrores("BusquedaExpedienteCrm","Nueva alta de " + companyName + " con numero de solicitud: " + requestNumber + " se ha procesado pero no se ha dado de alta en CRM",null)
-                    requestService.insertarError(companyId, requestNumber, requestBBDD.request, opername, "Peticion procesada para solicitud: " + requestNumber + ". Error: No encontrada en CRM")
+                    logginService.putInfoMessage(opername+" - Nueva alta de " + company.nombre + " con numero de solicitud: " + requestNumber + " se ha procesado pero no se ha dado de alta en CRM")
+                    correoUtil.envioEmailErrores(opername,"Nueva alta de " + company.nombre + " con numero de solicitud: " + requestNumber + " se ha procesado pero no se ha dado de alta en CRM",null)
+                    requestService.insertarError(company.id, requestNumber, requestBBDD.request, opername, "Peticion procesada para solicitud: " + requestNumber + ". Error: No encontrada en CRM")
                 }
             } catch (Exception e) {
-                logginService.putInfoMessage("BusquedaExpedienteCrm - Nueva alta de " + companyName + " con numero de solicitud: " + requestNumber + ". Error: " + e.getMessage())
-                correoUtil.envioEmailErrores("BusquedaExpedienteCrm","Nueva alta de " + companyName + " con numero de solicitud: " + requestNumber,e)
+                logginService.putInfoMessage(opername+" - Nueva alta de " + company.nombre + " con numero de solicitud: " + requestNumber + ". Error: " + e.getMessage())
+                correoUtil.envioEmailErrores(opername,"Nueva alta de " + company.nombre + " con numero de solicitud: " + requestNumber,e)
             }
+        }
+    }
+
+    private Filtro getFiltradoCRM(String numPoliza, String numSolicitud, String numCertificado, String codigoStCompany) {
+        if(numPoliza) {
+            Filtro filtro = new Filtro()
+            filtro.setClave(ClaveFiltro.NUM_POLIZA)
+            filtro.setValor(numPoliza)
+        } else if(codigoStCompany && numSolicitud) {
+            Filtro filtro = new Filtro()
+            filtro.setClave(ClaveFiltro.CLIENTE)
+            filtro.setValor(codigoStCompany)
+            Filtro filtroRelacionado = new Filtro()
+            filtroRelacionado.setClave(ClaveFiltro.NUM_SOLICITUD)
+            filtroRelacionado.setValor(numSolicitud)
+            if(numCertificado) {
+                Filtro filtroRelacionado2 = new Filtro()
+                filtroRelacionado2.setClave(ClaveFiltro.NUM_CERTIFICADO)
+                filtroRelacionado2.setValor(numCertificado)
+                filtroRelacionado.setFiltroRelacionado(filtroRelacionado2)
+            }
+            filtro.setFiltroRelacionado(filtroRelacionado)
         }
     }
 }

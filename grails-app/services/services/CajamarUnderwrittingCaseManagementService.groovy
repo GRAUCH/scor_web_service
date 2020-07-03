@@ -1,5 +1,6 @@
 package services
 
+import com.scortelemed.Request
 import com.scortelemed.TipoCompany
 import com.scortelemed.TipoOperacion
 import hwsol.webservices.CorreoUtil
@@ -70,9 +71,7 @@ class CajamarUnderwrittingCaseManagementService {
 
 		def opername = "CajamarUnderwrittingCaseManagementRequest"
 		def requestXML = ""
-		def requestBBDD
-		def tarificadorService
-		def respuestaCrm
+		Request requestBBDD
 
 		def company = Company.findByNombre(TipoCompany.CAJAMAR.getNombre())
 
@@ -98,10 +97,8 @@ class CajamarUnderwrittingCaseManagementService {
 					logginService.putInfoMessage("Se procede el alta automatica de " + company.nombre + " con numero de solicitud " + cajamarUnderwrittingCaseManagementRequest.regScor.numref)
 					requestService.insertarRecibido(company, cajamarUnderwrittingCaseManagementRequest.regScor.numref, requestBBDD.request, TipoOperacion.ALTA)
 
-					/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
-					 * 
-					 */
-					cajamarService.busquedaCrm(cajamarUnderwrittingCaseManagementRequest.regScor.numref, company.ou, opername, company.codigoSt, company.id, requestBBDD)
+					/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado*/
+					expedienteService.busquedaCrm(requestBBDD, company, cajamarUnderwrittingCaseManagementRequest.regScor.numref, null, null)
 
 				}
 
@@ -187,8 +184,7 @@ class CajamarUnderwrittingCaseManagementService {
 		def opername="CajamarConsolidacionPolizaResponse"
 		def correoUtil = new CorreoUtil()
 		def requestXML = ""
-		def crearExpedienteService
-		def requestBBDD
+		Request requestBBDD
 
 		Company company = Company.findByNombre(TipoCompany.CAJAMAR.getNombre())
 		RespuestaCRM expediente = new RespuestaCRM()

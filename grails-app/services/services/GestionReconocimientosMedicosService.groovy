@@ -1,6 +1,8 @@
 package services
 
 import com.scortelemed.Company
+import com.scortelemed.Recibido
+import com.scortelemed.Request
 import com.scortelemed.TipoCompany
 import com.scortelemed.TipoOperacion
 import com.ws.enumeration.StatusType
@@ -53,7 +55,7 @@ class GestionReconocimientosMedicosService {
         def correoUtil = new CorreoUtil()
         def requestXML = ""
         def crearExpedienteService
-        def requestBBDD
+        Request requestBBDD
         def respuestaCrm
 
         Company company = Company.findByNombre(TipoCompany.LAGUN_ARO.getNombre())
@@ -85,10 +87,8 @@ class GestionReconocimientosMedicosService {
 
                     logginService.putInfoMessage("Se procede el alta automatica de Lagunaro con numero de solicitud " + gestionReconocimientoMedicoRequest.poliza.cod_poliza)
 
-                    /**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
-                     *
-                     */
-                    lagunaroService.busquedaCrm(gestionReconocimientoMedicoRequest.poliza.cod_poliza, gestionReconocimientoMedicoRequest.poliza.certificado, company.ou, opername, company.codigoSt, company.id, requestBBDD)
+                    /**Llamamos al metodo asincrono que busca en el crm el expediente recien creado*/
+                    expedienteService.busquedaCrm(requestBBDD, company, gestionReconocimientoMedicoRequest.poliza.cod_poliza, gestionReconocimientoMedicoRequest.poliza.certificado, null)
 
                 }
 
@@ -153,8 +153,8 @@ class GestionReconocimientosMedicosService {
 
         def opername = "TramitacionReconocimientoMedicoRequest"
         def correoUtil = new CorreoUtil()
-        def requestXML = ""
-        def requestBBDD
+        def requestXML
+        Request requestBBDD
         TramitacionReconocimientoMedicoResponse result = new TramitacionReconocimientoMedicoResponse()
         def timedelay = System.currentTimeMillis()
         logginService.putInfoEndpoint("Endpoint-" + opername, "Peticion para fecha: " + tramitacionReconocimientoMedicoRequest.fecha)

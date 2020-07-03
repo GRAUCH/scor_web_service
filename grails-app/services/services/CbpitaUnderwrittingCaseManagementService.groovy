@@ -54,8 +54,7 @@ class CbpitaUnderwrittingCaseManagementService {
         List<WsError> wsErrors = new ArrayList<WsError>()
         def opername = "CbpitaUnderwrittingCaseManagementRequest"
         def requestXML = ""
-        def requestBBDD
-        def tarificadorService
+        Request requestBBDD
         Company company = null
         String message = null
         StatusType status = null
@@ -95,10 +94,8 @@ class CbpitaUnderwrittingCaseManagementService {
                             logginService.putInfoMessage("Se procede el alta automatica de " + company.nombre + " con numero de solicitud " + cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber)
                             requestService.insertarRecibido(company, cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, requestXML.toString(), TipoOperacion.ALTA)
 
-                            /**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
-                             *                    */
-
-                            cbpitaService.busquedaCrm(cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, company.ou, company.codigoSt, company.id, requestBBDD, company.nombre)
+                            /**Llamamos al metodo asincrono que busca en el crm el expediente recien creado*/
+                            expedienteService.busquedaCrm(requestBBDD, company, cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, null, null)
 
                         } else if (expedientes != null && expedientes.size() == 1) {
 
@@ -210,7 +207,7 @@ class CbpitaUnderwrittingCaseManagementService {
 
         def opername = "cbpitaUnderwrittingCaseManagementResponse"
         def requestXML = ""
-        def requestBBDD
+        Request requestBBDD
         List<RespuestaCRMInforme> expedientes = new ArrayList<RespuestaCRMInforme>()
         TransformacionUtil util = new TransformacionUtil()
         CorreoUtil correoUtil = new CorreoUtil()

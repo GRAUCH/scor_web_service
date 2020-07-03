@@ -45,7 +45,7 @@ class AfiEscaUnderwrittingCasesResultsService {
 		def correoUtil = new CorreoUtil()
 		def requestXML = ""
 		def expedientes
-		def requestBBDD
+		Request requestBBDD
 		def company = Company.findByNombre(TipoCompany.AFI_ESCA.getNombre())
 		
 		AfiEscaUnderwrittingCasesResultsResponse result=new AfiEscaUnderwrittingCasesResultsResponse()

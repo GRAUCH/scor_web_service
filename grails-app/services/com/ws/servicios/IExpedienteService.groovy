@@ -1,5 +1,6 @@
 package com.ws.servicios
 
+import com.scortelemed.Company
 import com.scortelemed.TipoCompany
 import com.scortelemed.Request
 import com.ws.enumeration.UnidadOrganizativa
@@ -15,5 +16,6 @@ interface IExpedienteService {
     def obtenerInformeExpedientesSiniestros(String companya, String producto, int estado, String fechaIni, String fechaFin, UnidadOrganizativa pais)
     def modificaExpediente(UnidadOrganizativa pais, Expediente expediente, def servicioScorList, def paqueteScorList)
     def crearExpediente(Request req, TipoCompany comp)
+    def busquedaCrm(Request requestBBDD, Company company, String requestNumber, String certificateNumber, String policyNumber)
 
-}
+    }

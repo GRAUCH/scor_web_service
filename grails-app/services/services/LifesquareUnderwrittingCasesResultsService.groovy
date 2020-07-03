@@ -48,7 +48,7 @@ class LifesquareUnderwrittingCasesResultsService {
 		def opername = "LifesquareUnderwrittingCasesResultsRequest"
 		def correoUtil = new CorreoUtil()
 		def requestXML = ""
-		def requestBBDD
+		Request requestBBDD
 		def expedientes
 		def company = Company.findByNombre(TipoCompany.ZEN_UP.getNombre())
 		

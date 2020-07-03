@@ -44,10 +44,9 @@ class AfiEscaUnderwrittingCaseManagementService {
 
 		def opername = "AfiEscaUnderwrittingCaseManagementRequest"
 		def correoUtil = new CorreoUtil()
-		def requestXML = ""
-		def requestBBDD
+		def requestXML
+		Request requestBBDD
 		def company = Company.findByNombre(TipoCompany.AFI_ESCA.getNombre())
-		def respuestaCrm
 
 		Filtro filtro = new Filtro()
 		AfiEscaUnderwrittingCaseManagementResponse resultado = new AfiEscaUnderwrittingCaseManagementResponse()
@@ -70,11 +69,9 @@ class AfiEscaUnderwrittingCaseManagementService {
 				expedienteService.crearExpediente(requestBBDD, TipoCompany.AFI_ESCA)
 				requestService.insertarRecibido(company, afiEscaUnderwrittingCaseManagementRequest.policy.policy_number, requestBBDD.request, TipoOperacion.ALTA)
 
-				/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
-				 *
-				 */
+				/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado*/
 				correoUtil.envioEmail(opername, null, 1)
-				tarificadorService.busquedaAfiescaCrm(afiEscaUnderwrittingCaseManagementRequest.policy.policy_number, company.ou, opername, company.codigoSt, company.id, requestBBDD)
+				expedienteService.busquedaCrm(requestBBDD, company, afiEscaUnderwrittingCaseManagementRequest.policy.policy_number, null, null)
 								
 			} else {
 

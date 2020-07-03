@@ -49,8 +49,7 @@ class MethislabCFUnderwrittingCaseManagementService {
 
 		def opername="MethislabCFUnderwrittingCaseManagementRequest"
 		def requestXML = ""
-		def requestBBDD
-		def tarificadorService
+		Request requestBBDD
 		List<WsError> wsErrors = new ArrayList<WsError>()
 		String message = null
 		StatusType status = null
@@ -90,7 +89,7 @@ class MethislabCFUnderwrittingCaseManagementService {
 						 *
 						 */
 						logginService.putInfoMessage("Buscando en CRM solicitud de " + company.nombre + " con numero de solicitud: " + MethislabCFUnderwrittingCaseManagementRequest.candidateInformation.requestNumber)
-						methislabCFService.busquedaCrm(MethislabCFUnderwrittingCaseManagementRequest.candidateInformation.policyNumber, company.ou, MethislabCFUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, opername, company.codigoSt, company.id, requestBBDD, MethislabCFUnderwrittingCaseManagementRequest.candidateInformation.certificateNumber, company.nombre)
+						expedienteService.busquedaCrm(requestBBDD, company, MethislabCFUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, MethislabCFUnderwrittingCaseManagementRequest.candidateInformation.certificateNumber, null)
 
 					} else {
 						String error =  util.detalleError(wsErrors)
@@ -139,7 +138,7 @@ class MethislabCFUnderwrittingCaseManagementService {
 
 		def opername="MethislabCFUnderwrittingCaseManagementResponse"
 		def requestXML = ""
-		def requestBBDD
+		Request requestBBDD
 		List<RespuestaCRMInforme> expedientes = new ArrayList<RespuestaCRMInforme>()
 		TransformacionUtil util = new TransformacionUtil()
 		CorreoUtil correoUtil = new CorreoUtil()

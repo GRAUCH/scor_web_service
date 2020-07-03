@@ -53,7 +53,7 @@ class CaserUnderwrittingCaseManagementService {
 
         def opername = "CaserResultadoReconocimientoMedicoRequest"
         def requestXML = ""
-        def requestBBDD
+        Request requestBBDD
         String notes = null
         StatusType status = null
 
@@ -87,10 +87,8 @@ class CaserUnderwrittingCaseManagementService {
                     if (expedientes != null && expedientes.size() == 0) {
                         expedienteService.crearExpediente(requestBBDD, TipoCompany.CASER)
                         requestService.insertarRecibido(company, gestionReconocimientoMedico.policyHolderInformation.requestNumber, requestXML.toString(), TipoOperacion.ALTA)
-                        /**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
-                         *
-                         */
-                        caserService.busquedaCrm(gestionReconocimientoMedico.policyHolderInformation.policyNumber, company.ou, gestionReconocimientoMedico.policyHolderInformation.requestNumber, opername, company.codigoSt, company.id, requestBBDD, gestionReconocimientoMedico.policyHolderInformation.certificateNumber, company.nombre)
+                        /**Llamamos al metodo asincrono que busca en el crm el expediente recien creado*/
+                        expedienteService.busquedaCrm(requestBBDD, company, gestionReconocimientoMedico.policyHolderInformation.requestNumber, gestionReconocimientoMedico.policyHolderInformation.certificateNumber, null)
                     } else {
                         logginService.putInfoMessage("Se procede al envio del email para notificar del cambio  Ref: ${gestionReconocimientoMedico.policyHolderInformation.requestNumber}")
                         //el expediente existe, le envio un email a quien este configurado en la compania.
@@ -136,7 +134,7 @@ class CaserUnderwrittingCaseManagementService {
 
         def opername = "CaserResultadoReconocimientoMedicoResponse"
         def requestXML = ""
-        def requestBBDD
+        Request requestBBDD
         String notes = null
         StatusType status = null
 
@@ -237,7 +235,7 @@ class CaserUnderwrittingCaseManagementService {
 
         def opername = "CaserConsultaExpedienteResponse"
         def requestXML = ""
-        def requestBBDD
+        Request requestBBDD
         String notes = null
         StatusType status = null
 
@@ -342,8 +340,7 @@ class CaserUnderwrittingCaseManagementService {
         def opername = "CaserConsolidacionPolizaResponse"
         def correoUtil = new CorreoUtil()
         def requestXML = ""
-        def crearExpedienteService
-        def requestBBDD
+        Request requestBBDD
         def codigoSt
 
         String notes = null

@@ -49,9 +49,7 @@ class NationaleNederlandenUnderwrittingCaseManagementService {
 		def correoUtil = new CorreoUtil()
 		List<WsError> wsErrors = new ArrayList<WsError>()
 		def requestXML = ""
-		def crearExpedienteService
-		def requestBBDD
-		def respuestaCrm
+		Request requestBBDD
 
 		String message = null
 		StatusType status = null
@@ -89,10 +87,8 @@ class NationaleNederlandenUnderwrittingCaseManagementService {
 
 						requestService.insertarRecibido(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), TipoOperacion.ALTA)
 
-						/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
-						 *
-						 */
-						nnService.busquedaCrm(gestionReconocimientoMedico.candidateInformation.requestNumber, company.ou, opername, company.codigoSt, company.id, requestBBDD, gestionReconocimientoMedico.candidateInformation.certificateNumber, company.nombre)
+						/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado*/
+						expedienteService.busquedaCrm(requestBBDD, company, gestionReconocimientoMedico.candidateInformation.requestNumber, gestionReconocimientoMedico.candidateInformation.certificateNumber, null)
 
 					} else {
 
@@ -152,7 +148,7 @@ class NationaleNederlandenUnderwrittingCaseManagementService {
 
 		def opername="NnResultadoReconocimientoMedicoResponse"
 		def requestXML = ""
-		def requestBBDD
+		Request requestBBDD
 		List<RespuestaCRMInforme> expedientes = new ArrayList<RespuestaCRMInforme>()
 		TransformacionUtil util = new TransformacionUtil()
 		CorreoUtil correoUtil = new CorreoUtil()

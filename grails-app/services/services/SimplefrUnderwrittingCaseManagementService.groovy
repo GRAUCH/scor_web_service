@@ -1,5 +1,6 @@
 package services
 
+import com.scortelemed.Request
 import com.scortelemed.TipoCompany
 import com.scortelemed.TipoOperacion
 import grails.util.Environment
@@ -54,11 +55,9 @@ class SimplefrUnderwrittingCaseManagementService	 {
 
 		def opername="SimpleUnderwrittingCaseManagementRequest"
 		def correoUtil = new CorreoUtil()
-		def requestXML = ""
-		def crearExpedienteService
-		def requestBBDD
-		def respuestaCrm
-		
+		def requestXML
+		Request requestBBDD
+
 		Company company = Company.findByNombre(TipoCompany.MALAKOFF_MEDERIC.getNombre())
 		Filtro filtro = new Filtro()
 		SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
@@ -84,7 +83,7 @@ class SimplefrUnderwrittingCaseManagementService	 {
 				/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
 				 *
 				 */
-				simplefrService.busquedaCrm(simplefrUnderwrittingCaseManagement.candidateInformation.requestNumber, company.ou, opername, company.codigoSt, company.id, requestBBDD)
+				expedienteService.busquedaCrm(requestBBDD, company, simplefrUnderwrittingCaseManagement.candidateInformation.requestNumber, null, null)
 				
 			} else {	
 				
@@ -125,7 +124,7 @@ class SimplefrUnderwrittingCaseManagementService	 {
 		def requestXML = ""
 		def expedientes
 		def company = Company.findByNombre(TipoCompany.MALAKOFF_MEDERIC.getNombre())
-		def requestBBDD
+		Request requestBBDD
 		
 		TransformacionUtil util = new TransformacionUtil()
 		

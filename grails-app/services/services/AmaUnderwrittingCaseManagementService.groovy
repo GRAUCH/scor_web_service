@@ -1,5 +1,6 @@
 package services
 
+import com.scortelemed.Request
 import com.scortelemed.TipoCompany
 import com.scortelemed.TipoOperacion
 import grails.util.Environment
@@ -67,8 +68,7 @@ class AmaUnderwrittingCaseManagementService	 {
 		def opername="AmaResultadoReconocimientoMedicoRequest"
 		def correoUtil = new CorreoUtil()
 		def requestXML = ""
-		def requestBBDD
-		def respuestaCrm
+		Request requestBBDD
 
 		String notes = null
 		StatusType status = null
@@ -105,10 +105,8 @@ class AmaUnderwrittingCaseManagementService	 {
 							notes = "El caso se ha procesado correctamente"
 							status = StatusType.OK
 
-							/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
-							 *
-							 */
-							amaService.busquedaCrm(gestionReconocimientoMedico.candidateInformation.requestNumber, company.ou, opername, company.codigoSt, company.id, requestBBDD, company.nombre)
+							/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado*/
+							expedienteService.busquedaCrm(requestBBDD, company, gestionReconocimientoMedico.candidateInformation.requestNumber, null, null)
 							
 						} else if (gestionReconocimientoMedico.candidateInformation.operacion.toString().toUpperCase().equals("M")){
 
@@ -180,7 +178,7 @@ class AmaUnderwrittingCaseManagementService	 {
 
 		CorreoUtil correoUtil = new CorreoUtil()
 		def requestXML = ""
-		def requestBBDD
+		Request requestBBDD
 		List<RespuestaCRMInforme> expedientes = new ArrayList<RespuestaCRMInforme>()
 		Company company = Company.findByNombre(TipoCompany.AMA.getNombre())
 		TransformacionUtil util = new TransformacionUtil()
@@ -300,8 +298,7 @@ class AmaUnderwrittingCaseManagementService	 {
 		def opername="AmaConsolidacionPolizaResponse"
 		def correoUtil = new CorreoUtil()
 		def requestXML = ""
-		def crearExpedienteService
-		def requestBBDD
+		Request requestBBDD
 		def codigoSt
 
 		String notes = null
@@ -434,7 +431,7 @@ class AmaUnderwrittingCaseManagementService	 {
 
 		def opername="AmaConsultaExpediente"
 		def requestXML = ""
-		def requestBBDD
+		Request requestBBDD
 		RespuestaCRM respuestaCRM = new RespuestaCRM()
 		TransformacionUtil util = new TransformacionUtil()
 		CorreoUtil correoUtil = new CorreoUtil()
@@ -589,7 +586,7 @@ class AmaUnderwrittingCaseManagementService	 {
 
 		def opername="AmaConsultaDocumento"
 		def requestXML = ""
-		def requestBBDD
+		Request requestBBDD
 		TransformacionUtil util = new TransformacionUtil()
 		CorreoUtil correoUtil = new CorreoUtil()
 		Filtro filtro = new Filtro()

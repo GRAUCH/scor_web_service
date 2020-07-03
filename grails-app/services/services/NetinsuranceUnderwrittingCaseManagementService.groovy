@@ -61,9 +61,7 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 		def opername="NetinsuranceUnderwrittingCaseManagementRequest"
 		def correoUtil = new CorreoUtil()
 		def requestXML = ""
-		def crearExpedienteService
-		def requestBBDD
-		def respuestaCrm
+		Request requestBBDD
 
 		Company company = Company.findByNombre(TipoCompany.NET_INSURANCE.getNombre())
 		Filtro filtro = new Filtro()
@@ -94,10 +92,8 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 
 					requestService.insertarRecibido(company, netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber, requestXML.toString(), TipoOperacion.ALTA)
 
-					/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
-					 *
-					 */
-					netinsuranceService.busquedaCrm(netInsuranteUnderwrittingCaseManagement.candidateInformation.policyNumber, netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber, company.ou, opername, company.codigoSt, company.id, requestBBDD, company.nombre)
+					/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado*/
+					expedienteService.busquedaCrm(requestBBDD, company, netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber, null, null)
 				}
 			} else {
 
@@ -137,7 +133,7 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 
 		def opername="NetinsuranceUnderwrittingCaseManagementResponse"
 		def requestXML = ""
-		def requestBBDD
+		Request requestBBDD
 		List<RespuestaCRMInforme> expedientes = new ArrayList<RespuestaCRMInforme>()
 		TransformacionUtil util = new TransformacionUtil()
 		CorreoUtil correoUtil = new CorreoUtil()
@@ -239,7 +235,7 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 
 		def opername="NetinsuranteGetDossier"
 		def requestXML = ""
-		def requestBBDD
+		Request requestBBDD
 		String notes = null
 		StatusType status = null
 

@@ -1,6 +1,7 @@
 package services
 
 import com.scortelemed.Company
+import com.scortelemed.Request
 import com.scortelemed.TipoCompany
 import com.scortelemed.TipoOperacion
 import com.scortelemed.schemas.enginyers.*
@@ -44,7 +45,7 @@ class EnginyersUnderwrittingCaseManagementService {
 			def correoUtil = new CorreoUtil()
 			List<WsError> wsErrors = new ArrayList<WsError>()
 			def requestXML
-			def requestBBDD
+			Request requestBBDD
 
 			Company company = null
 			SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
@@ -87,9 +88,8 @@ class EnginyersUnderwrittingCaseManagementService {
 
 								requestService.insertarRecibido(company, addExp.d.getPolicyNumber(), requestXML.toString(), TipoOperacion.ALTA)
 
-								/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
-								 *                                */
-								enginyersService.busquedaCrm(addExp.d.getPolicyNumber(), company.ou, opername, company.codigoSt, company.id, requestBBDD, company.nombre)
+								/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado*/
+								expedienteService.busquedaCrm(requestBBDD, company, addExp.d.getPolicyNumber(), null, null)
 							
 							} else {
 

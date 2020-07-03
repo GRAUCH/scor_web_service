@@ -56,11 +56,9 @@ class SocieteGeneraleUnderwrittingCaseManagementService	 {
 
 		def opername="SocieteGeneraleUnderwrittingCaseManagementRequest"
 		def correoUtil = new CorreoUtil()
-		def requestXML = ""
-		def crearExpedienteService
-		def requestBBDD
-		def respuestaCrm
-		
+		def requestXML
+		Request requestBBDD
+
 		Company company = Company.findByNombre(TipoCompany.SOCIETE_GENERALE.getNombre())
 		Filtro filtro = new Filtro()
 		SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
@@ -83,10 +81,8 @@ class SocieteGeneraleUnderwrittingCaseManagementService	 {
 				resultado.setStatus(StatusType.OK)
 				requestService.insertarRecibido(company, societeGeneraleUnderwrittingCaseManagement.candidateInformation.requestNumber, requestBBDD.request, TipoOperacion.ALTA)
 
-				/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
-				 *
-				 */
-				societeGeneraleService.busquedaCrm(societeGeneraleUnderwrittingCaseManagement.candidateInformation.requestNumber, company.ou, opername, company.codigoSt, company.id, requestBBDD)
+				/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado*/
+				expedienteService.busquedaCrm(requestBBDD, company, societeGeneraleUnderwrittingCaseManagement.candidateInformation.requestNumber, null, null)
 				
 			} else {	
 				
@@ -127,9 +123,8 @@ class SocieteGeneraleUnderwrittingCaseManagementService	 {
 		def expedientes
 		def company = Company.findByNombre(TipoCompany.SOCIETE_GENERALE.getNombre())
 		def estadisticasService = new EstadisticasService()
-		def tarificadorService = new TarificadorService()
 		def logginService = new LogginService()
-		def requestBBDD
+		Request requestBBDD
 		
 		TransformacionUtil util = new TransformacionUtil()
 		

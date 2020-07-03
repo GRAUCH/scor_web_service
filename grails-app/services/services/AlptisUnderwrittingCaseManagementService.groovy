@@ -43,10 +43,9 @@ class AlptisUnderwrittingCaseManagementService {
 
 		def opername="AlptisUnderwrittingCaseManagementRequest"
 		def correoUtil = new CorreoUtil()
-		def requestXML = ""
-		def requestBBDD
+		def requestXML
+		Request requestBBDD
 		def company = Company.findByNombre(TipoCompany.ALPTIS.getNombre())
-		def respuestaCrm
 		Filtro filtro = new Filtro()
 		SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
 		AlptisUnderwrittingCaseManagementResponse resultado = new AlptisUnderwrittingCaseManagementResponse()
@@ -78,7 +77,7 @@ class AlptisUnderwrittingCaseManagementService {
 						 *
 						 */
 						correoUtil.envioEmail(opername, null, 1)
-						tarificadorService.busquedaAlptisCrm(alptisUnderwrittingCaseManagementRequest.policy.BasicPolicyGroup.policy_number, company.ou, opername, company.codigoSt, company.id, requestBBDD)
+						expedienteService.busquedaCrm(requestBBDD, company, null, null, alptisUnderwrittingCaseManagementRequest.policy.BasicPolicyGroup.policy_number)
 						
 					}
 				} else {

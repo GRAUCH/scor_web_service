@@ -1,5 +1,6 @@
 package services
 
+import com.scortelemed.Request
 import com.scortelemed.TipoCompany
 import com.scortelemed.TipoOperacion
 import hwsol.webservices.CorreoUtil
@@ -68,7 +69,7 @@ class PsnUnderwrittingCaseManagementService	 {
 		List<WsError> wsErrors = new ArrayList<WsError>()
 		def requestXML = ""
 		def crearExpedienteService
-		def requestBBDD
+		Request requestBBDD
 		def respuestaCrm
 
 		String message = null
@@ -112,7 +113,7 @@ class PsnUnderwrittingCaseManagementService	 {
 
 							/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
 							 *                                */
-							psnService.busquedaCrm(gestionReconocimientoMedico.candidateInformation.requestNumber, company.ou, opername, company.codigoSt, company.id, requestBBDD, gestionReconocimientoMedico.candidateInformation.certificateNumber, company.nombre)
+							expedienteService.busquedaCrm(requestBBDD, company, gestionReconocimientoMedico.candidateInformation.requestNumber, gestionReconocimientoMedico.candidateInformation.certificateNumber, null)
 
 
 						}
@@ -204,7 +205,7 @@ class PsnUnderwrittingCaseManagementService	 {
 
 		def opername="PsnResultadoReconocimientoMedicoResponse"
 		def requestXML = ""
-		def requestBBDD
+		Request requestBBDD
 		List<RespuestaCRMInforme> expedientes = new ArrayList<RespuestaCRMInforme>()
 		TransformacionUtil util = new TransformacionUtil()
 		CorreoUtil correoUtil = new CorreoUtil()
@@ -350,8 +351,7 @@ class PsnUnderwrittingCaseManagementService	 {
 		def opername="PsnConsolidacionPolizaResponse"
 		def correoUtil = new CorreoUtil()
 		def requestXML = ""
-		def crearExpedienteService
-		def requestBBDD
+		Request requestBBDD
 
 		String notes = null
 		StatusType status = null
@@ -488,7 +488,7 @@ class PsnUnderwrittingCaseManagementService	 {
 
 		def opername="PsnConsultaExpediente"
 		def requestXML = ""
-		def requestBBDD
+		Request requestBBDD
 		RespuestaCRM respuestaCRM = new RespuestaCRM()
 		TransformacionUtil util = new TransformacionUtil()
 		CorreoUtil correoUtil = new CorreoUtil()
@@ -654,7 +654,7 @@ class PsnUnderwrittingCaseManagementService	 {
 
 		def opername="PsnConsultaDocumento"
 		def requestXML = ""
-		def requestBBDD
+		Request requestBBDD
 		TransformacionUtil util = new TransformacionUtil()
 		CorreoUtil correoUtil = new CorreoUtil()
 		Filtro filtro = new Filtro()
