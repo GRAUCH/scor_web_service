@@ -5,8 +5,11 @@ import com.scortelemed.Envio
 import com.scortelemed.Recibido
 import com.scortelemed.Request
 import com.scortelemed.Error
+import com.scortelemed.TipoCompany
 import com.scortelemed.TipoOperacion
+import com.ws.servicios.CompanyFactory
 import com.ws.servicios.EstadisticasService
+import com.ws.servicios.ICompanyService
 import com.ws.servicios.IRequestService
 import com.ws.servicios.LogginService
 import org.springframework.web.context.request.RequestContextHolder
@@ -25,8 +28,8 @@ import grails.transaction.Transactional
 @Transactional
 class RequestService implements IRequestService {
 
-    def logginService = new LogginService()
-    def estadisticasService = new EstadisticasService()
+    def logginService
+    def estadisticasService
 
     def getBBDDRequest(Request requestInstance, String opername, String schema, Class<?> myObjectClass) {
         def object = unmarshall(requestInstance.getRequest(), myObjectClass)
@@ -51,6 +54,15 @@ class RequestService implements IRequestService {
             object = root.getValue()
         }
         return object
+    }
+
+    def marshall(def objetoRelleno, TipoCompany tipo) {
+        String salida = null
+        ICompanyService service = CompanyFactory.getCompanyImpl(tipo)
+        if(service) {
+            salida = service.marshall(objetoRelleno)
+        }
+        return salida
     }
 
     def marshall(def objetoRelleno, Class<?> clase) {
