@@ -149,8 +149,8 @@ class SimplefrUnderwrittingCaseManagementService	 {
 				String fechaFin = sdfr.format(date)
 				requestService.insertarEnvio(company, simpleUnderwrittingCasesResults.dateStart.toString() + "-" + simpleUnderwrittingCasesResults.dateEnd.toString(), requestXML.toString())
 
-				expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt,null,1,fechaIni,fechaFin,"IT"))
-				expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt,null,2,fechaIni,fechaFin,"IT"))
+				expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt,null,1,fechaIni,fechaFin,company.ou))
+				expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt,null,2,fechaIni,fechaFin,company.ou))
 
 				if(expedientes){
 

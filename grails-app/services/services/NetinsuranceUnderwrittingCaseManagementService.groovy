@@ -168,8 +168,8 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 					date = netInsuranteUnderwrittingCasesResults.dateEnd.toGregorianCalendar().getTime()
 					String fechaFin = sdfr.format(date)
 
-					expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt,null,1,fechaIni,fechaFin,"IT"))
-					expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt,null,2,fechaIni,fechaFin,"IT"))
+					expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt,null,1,fechaIni,fechaFin,company.ou))
+					expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt,null,2,fechaIni,fechaFin,company.ou))
 
 					requestService.insertarEnvio(company, netInsuranteUnderwrittingCasesResults.dateStart.toString().substring(0,10) + "-" + netInsuranteUnderwrittingCasesResults.dateEnd.toString().substring(0,10), requestXML.toString())
 

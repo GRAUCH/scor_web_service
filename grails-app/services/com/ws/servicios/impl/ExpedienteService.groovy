@@ -6,13 +6,16 @@ import com.scor.srpfileinbound.RootElement
 import com.scortelemed.Conf
 import com.scortelemed.Request
 import com.scortelemed.TipoCompany
+import com.ws.enumeration.UnidadOrganizativa
 import com.ws.servicios.CompanyFactory
 import com.ws.servicios.ICompanyService
 import com.ws.servicios.IExpedienteService
 import grails.transaction.Transactional
+import grails.util.Environment
 import servicios.ClaveFiltro
 import servicios.Expediente
 import servicios.Filtro
+import servicios.Usuario
 
 import java.text.SimpleDateFormat
 
@@ -26,12 +29,12 @@ class ExpedienteService implements IExpedienteService {
     ICompanyService companyService
 
 
-    def consultaExpediente(String unidadOrganizativa, Filtro filtro) {
+    def consultaExpediente(UnidadOrganizativa pais, Filtro filtro) {
         try {
             def ctx = grailsApplication.mainContext
             def bean = ctx.getBean("soapClientAlptis")
             bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY,Conf.findByName("frontal.wsdl")?.value)
-            def salida=grailsApplication.mainContext.soapClientAlptis.consultaExpediente(tarificadorService.obtenerUsuarioFrontal(unidadOrganizativa),filtro)
+            def salida=grailsApplication.mainContext.soapClientAlptis.consultaExpediente(obtenerUsuarioFrontal(pais),filtro)
             return salida
         } catch (Exception e) {
             logginService.putError("consultaExpediente","No se ha podido consultar el expediente " + e)
@@ -40,14 +43,14 @@ class ExpedienteService implements IExpedienteService {
         }
     }
 
-    def consultaExpedienteCodigoST(String codigoST, String unidadOrganizativa) {
+    def consultaExpedienteCodigoST(String codigoST, UnidadOrganizativa pais) {
         Filtro filtro = new Filtro()
         filtro.setClave(ClaveFiltro.EXPEDIENTE)
         filtro.setValor(codigoST)
-        return consultaExpediente(unidadOrganizativa, filtro)
+        return consultaExpediente(pais, filtro)
     }
 
-    def consultaExpedienteNumSolicitud(String requestNumber, String unidadOrganizativa, String codigoST) {
+    def consultaExpedienteNumSolicitud(String requestNumber, UnidadOrganizativa pais, String codigoST) {
         Filtro filtro = new Filtro()
         filtro.setClave(ClaveFiltro.CLIENTE)
         filtro.setValor(codigoST)
@@ -55,16 +58,27 @@ class ExpedienteService implements IExpedienteService {
         filtroRelacionado.setClave(ClaveFiltro.NUM_SOLICITUD)
         filtroRelacionado.setValor(requestNumber)
         filtro.setFiltroRelacionado(filtroRelacionado)
-        return consultaExpediente(unidadOrganizativa, filtro)
+        return consultaExpediente(pais, filtro)
     }
 
-    def obtenerInformeExpedientes(String companya, String servicioScor, int estado, String fechaIni, String fechaFin, String pais) {
+    /**
+     * Obtener Expedientes en formato Informe (Más reducido)
+     *
+     * @param companya (Código ST de la compañía)
+     * @param servicioScor (Código ST de servicio SCOR)
+     * @param estado (0 abiertos, 1 Cerrados, 2 Anulados, 3 Cerrados y Anulados)
+     * @param fechaIni
+     * @param fechaFin
+     * @param pais
+     * @return
+     */
+    def obtenerInformeExpedientes(String companya, String servicioScor, int estado, String fechaIni, String fechaFin, UnidadOrganizativa pais) {
         try {
             //SOBREESCRIBIMOS LA URL A LA QUE TIENE QUE LLAMAR EL WSDL
             def ctx = grailsApplication.mainContext
             def bean = ctx.getBean("soapClientAlptis")
             bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("frontal.wsdl")?.value)
-            def salida = grailsApplication.mainContext.soapClientAlptis.informeExpedientes(tarificadorService.obtenerUsuarioFrontal(pais), companya, servicioScor, estado, fechaIni, fechaFin)
+            def salida = grailsApplication.mainContext.soapClientAlptis.informeExpedientes(obtenerUsuarioFrontal(pais), companya, servicioScor, estado, fechaIni, fechaFin)
             return salida.listaExpedientesInforme
         } catch (Throwable e) {
             logginService.putError("obtenerInformeExpedientes", "No se ha podido obtener el informe de expediente " + e)
@@ -73,12 +87,23 @@ class ExpedienteService implements IExpedienteService {
         }
     }
 
-    def obtenerInformeExpedientesSiniestros(String companya, String producto, int estado, String fechaIni, String fechaFin, String pais) {
+    /**
+     * Obtener Expedientes de Siniestro en formato Informe (Más reducido)
+     *
+     * @param companya (Código ST de la compañía)
+     * @param producto (Código ST del producto)
+     * @param estado (0 abiertos, 1 Cerrados, 2 Anulados, 3 Cerrados y Anulados)
+     * @param fechaIni
+     * @param fechaFin
+     * @param pais
+     * @return
+     */
+    def obtenerInformeExpedientesSiniestros(String companya, String producto, int estado, String fechaIni, String fechaFin, UnidadOrganizativa pais) {
         try {
             def ctx = grailsApplication.mainContext
             def bean = ctx.getBean("soapClientAlptis")
             bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("frontal.wsdl")?.value)
-            def salida = grailsApplication.mainContext.soapClientAlptis.informeExpedientesSiniestros(tarificadorService.obtenerUsuarioFrontal(pais), companya, producto, estado, fechaIni, fechaFin)
+            def salida = grailsApplication.mainContext.soapClientAlptis.informeExpedientesSiniestros(obtenerUsuarioFrontal(pais), companya, producto, estado, fechaIni, fechaFin)
             return salida.listaExpedientes
         } catch (Exception e) {
             logginService.putError("obtenerInformeExpedientesSiniestros", "No se ha podido obtener el informe de expediente " + e)
@@ -87,13 +112,25 @@ class ExpedienteService implements IExpedienteService {
         }
     }
 
+    def informeExpedientePorFiltro(Filtro filtro, UnidadOrganizativa pais) {
+        try {
+            def ctx = grailsApplication.mainContext
+            def bean = ctx.getBean("soapClientAlptis")
+            bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY,Conf.findByName("frontal.wsdl")?.value)
+            def salida=grailsApplication.mainContext.soapClientAlptis.informeExpedientesPorFiltro(obtenerUsuarioFrontal(pais),filtro)
+            return salida
+        } catch (Exception e) {
+            logginService.putError("informeExpedientePorFiltro de ama","No se ha podido obtener el informe de expediente : " + e)
+            return null
+        }
+    }
 
-    def modificaExpediente(String pais, Expediente expediente, def servicioScorList, def paqueteScorList) {
+    def modificaExpediente(UnidadOrganizativa pais, Expediente expediente, def servicioScorList, def paqueteScorList) {
         try {
             def ctx = grailsApplication.mainContext
             def bean = ctx.getBean("soapClientAlptis")
             bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("frontal.wsdl")?.value)
-            def salida = grailsApplication.mainContext.soapClientAlptis.modificaExpediente(tarificadorService.obtenerUsuarioFrontal(pais), expediente, servicioScorList, paqueteScorList)
+            def salida = grailsApplication.mainContext.soapClientAlptis.modificaExpediente(obtenerUsuarioFrontal(pais), expediente, servicioScorList, paqueteScorList)
             return salida
         } catch (Exception e) {
             logginService.putError("modificaExpediente", "No se ha podido ejecutar la operacion de modificacion : " + e)
@@ -118,7 +155,7 @@ class ExpedienteService implements IExpedienteService {
             def salida = grailsApplication.mainContext.soapClientCrearOrabpel.initiate(crearExpedienteBPM(req, comp))
             return "OK"
         } catch (Exception e) {
-            throw new WSException(this.getClass(), "crearExpediente", ExceptionUtils.composeMessage(null, e));
+            throw new WSException(this.getClass(), "crearExpediente", ExceptionUtils.composeMessage(null, e))
         }
     }
 
@@ -139,7 +176,7 @@ class ExpedienteService implements IExpedienteService {
     }
 
     private def buildCabecera(Request req, String codigoSt) {
-        def formato = new SimpleDateFormat("yyyyMMdd");
+        def formato = new SimpleDateFormat("yyyyMMdd")
         RootElement.CABECERA cabecera = new RootElement.CABECERA()
         if(codigoSt) {
             cabecera.setCodigoCia(codigoSt)
@@ -159,5 +196,54 @@ class ExpedienteService implements IExpedienteService {
         pie.setNumFilasFichero(100)
         pie.setNumRegistros(1)
         return pie
+    }
+
+    def obtenerUsuarioFrontal(UnidadOrganizativa unidadOrganizativa) {
+        def usuario = new Usuario()
+
+        switch(unidadOrganizativa) {
+            case UnidadOrganizativa.ES:
+                if (Environment.current.name.equals("production_wildfly")) {
+                    usuario.clave = "7Q%NN!v5"
+                    usuario.dominio = "SCOR-TELEMED"
+                    usuario.unidadOrganizativa = "ES"
+                    usuario.usuario = "usuarioBPM"
+                } else {
+                    usuario.clave = "Wcbhjfod!"
+                    usuario.dominio = "scor.local"
+                    usuario.unidadOrganizativa = "ES"
+                    usuario.usuario = "gcaballero-es"
+                }
+                break
+            case UnidadOrganizativa.IT:
+                if (Environment.current.name.equals("production_wildfly")) {
+                    usuario.clave = "sc5t4!QAZ123"
+                    usuario.dominio = "SCOR-TELEMED"
+                    usuario.unidadOrganizativa = "IT"
+                    usuario.usuario = "adminitalia"
+                } else {
+                    usuario.clave = "P@ssword"
+                    usuario.dominio = "scor.local"
+                    usuario.unidadOrganizativa = "IT"
+                    usuario.usuario = "admin-ITA"
+                }
+                break
+            case UnidadOrganizativa.FR:
+                if (Environment.current.name.equals("production_wildfly")) {
+                    usuario.clave = "5#6GAkXP456"
+                    usuario.dominio = "SCOR-TELEMED"
+                    usuario.unidadOrganizativa = "FR"
+                    usuario.usuario = "webclientesFR"
+                } else {
+                    usuario.clave = "5#6GAkXP456"
+                    usuario.dominio = "scor.local"
+                    usuario.unidadOrganizativa = "FR"
+                    usuario.usuario = "webclientesFR"
+                }
+                break
+            default:
+                break
+        }
+        return usuario
     }
 }

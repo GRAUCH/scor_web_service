@@ -246,7 +246,7 @@ class PsnUnderwrittingCaseManagementService	 {
 					filtroRelacionado.setValor(resultadoReconocimientoMedico.numSolicitud)
 					filtro.setFiltroRelacionado(filtroRelacionado)
 
-					respuestaCRM = psnService.informeExpedientePorFiltro(filtro,"ES")
+					respuestaCRM = expedienteService.informeExpedientePorFiltro(filtro,company.ou)
 
 					if(respuestaCRM != null && respuestaCRM.getListaExpedientesInforme() != null && respuestaCRM.getListaExpedientesInforme().size() > 0){
 
@@ -398,7 +398,7 @@ class PsnUnderwrittingCaseManagementService	 {
 
 					requestService.insertarRecibido(company, identificador, requestXML.toString(), TipoOperacion.CONSOLIDACION)
 
-					expediente = psnService.informeExpedientePorFiltro(filtro,"ES")
+					expediente = expedienteService.informeExpedientePorFiltro(filtro,company.ou)
 
 					if (expediente != null && expediente.getErrorCRM() == null && expediente.getListaExpedientesInforme() != null && expediente.getListaExpedientesInforme().size() > 0) {
 
@@ -409,7 +409,7 @@ class PsnUnderwrittingCaseManagementService	 {
 
 							logginService.putInfoEndpoint("ConsolidacionPoliza","Se procede a la modificacion de " + company.nombre + " con " + identificador)
 
-							RespuestaCRM respuestaCrmExpediente = expedienteService.modificaExpediente("ES",eModificado,null,null)
+							RespuestaCRM respuestaCrmExpediente = expedienteService.modificaExpediente(company.ou,eModificado,null,null)
 
 							if (respuestaCrmExpediente.getErrorCRM() != null && respuestaCrmExpediente.getErrorCRM().getDetalle() != null && !respuestaCrmExpediente.getErrorCRM().getDetalle().isEmpty()){
 
@@ -568,7 +568,7 @@ class PsnUnderwrittingCaseManagementService	 {
 
 					logginService.putInfoEndpoint("ConsultaExpediente","Realizando peticion para " + company.nombre + " con " + identificador)
 
-					respuestaCRM = psnService.informeExpedientePorFiltro(filtro,"ES")
+					respuestaCRM = expedienteService.informeExpedientePorFiltro(filtro,company.ou)
 
 					if(respuestaCRM != null && respuestaCRM.getListaExpedientesInforme() != null && respuestaCRM.getListaExpedientesInforme().size() > 0){
 
@@ -679,7 +679,7 @@ class PsnUnderwrittingCaseManagementService	 {
 					filtro.setClave(ClaveFiltro.EXPEDIENTE)
 					filtro.setValor(consultaDocumento.codigoSt)
 
-					respuestaCRM = psnService.informeExpedientePorFiltro(filtro,"ES")
+					respuestaCRM = expedienteService.informeExpedientePorFiltro(filtro,company.ou)
 
 					if (consultaDocumento.nodoAlfresco != null && !consultaDocumento.nodoAlfresco.isEmpty()) {
 

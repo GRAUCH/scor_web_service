@@ -210,9 +210,9 @@ class AmaUnderwrittingCaseManagementService	 {
 					String fechaFin = sdfr.format(date)
 
 					if (Environment.current.name.equals("production_wildfly")) {
-						expedientes=expedienteService.obtenerInformeExpedientesSiniestros("1060",null,null,fechaIni,fechaFin,"ES")
+						expedientes=expedienteService.obtenerInformeExpedientesSiniestros("1060",null,null,fechaIni,fechaFin,company.ou)
 					} else {
-						expedientes=expedienteService.obtenerInformeExpedientesSiniestros("1061",null,null,fechaIni,fechaFin,"ES")
+						expedientes=expedienteService.obtenerInformeExpedientesSiniestros("1061",null,null,fechaIni,fechaFin,company.ou)
 					}
 
 					logginService.putInfoEndpoint("ResultadoSiniestro","Realizando peticion para " + company.nombre + " con fecha " + resultadoSiniestro.dateStart.toString().substring(0,10) +"-"+resultadoSiniestro.dateEnd.toString().substring(0,10))
@@ -335,7 +335,7 @@ class AmaUnderwrittingCaseManagementService	 {
 
 					requestService.insertarRecibido(company, consolidacionPoliza.requestNumber, requestXML.toString(), TipoOperacion.CONSOLIDACION)
 
-					expediente = expedienteService.consultaExpedienteNumSolicitud(consolidacionPoliza.requestNumber,"ES",codigoSt )
+					expediente = expedienteService.consultaExpedienteNumSolicitud(consolidacionPoliza.requestNumber,company.ou,codigoSt )
 
 					if (expediente != null && expediente.getErrorCRM() == null && expediente.getListaExpedientes() != null && expediente.getListaExpedientes().size() > 0){
 
@@ -346,7 +346,7 @@ class AmaUnderwrittingCaseManagementService	 {
 							Expediente eModificado = expediente.getListaExpedientes().get(0)
 							eModificado.setNumPoliza(consolidacionPoliza.policyNumber.toString())
 
-							RespuestaCRM respuestaCrmExpediente = expedienteService.modificaExpediente("ES",eModificado,null,null)
+							RespuestaCRM respuestaCrmExpediente = expedienteService.modificaExpediente(company.ou,eModificado,null,null)
 
 							if (respuestaCrmExpediente.getErrorCRM() != null && respuestaCrmExpediente.getErrorCRM().getDetalle() != null && !respuestaCrmExpediente.getErrorCRM().getDetalle().isEmpty()){
 
@@ -515,7 +515,7 @@ class AmaUnderwrittingCaseManagementService	 {
 					}
 					requestService.insertarEnvio(company, identificador, requestXML.toString())
 
-					respuestaCRM = amaService.informeExpedientePorFiltro(filtro,"ES")
+					respuestaCRM = expedienteService.informeExpedientePorFiltro(filtro,company.ou)
 
 					if(respuestaCRM != null && respuestaCRM.getListaExpedientesInforme() != null && respuestaCRM.getListaExpedientesInforme().size() > 0){
 
@@ -611,7 +611,7 @@ class AmaUnderwrittingCaseManagementService	 {
 					filtro.setClave(ClaveFiltro.EXPEDIENTE)
 					filtro.setValor(consultaDocumento.codigoSt)
 
-					respuestaCRM = amaService.informeExpedientePorFiltro(filtro,"ES")
+					respuestaCRM = expedienteService.informeExpedientePorFiltro(filtro,company.ou)
 
 					if (consultaDocumento.nodoAlfresco != null && !consultaDocumento.nodoAlfresco.isEmpty()) {
 

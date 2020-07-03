@@ -209,14 +209,14 @@ class CajamarUnderwrittingCaseManagementService {
 
 				if (consolidacionPoliza.requestNumber != null && !consolidacionPoliza.requestNumber.isEmpty() != null && consolidacionPoliza.ciaCode !=null && !consolidacionPoliza.ciaCode.isEmpty() && consolidacionPoliza.policyNumber != null && !consolidacionPoliza.policyNumber.isEmpty()){
 
-					expediente = expedienteService.consultaExpedienteNumSolicitud(consolidacionPoliza.requestNumber,"ES", consolidacionPoliza.ciaCode)
+					expediente = expedienteService.consultaExpedienteNumSolicitud(consolidacionPoliza.requestNumber,company.ou, consolidacionPoliza.ciaCode)
 
 					if (expediente != null && expediente.getErrorCRM() == null && expediente.getListaExpedientes() != null && expediente.getListaExpedientes().size() > 0){
 
 						Expediente eModificado = expediente.getListaExpedientes().get(0)
 						eModificado.setNumPoliza(consolidacionPoliza.policyNumber.toString())
 
-						RespuestaCRM respuestaCrmExpediente = expedienteService.modificaExpediente("ES",eModificado,null,null)
+						RespuestaCRM respuestaCrmExpediente = expedienteService.modificaExpediente(company.ou,eModificado,null,null)
 
 						if (respuestaCrmExpediente.getErrorCRM() != null && respuestaCrmExpediente.getErrorCRM().getDetalle() != null && !respuestaCrmExpediente.getErrorCRM().getDetalle().isEmpty()){
 

@@ -187,8 +187,8 @@ class NationaleNederlandenUnderwrittingCaseManagementService {
 
 					requestService.insertarEnvio (company, resultadoReconocimientoMedico.dateStart.toString().substring(0,10) + "-" + resultadoReconocimientoMedico.dateEnd.toString().substring(0,10), requestXML.toString())
 
-					expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt,null,1,fechaIni,fechaFin,"ES"))
-					expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt,null,2,fechaIni,fechaFin,"ES"))
+					expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt,null,1,fechaIni,fechaFin,company.ou))
+					expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt,null,2,fechaIni,fechaFin,company.ou))
 
 					if(expedientes){
 

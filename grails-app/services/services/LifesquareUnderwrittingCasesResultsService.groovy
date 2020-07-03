@@ -74,7 +74,7 @@ class LifesquareUnderwrittingCasesResultsService {
 				def fechaIni = fecha.getTime().format ('yyyyMMdd HH:mm')
 				fechaIni= fechaIni.toString()+":00"
 
-				expedientes=expedienteService.obtenerInformeExpedientes(company.codigoSt,null,1,fechaIni,fechaFin,"FR")
+				expedientes=expedienteService.obtenerInformeExpedientes(company.codigoSt,null,1,fechaIni,fechaFin,company.ou)
 				
 				StringBuilder sbInfo = new StringBuilder ("Realizando proceso envio de informacion para " + company.nombre + " con fecha ")
 				sbInfo.append(fechaIni).append("-").append(fechaIni)
