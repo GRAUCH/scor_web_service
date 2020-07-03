@@ -7,6 +7,7 @@ import com.scortelemed.Company
 import com.scortelemed.Conf
 import com.scortelemed.Request
 import com.scortelemed.TipoCompany
+import com.scortelemed.TipoOperacion
 import com.ws.enumeration.UnidadOrganizativa
 import com.ws.servicios.CompanyFactory
 import com.ws.servicios.ICompanyService
@@ -255,7 +256,8 @@ class ExpedienteService implements IExpedienteService {
     def busquedaCrm(Request requestBBDD, Company company, String requestNumber, String certificateNumber, String policyNumber) {
         task {
             String opername = "ExpedienteService BusquedaCrm"
-            logginService.putInfoMessage(opername+" - Buscando en CRM solicitud de " + company.nombre + " con numSolicitud: " + requestNumber)
+            String logExpediente = getLogExpediente(policyNumber, requestNumber, certificateNumber, company.codigoSt)
+            logginService.putInfoMessage(opername+" - Buscando en CRM solicitud de "+logExpediente)
             def respuestaCrm
             int limite = 0
             boolean encontrado = false
@@ -269,7 +271,7 @@ class ExpedienteService implements IExpedienteService {
 
                     if (respuestaCrm != null && respuestaCrm.getListaExpedientes() != null && respuestaCrm.getListaExpedientes().size() > 0) {
                         for (int i = 0; i < respuestaCrm.getListaExpedientes().size(); i++) {
-                            servicios.Expediente exp = respuestaCrm.getListaExpedientes().get(i)
+                            Expediente exp = respuestaCrm.getListaExpedientes().get(i)
                             logginService.putInfoMessage(opername+" - Expediente encontrado: " + exp.getCodigoST() + " para " + company.nombre)
 
                             String fechaCreacion = format.format(new Date())
@@ -278,7 +280,7 @@ class ExpedienteService implements IExpedienteService {
                                     && fechaCreacion != null && fechaCreacion.equals(exp.getFechaApertura())){
                                 /**Alta procesada correctamente*/
                                 encontrado = true
-                                logginService.putInfoMessage(opername+" - Nueva alta automatica de " + company.nombre + " con numero de solicitud: " + requestNumber + " procesada correctamente")
+                                logginService.putInfoMessage(opername+" - Nueva alta automatica de "+logExpediente+" procesada correctamente")
                             }
                         }
                     }
@@ -288,15 +290,29 @@ class ExpedienteService implements IExpedienteService {
 
                 /**Alta procesada pero no se ha encontrado en CRM.*/
                 if (limite == 10) {
-                    logginService.putInfoMessage(opername+" - Nueva alta de " + company.nombre + " con numero de solicitud: " + requestNumber + " se ha procesado pero no se ha dado de alta en CRM")
-                    correoUtil.envioEmailErrores(opername,"Nueva alta de " + company.nombre + " con numero de solicitud: " + requestNumber + " se ha procesado pero no se ha dado de alta en CRM",null)
-                    requestService.insertarError(company.id, requestNumber, requestBBDD.request, opername, "Peticion procesada para solicitud: " + requestNumber + ". Error: No encontrada en CRM")
+                    logginService.putInfoMessage(opername+" - Nueva alta de "+logExpediente+" se ha procesado pero no se ha dado de alta en CRM")
+                    correoUtil.envioEmailErrores(opername,"Nueva alta de "+logExpediente+" se ha procesado pero no se ha dado de alta en CRM",null)
+                    requestService.insertarError(company.id, requestNumber, requestBBDD.request, TipoOperacion.ALTA, "Peticion procesada para solicitud: "+logExpediente+". Error: No encontrada en CRM")
                 }
             } catch (Exception e) {
-                logginService.putInfoMessage(opername+" - Nueva alta de " + company.nombre + " con numero de solicitud: " + requestNumber + ". Error: " + e.getMessage())
-                correoUtil.envioEmailErrores(opername,"Nueva alta de " + company.nombre + " con numero de solicitud: " + requestNumber,e)
+                logginService.putInfoMessage(opername+" - Nueva alta de "+logExpediente+". Error: " + e.getMessage())
+                correoUtil.envioEmailErrores(opername,"Nueva alta de "+logExpediente,e)
             }
         }
+    }
+
+    private String getLogExpediente(String numPoliza, String numSolicitud, String numCertificado, String codigoStCompany) {
+        String logExpediente = codigoStCompany
+        if(numPoliza) {
+            logExpediente = logExpediente.concat(" con numPoliza: " + numPoliza)
+        }
+        if(numSolicitud) {
+            logExpediente = logExpediente.concat(" con numSolicitud: " + numSolicitud)
+        }
+        if(numCertificado) {
+            logExpediente = logExpediente.concat(" con numCertificado: " + numCertificado)
+        }
+        return logExpediente
     }
 
     private Filtro getFiltradoCRM(String numPoliza, String numSolicitud, String numCertificado, String codigoStCompany) {
