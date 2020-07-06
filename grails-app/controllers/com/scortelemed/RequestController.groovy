@@ -348,7 +348,7 @@ class RequestController {
 		def paso = true//validacionXmlService.validar(params.request, nombreXsd)
 
 		if(paso) {
-			requestInstance.request = params.request
+			requestInstance.request = params.request.trim()
 			requestInstance.errores = null
 			requestInstance.save()
 
