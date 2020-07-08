@@ -1,6 +1,8 @@
 package services
 
-import com.scor.global.WSException
+import com.scortelemed.Request
+import com.scortelemed.TipoCompany
+import com.scortelemed.TipoOperacion
 import grails.util.Environment
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
@@ -16,33 +18,26 @@ import org.apache.cxf.annotations.SchemaValidation
 import org.grails.cxf.utils.EndpointType
 import org.grails.cxf.utils.GrailsCxfEndpoint
 import org.grails.cxf.utils.GrailsCxfEndpointProperty
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.web.context.request.RequestContextHolder
 
-import servicios.ClaveFiltro
+import org.springframework.web.context.request.RequestContextHolder
 import servicios.Expediente
 import servicios.Filtro
 import servicios.RespuestaCRM
 import servicios.RespuestaCRMInforme
 
 import com.scortelemed.Company
-import com.scortelemed.Envio
 import com.scortelemed.Operacion
-import com.scortelemed.Recibido
-import com.scortelemed.schemas.caser.ConsultaExpedienteRequest;
-import com.scortelemed.schemas.caser.ConsultaExpedienteResponse;
 import com.scortelemed.schemas.netinsurance.NetinsuranteGetDossierRequest
 import com.scortelemed.schemas.netinsurance.NetinsuranteGetDossierResponse
 import com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCaseManagementRequest
 import com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCaseManagementResponse
 import com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCasesResultsRequest
 import com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCasesResultsResponse
-import com.scortelemed.schemas.netinsurance.ResultsBasicType
 import com.scortelemed.schemas.netinsurance.StatusType
 import com.ws.servicios.EstadisticasService
 import com.ws.servicios.LogginService
-import com.ws.servicios.NetinsuranceService
-import com.ws.servicios.RequestService
+import com.ws.servicios.impl.companies.NetinsuranceService
+import com.ws.servicios.impl.RequestService
 import com.ws.servicios.TarificadorService
 
 @WebService(targetNamespace = "http://www.scortelemed.com/schemas/netinsurance")
@@ -52,16 +47,12 @@ expose = EndpointType.JAX_WS,properties = [@GrailsCxfEndpointProperty(name = "ws
 @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
 class NetinsuranceUnderwrittingCaseManagementService	 {
 
-	@Autowired
-	private NetinsuranceService netinsuranceService
-	@Autowired
-	private EstadisticasService estadisticasService
-	@Autowired
-	private RequestService requestService
-	@Autowired
-	private LogginService logginService
-	@Autowired
-	private TarificadorService tarificadorService
+	def expedienteService
+	def netinsuranceService
+	def estadisticasService
+	def requestService
+	def logginService
+	def tarificadorService
 
 	@WebResult(name = "CaseManagementResponse")
 	NetinsuranteUnderwrittingCaseManagementResponse netInsuranteUnderwrittingCaseManagement(
@@ -71,11 +62,9 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 		def opername="NetinsuranceUnderwrittingCaseManagementRequest"
 		def correoUtil = new CorreoUtil()
 		def requestXML = ""
-		def crearExpedienteService
-		def requestBBDD
-		def respuestaCrm
+		Request requestBBDD
 
-		Company company = Company.findByNombre("netinsurance")
+		Company company = Company.findByNombre(TipoCompany.NET_INSURANCE.getNombre())
 		Filtro filtro = new Filtro()
 		SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
 		TransformacionUtil util = new TransformacionUtil()
@@ -92,27 +81,24 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 
 			if (operacion && operacion.activo){
 
-				if (Company.findByNombre("netinsurance").generationAutomatic) {
+				if (company.generationAutomatic) {
 
-					requestXML=netinsuranceService.marshall("http://www.scortelemed.com/schemas/netinsurance",netInsuranteUnderwrittingCaseManagement)
+					requestXML=netinsuranceService.marshall(netInsuranteUnderwrittingCaseManagement)
 					requestBBDD = requestService.crear(opername,requestXML)
-					requestBBDD.fecha_procesado = new Date()
-					requestBBDD.save(flush:true)
-					netinsuranceService.crearExpediente(requestBBDD)
 
-					message = "Il caso � stato elaborato correttamente";
+					expedienteService.crearExpediente(requestBBDD, TipoCompany.NET_INSURANCE)
+
+					message = "Il caso � stato elaborato correttamente"
 					status = StatusType.OK
 
-					netinsuranceService.insertarRecibido(company, netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber, requestXML.toString(), "ALTA")
+					requestService.insertarRecibido(company, netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber, requestXML.toString(), TipoOperacion.ALTA)
 
-					/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
-					 *
-					 */
-					netinsuranceService.busquedaCrm(netInsuranteUnderwrittingCaseManagement.candidateInformation.policyNumber, netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber, company.ou, opername, company.codigoSt, company.id, requestBBDD, company.nombre)
+					/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado*/
+					expedienteService.busquedaCrm(requestBBDD, company, netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber, null, null)
 				}
 			} else {
 
-				message = "L'operazione viene disattivata temporaneamente";
+				message = "L'operazione viene disattivata temporaneamente"
 				status = StatusType.OK
 
 				logginService.putInfoEndpoint("GestionReconocimientoMedico","Esta operacion para " + company.nombre + " esta desactivada temporalmente")
@@ -120,10 +106,10 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 			}
 		} catch (Exception e){
 
-			message = "Error: " + e.printStackTrace();
+			message = "Error: " + e.printStackTrace()
 			status = StatusType.ERROR
 
-			netinsuranceService.insertarError(company, netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber, requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber + ". Error: " + e.getMessage())
+			requestService.insertarError(company, netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber, requestXML.toString(), TipoOperacion.ALTA, "Peticion no realizada para solicitud: " + netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber + ". Error: " + e.getMessage())
 
 			logginService.putErrorEndpoint("GestionReconocimientoMedico","Peticion no realizada de " + company.nombre + " con numero de solicitud: " + netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber + ". Error: " + e.getMessage())
 			correoUtil.envioEmailErrores("GestionReconocimientoMedico","Peticion de " + company.nombre + " con numero de solicitud: " + netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber,e.getMessage())
@@ -148,7 +134,8 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 
 		def opername="NetinsuranceUnderwrittingCaseManagementResponse"
 		def requestXML = ""
-		List<RespuestaCRMInforme> expedientes = new ArrayList<RespuestaCRMInforme>();
+		Request requestBBDD
+		List<RespuestaCRMInforme> expedientes = new ArrayList<RespuestaCRMInforme>()
 		TransformacionUtil util = new TransformacionUtil()
 		CorreoUtil correoUtil = new CorreoUtil()
 
@@ -157,7 +144,7 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 
 		NetinsuranteUnderwrittingCasesResultsResponse resultado =new NetinsuranteUnderwrittingCasesResultsResponse()
 
-		Company company = Company.findByNombre("netinsurance")
+		Company company = Company.findByNombre(TipoCompany.NET_INSURANCE.getNombre())
 
 		try{
 
@@ -169,26 +156,19 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 
 				if (netInsuranteUnderwrittingCasesResults && netInsuranteUnderwrittingCasesResults.dateStart && netInsuranteUnderwrittingCasesResults.dateEnd){
 
-					requestXML=netinsuranceService.marshall("http://www.scortelemed.com/schemas/netinsurance",netInsuranteUnderwrittingCasesResults)
-
-					requestService.crear(opername,requestXML)
+					requestXML=netinsuranceService.marshall(netInsuranteUnderwrittingCasesResults)
+					requestBBDD=requestService.crear(opername,requestXML)
 
 					Date date = netInsuranteUnderwrittingCasesResults.dateStart.toGregorianCalendar().getTime()
-					SimpleDateFormat sdfr = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
-					String fechaIni = sdfr.format(date);
+					SimpleDateFormat sdfr = new SimpleDateFormat("yyyyMMdd HH:mm:ss")
+					String fechaIni = sdfr.format(date)
 					date = netInsuranteUnderwrittingCasesResults.dateEnd.toGregorianCalendar().getTime()
-					String fechaFin = sdfr.format(date);
+					String fechaFin = sdfr.format(date)
 
+					expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt,null,1,fechaIni,fechaFin,company.ou))
+					expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt,null,2,fechaIni,fechaFin,company.ou))
 
-					for (int i = 1; i < 3; i++){
-						if (Environment.current.name.equals("production_wildfly")) {
-							expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1062",null,i,fechaIni,fechaFin,"IT"))
-						} else {
-							expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1060",null,i,fechaIni,fechaFin,"IT"))
-						}
-					}
-
-					netinsuranceService.insertarEnvio(company, netInsuranteUnderwrittingCasesResults.dateStart.toString().substring(0,10) + "-" + netInsuranteUnderwrittingCasesResults.dateEnd.toString().substring(0,10), requestXML.toString())
+					requestService.insertarEnvio(company, netInsuranteUnderwrittingCasesResults.dateStart.toString().substring(0,10) + "-" + netInsuranteUnderwrittingCasesResults.dateEnd.toString().substring(0,10), requestXML.toString())
 
 					if(expedientes){
 
@@ -232,7 +212,7 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 			logginService.putErrorEndpoint("ResultadoReconocimientoMedico","Peticion realizada para " + company.nombre + " con fecha: " + netInsuranteUnderwrittingCasesResults.dateStart.toString() + "-" + netInsuranteUnderwrittingCasesResults.dateEnd.toString() + ". Error: " + e.getMessage())
 			correoUtil.envioEmailErrores("ResultadoReconocimientoMedico","Peticion realizada para " + company.nombre + " con fecha: " + netInsuranteUnderwrittingCasesResults.dateStart.toString() + "-" + netInsuranteUnderwrittingCasesResults.dateEnd.toString() + ". Error: " + e.getMessage())
 
-			netinsuranceService.insertarError(company, netInsuranteUnderwrittingCasesResults.dateStart.toString().substring(0,10) + "-" + netInsuranteUnderwrittingCasesResults.dateEnd.toString().substring(0,10), requestXML.toString(), "CONSULTA", "Peticion no realizada para solicitud: " + netInsuranteUnderwrittingCasesResults.dateStart.toString() + "-" + netInsuranteUnderwrittingCasesResults.dateEnd.toString() + ". Error: " + e.getMessage())
+			requestService.insertarError(company, netInsuranteUnderwrittingCasesResults.dateStart.toString().substring(0,10) + "-" + netInsuranteUnderwrittingCasesResults.dateEnd.toString().substring(0,10), requestXML.toString(), TipoOperacion.CONSULTA, "Peticion no realizada para solicitud: " + netInsuranteUnderwrittingCasesResults.dateStart.toString() + "-" + netInsuranteUnderwrittingCasesResults.dateEnd.toString() + ". Error: " + e.getMessage())
 		}finally{
 
 			def sesion=RequestContextHolder.currentRequestAttributes().getSession()
@@ -256,15 +236,15 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 
 		def opername="NetinsuranteGetDossier"
 		def requestXML = ""
-
+		Request requestBBDD
 		String notes = null
 		StatusType status = null
 
-		RespuestaCRM respuestaCRM = new RespuestaCRM();
+		RespuestaCRM respuestaCRM = new RespuestaCRM()
 		TransformacionUtil util = new TransformacionUtil()
 		CorreoUtil correoUtil = new CorreoUtil()
 
-		Company company = Company.findByNombre("netinsurance")
+		Company company = Company.findByNombre(TipoCompany.NET_INSURANCE.getNombre())
 
 		logginService.putInfoMessage("Realizando peticion de informacion de servicio ConsultaExpediente para la cia " + company.nombre)
 
@@ -276,13 +256,12 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 
 				if (consultaExpediente && consultaExpediente.requestNumber) {
 
-					requestXML=netinsuranceService.marshall("http://www.scortelemed.com/schemas/caser",consultaExpediente)
-
-					requestService.crear(opername,requestXML)
+					requestXML=netinsuranceService.marshall(consultaExpediente)
+					requestBBDD=requestService.crear(opername,requestXML)
 
 					logginService.putInfoEndpoint("ConsultaExpediente","Realizando peticion para " + company.nombre + " con numero de expiente: " + consultaExpediente.requestNumber)
-					respuestaCRM = tarificadorService.consultaExpedienteNumSolicitud(consultaExpediente.requestNumber, company.ou.toString() ,company.codigoSt)
-					netinsuranceService.insertarEnvio (company, consultaExpediente.requestNumber, requestXML.toString())
+					respuestaCRM = expedienteService.consultaExpedienteNumSolicitud(consultaExpediente.requestNumber, company.ou.toString() ,company.codigoSt)
+					requestService.insertarEnvio (company, consultaExpediente.requestNumber, requestXML.toString())
 					if(respuestaCRM != null && respuestaCRM.getListaExpedientes() != null){
 
 						for (int i = 0; i < respuestaCRM.getListaExpedientes().size(); i++){
@@ -332,7 +311,7 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 			notes = "Errore in ConsultaExpediente: " + e.getMessage()
 			status = StatusType.ERROR
 
-			netinsuranceService.insertarError(company, consultaExpediente.requestNumber, requestXML.toString(), "CONSULTA", "Peticion no realizada para solicitud: " + consultaExpediente.requestNumber + ". Error: " + e.getMessage())
+			requestService.insertarError(company, consultaExpediente.requestNumber, requestXML.toString(), TipoOperacion.CONSULTA, "Peticion no realizada para solicitud: " + consultaExpediente.requestNumber + ". Error: " + e.getMessage())
 		}finally{
 			//BORRAMOS VARIABLES DE SESION
 			def sesion=RequestContextHolder.currentRequestAttributes().getSession()

@@ -1,5 +1,7 @@
 package services
 
+import com.scortelemed.Request
+import com.scortelemed.TipoCompany
 import org.grails.cxf.utils.EndpointType
 import org.grails.cxf.utils.GrailsCxfEndpoint
 import org.grails.cxf.utils.GrailsCxfEndpointProperty
@@ -10,13 +12,12 @@ import com.ws.lifesquare.beans.LifesquareUnderwrittingCasesResultsRequest
 import com.ws.lifesquare.beans.LifesquareUnderwrittingCasesResultsResponse
 import com.ws.lifesquare.beans.TuwCase
 import com.scortelemed.Company
-import com.scortelemed.Envio
 
 import hwsol.webservices.CorreoUtil
 
 import java.text.SimpleDateFormat
 
-import javax.jws.WebMethod;
+import javax.jws.WebMethod
 import javax.jws.WebParam
 import javax.jws.WebResult
 import javax.jws.WebService
@@ -24,7 +25,6 @@ import javax.jws.soap.SOAPBinding
 
 import org.apache.cxf.annotations.SchemaValidation
 import org.springframework.web.context.request.RequestContextHolder
-import org.springframework.security.core.context.SecurityContextHolder
 
 @WebService(targetNamespace = "http://www.scortelemed.com/schemas/lifesquare")
 @SchemaValidation
@@ -35,6 +35,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 class LifesquareUnderwrittingCasesResultsService {
 	
 	def requestService
+	def expedienteService
 	def estadisticasService
 	def tarificadorService
 	def logginService
@@ -48,9 +49,9 @@ class LifesquareUnderwrittingCasesResultsService {
 		def opername = "LifesquareUnderwrittingCasesResultsRequest"
 		def correoUtil = new CorreoUtil()
 		def requestXML = ""
-		def requestBBDD
+		Request requestBBDD
 		def expedientes
-		def company = Company.findByNombre('lifesquare')
+		def company = Company.findByNombre(TipoCompany.ZEN_UP.getNombre())
 		
 		LifesquareUnderwrittingCasesResultsResponse result=new LifesquareUnderwrittingCasesResultsResponse()
 		logginService.putInfoEndpoint("Endpoint-"+opername,"Peticion para fecha: " + LifesquareUnderwrittingCasesResultsRequest.date)
@@ -62,26 +63,19 @@ class LifesquareUnderwrittingCasesResultsService {
 				
 				requestXML=requestService.marshall(LifesquareUnderwrittingCasesResultsRequest,LifesquareUnderwrittingCasesResultsRequest.class)
 				requestBBDD = requestService.crear(opername,requestXML)
-				requestBBDD.fecha_procesado = new Date()
-				requestBBDD.save(flush:true)
 				
 				//PARSEAMOS LA FECHA
-				def fechaHora = new SimpleDateFormat("yyyyMMdd HH:mm");
-				String convertido = fechaHora.format(LifesquareUnderwrittingCasesResultsRequest.date);
+				def fechaHora = new SimpleDateFormat("yyyyMMdd HH:mm")
+				String convertido = fechaHora.format(LifesquareUnderwrittingCasesResultsRequest.date)
 				def fechaFin = convertido
 				fechaFin= fechaFin.toString()+":00"
-				Calendar fecha = Calendar.getInstance();
+				Calendar fecha = Calendar.getInstance()
 				fecha.setTime(LifesquareUnderwrittingCasesResultsRequest.date)
 				fecha.add(Calendar.MINUTE , -120)
 				def fechaIni = fecha.getTime().format ('yyyyMMdd HH:mm')
 				fechaIni= fechaIni.toString()+":00"
-				
-				//OBTENEMOS TODOS LOS EXPEDIENTES DESDE FECHAINI A FECHAFIN			
-				if (Environment.current.name.equals("production_wildfly")) {
-					expedientes=tarificadorService.obtenerInformeExpedientes("1043",null,1,fechaIni,fechaFin,"FR")
-				} else {
-					expedientes=tarificadorService.obtenerInformeExpedientes("1053",null,1,fechaIni,fechaFin,"FR") 
-				}
+
+				expedientes=expedienteService.obtenerInformeExpedientes(company.codigoSt,null,1,fechaIni,fechaFin,company.ou)
 				
 				StringBuilder sbInfo = new StringBuilder ("Realizando proceso envio de informacion para " + company.nombre + " con fecha ")
 				sbInfo.append(fechaIni).append("-").append(fechaIni)
@@ -103,14 +97,9 @@ class LifesquareUnderwrittingCasesResultsService {
 					
 					
 					listTuwCases.each { caso ->
-						Envio envio = new Envio()
-						envio.setFecha(new Date())
-						envio.setCia(company.id.toString())
-						envio.setIdentificador(caso.policy_number!=null?caso.policy_number:caso.reference_number)
-						envio.setInfo("")
-						envio.save(flush:true)
-						
-						logginService.putInfoMessage("Informacion expediente " + envio.getIdentificador() + " enviado a " + company.nombre + " correctamente")
+						String identificador = caso.policy_number!=null?caso.policy_number:caso.reference_number
+						requestService.insertarEnvio(company, identificador, requestXML.toString())
+						logginService.putInfoMessage("Informacion expediente " + identificador + " enviado a " + company.nombre + " correctamente")
 						
 					}
 					

@@ -1,111 +1,79 @@
-package com.ws.servicios
+package com.ws.servicios.impl.companies
 
-import javax.xml.bind.JAXBContext
-import javax.xml.bind.JAXBElement
-import javax.xml.bind.Marshaller
-import javax.xml.namespace.QName
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.DocumentBuilder;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Node;
-import org.w3c.dom.Element;
-import org.xml.sax.InputSource
-import java.io.File;
-import java.text.SimpleDateFormat
-import com.scor.srpfileinbound.DATOS
-import com.scor.srpfileinbound.REGISTRODATOS
-import com.scor.srpfileinbound.RootElement
-import hwsol.webservices.CorreoUtil
-import hwsol.webservices.TransformacionUtil
 import com.scor.global.ExceptionUtils
 import com.scor.global.WSException
-import org.apache.axis.types.Token
-import com.scortelemed.Conf
+import com.scor.srpfileinbound.DATOS
+import com.scor.srpfileinbound.REGISTRODATOS
+import com.scortelemed.Company
+import com.scortelemed.Request
+import com.scortelemed.TipoOperacion
 import com.ws.cajamar.beans.CajamarUnderwrittingCaseManagementRequest
 import com.ws.cajamar.beans.ConsolidacionPolizaRequest
-import static grails.async.Promises.*
+import com.ws.servicios.ICompanyService
+import hwsol.webservices.CorreoUtil
+import hwsol.webservices.TransformacionUtil
+import org.w3c.dom.Document
+import org.w3c.dom.Element
+import org.w3c.dom.Node
+import org.w3c.dom.NodeList
+import org.xml.sax.InputSource
 
-class CajamarService {
+import javax.xml.parsers.DocumentBuilder
+import javax.xml.parsers.DocumentBuilderFactory
+import java.text.SimpleDateFormat
+
+class CajamarService implements ICompanyService{
 
 	TransformacionUtil transformacion = new TransformacionUtil()
+	def requestService
+	def expedienteService
 	def tarificadorService
 	def grailsApplication
-	def logginService = new LogginService()
+	def logginService
 
+	/**
+	 * CAJAMAR  (Beans, sin namespace)
+	 */
 
-	def crearExpediente = { req ->
-		try {
-			//SOBREESCRIBIMOS LA URL A LA QUE TIENE QUE LLAMAR EL WSDL
-			def ctx = grailsApplication.mainContext
-			def bean = ctx.getBean("soapClientCrearOrabpel")
-			bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("orabpelCreacion.wsdl")?.value)
-			def salida = grailsApplication.mainContext.soapClientCrearOrabpel.initiate(crearExpedienteBPM(req))
-			return "OK"
-		} catch (Exception e) {
-			throw new WSException(this.getClass(), "crearExpediente", ExceptionUtils.composeMessage(null, e));
+	String marshall(def objeto) {
+		String nameSpace = "http://www.scortelemed.com/schemas/cajamar"
+		String result
+		try{
+			if (objeto instanceof CajamarUnderwrittingCaseManagementRequest){
+				result = requestService.marshall(nameSpace, objeto, CajamarUnderwrittingCaseManagementRequest.class)
+			} else if (objeto instanceof ConsolidacionPolizaRequest){
+				result = requestService.marshall(nameSpace, objeto, ConsolidacionPolizaRequest.class)
+			}
+		} finally {
+			return result
 		}
 	}
 
-	private def crearExpedienteBPM = { req ->
-		def listadoFinal = []
-		RootElement payload = new RootElement()
 
-		listadoFinal.add(buildCabecera(req))
-		listadoFinal.add(buildDatos(req, req.company))
-		listadoFinal.add(buildPie())
-
-		payload.cabeceraOrDATOSOrPIE = listadoFinal
-
-		return payload
-	}
-
-	private def buildCabecera = { req ->
-		def formato = new SimpleDateFormat("yyyyMMdd");
-		RootElement.CABECERA cabecera = new RootElement.CABECERA()
-		cabecera.setCodigoCia(req.company.codigoSt)
-		cabecera.setContadorSecuencial("1")
-		cabecera.setFechaGeneracion(formato.format(new Date()))
-		cabecera.setFiller("")
-		cabecera.setTipoFichero("1")
-
-		return cabecera
-	}
-
-	private def buildPie = {
-
-		RootElement.PIE pie = new RootElement.PIE()
-		pie.setFiller("")
-		pie.setNumFilasFichero(100)
-
-		pie.setNumRegistros(1)
-
-		return pie
-	}
-
-
-	private def buildDatos = { req, company ->
-
+	def buildDatos(Request req, String codigoSt) {
 		try {
-
 			DATOS dato = new DATOS()
-
+			Company company = req.company
 			dato.registro = rellenaDatos(req, company)
 			dato.pregunta = rellenaPreguntas(req, company.nombre)
 			dato.servicio = rellenaServicios(req, company.nombre)
 			dato.coberturas = rellenaCoberturas(req)
-
 			return dato
 		} catch (Exception e) {
 			logginService.putError(e.toString())
 		}
 	}
 
-	public def rellenaDatos (req, company) {
+
+	def getCodigoStManual(Request req) {
+		return null //No tiene particularidades
+	}
+
+	def rellenaDatos (req, company) {
 
 		def mapDatos = [:]
 		def listadoPreguntas = []
-		def formato = new SimpleDateFormat("yyyyMMdd");
+		def formato = new SimpleDateFormat("yyyyMMdd")
 		def apellido1
 		def apellido2
 		def codigoCliente
@@ -139,7 +107,7 @@ class CajamarService {
 
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-					Element eElement = (Element) nNode;
+					Element eElement = (Element) nNode
 
 					/**NUMERO DE REFERENCIA
 					 *
@@ -310,10 +278,9 @@ class CajamarService {
 				return datos
 			}
 		} catch (Exception e) {
-			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
 		}
 	}
-
 
 	private void setCamposGenericos(REGISTRODATOS datos) {
 
@@ -349,9 +316,6 @@ class CajamarService {
 		datos.campo20 = ""
 	}
 
-
-
-
 	private def rellenaPreguntas (req, nameCompany) {
 
 		def listadoPreguntas = []
@@ -374,7 +338,7 @@ class CajamarService {
 
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-					Element eElement = (Element) nNode;
+					Element eElement = (Element) nNode
 
 
 					/**PREGUNTAS PREVIAS
@@ -458,12 +422,17 @@ class CajamarService {
 						pregunta.respuesta = eElement.getElementsByTagName("estatu").item(0).getTextContent()
 						listadoPreguntas.add(pregunta)
 					}
+					DATOS.Pregunta preguntaDeporte = new DATOS.Pregunta()
+					preguntaDeporte.codigoPregunta = "13"
+					preguntaDeporte.tipoDatos = "BOLEAN"
+					preguntaDeporte.respuesta = doc.getElementsByTagName("deportType").item(0) ? "SI" : "NO"
+					listadoPreguntas.add(preguntaDeporte)
 				}
 			}
 
 			return listadoPreguntas
 		} catch (Exception e) {
-			throw new WSException(this.getClass(), "rellenaPreguntas", ExceptionUtils.composeMessage(null, e));
+			throw new WSException(this.getClass(), "rellenaPreguntas", ExceptionUtils.composeMessage(null, e))
 		}
 	}
 
@@ -489,7 +458,7 @@ class CajamarService {
 
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-					Element eElement = (Element) nNode;
+					Element eElement = (Element) nNode
 
 					DATOS.Coberturas cobertura = new DATOS.Coberturas()
 
@@ -552,7 +521,7 @@ class CajamarService {
 
 			return listadoServicios
 		} catch (Exception e) {
-			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
 		}
 	}
 
@@ -577,7 +546,7 @@ class CajamarService {
 
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-					Element eElement = (Element) nNode;
+					Element eElement = (Element) nNode
 
 					/**NUMERO DE REFERENCIA
 					 *
@@ -598,7 +567,7 @@ class CajamarService {
 
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-					Element eElement = (Element) nNode;
+					Element eElement = (Element) nNode
 
 					DATOS.Coberturas cobertura = new DATOS.Coberturas()
 
@@ -621,117 +590,11 @@ class CajamarService {
 
 			return listadoCoberturas
 		} catch (Exception e) {
-			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
 		}
 	}
 
-	def consultaExpediente = { ou, filtro ->
-
-		try {
-
-			def ctx = grailsApplication.mainContext
-			def bean = ctx.getBean("soapClientAlptis")
-			bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY,Conf.findByName("frontal.wsdl")?.value)
-
-			def salida=grailsApplication.mainContext.soapClientAlptis.consultaExpediente(tarificadorService.obtenerUsuarioFrontal(ou),filtro)
-
-			return salida
-		} catch (Exception e) {
-			logginService.putError("obtenerInformeExpedientes de Cajamar","No se ha podido obtener el informe de expediente : " + e)
-			return null
-		}
-	}
-
-	def busquedaCrm (numref, ou, opername, comapanyCodigoSt, companyId, requestBBDD) {
-
-		task {
-
-			logginService.putInfoMessage("Buscando en CRM solicitud de Cajamar con requestNumber: " + numref.toString())
-
-			def respuestaCrm
-			int limite = 0;
-			boolean encontrado = false;
-
-
-			servicios.Filtro filtro = new servicios.Filtro()
-			SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
-			CorreoUtil correoUtil = new CorreoUtil()
-
-			Thread.sleep(90000);
-
-			try {
-
-				while( !encontrado && limite < 10) {
-
-					filtro.setClave(servicios.ClaveFiltro.CLIENTE);
-					filtro.setValor(comapanyCodigoSt.toString());
-					servicios.Filtro filtroRelacionado = new servicios.Filtro()
-					filtroRelacionado.setClave(servicios.ClaveFiltro.NUM_SOLICITUD)
-					filtroRelacionado.setValor(numref.toString())
-					filtro.setFiltroRelacionado(filtroRelacionado)
-
-					respuestaCrm = consultaExpediente(ou.toString(),filtro)
-
-					if (respuestaCrm != null && respuestaCrm.getListaExpedientes() != null && respuestaCrm.getListaExpedientes().size() > 0) {
-
-						for (int i = 0; i < respuestaCrm.getListaExpedientes().size(); i++) {
-
-							servicios.Expediente exp = respuestaCrm.getListaExpedientes().get(i)
-
-							String fechaCreacion = format.format(new Date());
-
-							if (exp.getCandidato() != null && exp.getCandidato().getCompanya() != null && exp.getCandidato().getCompanya().getCodigoST().equals(comapanyCodigoSt.toString()) &&
-							exp.getNumSolicitud() != null && exp.getNumSolicitud().equals(numref.toString()) && fechaCreacion != null && fechaCreacion.equals(exp.getFechaApertura())){
-
-								/**Alta procesada correctamente
-								 *
-								 */
-
-								encontrado = true
-							}
-						}
-					}
-
-					if (encontrado) {
-
-						logginService.putInfoMessage("Nueva alta automatica de Cajamar con numero de solicitud: " + numref.toString() + " procesada correctamente")
-					}
-
-					limite++
-					Thread.sleep(10000)
-				}
-
-				/**Alta procesada pero no se ha encontrado en CRM.
-				 *
-				 */
-				if (limite == 10) {
-
-					logginService.putInfoMessage("Nueva alta de Cajamar con numero de solicitud: " + numref.toString() + " se ha procesado pero no se ha dado de alta en CRM")
-					correoUtil.envioEmailErrores("BusquedaExpedienteCrm","Nueva alta de Cajamar con numero de solicitud: " + numref.toString() + " se ha procesado pero no se ha dado de alta en CRM",null)
-
-
-					/**Metemos en errores
-					 *
-					 */
-					com.scortelemed.Error error = new com.scortelemed.Error()
-					error.setFecha(new Date())
-					error.setCia(companyId.toString())
-					error.setIdentificador(numref.toString())
-					error.setInfo(requestBBDD.request)
-					error.setOperacion("ALTA")
-					error.setError("Peticion procesada para numero de solictud: " + numref.toString() + ". No encontrada en CRM")
-					error.save(flush:true)
-				}
-			} catch (Exception e) {
-
-				logginService.putErrorMessage("Nueva alta de Cajamar con numero de solicitud: " + numref.toString() + " no se ha procesado: Motivo: " + e.getMessage())
-				correoUtil.envioEmailErrores(opername,"Nueva alta de Cajamar con numero de solicitud: " + numref.toString() + " no se ha procesado: Motivo: " + e.getMessage(),null)
-			}
-		}
-	}
-
-
-	public String obtenerCobertura(String producto, String codigoCajamar){
+	String obtenerCobertura(String producto, String codigoCajamar){
 
 		def codigoCRM
 
@@ -950,35 +813,4 @@ class CajamarService {
 		return codigoCRM
 	}
 
-	def marshall (nameSpace, clase){
-
-		StringWriter writer = new StringWriter();
-
-		try{
-
-			JAXBContext jaxbContext = JAXBContext.newInstance(clase.class);
-			Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-
-			jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-			def root = null
-			QName qName = null
-			
-			if (clase instanceof CajamarUnderwrittingCaseManagementRequest){
-				qName = new QName(nameSpace, "CajamarUnderwrittingCaseManagementRequest");
-				root = new JAXBElement<CajamarUnderwrittingCaseManagementRequest>(qName, CajamarUnderwrittingCaseManagementRequest.class, clase);
-			}
-
-			if (clase instanceof ConsolidacionPolizaRequest){
-				qName = new QName(nameSpace, "ConsolidacionPolizaRequest");
-				root = new JAXBElement<ConsolidacionPolizaRequest>(qName, ConsolidacionPolizaRequest.class, clase);
-			}
-
-			jaxbMarshaller.marshal(root, writer);
-			String result = writer.toString();
-		} finally {
-			writer.close();
-		}
-
-		return writer
-	}
 }

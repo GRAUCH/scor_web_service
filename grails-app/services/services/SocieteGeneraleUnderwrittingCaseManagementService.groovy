@@ -1,5 +1,8 @@
 package services
 
+import com.scortelemed.Request
+import com.scortelemed.TipoCompany
+import com.scortelemed.TipoOperacion
 import grails.util.Environment
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
@@ -15,15 +18,13 @@ import org.apache.cxf.annotations.SchemaValidation
 import org.grails.cxf.utils.EndpointType
 import org.grails.cxf.utils.GrailsCxfEndpoint
 import org.grails.cxf.utils.GrailsCxfEndpointProperty
-import org.springframework.beans.factory.annotation.Autowired
+
 import org.springframework.web.context.request.RequestContextHolder
 
 import servicios.Filtro
 
 import com.scortelemed.Company
-import com.scortelemed.Envio
 import com.scortelemed.Operacion
-import com.scortelemed.Recibido
 import com.scortelemed.schemas.societegenerale.SocieteGeneraleUnderwrittingCaseManagementRequest
 import com.scortelemed.schemas.societegenerale.SocieteGeneraleUnderwrittingCaseManagementResponse
 import com.scortelemed.schemas.societegenerale.SocieteGeneraleUnderwrittingCasesResultsRequest
@@ -31,8 +32,8 @@ import com.scortelemed.schemas.societegenerale.SocieteGeneraleUnderwrittingCases
 import com.scortelemed.schemas.societegenerale.StatusType
 import com.ws.servicios.EstadisticasService
 import com.ws.servicios.LogginService
-import com.ws.servicios.RequestService
-import com.ws.servicios.SocieteGeneraleService
+import com.ws.servicios.impl.RequestService
+import com.ws.servicios.impl.companies.SocieteGeneraleService
 import com.ws.servicios.TarificadorService
 
 @WebService(targetNamespace = "http://www.scortelemed.com/schemas/societeGenerale")
@@ -41,17 +42,13 @@ import com.ws.servicios.TarificadorService
 expose = EndpointType.JAX_WS,properties = [@GrailsCxfEndpointProperty(name = "ws-security.enable.nonce.cache", value = "false"), @GrailsCxfEndpointProperty(name = "ws-security.enable.timestamp.cache", value = "false")])
 @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
 class SocieteGeneraleUnderwrittingCaseManagementService	 {
-	
-	@Autowired
-	private SocieteGeneraleService societeGeneraleService
-	@Autowired
-	private EstadisticasService estadisticasService
-	@Autowired
-	private RequestService requestService
-	@Autowired
-	private LogginService logginService
-	@Autowired
-	private TarificadorService tarificadorService
+
+	def requestService
+	def expedienteService
+	def societeGeneraleService
+	def estadisticasService
+	def logginService
+	def tarificadorService
 
 	@WebResult(name = "CaseManagementResponse")
 	SocieteGeneraleUnderwrittingCaseManagementResponse societeGeneraleUnderwrittingCaseManagement(
@@ -60,12 +57,10 @@ class SocieteGeneraleUnderwrittingCaseManagementService	 {
 
 		def opername="SocieteGeneraleUnderwrittingCaseManagementRequest"
 		def correoUtil = new CorreoUtil()
-		def requestXML = ""
-		def crearExpedienteService
-		def requestBBDD
-		def respuestaCrm
-		
-		Company company = Company.findByNombre("societeGenerale")
+		def requestXML
+		Request requestBBDD
+
+		Company company = Company.findByNombre(TipoCompany.SOCIETE_GENERALE.getNombre())
 		Filtro filtro = new Filtro()
 		SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
 		TransformacionUtil util = new TransformacionUtil()
@@ -78,30 +73,17 @@ class SocieteGeneraleUnderwrittingCaseManagementService	 {
 			def operacion = estadisticasService.obtenerObjetoOperacion(opername)
 
 			if (operacion && operacion.activo){
-				requestXML=societeGeneraleService.marshall("http://www.scortelemed.com/schemas/netinsurance",societeGeneraleUnderwrittingCaseManagement)
+				requestXML=societeGeneraleService.marshall(societeGeneraleUnderwrittingCaseManagement)
 				requestBBDD = requestService.crear(opername,requestXML)
-				requestBBDD.fecha_procesado = new Date()
-				requestBBDD.save(flush:true)
-				societeGeneraleService.crearExpediente(requestBBDD)
+
+				expedienteService.crearExpediente(requestBBDD, TipoCompany.SOCIETE_GENERALE)
 				resultado.setMessage("The case has been successfully processed")
 				resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 				resultado.setStatus(StatusType.OK)
-				
-				/**Metemos en recibidos
-				 *
-				 */
-				Recibido recibido = new Recibido()
-				recibido.setFecha(new Date())
-				recibido.setCia(company.id.toString())
-				recibido.setIdentificador(societeGeneraleUnderwrittingCaseManagement.candidateInformation.requestNumber)
-				recibido.setInfo(requestBBDD.request)
-				recibido.setOperacion("ALTA")
-				recibido.save(flush:true)
-				
-				/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
-				 *
-				 */
-				societeGeneraleService.busquedaCrm(societeGeneraleUnderwrittingCaseManagement.candidateInformation.requestNumber, company.ou, opername, company.codigoSt, company.id, requestBBDD)
+				requestService.insertarRecibido(company, societeGeneraleUnderwrittingCaseManagement.candidateInformation.requestNumber, requestBBDD.request, TipoOperacion.ALTA)
+
+				/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado*/
+				expedienteService.busquedaCrm(requestBBDD, company, societeGeneraleUnderwrittingCaseManagement.candidateInformation.requestNumber, null, null)
 				
 			} else {	
 				
@@ -119,19 +101,8 @@ class SocieteGeneraleUnderwrittingCaseManagementService	 {
 			resultado.setMessage("Error: " + e.printStackTrace())
 			resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 			resultado.setStatus(StatusType.ERROR)
-			
-			/**Metemos en errores
-			 *
-			 */
-			com.scortelemed.Error error = new com.scortelemed.Error()
-			error.setFecha(new Date())
-			error.setCia(company.id.toString())
-			error.setIdentificador(societeGeneraleUnderwrittingCaseManagement.candidateInformation.requestNumber)
-			error.setInfo(requestBBDD.request)
-			error.setOperacion("ALTA")
-			error.setError("Peticion no realizada para solicitud: " + societeGeneraleUnderwrittingCaseManagement.candidateInformation.requestNumber + ". Error: "+e.getMessage())
-			error.save(flush:true)
-			
+			requestService.insertarError(company, societeGeneraleUnderwrittingCaseManagement.candidateInformation.requestNumber, requestBBDD.request, TipoOperacion.ALTA, "Peticion no realizada para solicitud: " + societeGeneraleUnderwrittingCaseManagement.candidateInformation.requestNumber + ". Error: "+e.getMessage())
+
 		}finally{
 			
 			def sesion=RequestContextHolder.currentRequestAttributes().getSession()
@@ -151,12 +122,10 @@ class SocieteGeneraleUnderwrittingCaseManagementService	 {
 		def correoUtil = new CorreoUtil()
 		def requestXML = ""
 		def expedientes
-		def company = Company.findByNombre('simplefr')
+		def company = Company.findByNombre(TipoCompany.SOCIETE_GENERALE.getNombre())
 		def estadisticasService = new EstadisticasService()
-		def requestService = new RequestService()
-		def tarificadorService = new TarificadorService()
 		def logginService = new LogginService()
-		def requestBBDD
+		Request requestBBDD
 		
 		TransformacionUtil util = new TransformacionUtil()
 		
@@ -170,33 +139,18 @@ class SocieteGeneraleUnderwrittingCaseManagementService	 {
 			
 			if(operacion && operacion.activo && societeGeneraleUnderwrittingCasesResults && societeGeneraleUnderwrittingCasesResults.dateStart && societeGeneraleUnderwrittingCasesResults.dateEnd){
 
-				requestXML=societeGeneraleService.marshall("http://www.scortelemed.com/schemas/societeGenerale",societeGeneraleUnderwrittingCasesResults)
-
-				requestService.crear(opername,requestXML)
+				requestXML=societeGeneraleService.marshall(societeGeneraleUnderwrittingCasesResults)
+				requestBBDD=requestService.crear(opername,requestXML)
 
 				Date date = societeGeneraleUnderwrittingCasesResults.dateStart.toGregorianCalendar().getTime()
-				SimpleDateFormat sdfr = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
-				String fechaIni = sdfr.format(date);
+				SimpleDateFormat sdfr = new SimpleDateFormat("yyyyMMdd HH:mm:ss")
+				String fechaIni = sdfr.format(date)
 				date = societeGeneraleUnderwrittingCasesResults.dateEnd.toGregorianCalendar().getTime()
-				String fechaFin = sdfr.format(date);
-				
-				/**Metemos en enviados
-				 *
-				 */
-				Envio envio = new Envio()
-				envio.setFecha(new Date())
-				envio.setCia(company.id.toString())
-				envio.setIdentificador(societeGeneraleUnderwrittingCasesResults.dateStart.toString() + "-" + societeGeneraleUnderwrittingCasesResults.dateEnd.toString())
-				envio.setInfo(requestXML.toString())
-				envio.save(flush:true)
+				String fechaFin = sdfr.format(date)
+				requestService.insertarEnvio(company, societeGeneraleUnderwrittingCasesResults.dateStart.toString() + "-" + societeGeneraleUnderwrittingCasesResults.dateEnd.toString(), requestXML.toString())
 
-				for (int i = 1; i < 3; i++){
-					if (Environment.current.name.equals("production_wildfly")) {
-						expedientes.addAll(tarificadorService.obtenerInformeExpedientes("xxxx",null,i,fechaIni,fechaFin,"FR"))
-					} else {
-						expedientes.addAll(tarificadorService.obtenerInformeExpedientes("xxxx",null,i,fechaIni,fechaFin,"FR"))
-					}
-				}
+				expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt,null,1,fechaIni,fechaFin,company.ou))
+				expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt,null,2,fechaIni,fechaFin,company.ou))
 
 				if(expedientes){
 
@@ -234,16 +188,8 @@ class SocieteGeneraleUnderwrittingCaseManagementService	 {
 			resultado.setNotes("Errore nel " + opername + ": " + e.getMessage())
 			resultado.setDate(societeGeneraleUnderwrittingCasesResults.dateStart)
 			resultado.setStatus(StatusType.ERROR)
-			
-			com.scortelemed.Error error = new com.scortelemed.Error()
-			error.setFecha(new Date())
-			error.setCia(company.id.toString())
-			error.setIdentificador(societeGeneraleUnderwrittingCasesResults.dateStart.toString() + "-" + societeGeneraleUnderwrittingCasesResults.dateEnd.toString())
-			error.setInfo(requestXML.toString())
-			error.setOperacion("CONSULTA")
-			error.setError(e.getMessage())
-			error.save(flush:true)
-			
+			requestService.insertarError(company, societeGeneraleUnderwrittingCasesResults.dateStart.toString() + "-" + societeGeneraleUnderwrittingCasesResults.dateEnd.toString(), requestXML.toString(), TipoOperacion.CONSULTA, e.getMessage())
+
 		}finally{
 			
 			def sesion=RequestContextHolder.currentRequestAttributes().getSession()

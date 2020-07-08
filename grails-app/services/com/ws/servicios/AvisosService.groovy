@@ -1,22 +1,15 @@
 package com.ws.servicios
-import java.security.Security;
-import java.util.Properties;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import com.scortelemed.Aviso
-import com.scortelemed.Request
-import com.scortelemed.Estadistica
-import com.scortelemed.Datowebservice
-import com.scortelemed.Conf
+
+import com.scortelemed.*
+
+import javax.mail.Message
+import javax.mail.Session
+import javax.mail.Transport
+import javax.mail.internet.InternetAddress
+import javax.mail.internet.MimeMessage
 
 class AvisosService {
 	
-	def mailService
 	def groovyPagesTemplateEngine
 	def logginService
 	
@@ -126,41 +119,41 @@ class AvisosService {
 */	
 
 	def enviarEmail(destino, tema, cuerpo) {
-	     //Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
+	     //Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider())
 	  
-	     String subject = "Titulo/Subject del mail";
-	     String message = "Mensaje/Body del mail";
+	     String subject = "Titulo/Subject del mail"
+	     String message = "Mensaje/Body del mail"
 	        
-		  boolean debug = false;
+		  boolean debug = false
 		
-		  Properties props = new Properties();
-		  props.put("mail.smtp.host", "mail.scortelemed.com");
-		  props.put("mail.smtp.auth", "true");
-		  props.put("mail.debug", "false");
-		  props.put("mail.smtp.port", "25");
-		  props.put("mail.smtp.socketFactory.port", "25");
-		 // props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-		  props.put("mail.smtp.socketFactory.fallback", "false");
+		  Properties props = new Properties()
+		  props.put("mail.smtp.host", "mail.scortelemed.com")
+		  props.put("mail.smtp.auth", "true")
+		  props.put("mail.debug", "false")
+		  props.put("mail.smtp.port", "25")
+		  props.put("mail.smtp.socketFactory.port", "25")
+		 // props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory")
+		  props.put("mail.smtp.socketFactory.fallback", "false")
 	
-	      Session session = Session.getDefaultInstance(props);
+	      Session session = Session.getDefaultInstance(props)
 		
 	
-		  session.setDebug(debug);
-		  Message msg = new MimeMessage(session);
-		  InternetAddress addressFrom = new InternetAddress("usuarioExtranet@scortelemed.com");
-		  msg.setFrom(addressFrom);
-		  String[] addressTo = new InternetAddress[1];
-		  addressTo[0] = "d@hwsol.com";
-		  msg.setRecipients(Message.RecipientType.TO, "d@hwsol.com");
-		  msg.setSubject(subject);
-		  msg.setContent(message, "text/plain");
-		  Transport t = session.getTransport("smtp");
+		  session.setDebug(debug)
+		  Message msg = new MimeMessage(session)
+		  InternetAddress addressFrom = new InternetAddress("usuarioExtranet@scortelemed.com")
+		  msg.setFrom(addressFrom)
+		  String[] addressTo = new InternetAddress[1]
+		  addressTo[0] = "d@hwsol.com"
+		  msg.setRecipients(Message.RecipientType.TO, "d@hwsol.com")
+		  msg.setSubject(subject)
+		  msg.setContent(message, "text/plain")
+		  Transport t = session.getTransport("smtp")
 		
 		  // Aqui usuario y password de gmail
-		  //t.connect("pruebashwsol@gmail.com","5helloworld5");
-		  t.connect("usuarioExtranet","T1pm050c");
-		  t.sendMessage(msg,msg.getAllRecipients());
-		  t.close();
+		  //t.connect("pruebashwsol@gmail.com","5helloworld5")
+		  t.connect("usuarioExtranet","T1pm050c")
+		  t.sendMessage(msg,msg.getAllRecipients())
+		  t.close()
 		  
 	      return null
 	}

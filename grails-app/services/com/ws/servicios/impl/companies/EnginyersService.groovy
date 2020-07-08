@@ -1,13 +1,15 @@
-package com.ws.servicios
+package com.ws.servicios.impl.companies
 
 import com.scor.global.ExceptionUtils
 import com.scor.global.WSException
 import com.scor.srpfileinbound.DATOS
 import com.scor.srpfileinbound.REGISTRODATOS
-import com.scor.srpfileinbound.RootElement
 import com.scortelemed.Company
-import com.scortelemed.Conf
 import com.scortelemed.Recibido
+import com.scortelemed.Request
+import com.scortelemed.TipoOperacion
+import com.scortelemed.schemas.enginyers.AddExp
+import com.ws.servicios.ICompanyService
 import grails.util.Environment
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
@@ -18,117 +20,58 @@ import org.w3c.dom.Node
 import org.w3c.dom.NodeList
 import org.xml.sax.InputSource
 
-import javax.xml.bind.JAXBContext
-import javax.xml.bind.JAXBElement
-import javax.xml.bind.Marshaller
-import javax.xml.namespace.QName
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 import java.text.SimpleDateFormat
 
 import static grails.async.Promises.task
 
-class EnginyersService {
+class EnginyersService implements ICompanyService{
 
     def grailsApplication
-    def logginService = new LogginService()
-    def tarificadorService = new TarificadorService()
+    def requestService
+    def expedienteService
+    def logginService
+    def tarificadorService
     TransformacionUtil util = new TransformacionUtil()
 
-    /**
-     *
-     * @param clase
-     * @return
-     */
-    def marshall(nameSpace, clase) {
 
-        StringWriter writer = new StringWriter();
-
+    String marshall(def objeto) {
+        String nameSpace = "http://www.scortelemed.com/schemas/enginyers"
+        String result
         try {
-
-            JAXBContext jaxbContext = JAXBContext.newInstance(clase.class);
-            Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-
-            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            def root = null
-            QName qName = null
-
-            if (clase instanceof com.scortelemed.schemas.enginyers.AddExp) {
-                qName = new QName(nameSpace, "addExp");
-                root = new JAXBElement<com.scortelemed.schemas.enginyers.AddExp>(qName, com.scortelemed.schemas.enginyers.AddExp.class, clase);
+            if (objeto instanceof AddExp) {
+                result = requestService.marshall(nameSpace, objeto, AddExp.class)
             }
-
-
-            jaxbMarshaller.marshal(root, writer);
-            String result = writer.toString();
-
         } finally {
-            writer.close();
+            return result
         }
-
-        return writer
     }
 
-    def crearExpediente = { req ->
+
+    def buildDatos(Request req, String codigoSt) {
         try {
-            //SOBREESCRIBIMOS LA URL A LA QUE TIENE QUE LLAMAR EL WSDL
-            def ctx = grailsApplication.mainContext
-            def bean = ctx.getBean("soapClientCrearOrabpel")
-            bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("orabpelCreacion.wsdl")?.value)
-            def salida = grailsApplication.mainContext.soapClientCrearOrabpel.initiate(crearExpedienteBPM(req))
-            return "OK"
-        } catch (Exception e) {
-            throw new WSException(this.getClass(), "crearExpediente", ExceptionUtils.composeMessage(null, e));
-        }
-    }
-
-    private def crearExpedienteBPM = { req ->
-        def listadoFinal = []
-        RootElement payload = new RootElement()
-
-        listadoFinal.add(buildCabecera(req))
-        listadoFinal.add(buildDatos(req, req.company))
-        listadoFinal.add(buildPie())
-
-        payload.cabeceraOrDATOSOrPIE = listadoFinal
-
-        return payload
-    }
-
-    private def buildCabecera = { req ->
-
-        def formato = new SimpleDateFormat("yyyyMMdd");
-
-        RootElement.CABECERA cabecera = new RootElement.CABECERA()
-
-        if (Environment.current.name.equals("production_wildfly")) {
-            cabecera.setCodigoCia("1071")
-        } else {
-            cabecera.setCodigoCia("1072")
-        }
-
-        cabecera.setContadorSecuencial("1")
-        cabecera.setFechaGeneracion(formato.format(new Date()))
-        cabecera.setFiller("")
-        cabecera.setTipoFichero("1")
-
-        return cabecera
-
-    }
-
-    private def buildDatos = { req, company ->
-
-        try {
-
             DATOS dato = new DATOS()
+            Company company = req.company
             dato.registro = rellenaDatos(req, company)
             dato.servicio = rellenaServicios(req)
             dato.coberturas = rellenaCoberturas(req)
-
             return dato
         } catch (Exception e) {
             logginService.putError(e.toString())
         }
+    }
+
+
+    def getCodigoStManual(Request req) {
+        String codigoSt
+        //TODO ESTO TIENE SENTIDO?
+        if (Environment.current.name.equals("production_wildfly")) {
+            codigoSt = "1071"
+        } else {
+            codigoSt = "1072"
+        }
+        return codigoSt
     }
 
     private def rellenaCoberturas(req) {
@@ -154,7 +97,7 @@ class EnginyersService {
 
                 if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-                    Element eElement = (Element) nNode;
+                    Element eElement = (Element) nNode
 
                     DATOS.Coberturas cobertura = new DATOS.Coberturas()
 
@@ -171,7 +114,7 @@ class EnginyersService {
             return listadoCoberturas
 
         } catch (Exception e) {
-            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
         }
     }
 
@@ -235,7 +178,7 @@ class EnginyersService {
 
                 if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-                    Element eElement = (Element) nNode;
+                    Element eElement = (Element) nNode
 
 //TODO: en la proxima implementacion sacar el paquete y asegurase que entre el campo observaciones en el sitio correcto.
 
@@ -249,7 +192,7 @@ class EnginyersService {
             return observaciones
 
         } catch (Exception e) {
-            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
         }
     }
 
@@ -347,7 +290,7 @@ class EnginyersService {
 
         def mapDatos = [:]
         def listadoPreguntas = []
-        def formato = new SimpleDateFormat("yyyyMMdd");
+        def formato = new SimpleDateFormat("yyyyMMdd")
         def apellido
         def telefono1
         def telefono2
@@ -593,7 +536,7 @@ class EnginyersService {
 
             return datosRegistro
         } catch (Exception e) {
-            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
         }
 
     }
@@ -626,153 +569,16 @@ class EnginyersService {
         datos.campo19 = ""
         datos.campo20 = ""
     }
-
-    private def buildPie = {
-
-        RootElement.PIE pie = new RootElement.PIE()
-        pie.setFiller("")
-        pie.setNumFilasFichero(100)
-
-        pie.setNumRegistros(1)
-
-        return pie
-    }
-
-    def busquedaCrm(policyNumber, ou, opername, companyCodigoSt, companyId, requestBBDD, companyName) {
-
-        task {
-
-            logginService.putInfoMessage("BusquedaExpedienteCrm - Buscando en CRM solicitud de " + companyName + " con numSolicitud: " + policyNumber.toString())
-
-            def respuestaCrm
-            int limite = 0;
-            boolean encontrado = false;
-
-            servicios.Filtro filtro = new servicios.Filtro()
-            SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
-            CorreoUtil correoUtil = new CorreoUtil()
-
-            Thread.sleep(90000);
-
-            try {
-
-                while (!encontrado && limite < 10) {
-
-                    filtro.setClave(servicios.ClaveFiltro.CLIENTE);
-                    filtro.setValor(companyCodigoSt.toString());
-
-                    servicios.Filtro filtroRelacionado1 = new servicios.Filtro()
-                    filtroRelacionado1.setClave(servicios.ClaveFiltro.NUM_SOLICITUD)
-                    filtroRelacionado1.setValor(policyNumber.toString())
-
-                    filtro.setFiltroRelacionado(filtroRelacionado1)
-
-                    respuestaCrm = consultaExpediente(ou.toString(), filtro)
-
-                    if (respuestaCrm != null && respuestaCrm.getListaExpedientes() != null && respuestaCrm.getListaExpedientes().size() > 0) {
-
-                        for (int i = 0; i < respuestaCrm.getListaExpedientes().size(); i++) {
-
-                            servicios.Expediente exp = respuestaCrm.getListaExpedientes().get(i)
-
-                            logginService.putInfoMessage("BusquedaExpedienteCrm - Expediente encontrado: " + exp.getCodigoST() + " para " + companyName)
-
-                            String fechaCreacion = format.format(new Date());
-
-                            if (exp.getCandidato() != null && exp.getCandidato().getCompanya() != null && exp.getCandidato().getCompanya().getCodigoST().equals(companyCodigoSt.toString()) &&
-                                    exp.getNumSolicitud() != null && exp.getNumSolicitud().equals(policyNumber.toString()) && fechaCreacion != null && fechaCreacion.equals(exp.getFechaApertura())) {
-
-                                /**Alta procesada correctamente
-                                 *
-                                 */
-
-                                encontrado = true
-                                logginService.putInfoMessage("BusquedaExpedienteCrm - Nueva alta automatica de " + companyName + " con numero de solicitud: " + policyNumber.toString() + " procesada correctamente")
-                            }
-                        }
-                    }
-
-                    limite++
-                    Thread.sleep(10000)
-                }
-
-                /**Alta procesada pero no se ha encontrado en CRM.
-                 *
-                 */
-                if (limite == 10) {
-
-                    logginService.putInfoMessage("BusquedaExpedienteCrm - Nueva alta de " + companyName + " con numero de solicitud: " + policyNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM")
-                    correoUtil.envioEmailErrores("BusquedaExpedienteCrm", "Nueva alta de " + companyName + " con numero de solicitud: " + policyNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM", null)
-
-                    /**Metemos en errores
-                     *
-                     */
-                    com.scortelemed.Error error = new com.scortelemed.Error()
-                    error.setFecha(new Date())
-                    error.setCia(companyId.toString())
-                    error.setIdentificador(policyNumber.toString())
-                    error.setInfo(requestBBDD.request)
-                    error.setOperacion("ALTA")
-                    error.setError("Peticion procesada para numero de solicitud: " + policyNumber.toString() + ". No encontrada en CRM")
-                    error.save(flush: true)
-                }
-            } catch (Exception e) {
-
-                logginService.putInfoMessage("BusquedaExpedienteCrm - Nueva alta de " + companyName + " con numero de solicitud: " + policyNumber.toString() + " . Error: " + e.getMessage())
-                correoUtil.envioEmailErrores("BusquedaExpedienteCrm", "Nueva alta de " + companyName + " con numero de solicitud: " + policyNumber.toString(), e)
-            }
-        }
-    }
-
-    def consultaExpediente = { ou, filtro ->
-
-        try {
-
-            def ctx = grailsApplication.mainContext
-            def bean = ctx.getBean("soapClientAlptis")
-            bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("frontal.wsdl")?.value)
-
-            def salida = grailsApplication.mainContext.soapClientAlptis.consultaExpediente(tarificadorService.obtenerUsuarioFrontal(ou), filtro)
-
-            return salida
-        } catch (Exception e) {
-            logginService.putError("obtenerInformeExpedientes", "No se ha podido obtener el informe de expediente : " + e)
-            return null
-        }
-    }
-
-    public void insertarRecibido(Company company, String identificador, String info, String operacion) {
-
-        Recibido recibido = new Recibido()
-        recibido.setFecha(new Date())
-        recibido.setCia(company.id.toString())
-        recibido.setIdentificador(identificador)
-        recibido.setInfo(info)
-        recibido.setOperacion(operacion)
-        recibido.save(flush: true)
-    }
-
-    public void insertarError(Company company, String identificador, String info, String operacion, String detalleError) {
-
-        com.scortelemed.Error error = new com.scortelemed.Error()
-        error.setFecha(new Date())
-        error.setCia(company.id.toString())
-        error.setIdentificador(identificador)
-        error.setInfo(info)
-        error.setOperacion(operacion)
-        error.setError(detalleError)
-        error.save(flush: true)
-    }
-
+    
     /**Devuelve lista con los errores de validacion
      *
      * @param requestBBDD
      * @return
      */
-    public List<WsError> validarDatosObligatorios(requestBBDD) {
+    List<WsError> validarDatosObligatorios(requestBBDD) {
 
         List<WsError> wsErrors = new ArrayList<WsError>()
-        SimpleDateFormat formato = new SimpleDateFormat("yyyyMMdd");
+        SimpleDateFormat formato = new SimpleDateFormat("yyyyMMdd")
         String telefono1 = null
         String telefono2 = null
         String telefonoMovil = null
@@ -797,7 +603,7 @@ class EnginyersService {
 
                 if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-                    Element eElement = (Element) nNode;
+                    Element eElement = (Element) nNode
 
                     /**NOMBRE DE CANDIDATO
                      *
@@ -871,7 +677,7 @@ class EnginyersService {
 
             return wsErrors
         } catch (Exception e) {
-            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
         }
     }
 
@@ -895,7 +701,7 @@ class EnginyersService {
 
                 if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-                    Element eElement = (Element) nNode;
+                    Element eElement = (Element) nNode
 
                     if (eElement.getElementsByTagName("idRisk").item(0).getTextContent().toString().equals("1") || eElement.getElementsByTagName("idRisk").item(0).getTextContent().toString().equals("453")) {
                         return true
@@ -904,7 +710,7 @@ class EnginyersService {
             }
 
         } catch (Exception e) {
-            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
         }
 
         return false
@@ -931,7 +737,7 @@ class EnginyersService {
 
                 if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-                    Element eElement = (Element) nNode;
+                    Element eElement = (Element) nNode
 
                     if (eElement.getElementsByTagName("idRisk").item(0).getTextContent().toString().equals("432") || eElement.getElementsByTagName("idRisk").item(0).getTextContent().toString().equals("449")) {
                         return true
@@ -940,7 +746,7 @@ class EnginyersService {
             }
 
         } catch (Exception e) {
-            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
         }
 
         return false

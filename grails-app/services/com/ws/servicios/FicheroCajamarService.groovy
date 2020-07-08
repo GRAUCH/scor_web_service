@@ -62,7 +62,7 @@ class FicheroCajamarService {
 
 	def procesarCabezeraFichero(compania){
 		try{
-			SimpleDateFormat formato = new SimpleDateFormat("yyyymmdd");
+			SimpleDateFormat formato = new SimpleDateFormat("yyyymmdd")
 			
 			//OBTENEMOS EL SIGUIENTE ID DE FICHERO
 			def lote = ConfFichero.findByName("contador_fichero")

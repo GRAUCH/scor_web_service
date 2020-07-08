@@ -1,5 +1,8 @@
 package services
 
+import com.scortelemed.Request
+import com.scortelemed.TipoCompany
+import com.scortelemed.TipoOperacion
 import hwsol.webservices.CorreoUtil
 
 import java.text.SimpleDateFormat
@@ -13,13 +16,9 @@ import org.grails.cxf.utils.EndpointType
 import org.grails.cxf.utils.GrailsCxfEndpoint
 import org.grails.cxf.utils.GrailsCxfEndpointProperty
 import org.springframework.web.context.request.RequestContextHolder
-
-import servicios.ClaveFiltro
-import servicios.Expediente
 import servicios.Filtro
 
 import com.scortelemed.Company
-import com.scortelemed.Recibido
 import com.ws.afiesca.beans.AfiEscaUnderwrittingCaseManagementRequest
 import com.ws.afiesca.beans.AfiEscaUnderwrittingCaseManagementResponse
 import com.ws.enumeration.StatusType
@@ -34,8 +33,9 @@ class AfiEscaUnderwrittingCaseManagementService {
 
 	def requestService
 	def estadisticasService
+	def expedienteService
 	def logginService
-	def crearExpedienteService
+	def francesasService
 	def tarificadorService
 
 	@WebResult(name = "AfiEscaUnderwrittingCaseManagementResponse")
@@ -45,10 +45,9 @@ class AfiEscaUnderwrittingCaseManagementService {
 
 		def opername = "AfiEscaUnderwrittingCaseManagementRequest"
 		def correoUtil = new CorreoUtil()
-		def requestXML = ""
-		def requestBBDD
-		def company = Company.findByNombre('afiesca')
-		def respuestaCrm
+		def requestXML
+		Request requestBBDD
+		def company = Company.findByNombre(TipoCompany.AFI_ESCA.getNombre())
 
 		Filtro filtro = new Filtro()
 		AfiEscaUnderwrittingCaseManagementResponse resultado = new AfiEscaUnderwrittingCaseManagementResponse()
@@ -59,41 +58,26 @@ class AfiEscaUnderwrittingCaseManagementService {
 
 			def operacion = estadisticasService.obtenerObjetoOperacion(opername)
 
-			if(operacion && operacion.activo && afiEscaUnderwrittingCaseManagementRequest && Company.findByNombre("afiesca").generationAutomatic) {
+			if(operacion && operacion.activo && afiEscaUnderwrittingCaseManagementRequest && company.generationAutomatic) {
 
 				requestXML=requestService.marshall(afiEscaUnderwrittingCaseManagementRequest,AfiEscaUnderwrittingCaseManagementRequest.class)
 				requestBBDD = requestService.crear(opername,requestXML)
-				requestBBDD.fecha_procesado = new Date()
-				requestBBDD.save(flush:true)
 				resultado.setStatusType(StatusType.ok)
 				resultado.setComments("ok mensaje")
 
 
 				logginService.putInfoMessage("Se procede el alta automatica de Afiesca con numero de solicitud " + afiEscaUnderwrittingCaseManagementRequest.policy.policy_number)
-				crearExpedienteService.crearExpediente(requestBBDD)
+				expedienteService.crearExpediente(requestBBDD, TipoCompany.AFI_ESCA)
+				requestService.insertarRecibido(company, afiEscaUnderwrittingCaseManagementRequest.policy.policy_number, requestBBDD.request, TipoOperacion.ALTA)
 
-				/**Metemos en recibidos
-				 *
-				 */
-				Recibido recibido = new Recibido()
-				recibido.setFecha(new Date())
-				recibido.setCia(company.id.toString())
-				recibido.setIdentificador(afiEscaUnderwrittingCaseManagementRequest.policy.policy_number)
-				recibido.setInfo(requestBBDD.request)
-				recibido.setOperacion("ALTA")
-				recibido.save(flush:true)
-				
-				
-				/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
-				 *
-				 */
+				/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado*/
 				correoUtil.envioEmail(opername, null, 1)
-				tarificadorService.busquedaAfiescaCrm(afiEscaUnderwrittingCaseManagementRequest.policy.policy_number, company.ou, opername, company.codigoSt, company.id, requestBBDD)
+				expedienteService.busquedaCrm(requestBBDD, company, afiEscaUnderwrittingCaseManagementRequest.policy.policy_number, null, null)
 								
 			} else {
 
 				resultado.setStatusType(StatusType.error)
-				resultado.setComments("L'opération est temporairement désactivée")
+				resultado.setComments("L'opï¿½ration est temporairement dï¿½sactivï¿½e")
 				logginService.putInfoMessage("Peticion " + opername + " no realizada para solicitud: " + afiEscaUnderwrittingCaseManagementRequest.policy.policy_number)
 				correoUtil.envioEmailErrores(opername,"Endpoint-"+ opername + ". La operacion esta desactivada temporalmente",null)
 			}
@@ -103,18 +87,8 @@ class AfiEscaUnderwrittingCaseManagementService {
 			correoUtil.envioEmailErrores(opername,"Peticion no realizada para solicitud: " + afiEscaUnderwrittingCaseManagementRequest.policy.policy_number,e)
 			resultado.setStatusType(StatusType.error)
 			resultado.setComments(opername+": "+e)
+			requestService.insertarError(company, afiEscaUnderwrittingCaseManagementRequest.policy.policy_number, requestBBDD.request, TipoOperacion.ALTA, "Peticion no realizada para solicitud: " + afiEscaUnderwrittingCaseManagementRequest.policy.policy_number + ". Error: " + e.getMessage())
 
-			/**Metemos en errores
-			 *
-			 */
-			com.scortelemed.Error error = new com.scortelemed.Error()
-			error.setFecha(new Date())
-			error.setCia(company.id.toString())
-			error.setIdentificador(afiEscaUnderwrittingCaseManagementRequest.policy.policy_number)
-			error.setInfo(requestBBDD.request)
-			error.setOperacion("ALTA")
-			error.setError("Peticion no realizada para solicitud: " + afiEscaUnderwrittingCaseManagementRequest.policy.policy_number + ". Error: " + e.getMessage())
-			error.save(flush:true)
 		} finally {
 
 			def sesion=RequestContextHolder.currentRequestAttributes().getSession()

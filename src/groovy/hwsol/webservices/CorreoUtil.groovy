@@ -117,7 +117,7 @@ class CorreoUtil {
 
                     msg.setRecipients(Message.RecipientType.TO, addressTo)
                     msg.setSubject(subject)
-                    msg.setContent(message, "text/plain")
+                    msg.setContent(message, "text/plain; charset=UTF-8")
                     Transport t = sessionMail.getTransport("smtp")
                     t.connect(usuarioConexion, passConexion)
                     t.sendMessage(msg, msg.getAllRecipients())

@@ -1,40 +1,26 @@
 package services
 
-
+import com.scortelemed.Company
+import com.scortelemed.Request
+import com.scortelemed.TipoCompany
+import com.scortelemed.TipoOperacion
+import com.scortelemed.schemas.enginyers.*
+import com.ws.servicios.impl.ExpedienteService
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
 import hwsol.webservices.WsError
-import org.springframework.web.context.request.RequestContextHolder
-
-import java.text.SimpleDateFormat
-import java.util.List;
-
 import org.apache.cxf.annotations.SchemaValidation
-import org.apache.jasper.tagplugins.jstl.core.Catch;
 import org.grails.cxf.utils.EndpointType
 import org.grails.cxf.utils.GrailsCxfEndpoint
 import org.grails.cxf.utils.GrailsCxfEndpointProperty
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.request.RequestContextHolder
 
+import javax.jws.WebMethod
 import javax.jws.WebParam
 import javax.jws.WebResult
 import javax.jws.WebService
 import javax.jws.soap.SOAPBinding
-import javax.jws.WebMethod;
-
-import com.scortelemed.Company
-import com.scortelemed.schemas.enginyers.ArrayOfFaultElement;
-import com.scortelemed.schemas.enginyers.ErrorElement;
-import com.scortelemed.schemas.enginyers.Expedient
-import com.scortelemed.schemas.enginyers.AddExpResponse
-import com.scortelemed.schemas.enginyers.AddExp
-import com.scortelemed.schemas.enginyers.FaultElement;
-import com.ws.servicios.EnginyersService
-import com.ws.servicios.EstadisticasService
-import com.ws.servicios.LogginService;
-import com.ws.servicios.RequestService
-import com.ws.servicios.TarificadorService
-
+import java.text.SimpleDateFormat
 
 @WebService(targetNamespace = "http://www.scortelemed.com/schemas/enginyers")
 @SchemaValidation
@@ -43,17 +29,13 @@ expose = EndpointType.JAX_WS,properties = [@GrailsCxfEndpointProperty(name = "ws
 @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
 
 class EnginyersUnderwrittingCaseManagementService {
-	
-	@Autowired
-	private EnginyersService enginyersService
-	@Autowired
-	private EstadisticasService estadisticasService
-	@Autowired
-	private RequestService requestService
-	@Autowired
-	private LogginService logginService
-	@Autowired
-	private TarificadorService tarificadorService
+
+	def expedienteService = new ExpedienteService()
+	def enginyersService
+	def estadisticasService
+	def requestService
+	def logginService
+	def tarificadorService
 
 	@WebResult(name = "addExpResponse")
 	@WebMethod(action = "http://www.scortelemed.com/schemas/enginyers/addExp")
@@ -63,7 +45,7 @@ class EnginyersUnderwrittingCaseManagementService {
 			def correoUtil = new CorreoUtil()
 			List<WsError> wsErrors = new ArrayList<WsError>()
 			def requestXML
-			def requestBBDD
+			Request requestBBDD
 
 			Company company = null
 			SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
@@ -71,15 +53,15 @@ class EnginyersUnderwrittingCaseManagementService {
 			AddExpResponse resultado=new AddExpResponse()
 
 			ArrayOfFaultElement array = new ArrayOfFaultElement()
-			FaultElement fault = new FaultElement();
-			Expedient expedient = new Expedient();
+			FaultElement fault = new FaultElement()
+			Expedient expedient = new Expedient()
 			expedient.setIdExpedient(Integer.valueOf(addExp.getD().getPolicyNumber()))
-			List<FaultElement> faultList = new ArrayList<FaultElement>();
+			List<FaultElement> faultList = new ArrayList<FaultElement>()
 			ErrorElement errorElement = new ErrorElement()
 
 			try{
 
-				company = Company.findByNombre('enginyers')
+				company = Company.findByNombre(TipoCompany.ENGINYERS.getNombre())
 
 				def operacion = estadisticasService.obtenerObjetoOperacion(opername)
 
@@ -91,26 +73,23 @@ class EnginyersUnderwrittingCaseManagementService {
 							
 							logginService.putInfoMessage("Realizando peticion AddExp para " + company.nombre + " con numero de solicitud: " + addExp.d.getPolicyNumber())
 
-							requestXML = enginyersService.marshall("http://www.scortelemed.com/schemas/enginyers", addExp)
+							requestXML = enginyersService.marshall(addExp)
 							requestBBDD = requestService.crear(opername, requestXML)
-							requestBBDD.fecha_procesado = new Date()
-							requestBBDD.save(flush: true)
 		
 							wsErrors = enginyersService.validarDatosObligatorios(requestBBDD)
 		
 							if (wsErrors != null && wsErrors.size() == 0) {
 
-								enginyersService.crearExpediente(requestBBDD)
+								expedienteService.crearExpediente(requestBBDD, TipoCompany.ENGINYERS)
 
 								expedient.setAddExpResultCode(0)
 								fault.setFaultCode("0")
 								fault.setFaultString("")
 
-								enginyersService.insertarRecibido(company, addExp.d.getPolicyNumber(), requestXML.toString(), "ALTA")
+								requestService.insertarRecibido(company, addExp.d.getPolicyNumber(), requestXML.toString(), TipoOperacion.ALTA)
 
-								/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
-								 *                                */
-								enginyersService.busquedaCrm(addExp.d.getPolicyNumber(), company.ou, opername, company.codigoSt, company.id, requestBBDD, company.nombre)
+								/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado*/
+								expedienteService.busquedaCrm(requestBBDD, company, addExp.d.getPolicyNumber(), null, null)
 							
 							} else {
 
@@ -120,7 +99,7 @@ class EnginyersUnderwrittingCaseManagementService {
 								fault.setFaultCode("8")
 								fault.setFaultString("Error de validacion: " + error)
 
-								enginyersService.insertarError(company, addExp.d.getPolicyNumber(), requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + addExp.d.getPolicyNumber() + ". Error de validacion: " + error)
+								requestService.insertarError(company, addExp.d.getPolicyNumber(), requestXML.toString(), TipoOperacion.ALTA, "Peticion no realizada para solicitud: " + addExp.d.getPolicyNumber() + ". Error de validacion: " + error)
 								logginService.putErrorEndpoint("GestionReconocimientoMedico", "Peticion no realizada de " + company.nombre + " con numero de solicitud: " + addExp.d.getPolicyNumber() + ". Error de validacion: " + error)
 
 							}
@@ -137,7 +116,7 @@ class EnginyersUnderwrittingCaseManagementService {
 					}
 			} catch (Exception e){
 
-				enginyersService.insertarError(company,addExp.d.getPolicyNumber(), requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + addExp.d.getPolicyNumber() + ". Error: " + e.getMessage())
+				requestService.insertarError(company,addExp.d.getPolicyNumber(), requestXML.toString(), TipoOperacion.ALTA, "Peticion no realizada para solicitud: " + addExp.d.getPolicyNumber() + ". Error: " + e.getMessage())
 
 				logginService.putErrorEndpoint("GestionReconocimientoMedico","Peticion no realizada de " + company.nombre + " con numero de solicitud: " + addExp.d.getPolicyNumber() + ". Error: " + e.getMessage())
 				correoUtil.envioEmailErrores("GestionReconocimientoMedico","Peticion de " + company.nombre + " con numero de solicitud: " + addExp.d.getPolicyNumber(), e)

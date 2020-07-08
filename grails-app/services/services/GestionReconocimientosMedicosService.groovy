@@ -1,23 +1,25 @@
 package services
 
 import com.scortelemed.Company
-import com.scortelemed.Envio
 import com.scortelemed.Recibido
+import com.scortelemed.Request
+import com.scortelemed.TipoCompany
+import com.scortelemed.TipoOperacion
 import com.ws.enumeration.StatusType
 import com.ws.enumeration.TipoDictamenType
 import com.ws.enumeration.TipoDocumentoType
 import com.ws.enumeration.TipoGarantiaType
 import com.ws.lagunaro.beans.*
-import com.ws.servicios.LagunaroService
+import com.ws.servicios.impl.companies.LagunaroService
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
 import org.apache.cxf.annotations.SchemaValidation
 import org.grails.cxf.utils.EndpointType
 import org.grails.cxf.utils.GrailsCxfEndpoint
 import org.grails.cxf.utils.GrailsCxfEndpointProperty
-import org.springframework.beans.factory.annotation.Autowired
 
-//import org.jboss.ws.annotation.SchemaValidation;
+
+//import org.jboss.ws.annotation.SchemaValidation
 import org.springframework.web.context.request.RequestContextHolder
 import servicios.Filtro
 
@@ -40,10 +42,9 @@ class GestionReconocimientosMedicosService {
     def estadisticasService
     def requestService
     def logginService
+    def expedienteService
     def tarificadorService
-
-    @Autowired
-    private LagunaroService lagunaroService
+    def lagunaroService
 
     @WebResult(name = "GestionReconocimientoMedicoResponse")
     GestionReconocimientoMedicoResponse GestionReconocimientosMedico(
@@ -54,10 +55,10 @@ class GestionReconocimientosMedicosService {
         def correoUtil = new CorreoUtil()
         def requestXML = ""
         def crearExpedienteService
-        def requestBBDD
+        Request requestBBDD
         def respuestaCrm
 
-        Company company = Company.findByNombre("lagunaro")
+        Company company = Company.findByNombre(TipoCompany.LAGUN_ARO.getNombre())
         Filtro filtro = new Filtro()
         SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
         TransformacionUtil util = new TransformacionUtil()
@@ -72,15 +73,13 @@ class GestionReconocimientosMedicosService {
             if (operacion && operacion.activo) {
 
 
-                if (Company.findByNombre("lagunaro").generationAutomatic && gestionReconocimientoMedicoRequest.getDatos_envio().getMovimiento().getNombre().equals("A")) {
+                if (company.generationAutomatic && gestionReconocimientoMedicoRequest.getDatos_envio().getMovimiento().getNombre().equals("A")) {
 
                     requestXML = requestService.marshall(gestionReconocimientoMedicoRequest, GestionReconocimientoMedicoRequest.class)
-
                     requestBBDD = requestService.crear(opername, requestXML)
-                    requestBBDD.fecha_procesado = new Date()
-                    requestBBDD.save(flush: true)
 
-                    lagunaroService.crearExpediente(requestBBDD)
+                    expedienteService.crearExpediente(requestBBDD, TipoCompany.LAGUN_ARO)
+                    requestService.insertarRecibido(company, gestionReconocimientoMedicoRequest.poliza.cod_poliza, requestBBDD.request, TipoOperacion.ALTA)
 
                     resultado.setMensaje("El caso se ha procesado correctamente")
                     resultado.setFecha(new Date())
@@ -88,21 +87,8 @@ class GestionReconocimientosMedicosService {
 
                     logginService.putInfoMessage("Se procede el alta automatica de Lagunaro con numero de solicitud " + gestionReconocimientoMedicoRequest.poliza.cod_poliza)
 
-                    /**Metemos en recibidos
-                     *
-                     */
-                    Recibido recibido = new Recibido()
-                    recibido.setFecha(new Date())
-                    recibido.setCia(company.id.toString())
-                    recibido.setIdentificador(gestionReconocimientoMedicoRequest.poliza.cod_poliza)
-                    recibido.setInfo(requestBBDD.request)
-                    recibido.setOperacion("ALTA")
-                    recibido.save(flush: true)
-
-                    /**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
-                     *
-                     */
-                    lagunaroService.busquedaCrm(gestionReconocimientoMedicoRequest.poliza.cod_poliza, gestionReconocimientoMedicoRequest.poliza.certificado, company.ou, opername, company.codigoSt, company.id, requestBBDD)
+                    /**Llamamos al metodo asincrono que busca en el crm el expediente recien creado*/
+                    expedienteService.busquedaCrm(requestBBDD, company, gestionReconocimientoMedicoRequest.poliza.cod_poliza, gestionReconocimientoMedicoRequest.poliza.certificado, null)
 
                 }
 
@@ -110,23 +96,13 @@ class GestionReconocimientosMedicosService {
                  *
                  */
 
-                if (Company.findByNombre("lagunaro").generationAutomatic && gestionReconocimientoMedicoRequest.getDatos_envio().getMovimiento().getNombre().equals("B")) {
+                if (company.generationAutomatic && gestionReconocimientoMedicoRequest.getDatos_envio().getMovimiento().getNombre().equals("B")) {
 
                     def msg = "Ha llegado una cancelacion de Lagunaro con n�mero de solicitud: " + gestionReconocimientoMedicoRequest.poliza.cod_poliza + ", certificado: " + gestionReconocimientoMedicoRequest.poliza.certificado + ", numero de suplemento: " + gestionReconocimientoMedicoRequest.poliza.movimiento
 
                     requestXML = requestService.marshall(gestionReconocimientoMedicoRequest, GestionReconocimientoMedicoRequest.class)
                     requestBBDD = requestService.crear(opername, requestXML)
-
-                    /**Metemos en recibidos
-                     *
-                     */
-                    Recibido recibido = new Recibido()
-                    recibido.setFecha(new Date())
-                    recibido.setCia(company.id.toString())
-                    recibido.setIdentificador(gestionReconocimientoMedicoRequest.poliza.cod_poliza)
-                    recibido.setInfo(requestBBDD.request)
-                    recibido.setOperacion("CANCELACION")
-                    recibido.save(flush: true)
+                    requestService.insertarRecibido(company, gestionReconocimientoMedicoRequest.poliza.cod_poliza, requestBBDD.request, TipoOperacion.CANCELACION)
 
                     resultado.setMensaje("El baja se ha procesado correctamente")
                     resultado.setFecha(new Date())
@@ -154,18 +130,7 @@ class GestionReconocimientosMedicosService {
             resultado.setMensaje("Error: " + "Peticion no realizada para solicitud: " + gestionReconocimientoMedicoRequest.poliza.cod_poliza + " y certificado: " + gestionReconocimientoMedicoRequest.poliza.certificado)
             resultado.setFecha(new Date())
             resultado.setStatusType(StatusType.error)
-
-            /**Metemos en errores
-             *
-             */
-            com.scortelemed.Error error = new com.scortelemed.Error()
-            error.setFecha(new Date())
-            error.setCia(company.id.toString())
-            error.setIdentificador(gestionReconocimientoMedicoRequest.poliza.cod_poliza)
-            error.setInfo(requestBBDD.request)
-            error.setOperacion("ALTA")
-            error.setError("Peticion no realizada para solicitud: " + gestionReconocimientoMedicoRequest.poliza.cod_poliza + " y certificado: " + gestionReconocimientoMedicoRequest.poliza.certificado + ". Error: " + e.getMessage())
-            error.save(flush: true)
+            requestService.insertarError(company, gestionReconocimientoMedicoRequest.poliza.cod_poliza, requestBBDD.request, TipoOperacion.ALTA, "Peticion no realizada para solicitud: " + gestionReconocimientoMedicoRequest.poliza.cod_poliza + " y certificado: " + gestionReconocimientoMedicoRequest.poliza.certificado + ". Error: " + e.getMessage())
 
         } finally {
 
@@ -188,12 +153,13 @@ class GestionReconocimientosMedicosService {
 
         def opername = "TramitacionReconocimientoMedicoRequest"
         def correoUtil = new CorreoUtil()
-        def requestXML = ""
+        def requestXML
+        Request requestBBDD
         TramitacionReconocimientoMedicoResponse result = new TramitacionReconocimientoMedicoResponse()
         def timedelay = System.currentTimeMillis()
         logginService.putInfoEndpoint("Endpoint-" + opername, "Peticion para fecha: " + tramitacionReconocimientoMedicoRequest.fecha)
         logginService.putInfoEndpoint("Endpoint-" + opername + "Tiempo inicial: ", timedelay)
-        Company company = Company.findByNombre("lagunaro")
+        Company company = Company.findByNombre(TipoCompany.LAGUN_ARO.getNombre())
 
         try {
             def listaExpedientes
@@ -203,7 +169,7 @@ class GestionReconocimientosMedicosService {
             session.setAttribute("compa", "lagunaro")
             if (operacion && operacion.activo) {
                 requestXML = requestService.marshall(tramitacionReconocimientoMedicoRequest, TramitacionReconocimientoMedicoRequest.class)
-                requestService.crear(opername, requestXML)
+                requestBBDD = requestService.crear(opername, requestXML)
                 listaExpedientes = tarificadorService.tarificador(tramitacionReconocimientoMedicoRequest.fecha)
                 def listPolizaBasicaGroup = []
                 listaExpedientes.each {
@@ -233,9 +199,9 @@ class GestionReconocimientosMedicosService {
                         def pmedica = new Prueba_Medica()
                         pmedica.codigo_prueba_medica = pm.codigo
 
-                        def formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-                        formatter.setTimeZone(TimeZone.getTimeZone("GMT+2:00"));
-                        Date date = formatter.parse(pm.fecha.toString());
+                        def formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+                        formatter.setTimeZone(TimeZone.getTimeZone("GMT+2:00"))
+                        Date date = formatter.parse(pm.fecha.toString())
                         pmedica.fecha_realizacion = date
 
                         pmedica.candidato_aporta_pruebas = pm.aportaPruebas
@@ -264,13 +230,7 @@ class GestionReconocimientosMedicosService {
                     if (it.zip) {
                         polizaBasicaGroup.zip = it.zip.toString()
                     }
-
-                    Envio envio = new Envio()
-                    envio.setFecha(new Date())
-                    envio.setCia(company.id.toString())
-                    envio.setIdentificador(polizaBasicaGroup.cod_poliza)
-                    envio.setInfo("Peticion realizada para fecha: " + tramitacionReconocimientoMedicoRequest.fecha + " poliza " + polizaBasicaGroup.cod_poliza + ", certificado: " + polizaBasicaGroup.certificado + " movimiento " + polizaBasicaGroup.movimiento)
-                    envio.save(flush: true)
+                    requestService.insertarEnvio(company, polizaBasicaGroup.cod_poliza, "Peticion realizada para fecha: " + tramitacionReconocimientoMedicoRequest.fecha + " poliza " + polizaBasicaGroup.cod_poliza + ", certificado: " + polizaBasicaGroup.certificado + " movimiento " + polizaBasicaGroup.movimiento)
 
                     listPolizaBasicaGroup.add(polizaBasicaGroup)
                     logginService.putInfoEndpoint("Endpoint-" + opername, "Peticion realizada para fecha: " + tramitacionReconocimientoMedicoRequest.fecha + " poliza " + polizaBasicaGroup.cod_poliza + ", certificado: " + polizaBasicaGroup.certificado + " mofivimiento " + polizaBasicaGroup.movimiento)
@@ -287,29 +247,13 @@ class GestionReconocimientosMedicosService {
             } else {
                 result.setStatusType(StatusType.error)
                 result.setObservaciones("La operacion esta desactivada temporalmente.")
-
-                com.scortelemed.Error error = new com.scortelemed.Error()
-                error.setFecha(new Date())
-                error.setCia(company.id.toString())
-                error.setIdentificador()
-                error.setInfo(tramitacionReconocimientoMedicoRequest.fecha)
-                error.setOperacion("CONSULTA")
-                error.setError("La operacion esta desactivada temporalmente")
-                error.save(flush: true)
+                requestService.insertarError(company, "", tramitacionReconocimientoMedicoRequest.fecha.toString(), TipoOperacion.CONSULTA, "La operacion esta desactivada temporalmente")
 
                 logginService.putInfoEndpoint("Endpoint-" + opername, "Peticion no realizada para fecha: " + tramitacionReconocimientoMedicoRequest.fecha)
 
             }
         } catch (Exception e) {
-
-            com.scortelemed.Error error = new com.scortelemed.Error()
-            error.setFecha(new Date())
-            error.setCia(company.id.toString())
-            error.setIdentificador()
-            error.setInfo(tramitacionReconocimientoMedicoRequest.fecha)
-            error.setOperacion("CONSULTA")
-            error.setError("Endpoint-" + opername, "Peticion no realizada para fecha: " + tramitacionReconocimientoMedicoRequest.fecha + "- Error: " + e)
-            error.save(flush: true)
+            requestService.insertarError(company, "", tramitacionReconocimientoMedicoRequest.fecha.toString(), TipoOperacion.CONSULTA, "Peticion no realizada para fecha: " + tramitacionReconocimientoMedicoRequest.fecha.toString() + "- Error: " + e.getMessage())
             logginService.putErrorEndpoint("Endpoint-" + opername, "Peticion no realizada para fecha: " + tramitacionReconocimientoMedicoRequest.fecha + "- Error: " + e)
             correoUtil.envioEmailErrores("TramitacionReconocimientoMedicoRequest", "Peticion no realizada para fecha: " + tramitacionReconocimientoMedicoRequest.fecha, e)
             result.setStatusType(StatusType.error)

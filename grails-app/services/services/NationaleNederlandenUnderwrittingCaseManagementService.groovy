@@ -2,8 +2,13 @@ package services
 
 import com.scortelemed.Company
 import com.scortelemed.Operacion
+import com.scortelemed.Request
+import com.scortelemed.TipoCompany
+import com.scortelemed.TipoOperacion
 import com.ws.servicios.*
 import com.scortelemed.schemas.nn.*
+import com.ws.servicios.impl.RequestService
+import com.ws.servicios.impl.companies.NnService
 import grails.util.Environment
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
@@ -12,7 +17,7 @@ import org.apache.cxf.annotations.SchemaValidation
 import org.grails.cxf.utils.EndpointType
 import org.grails.cxf.utils.GrailsCxfEndpoint
 import org.grails.cxf.utils.GrailsCxfEndpointProperty
-import org.springframework.beans.factory.annotation.Autowired
+
 import org.springframework.web.context.request.RequestContextHolder
 import servicios.*
 
@@ -29,16 +34,12 @@ import java.text.SimpleDateFormat
 @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
 class NationaleNederlandenUnderwrittingCaseManagementService {
 
-	@Autowired
-	private NnService nnService
-	@Autowired
-	private EstadisticasService estadisticasService
-	@Autowired
-	private RequestService requestService
-	@Autowired
-	private LogginService logginService
-	@Autowired
-	private TarificadorService tarificadorService
+	def expedienteService
+	def nnService
+	def estadisticasService
+	def requestService
+	def logginService
+	def tarificadorService
 
 	@WebResult(name = "GestionReconocimientoMedicoResponse")
 	GestionReconocimientoMedicoResponse gestionReconocimientoMedico(
@@ -49,15 +50,13 @@ class NationaleNederlandenUnderwrittingCaseManagementService {
 		def correoUtil = new CorreoUtil()
 		List<WsError> wsErrors = new ArrayList<WsError>()
 		def requestXML = ""
-		def crearExpedienteService
-		def requestBBDD
-		def respuestaCrm
+		Request requestBBDD
 
 		String message = null
 		StatusType status = null
 		int code = 0
 
-		Company company = Company.findByNombre("Nn")
+		Company company = Company.findByNombre(TipoCompany.NATIONALE_NETHERLANDEN.getNombre())
 		SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
 		TransformacionUtil util = new TransformacionUtil()
 		GestionReconocimientoMedicoResponse resultado=new GestionReconocimientoMedicoResponse()
@@ -70,31 +69,27 @@ class NationaleNederlandenUnderwrittingCaseManagementService {
 
 			if (operacion && operacion.activo){
 
-				if (Company.findByNombre("Nn").generationAutomatic) {
+				if (company.generationAutomatic) {
 
 					logginService.putErrorEndpoint("GestionReconocimientoMedico","Realizando peticion " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber)
 
-					requestXML=nnService.marshall("http://www.scortelemed.com/schemas/nn",gestionReconocimientoMedico)
+					requestXML=nnService.marshall(gestionReconocimientoMedico)
 					requestBBDD = requestService.crear(opername,requestXML)
-					requestBBDD.fecha_procesado = new Date()
-					requestBBDD.save(flush:true)
 
 					wsErrors = nnService.validarDatosObligatorios(requestBBDD)
 
 					if (wsErrors != null && wsErrors.size() == 0) {
 
-						nnService.crearExpediente(requestBBDD)
+						expedienteService.crearExpediente(requestBBDD, TipoCompany.NATIONALE_NETHERLANDEN)
 
 						message = "El caso se ha procesado correctamente"
 						status = StatusType.OK
 						code = 0
 
-						nnService.insertarRecibido(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), "ALTA")
+						requestService.insertarRecibido(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), TipoOperacion.ALTA)
 
-						/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
-						 *
-						 */
-						nnService.busquedaCrm(gestionReconocimientoMedico.candidateInformation.requestNumber, company.ou, opername, company.codigoSt, company.id, requestBBDD, gestionReconocimientoMedico.candidateInformation.certificateNumber, company.nombre)
+						/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado*/
+						expedienteService.busquedaCrm(requestBBDD, company, gestionReconocimientoMedico.candidateInformation.requestNumber, gestionReconocimientoMedico.candidateInformation.certificateNumber, null)
 
 					} else {
 
@@ -105,7 +100,7 @@ class NationaleNederlandenUnderwrittingCaseManagementService {
 						status = StatusType.ERROR
 						code = 8
 
-						nnService.insertarError(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber + ". Error de validacion: " + error)
+						requestService.insertarError(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), TipoOperacion.ALTA, "Peticion no realizada para solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber + ". Error de validacion: " + error)
 						logginService.putErrorEndpoint("GestionReconocimientoMedico","Peticion no realizada de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber + ". Error de validacion: " + error)
 
 					}
@@ -125,7 +120,7 @@ class NationaleNederlandenUnderwrittingCaseManagementService {
 			status = StatusType.ERROR
 			code = 2
 
-			nnService.insertarError(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber + ". Error: " + e.getMessage())
+			requestService.insertarError(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), TipoOperacion.ALTA, "Peticion no realizada para solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber + ". Error: " + e.getMessage())
 
 			logginService.putErrorEndpoint("GestionReconocimientoMedico","Peticion no realizada de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber + ". Error: " + e.getMessage())
 			correoUtil.envioEmailErrores("GestionReconocimientoMedico","Peticion de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber, e)
@@ -154,6 +149,7 @@ class NationaleNederlandenUnderwrittingCaseManagementService {
 
 		def opername="NnResultadoReconocimientoMedicoResponse"
 		def requestXML = ""
+		Request requestBBDD
 		List<RespuestaCRMInforme> expedientes = new ArrayList<RespuestaCRMInforme>()
 		TransformacionUtil util = new TransformacionUtil()
 		CorreoUtil correoUtil = new CorreoUtil()
@@ -163,7 +159,7 @@ class NationaleNederlandenUnderwrittingCaseManagementService {
 		StatusType status = null
 		int code = 0
 
-		Company company = Company.findByNombre("nn")
+		Company company = Company.findByNombre(TipoCompany.NATIONALE_NETHERLANDEN.getNombre())
 
 		logginService.putInfoMessage("Realizando peticion de informacion de servicio ResultadoReconocimientoMedico para la cia " + company.nombre)
 
@@ -175,28 +171,21 @@ class NationaleNederlandenUnderwrittingCaseManagementService {
 
 				if (resultadoReconocimientoMedico && resultadoReconocimientoMedico.dateStart && resultadoReconocimientoMedico.dateEnd) {
 
-					requestXML=nnService.marshall("http://www.scortelemed.com/schemas/caser",resultadoReconocimientoMedico)
-
-					requestService.crear(opername,requestXML)
+					requestXML=nnService.marshall(resultadoReconocimientoMedico)
+					requestBBDD=requestService.crear(opername,requestXML)
 
 					Date date = resultadoReconocimientoMedico.dateStart.toGregorianCalendar().getTime()
-					SimpleDateFormat sdfr = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
-					String fechaIni = sdfr.format(date);
+					SimpleDateFormat sdfr = new SimpleDateFormat("yyyyMMdd HH:mm:ss")
+					String fechaIni = sdfr.format(date)
 					date = resultadoReconocimientoMedico.dateEnd.toGregorianCalendar().getTime()
-					String fechaFin = sdfr.format(date);
+					String fechaFin = sdfr.format(date)
 
 					logginService.putInfoEndpoint("ResultadoReconocimientoMedico","Realizando peticion para " + company.nombre + " con fecha: " + resultadoReconocimientoMedico.dateStart.toString() + "-" + resultadoReconocimientoMedico.dateEnd.toString())
 
-					nnService.insertarEnvio (company, resultadoReconocimientoMedico.dateStart.toString().substring(0,10) + "-" + resultadoReconocimientoMedico.dateEnd.toString().substring(0,10), requestXML.toString())
+					requestService.insertarEnvio (company, resultadoReconocimientoMedico.dateStart.toString().substring(0,10) + "-" + resultadoReconocimientoMedico.dateEnd.toString().substring(0,10), requestXML.toString())
 
-					for (int i = 1; i < 3; i++){
-
-						if (Environment.current.name.equals("production_wildfly")) {
-							expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1061",null,i,fechaIni,fechaFin,"ES"))
-						} else {
-							expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1062",null,i,fechaIni,fechaFin,"ES"))
-						}
-					}
+					expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt,null,1,fechaIni,fechaFin,company.ou))
+					expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt,null,2,fechaIni,fechaFin,company.ou))
 
 					if(expedientes){
 
@@ -244,7 +233,7 @@ class NationaleNederlandenUnderwrittingCaseManagementService {
 			status = StatusType.ERROR
 			code = 2
 
-			nnService.insertarError(company,resultadoReconocimientoMedico.fechaIni.toString(), requestXML.toString(), "CONSULTA", "Peticion no realizada para solicitud: " + resultadoReconocimientoMedico.fechaIni.toString() + ". Error: " + e.getMessage())
+			requestService.insertarError(company,resultadoReconocimientoMedico.fechaIni.toString(), requestXML.toString(), TipoOperacion.CONSULTA, "Peticion no realizada para solicitud: " + resultadoReconocimientoMedico.fechaIni.toString() + ". Error: " + e.getMessage())
 		}finally{
 
 			def sesion=RequestContextHolder.currentRequestAttributes().getSession()

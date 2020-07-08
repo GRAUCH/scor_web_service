@@ -1,5 +1,8 @@
 package services
 
+import com.scortelemed.Request
+import com.scortelemed.TipoCompany
+import com.scortelemed.TipoOperacion
 import grails.util.Environment
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
@@ -15,7 +18,7 @@ import org.apache.cxf.annotations.SchemaValidation
 import org.grails.cxf.utils.EndpointType
 import org.grails.cxf.utils.GrailsCxfEndpoint
 import org.grails.cxf.utils.GrailsCxfEndpointProperty
-import org.springframework.beans.factory.annotation.Autowired
+
 import org.springframework.web.context.request.RequestContextHolder
 
 import servicios.ClaveFiltro
@@ -25,9 +28,7 @@ import servicios.RespuestaCRM
 import servicios.RespuestaCRMInforme
 
 import com.scortelemed.Company
-import com.scortelemed.Envio
 import com.scortelemed.Operacion
-import com.scortelemed.Recibido
 import com.scortelemed.schemas.ama.ConsolidacionPolizaRequest
 import com.scortelemed.schemas.ama.ConsolidacionPolizaResponse
 import com.scortelemed.schemas.ama.ConsultaDocumentoRequest
@@ -39,10 +40,10 @@ import com.scortelemed.schemas.ama.GestionReconocimientoMedicoResponse
 import com.scortelemed.schemas.ama.ResultadoSiniestroRequest
 import com.scortelemed.schemas.ama.ResultadoSiniestroResponse
 import com.scortelemed.schemas.ama.StatusType
-import com.ws.servicios.AmaService
+import com.ws.servicios.impl.companies.AmaService
 import com.ws.servicios.EstadisticasService
 import com.ws.servicios.LogginService
-import com.ws.servicios.RequestService
+import com.ws.servicios.impl.RequestService
 import com.ws.servicios.TarificadorService
 
 @WebService(targetNamespace = "http://www.scortelemed.com/schemas/ama")
@@ -52,16 +53,12 @@ expose = EndpointType.JAX_WS,properties = [@GrailsCxfEndpointProperty(name = "ws
 @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
 class AmaUnderwrittingCaseManagementService	 {
 
-	@Autowired
-	private AmaService amaService
-	@Autowired
-	private EstadisticasService estadisticasService
-	@Autowired
-	private RequestService requestService
-	@Autowired
-	private LogginService logginService
-	@Autowired
-	private TarificadorService tarificadorService
+	def expedienteService
+	def amaService
+	def estadisticasService
+	def requestService
+	def logginService
+	def tarificadorService
 
 	@WebResult(name = "GestionReconocimientoMedicoResponse")
 	GestionReconocimientoMedicoResponse gestionReconocimientoMedico(
@@ -71,14 +68,12 @@ class AmaUnderwrittingCaseManagementService	 {
 		def opername="AmaResultadoReconocimientoMedicoRequest"
 		def correoUtil = new CorreoUtil()
 		def requestXML = ""
-		def crearExpedienteService
-		def requestBBDD
-		def respuestaCrm
+		Request requestBBDD
 
 		String notes = null
 		StatusType status = null
 
-		Company company = Company.findByNombre("ama")
+		Company company = Company.findByNombre(TipoCompany.AMA.getNombre())
 		Filtro filtro = new Filtro()
 		SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
 		TransformacionUtil util = new TransformacionUtil()
@@ -91,12 +86,10 @@ class AmaUnderwrittingCaseManagementService	 {
 
 			if (operacion && operacion.activo){
 
-				if (Company.findByNombre("ama").generationAutomatic) {
+				if (company.generationAutomatic) {
 
-					requestXML=amaService.marshall("http://www.scortelemed.com/schemas/ama",gestionReconocimientoMedico)
+					requestXML=amaService.marshall(gestionReconocimientoMedico)
 					requestBBDD = requestService.crear(opername,requestXML)
-					requestBBDD.fecha_procesado = new Date()
-					requestBBDD.save(flush:true)
 
 					if (gestionReconocimientoMedico && gestionReconocimientoMedico.candidateInformation.operacion) {
 
@@ -105,22 +98,20 @@ class AmaUnderwrittingCaseManagementService	 {
 
 							logginService.putInfoMessage("Se procede el alta automatica de " + company.nombre + " con numero de solicitud " + gestionReconocimientoMedico.candidateInformation.requestNumber)
 
-							amaService.crearExpediente(requestBBDD)
+							expedienteService.crearExpediente(requestBBDD, TipoCompany.AMA)
 
-							amaService.insertarRecibido(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), "ALTA")
+							requestService.insertarRecibido(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), TipoOperacion.ALTA)
 
 							notes = "El caso se ha procesado correctamente"
 							status = StatusType.OK
 
-							/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
-							 *
-							 */
-							amaService.busquedaCrm(gestionReconocimientoMedico.candidateInformation.requestNumber, company.ou, opername, company.codigoSt, company.id, requestBBDD, company.nombre)
+							/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado*/
+							expedienteService.busquedaCrm(requestBBDD, company, gestionReconocimientoMedico.candidateInformation.requestNumber, null, null)
 							
 						} else if (gestionReconocimientoMedico.candidateInformation.operacion.toString().toUpperCase().equals("M")){
 
 
-							amaService.insertarRecibido(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), "MODIFICACION")
+							requestService.insertarRecibido(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), TipoOperacion.MODIFICACION)
 
 							notes = "El caso se ha procesado correctamente"
 							status = StatusType.OK
@@ -130,7 +121,7 @@ class AmaUnderwrittingCaseManagementService	 {
 						} else if (gestionReconocimientoMedico.candidateInformation.operacion.toString().toUpperCase().equals("B")){
 
 
-							amaService.insertarRecibido(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), "BAJA")
+							requestService.insertarRecibido(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), TipoOperacion.BAJA)
 
 							notes = "El caso se ha procesado correctamente"
 							status = StatusType.OK
@@ -160,7 +151,7 @@ class AmaUnderwrittingCaseManagementService	 {
 			notes = "Error: " + e.getMessage()
 			status = StatusType.ERROR
 
-			amaService.insertarError(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber + ". Error: " + e.getMessage())
+			requestService.insertarError(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), TipoOperacion.ALTA, "Peticion no realizada para solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber + ". Error: " + e.getMessage())
 
 			logginService.putErrorEndpoint("GestionReconocimientoMedico","Peticion no realizada de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber + ". Error: " + e.getMessage())
 			correoUtil.envioEmailErrores("GestionReconocimientoMedico","Peticion de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber,e)
@@ -187,9 +178,9 @@ class AmaUnderwrittingCaseManagementService	 {
 
 		CorreoUtil correoUtil = new CorreoUtil()
 		def requestXML = ""
-		def requestBBDD
-		List<RespuestaCRMInforme> expedientes = new ArrayList<RespuestaCRMInforme>();
-		Company company = Company.findByNombre('ama')
+		Request requestBBDD
+		List<RespuestaCRMInforme> expedientes = new ArrayList<RespuestaCRMInforme>()
+		Company company = Company.findByNombre(TipoCompany.AMA.getNombre())
 		TransformacionUtil util = new TransformacionUtil()
 
 		String notes = null
@@ -207,28 +198,24 @@ class AmaUnderwrittingCaseManagementService	 {
 
 				if (resultadoSiniestro && resultadoSiniestro.dateStart && resultadoSiniestro.dateEnd) {
 
-					requestXML=amaService.marshall("http://www.scortelemed.com/schemas/ama",resultadoSiniestro)
+					requestXML=amaService.marshall(resultadoSiniestro)
 					requestBBDD = requestService.crear(opername,requestXML)
-					requestBBDD.fecha_procesado = new Date()
-					requestBBDD.save(flush:true)
-
-					requestService.crear(opername,requestXML)
 
 					Date date = resultadoSiniestro.dateStart.toGregorianCalendar().getTime()
-					SimpleDateFormat sdfr = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
-					String fechaIni = sdfr.format(date);
+					SimpleDateFormat sdfr = new SimpleDateFormat("yyyyMMdd HH:mm:ss")
+					String fechaIni = sdfr.format(date)
 					date = resultadoSiniestro.dateEnd.toGregorianCalendar().getTime()
-					String fechaFin = sdfr.format(date);
+					String fechaFin = sdfr.format(date)
 
 					if (Environment.current.name.equals("production_wildfly")) {
-						expedientes=tarificadorService.obtenerInformeExpedientesSiniestros("1060",null,null,fechaIni,fechaFin,"ES")
+						expedientes=expedienteService.obtenerInformeExpedientesSiniestros("1060",null,null,fechaIni,fechaFin,company.ou)
 					} else {
-						expedientes=tarificadorService.obtenerInformeExpedientesSiniestros("1061",null,null,fechaIni,fechaFin,"ES")
+						expedientes=expedienteService.obtenerInformeExpedientesSiniestros("1061",null,null,fechaIni,fechaFin,company.ou)
 					}
 
 					logginService.putInfoEndpoint("ResultadoSiniestro","Realizando peticion para " + company.nombre + " con fecha " + resultadoSiniestro.dateStart.toString().substring(0,10) +"-"+resultadoSiniestro.dateEnd.toString().substring(0,10))
 
-					amaService.insertarEnvio (company, resultadoSiniestro.dateStart.toString().substring(0,10) +"-"+resultadoSiniestro.dateEnd.toString().substring(0,10), requestXML.toString())
+					requestService.insertarEnvio (company, resultadoSiniestro.dateStart.toString().substring(0,10) +"-"+resultadoSiniestro.dateEnd.toString().substring(0,10), requestXML.toString())
 
 
 					if(expedientes){
@@ -288,7 +275,7 @@ class AmaUnderwrittingCaseManagementService	 {
 			notes = "Error: " + e.getMessage()
 			status = StatusType.ERROR
 
-			amaService.insertarError(company, resultadoSiniestro.dateStart.toString().substring(0,10) +"-"+resultadoSiniestro.dateEnd.toString().substring(0,10), requestXML.toString(), "CONSULTA", "Peticion no realizada para solicitud: " + resultadoSiniestro.dateStart.toString().substring(0,10) +"-"+resultadoSiniestro.dateEnd.toString().substring(0,10) + ". Error: " + e.getMessage())
+			requestService.insertarError(company, resultadoSiniestro.dateStart.toString().substring(0,10) +"-"+resultadoSiniestro.dateEnd.toString().substring(0,10), requestXML.toString(), TipoOperacion.CONSULTA, "Peticion no realizada para solicitud: " + resultadoSiniestro.dateStart.toString().substring(0,10) +"-"+resultadoSiniestro.dateEnd.toString().substring(0,10) + ". Error: " + e.getMessage())
 		}finally{
 			//BORRAMOS VARIABLES DE SESION
 			def sesion=RequestContextHolder.currentRequestAttributes().getSession()
@@ -311,16 +298,15 @@ class AmaUnderwrittingCaseManagementService	 {
 		def opername="AmaConsolidacionPolizaResponse"
 		def correoUtil = new CorreoUtil()
 		def requestXML = ""
-		def crearExpedienteService
-		def requestBBDD
+		Request requestBBDD
 		def codigoSt
 
 		String notes = null
 		StatusType status = null
 		int codigo = 0
 
-		Company company = Company.findByNombre("ama")
-		RespuestaCRM expediente = new RespuestaCRM();
+		Company company = Company.findByNombre(TipoCompany.AMA.getNombre())
+		RespuestaCRM expediente = new RespuestaCRM()
 		TransformacionUtil util = new TransformacionUtil()
 		ConsolidacionPolizaResponse resultado=new ConsolidacionPolizaResponse()
 
@@ -332,10 +318,8 @@ class AmaUnderwrittingCaseManagementService	 {
 
 			if (operacion && operacion.activo){
 
-				requestXML=amaService.marshall("http://www.scortelemed.com/schemas/ama",consolidacionPoliza)
+				requestXML=amaService.marshall(consolidacionPoliza)
 				requestBBDD = requestService.crear(opername,requestXML)
-				requestBBDD.fecha_procesado = new Date()
-				requestBBDD.save(flush:true)
 
 				if (consolidacionPoliza.requestNumber != null && !consolidacionPoliza.requestNumber.isEmpty() != null && consolidacionPoliza.ciaCode !=null && !consolidacionPoliza.ciaCode.isEmpty() && consolidacionPoliza.policyNumber != null && !consolidacionPoliza.policyNumber.isEmpty()){
 
@@ -346,9 +330,9 @@ class AmaUnderwrittingCaseManagementService	 {
 						codigoSt = "1059"
 					}
 
-					amaService.insertarRecibido(company, consolidacionPoliza.requestNumber, requestXML.toString(), "CONSOLIDACION")
+					requestService.insertarRecibido(company, consolidacionPoliza.requestNumber, requestXML.toString(), TipoOperacion.CONSOLIDACION)
 
-					expediente = tarificadorService.consultaExpedienteNumSolicitud(consolidacionPoliza.requestNumber,"ES",codigoSt )
+					expediente = expedienteService.consultaExpedienteNumSolicitud(consolidacionPoliza.requestNumber,company.ou,codigoSt )
 
 					if (expediente != null && expediente.getErrorCRM() == null && expediente.getListaExpedientes() != null && expediente.getListaExpedientes().size() > 0){
 
@@ -359,7 +343,7 @@ class AmaUnderwrittingCaseManagementService	 {
 							Expediente eModificado = expediente.getListaExpedientes().get(0)
 							eModificado.setNumPoliza(consolidacionPoliza.policyNumber.toString())
 
-							RespuestaCRM respuestaCrmExpediente = tarificadorService.modificaExpediente("ES",eModificado,null,null)
+							RespuestaCRM respuestaCrmExpediente = expedienteService.modificaExpediente(company.ou,eModificado,null,null)
 
 							if (respuestaCrmExpediente.getErrorCRM() != null && respuestaCrmExpediente.getErrorCRM().getDetalle() != null && !respuestaCrmExpediente.getErrorCRM().getDetalle().isEmpty()){
 
@@ -371,7 +355,7 @@ class AmaUnderwrittingCaseManagementService	 {
 								correoUtil.envioEmail("ConsolidacionPoliza","Error en la modificacion de " + company.nombre + " con numero de solicitud: " + consolidacionPoliza.requestNumber + ". Error: " + respuestaCrmExpediente.getErrorCRM().getDetalle(), null)
 								logginService.putInfoEndpoint("ConsolidacionPoliza","Error en la modificacion de " + company.nombre + " con numero de solicitud: " + consolidacionPoliza.requestNumber + ". Error: " + respuestaCrmExpediente.getErrorCRM().getDetalle())
 
-								amaService.insertarError(company, consolidacionPoliza.requestNumber, requestXML.toString(), "CONSOLIDACION", "Peticion no realizada para solicitud: " + consolidacionPoliza.requestNumber + ". Error: " + respuestaCrmExpediente.getErrorCRM().getDetalle())
+								requestService.insertarError(company, consolidacionPoliza.requestNumber, requestXML.toString(), TipoOperacion.CONSOLIDACION, "Peticion no realizada para solicitud: " + consolidacionPoliza.requestNumber + ". Error: " + respuestaCrmExpediente.getErrorCRM().getDetalle())
 							} else {
 
 								notes = "El caso se ha procesado correctamente"
@@ -422,7 +406,7 @@ class AmaUnderwrittingCaseManagementService	 {
 			logginService.putErrorEndpoint("ConsolidacionPoliza","Peticion realizada para " + company.nombre + " con con numero de expiente: " + consolidacionPoliza.requestNumber + ". Error: " + e.getMessage())
 			correoUtil.envioEmailErrores("ConsolidacionPoliza","Peticion realizada para " + company.nombre + " con numero de expiente: " + consolidacionPoliza.requestNumber,e)
 
-			amaService.insertarError(company, consolidacionPoliza.requestNumber, requestXML.toString(), "CONSOLIDACION", "Peticion no realizada para solicitud: " + consolidacionPoliza.requestNumber + ". Error: " + e.getMessage())
+			requestService.insertarError(company, consolidacionPoliza.requestNumber, requestXML.toString(), TipoOperacion.CONSOLIDACION, "Peticion no realizada para solicitud: " + consolidacionPoliza.requestNumber + ". Error: " + e.getMessage())
 		}finally{
 
 			def sesion=RequestContextHolder.currentRequestAttributes().getSession()
@@ -447,12 +431,13 @@ class AmaUnderwrittingCaseManagementService	 {
 
 		def opername="AmaConsultaExpediente"
 		def requestXML = ""
-		RespuestaCRM respuestaCRM = new RespuestaCRM();
+		Request requestBBDD
+		RespuestaCRM respuestaCRM = new RespuestaCRM()
 		TransformacionUtil util = new TransformacionUtil()
 		CorreoUtil correoUtil = new CorreoUtil()
 		String identificador = ""
 
-		Company company = Company.findByNombre("ama")
+		Company company = Company.findByNombre(TipoCompany.AMA.getNombre())
 
 		try{
 
@@ -465,20 +450,19 @@ class AmaUnderwrittingCaseManagementService	 {
 
 				if ((consultaExpediente.numSolicitud != null && !consultaExpediente.numSolicitud.isEmpty()) || (consultaExpediente.numExpediente != null  && !consultaExpediente.numExpediente.isEmpty()) || (consultaExpediente.numSumplemento != null && !consultaExpediente.numSumplemento.isEmpty())){
 
-					requestXML=amaService.marshall("http://www.scortelemed.com/schemas/ama",consultaExpediente)
+					requestXML=amaService.marshall(consultaExpediente)
+					requestBBDD=requestService.crear(opername,requestXML)
 
-					requestService.crear(opername,requestXML)
-
-					Filtro filtro = new Filtro();
+					Filtro filtro = new Filtro()
 
 					/**Si numExpediente esta relleno buscamos por codigost que es unico y el resto da igual
 					 *
 					 */
 					if (consultaExpediente.numExpediente != null && !consultaExpediente.numExpediente.isEmpty()) {
 
-						filtro = new Filtro();
-						filtro.setClave(ClaveFiltro.EXPEDIENTE);
-						filtro.setValor(consultaExpediente.numExpediente);
+						filtro = new Filtro()
+						filtro.setClave(ClaveFiltro.EXPEDIENTE)
+						filtro.setValor(consultaExpediente.numExpediente)
 
 						identificador = "numExp: " +consultaExpediente.numExpediente
 					} else if ((consultaExpediente.numSolicitud != null && !consultaExpediente.numSolicitud.isEmpty()) && (consultaExpediente.numSumplemento == null || consultaExpediente.numSumplemento.isEmpty())){
@@ -486,9 +470,9 @@ class AmaUnderwrittingCaseManagementService	 {
 						/** numSolicitud
 						 *
 						 */
-						filtro = new Filtro();
-						filtro.setClave(ClaveFiltro.CLIENTE);
-						filtro.setValor(company.codigoSt);
+						filtro = new Filtro()
+						filtro.setClave(ClaveFiltro.CLIENTE)
+						filtro.setValor(company.codigoSt)
 						Filtro filtroRelacionado = new Filtro()
 						filtroRelacionado.setClave(ClaveFiltro.NUM_SOLICITUD)
 						filtroRelacionado.setValor(consultaExpediente.numSolicitud)
@@ -501,9 +485,9 @@ class AmaUnderwrittingCaseManagementService	 {
 						 *
 						 */
 
-						filtro = new Filtro();
-						filtro.setClave(ClaveFiltro.CLIENTE);
-						filtro.setValor(company.codigoSt);
+						filtro = new Filtro()
+						filtro.setClave(ClaveFiltro.CLIENTE)
+						filtro.setValor(company.codigoSt)
 
 						Filtro filtroRelacionado = new Filtro()
 						filtroRelacionado.setClave(ClaveFiltro.NUM_SOLICITUD)
@@ -526,19 +510,9 @@ class AmaUnderwrittingCaseManagementService	 {
 						logginService.putInfoMessage("Datos obligatorios incompletos. Es necesario indicar numExpediente o numSolicitud o numSolicitud+numSuplemento." + company.nombre)
 						return resultado
 					}
+					requestService.insertarEnvio(company, identificador, requestXML.toString())
 
-					/**Metemos en enviados
-					 *
-					 */
-					Envio envio = new Envio()
-					envio.setFecha(new Date())
-					envio.setCia(company.id.toString())
-					envio.setIdentificador(identificador)
-					envio.setInfo(requestXML.toString())
-					envio.save(flush:true)
-
-
-					respuestaCRM = amaService.informeExpedientePorFiltro(filtro,"ES")
+					respuestaCRM = expedienteService.informeExpedientePorFiltro(filtro,company.ou)
 
 					if(respuestaCRM != null && respuestaCRM.getListaExpedientesInforme() != null && respuestaCRM.getListaExpedientesInforme().size() > 0){
 
@@ -592,15 +566,8 @@ class AmaUnderwrittingCaseManagementService	 {
 			resultado.setNotes("Error en consultaExpediente: " + e.getMessage())
 			resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 			resultado.setStatus(StatusType.ERROR)
+			requestService.insertarError(company, identificador, requestXML.toString(), TipoOperacion.CONSULTA, e.getMessage())
 
-			com.scortelemed.Error error = new com.scortelemed.Error()
-			error.setFecha(new Date())
-			error.setCia(company.id.toString())
-			error.setIdentificador(identificador)
-			error.setInfo(requestXML.toString())
-			error.setOperacion("CONSULTA EXPEDIENTE")
-			error.setError(e.getMessage())
-			error.save(flush:true)
 		}finally{
 			//BORRAMOS VARIABLES DE SESION
 			def sesion=RequestContextHolder.currentRequestAttributes().getSession()
@@ -619,13 +586,13 @@ class AmaUnderwrittingCaseManagementService	 {
 
 		def opername="AmaConsultaDocumento"
 		def requestXML = ""
-
+		Request requestBBDD
 		TransformacionUtil util = new TransformacionUtil()
 		CorreoUtil correoUtil = new CorreoUtil()
-		Filtro filtro = new Filtro();
-		Company company = Company.findByNombre("ama")
+		Filtro filtro = new Filtro()
+		Company company = Company.findByNombre(TipoCompany.AMA.getNombre())
 		String indentificador = null
-		RespuestaCRM respuestaCRM = new RespuestaCRM();
+		RespuestaCRM respuestaCRM = new RespuestaCRM()
 
 		try{
 
@@ -637,30 +604,19 @@ class AmaUnderwrittingCaseManagementService	 {
 
 				if (consultaDocumento && consultaDocumento.codigoSt != null && !consultaDocumento.codigoSt.isEmpty()){
 
-					filtro = new Filtro();
-					filtro.setClave(ClaveFiltro.EXPEDIENTE);
-					filtro.setValor(consultaDocumento.codigoSt);
+					filtro = new Filtro()
+					filtro.setClave(ClaveFiltro.EXPEDIENTE)
+					filtro.setValor(consultaDocumento.codigoSt)
 
-					respuestaCRM = amaService.informeExpedientePorFiltro(filtro,"ES")
+					respuestaCRM = expedienteService.informeExpedientePorFiltro(filtro,company.ou)
 
 					if (consultaDocumento.nodoAlfresco != null && !consultaDocumento.nodoAlfresco.isEmpty()) {
 
 						if (amaService.existeDocumentoNodo(respuestaCRM,consultaDocumento.nodoAlfresco)) {
 
-							requestXML=amaService.marshall("http://www.scortelemed.com/schemas/ama",consultaDocumento)
-
-							requestService.crear(opername,requestXML)
-
-
-							/**Metemos en enviados
-							 *
-							 */
-							Envio envio = new Envio()
-							envio.setFecha(new Date())
-							envio.setCia(company.id.toString())
-							envio.setIdentificador(consultaDocumento.nodoAlfresco.substring(consultaDocumento.nodoAlfresco.lastIndexOf("/")+1,consultaDocumento.nodoAlfresco.length()))
-							envio.setInfo(requestXML.toString())
-							envio.save(flush:true)
+							requestXML=amaService.marshall(consultaDocumento)
+							requestBBDD=requestService.crear(opername,requestXML)
+							requestService.insertarEnvio(company, consultaDocumento.nodoAlfresco.substring(consultaDocumento.nodoAlfresco.lastIndexOf("/")+1,consultaDocumento.nodoAlfresco.length()), requestXML.toString())
 
 							resultado.setDocumento(amaService.rellenaDatosSalidaDocumentoNodo(consultaDocumento.nodoAlfresco, util.fromDateToXmlCalendar(new Date()), logginService, consultaDocumento.codigoSt))
 
@@ -693,20 +649,9 @@ class AmaUnderwrittingCaseManagementService	 {
 
 						if (amaService.existeDocumentoId(respuestaCRM,consultaDocumento.documentacionId)) {
 
-							requestXML=amaService.marshall("http://www.scortelemed.com/schemas/ama",consultaDocumento)
-
-							requestService.crear(opername,requestXML)
-
-
-							/**Metemos en enviados
-							 *
-							 */
-							Envio envio = new Envio()
-							envio.setFecha(new Date())
-							envio.setCia(company.id.toString())
-							envio.setIdentificador(consultaDocumento.documentacionId)
-							envio.setInfo(requestXML.toString())
-							envio.save(flush:true)
+							requestXML=amaService.marshall(consultaDocumento)
+							requestBBDD=requestService.crear(opername,requestXML)
+							requestService.insertarEnvio(company, consultaDocumento.documentacionId, requestXML.toString())
 
 							resultado.setDocumento(amaService.rellenaDatosSalidaDocumentoId(consultaDocumento.documentacionId, util.fromDateToXmlCalendar(new Date()), logginService, consultaDocumento.codigoSt))
 
@@ -762,15 +707,8 @@ class AmaUnderwrittingCaseManagementService	 {
 			resultado.setMessage("Error en consultaExpediente: " + e.getMessage())
 			resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 			resultado.setStatus(StatusType.ERROR)
+			requestService.insertarError(company, consultaDocumento.nodoAlfresco.substring(consultaDocumento.nodoAlfresco.lastIndexOf("/")+1,consultaDocumento.nodoAlfresco.length()), requestXML.toString(), TipoOperacion.DOCUMENTACION, e.getMessage())
 
-			com.scortelemed.Error error = new com.scortelemed.Error()
-			error.setFecha(new Date())
-			error.setCia(company.id.toString())
-			error.setIdentificador(consultaDocumento.nodoAlfresco.substring(consultaDocumento.nodoAlfresco.lastIndexOf("/")+1,consultaDocumento.nodoAlfresco.length()))
-			error.setInfo(requestXML.toString())
-			error.setOperacion("CONSULTA DOCUMENTO")
-			error.setError(e.getMessage())
-			error.save(flush:true)
 		}finally{
 			//BORRAMOS VARIABLES DE SESION
 			def sesion=RequestContextHolder.currentRequestAttributes().getSession()

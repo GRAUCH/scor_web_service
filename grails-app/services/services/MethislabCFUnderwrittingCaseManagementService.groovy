@@ -2,8 +2,13 @@ package services
 
 import com.scortelemed.Company
 import com.scortelemed.Operacion
+import com.scortelemed.Request
+import com.scortelemed.TipoCompany
+import com.scortelemed.TipoOperacion
 import com.scortelemed.schemas.methislabCF.*
 import com.ws.servicios.*
+import com.ws.servicios.impl.RequestService
+import com.ws.servicios.impl.companies.MethislabCFService
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
 import hwsol.webservices.WsError
@@ -11,7 +16,7 @@ import org.apache.cxf.annotations.SchemaValidation
 import org.grails.cxf.utils.EndpointType
 import org.grails.cxf.utils.GrailsCxfEndpoint
 import org.grails.cxf.utils.GrailsCxfEndpointProperty
-import org.springframework.beans.factory.annotation.Autowired
+
 import org.springframework.web.context.request.RequestContextHolder
 import servicios.RespuestaCRMInforme
 
@@ -28,16 +33,12 @@ expose = EndpointType.JAX_WS,properties = [@GrailsCxfEndpointProperty(name = "ws
 @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
 class MethislabCFUnderwrittingCaseManagementService {
 
-	@Autowired
-	private MethislabCFService methislabCFService
-	@Autowired
-	private EstadisticasService estadisticasService
-	@Autowired
-	private RequestService requestService
-	@Autowired
-	private LogginService logginService
-	@Autowired
-	private TarificadorService tarificadorService
+	def expedienteService
+	def methislabCFService
+	def estadisticasService
+	def requestService
+	def logginService
+	def tarificadorService
 
 	@WebResult(name = "caseManagementResponse")
 	MethislabCFUnderwrittingCaseManagementResponse MethislabCFUnderwrittingCaseManagementResponse(@WebParam(partName = "CaseManagementRequest",name = "CaseManagementRequest")
@@ -49,14 +50,13 @@ class MethislabCFUnderwrittingCaseManagementService {
 
 		def opername="MethislabCFUnderwrittingCaseManagementRequest"
 		def requestXML = ""
-		def requestBBDD
-		def tarificadorService
+		Request requestBBDD
 		List<WsError> wsErrors = new ArrayList<WsError>()
 		String message = null
 		StatusType status = null
 		String code = 0
 
-		def company = Company.findByNombre('methislabCF')
+		def company = Company.findByNombre(TipoCompany.CF_LIFE.getNombre())
 
         logginService.putInfoMessage("Realizando peticion de informacion de servicio GestionReconocimientoMedico para la cia " + company.nombre)
 
@@ -66,12 +66,10 @@ class MethislabCFUnderwrittingCaseManagementService {
 
 			if (operacion && operacion.activo){
 
-				if (Company.findByNombre("methislabCF").generationAutomatic) {
+				if (company.generationAutomatic) {
 
-					requestXML=methislabCFService.marshall("http://www.scortelemed.com/schemas/methislabCF",MethislabCFUnderwrittingCaseManagementRequest)
+					requestXML=methislabCFService.marshall(MethislabCFUnderwrittingCaseManagementRequest)
 					requestBBDD = requestService.crear(opername,requestXML)
-					requestBBDD.fecha_procesado = new Date()
-					requestBBDD.save(flush:true)
 
 					wsErrors = methislabCFService.validarDatosObligatorios(requestBBDD)
 
@@ -79,9 +77,9 @@ class MethislabCFUnderwrittingCaseManagementService {
 
 						logginService.putInfoMessage("Se procede el alta automatica de " + company.nombre + " con numero de solicitud " + MethislabCFUnderwrittingCaseManagementRequest.candidateInformation.requestNumber)
 
-						methislabCFService.crearExpediente(requestBBDD)
+						expedienteService.crearExpediente(requestBBDD, TipoCompany.CF_LIFE)
 
-						methislabCFService.insertarRecibido(company, MethislabCFUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, requestXML.toString(), "ALTA")
+						requestService.insertarRecibido(company, MethislabCFUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, requestXML.toString(), TipoOperacion.ALTA)
 
 
 						message = "Il caso e stato elaborato correttamente"
@@ -92,14 +90,14 @@ class MethislabCFUnderwrittingCaseManagementService {
 						 *
 						 */
 						logginService.putInfoMessage("Buscando en CRM solicitud de " + company.nombre + " con numero de solicitud: " + MethislabCFUnderwrittingCaseManagementRequest.candidateInformation.requestNumber)
-						methislabCFService.busquedaCrm(MethislabCFUnderwrittingCaseManagementRequest.candidateInformation.policyNumber, company.ou, MethislabCFUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, opername, company.codigoSt, company.id, requestBBDD, MethislabCFUnderwrittingCaseManagementRequest.candidateInformation.certificateNumber, company.nombre)
+						expedienteService.busquedaCrm(requestBBDD, company, MethislabCFUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, MethislabCFUnderwrittingCaseManagementRequest.candidateInformation.certificateNumber, null)
 
 					} else {
 						String error =  util.detalleError(wsErrors)
 						message = "Errore di convalida: " + error
 						status = StatusType.ERROR
 						code = 8
-						methislabCFService.insertarError(company, MethislabCFUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + MethislabCFUnderwrittingCaseManagementRequest.candidateInformation.requestNumber + ". Error de validacion: " + error)
+						requestService.insertarError(company, MethislabCFUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, requestXML.toString(), TipoOperacion.ALTA, "Peticion no realizada para solicitud: " + MethislabCFUnderwrittingCaseManagementRequest.candidateInformation.requestNumber + ". Error de validacion: " + error)
 						logginService.putErrorEndpoint("GestionReconocimientoMedico","Peticion no realizada de " + company.nombre + " con numero de solicitud: " + MethislabCFUnderwrittingCaseManagementRequest.candidateInformation.requestNumber + ". Error de validacion: " + error)
 					}
 				}
@@ -116,7 +114,7 @@ class MethislabCFUnderwrittingCaseManagementService {
 			message = "Error: " + e.printStackTrace()
 			status = StatusType.ERROR
 			code = 2
-			methislabCFService.insertarError(company, MethislabCFUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + MethislabCFUnderwrittingCaseManagementRequest.candidateInformation.requestNumber + ". Error: " + e.getMessage())
+			requestService.insertarError(company, MethislabCFUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, requestXML.toString(), TipoOperacion.ALTA, "Peticion no realizada para solicitud: " + MethislabCFUnderwrittingCaseManagementRequest.candidateInformation.requestNumber + ". Error: " + e.getMessage())
 			logginService.putErrorEndpoint("GestionReconocimientoMedico","Peticion no realizada de " + company.nombre + " con numero de solicitud: " + MethislabCFUnderwrittingCaseManagementRequest.candidateInformation.requestNumber + ". Error: " + e.getMessage())
 			correoUtil.envioEmailErrores("GestionReconocimientoMedico","Peticion de " + company.nombre + " con numero de solicitud: " + MethislabCFUnderwrittingCaseManagementRequest.candidateInformation.requestNumber,e.getMessage())
 			
@@ -141,6 +139,7 @@ class MethislabCFUnderwrittingCaseManagementService {
 
 		def opername="MethislabCFUnderwrittingCaseManagementResponse"
 		def requestXML = ""
+		Request requestBBDD
 		List<RespuestaCRMInforme> expedientes = new ArrayList<RespuestaCRMInforme>()
 		TransformacionUtil util = new TransformacionUtil()
 		CorreoUtil correoUtil = new CorreoUtil()
@@ -151,7 +150,7 @@ class MethislabCFUnderwrittingCaseManagementService {
 
 		MethislabCFUnderwrittingCasesResultsResponse resultado =new MethislabCFUnderwrittingCasesResultsResponse()
 
-		Company company = Company.findByNombre("methislabCF")
+		Company company = Company.findByNombre(TipoCompany.CF_LIFE.getNombre())
 
 		try{
 
@@ -163,9 +162,8 @@ class MethislabCFUnderwrittingCaseManagementService {
 
 				if (methislabCFUnderwrittingCasesResults && methislabCFUnderwrittingCasesResults.dateStart && methislabCFUnderwrittingCasesResults.dateEnd){
 
-					requestXML=methislabCFService.marshall("http://www.scortelemed.com/schemas/methislabCF",methislabCFUnderwrittingCasesResults)
-
-					requestService.crear(opername,requestXML)
+					requestXML=methislabCFService.marshall(methislabCFUnderwrittingCasesResults)
+					requestBBDD=requestService.crear(opername,requestXML)
 
 					Date date = methislabCFUnderwrittingCasesResults.dateStart.toGregorianCalendar().getTime()
 					SimpleDateFormat sdfr = new SimpleDateFormat("yyyyMMdd HH:mm:ss")
@@ -173,12 +171,10 @@ class MethislabCFUnderwrittingCaseManagementService {
 					date = methislabCFUnderwrittingCasesResults.dateEnd.toGregorianCalendar().getTime()
 					String fechaFin = sdfr.format(date)
 
+					expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt,null,1,fechaIni,fechaFin,company.ou))
+					expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt,null,2,fechaIni,fechaFin,company.ou))
 
-					for (int i = 1; i < 3; i++){
-						expedientes.addAll(tarificadorService.obtenerInformeExpedientes(company.codigoSt,null,i,fechaIni,fechaFin,"IT"))
-					}
-
-					methislabCFService.insertarEnvio(company, methislabCFUnderwrittingCasesResults.dateStart.toString().substring(0,10) + "-" + methislabCFUnderwrittingCasesResults.dateEnd.toString().substring(0,10), requestXML.toString())
+					requestService.insertarEnvio(company, methislabCFUnderwrittingCasesResults.dateStart.toString().substring(0,10) + "-" + methislabCFUnderwrittingCasesResults.dateEnd.toString().substring(0,10), requestXML.toString())
 
 					if(expedientes){
 
@@ -223,7 +219,7 @@ class MethislabCFUnderwrittingCaseManagementService {
 			code = 2
 			logginService.putErrorEndpoint("ResultadoReconocimientoMedico","Peticion realizada para " + company.nombre + " con fecha: " + methislabCFUnderwrittingCasesResults.dateStart.toString() + "-" + methislabCFUnderwrittingCasesResults.dateEnd.toString() + ". Error: " + e.getMessage())
 			correoUtil.envioEmailErrores("ResultadoReconocimientoMedico","Peticion realizada para " + company.nombre + " con fecha: " + methislabCFUnderwrittingCasesResults.dateStart.toString() + "-" + methislabCFUnderwrittingCasesResults.dateEnd.toString(), e)
-			methislabCFService.insertarError(company, methislabCFUnderwrittingCasesResults.dateStart.toString().substring(0,10) + "-" + methislabCFUnderwrittingCasesResults.dateEnd.toString().substring(0,10), requestXML.toString(), "CONSULTA", "Peticion no realizada para solicitud: " + methislabCFUnderwrittingCasesResults.dateStart.toString() + "-" + methislabCFUnderwrittingCasesResults.dateEnd.toString() + ". Error: " + e.getMessage())
+			requestService.insertarError(company, methislabCFUnderwrittingCasesResults.dateStart.toString().substring(0,10) + "-" + methislabCFUnderwrittingCasesResults.dateEnd.toString().substring(0,10), requestXML.toString(), TipoOperacion.CONSULTA, "Peticion no realizada para solicitud: " + methislabCFUnderwrittingCasesResults.dateStart.toString() + "-" + methislabCFUnderwrittingCasesResults.dateEnd.toString() + ". Error: " + e.getMessage())
 			
 		}finally{
 

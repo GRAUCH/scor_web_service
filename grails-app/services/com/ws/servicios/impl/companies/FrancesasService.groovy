@@ -1,106 +1,76 @@
-package com.ws.servicios
-import grails.util.Environment
-import hwsol.webservices.FetchUtilLagunaro
-
-import java.text.SimpleDateFormat
-
-import org.apache.axis.types.Token
+package com.ws.servicios.impl.companies
 
 import com.scor.global.ExceptionUtils
 import com.scor.global.WSException
-import com.scor.srpfileinbound.*
-import com.scortelemed.Conf
+import com.scor.srpfileinbound.DATOS
+import com.scor.srpfileinbound.REGISTRODATOS
+import com.scortelemed.Company
 import com.scortelemed.Estadistica
+import com.scortelemed.Request
+import com.ws.afiesca.beans.AfiEscaUnderwrittingCaseManagementRequest
+import com.ws.afiesca.beans.AfiEscaUnderwrittingCasesResultsRequest
+import com.ws.alptis.beans.AlptisUnderwrittingCaseManagementRequest
+import com.ws.lifesquare.beans.LifesquareUnderwrittingCaseManagementRequest
+import com.ws.lifesquare.beans.LifesquareUnderwrittingCasesResultsRequest
+import com.ws.servicios.ICompanyService
+import grails.util.Environment
+import org.apache.axis.types.Token
 
-class CrearExpedienteService {
+import java.text.SimpleDateFormat
 
-	/*
-	 Se conecta al CRM y devuelve los expedientes tarificados para una fecha
-	 */
+class FrancesasService implements ICompanyService{
+
 	def grailsApplication
-	def hwSoapClientService
-	def fetchUtil = new FetchUtilLagunaro()
-	def soapAlptisRecetteWSPRO
-	def soapAlptisRecetteWS
+	def expedienteService
 	def requestService
-	def logginService = new LogginService()
-	def cajamarService
+	def logginService
 
-	def crearExpediente = { req ->
+	/**
+	 * AFI_ESCA, ALPTIS, ZEN_UP(Lifesquare) (Beans, sin namespace)
+	 */
+
+	String marshall(Object objeto) {
+		String result
 		try {
-			//SOBREESCRIBIMOS LA URL A LA QUE TIENE QUE LLAMAR EL WSDL
-			def ctx = grailsApplication.mainContext
-			def bean = ctx.getBean("soapClientCrearOrabpel")
-			bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("orabpelCreacion.wsdl")?.value)
-			def salida = grailsApplication.mainContext.soapClientCrearOrabpel.initiate(crearExpedienteBPM(req))
-			return "OK"
-		} catch (Exception e) {
-			throw new WSException(this.getClass(), "crearExpediente", ExceptionUtils.composeMessage(null, e));
+			if (objeto instanceof AfiEscaUnderwrittingCaseManagementRequest) {
+				result = requestService.marshall(objeto, AfiEscaUnderwrittingCaseManagementRequest.class)
+			} else if(objeto instanceof AfiEscaUnderwrittingCasesResultsRequest) {
+				result = requestService.marshall(objeto, AfiEscaUnderwrittingCasesResultsRequest.class)
+			} else if (objeto instanceof AlptisUnderwrittingCaseManagementRequest) {
+				result = requestService.marshall(objeto, AlptisUnderwrittingCaseManagementRequest.class)
+			} else if (objeto instanceof LifesquareUnderwrittingCaseManagementRequest) {
+				result = requestService.marshall(objeto, LifesquareUnderwrittingCaseManagementRequest.class)
+			} else if (objeto instanceof LifesquareUnderwrittingCasesResultsRequest) {
+				result = requestService.marshall(objeto, LifesquareUnderwrittingCasesResultsRequest.class)
+			}
+		} finally {
+			return result
 		}
 	}
 
-	private def crearExpedienteBPM = { req ->
-		def listadoFinal = []
-		RootElement payload = new RootElement()
 
-		listadoFinal.add(buildCabecera(req))
-		listadoFinal.add(buildDatos(req, req.company))
-		listadoFinal.add(buildPie())
-
-		payload.cabeceraOrDATOSOrPIE = listadoFinal
-
-		return payload
-	}
-
-	private def buildCabecera = { req ->
-		def formato = new SimpleDateFormat("yyyyMMdd");
-		RootElement.CABECERA cabecera = new RootElement.CABECERA()
-		cabecera.setCodigoCia(req.company.codigoSt)
-		cabecera.setContadorSecuencial("1")
-		cabecera.setFechaGeneracion(formato.format(new Date()))
-		cabecera.setFiller("")
-		cabecera.setTipoFichero("1")
-
-		return cabecera
-	}
-
-	private def buildPie = { ->
-
-		RootElement.PIE pie = new RootElement.PIE()
-		pie.setFiller("")
-		pie.setNumFilasFichero(100)
-
-		pie.setNumRegistros(1)
-
-		return pie
-	}
-
-	private def buildDatos = { req, company ->
+	def buildDatos(Request req, String codigoSt) {
 		try {
 			DATOS dato = new DATOS()
-			if (company.nombre.equals("cajamar")){
-
-				dato.registro = cajamarService.rellenaDatos(req, company)
-				dato.pregunta = cajamarService.rellenaPreguntas(req, company.nombre)
-				dato.servicio = cajamarService.rellenaServicios(req, company.nombre)
-				dato.coberturas = cajamarService.rellenaCoberturas(req)
-
-			} else {
-				dato.registro = rellenaDatos(req, company)
-				dato.pregunta = rellenaPreguntas(req, company.nombre)
-				dato.servicio = rellenaServicio(req, company.nombre)
-				dato.coberturas = rellenaCoberturas(req)
-			}
-
+			Company company = req.company
+			dato.registro = rellenaDatos(req, company)
+			dato.pregunta = rellenaPreguntas(req, company.nombre)
+			dato.servicio = rellenaServicio(req, company.nombre)
+			dato.coberturas = rellenaCoberturas(req)
 			return dato
 		} catch (Exception e) {
 			logginService.putError(e.toString())
 		}
 	}
 
-	private def rellenaDatos = { req, company ->
+
+	def getCodigoStManual(Request req) {
+		return null
+	}
+
+	def rellenaDatos = { req, company ->
 		def mapDatos = [:]
-		def formato = new SimpleDateFormat("yyyyMMdd");
+		def formato = new SimpleDateFormat("yyyyMMdd")
 
 		try {
 			def estadisticas = Estadistica.findAllByRequestAndClaveInList(req, ["policy", "candidate", "agent", "request_Data"])
@@ -231,11 +201,11 @@ class CrearExpedienteService {
 
 			return datos
 		} catch (Exception e) {
-			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
 		}
 	}
 
-	private def rellenaPreguntas = { req, nameCompany ->
+	def rellenaPreguntas = { req, nameCompany ->
 		def listadoPreguntas = []
 		def mapDatos = [:]
 
@@ -288,18 +258,18 @@ class CrearExpedienteService {
 
 			return listadoPreguntas
 		} catch (Exception e) {
-			throw new WSException(this.getClass(), "rellenaPreguntas", ExceptionUtils.composeMessage(null, e));
+			throw new WSException(this.getClass(), "rellenaPreguntas", ExceptionUtils.composeMessage(null, e))
 		}
 	}
 
-	private def rellenaServicio = { req, nombre ->
+	def rellenaServicio = { req, nombre ->
 		def listadoServicios = []
-		listadoServicios.add(obtenerSerivicioPorNombreCompania(req, nombre))
+		listadoServicios.add(obtenerServicioPorNombreCompania(req, nombre))
 
 		return listadoServicios
 	}
 
-	private def rellenaCoberturas = { req ->
+	def rellenaCoberturas = { req ->
 		
 		def listadoCoberturas = []
 		def capital = 0
@@ -360,7 +330,7 @@ class CrearExpedienteService {
 
 			return listadoCoberturas
 		} catch (Exception e) {
-			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
 		}
 	}
 
@@ -378,7 +348,7 @@ class CrearExpedienteService {
 		return result
 	}
 
-	private def obtenerSerivicioPorNombreCompania = { req, nombre ->
+	private def obtenerServicioPorNombreCompania = { req, nombre ->
 		def mapDatos = [:]
 
 		DATOS.Servicio servicio = new DATOS.Servicio()
