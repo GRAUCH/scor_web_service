@@ -16,7 +16,7 @@ import com.scortelemed.schemas.caser.XSDProcessExecutionPort
 import com.scortelemed.schemas.caser.XSDProcessExecutionServiceLocator
 import com.ws.alptis.sp.beans.AlptisUnderwrittingCaseResultsRequest
 import com.ws.cajamar.beans.Cobertura
-import com.ws.servicios.AmaService
+import com.ws.servicios.impl.companies.AmaService
 import grails.plugin.springsecurity.annotation.Secured
 import grails.util.Environment
 import hwsol.entities.parser.RegistrarEventoSCOR
@@ -48,8 +48,9 @@ class WsController {
     def soapCaserRecetteWSPRO
     CorreoUtil correoUtil = new CorreoUtil()
     def requestService
+    def expedienteService
     def tarificadorService
-    def crearExpedienteService
+    def francesasService
 
 
     @Autowired
@@ -71,7 +72,7 @@ class WsController {
             StringBuilder sbInfo = new StringBuilder("* Realizando proceso envio de informacion para " + company.nombre + " *")
             if (params.myGroup != null && params.myGroup == 'codigoST' && params.codigoST) {
                 sbInfo.append(" al expediente con codigo ST ${params.codigoST}")
-                resulExpedienteSoap = tarificadorService.consultaExpedienteCodigoST(params.codigoST, "FR")
+                resulExpedienteSoap = expedienteService.consultaExpedienteCodigoST(params.codigoST, company.ou)
                 sbInfo.append(" * se encontraron :  ${resulExpedienteSoap.size()}  expedientes con el codigo ST *")
             } else {
                 //EJEMPLO DE URL:
@@ -79,7 +80,7 @@ class WsController {
                 fechaIni = LogUtil.paramsToDateIni(params)
                 fechaFin = LogUtil.paramsToDateFin(params)
                 sbInfo.append(" con fecha inicio ").append(fechaIni).append("-").append(" con fecha fin ").append(fechaFin)
-                resulExpedienteSoap = tarificadorService.obtenerInformeExpedientes("1019", null, 1, fechaIni, fechaFin, "FR")
+                resulExpedienteSoap = expedienteService.obtenerInformeExpedientes(company.codigoSt, null, 1, fechaIni, fechaFin, company.ou)
             }
             if (Environment.current.name.equals("production_wildfly")) {
                 logginService.putInfoMessage("WS PRD")
@@ -197,8 +198,8 @@ class WsController {
     }
 
     def caseresultCM = {
-        def fechaFin
-        def fechaIni
+        String fechaFin
+        String fechaIni
         def responseRecette
         def soap = soapCajamarRecetteWS
         def opername = "caseresultCM"
@@ -220,21 +221,15 @@ class WsController {
             sbInfo.append("\n")
             if (params.myGroup != null && params.myGroup == 'codigoST' && params.codigoST) {
                 sbInfo.append(" al expediente con codigo ST ${params.codigoST}")
-                resulExpedienteSoap.addAll(tarificadorService.consultaExpedienteCodigoST(params.codigoST, "ES"))
+                resulExpedienteSoap.addAll(expedienteService.consultaExpedienteCodigoST(params.codigoST, company.ou))
                 sbInfo.append("se encontraron :  ${resulExpedienteSoap.size()}  expedientes con el codigo ST")
             } else {
                 fechaIni = LogUtil.paramsToDateIni(params)
                 fechaFin = LogUtil.paramsToDateFin(params)
                 sbInfo.append(" con fecha inicio ").append(fechaIni).append("-").append(" con fecha fin ").append(fechaFin)
-                if (!Environment.current.name.equals("production_wildfly")) {
-                    for (int i = 0; i < 3; i++) {
-                        resulExpedienteSoap.addAll(tarificadorService.obtenerInformeExpedientes("1035", null, i, fechaIni, fechaFin, "ES"))
-                    }
-                } else {
-                    for (int i = 0; i < 3; i++) {
-                        resulExpedienteSoap.addAll(tarificadorService.obtenerInformeExpedientes("1018", null, i, fechaIni, fechaFin, "ES"))
-                    }
-                }
+                resulExpedienteSoap.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt, null, 0, fechaIni, fechaFin, company.ou))
+                resulExpedienteSoap.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt, null, 1, fechaIni, fechaFin, company.ou))
+                resulExpedienteSoap.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt, null, 2, fechaIni, fechaFin, company.ou))
             }
 
             def client = new SOAPClient('https://www.generali.es/evi_vidaEmissioServWeb/services/TeleSeleccionHandlerService?Company=M')
@@ -449,23 +444,16 @@ class WsController {
             sbInfo.append("\n")
             if (params.myGroup != null && params.myGroup == 'codigoST' && params.codigoST) {
                 sbInfo.append(" al expediente con codigo ST ${params.codigoST}")
-                expedientes.addAll(tarificadorService.consultaExpedienteCodigoST(params.codigoST, "ES"))
+                expedientes.addAll(expedienteService.consultaExpedienteCodigoST(params.codigoST, company.ou))
                 sbInfo.append(" * se encontraron :  ${expedientes.size()}  expedientes con el codigo ST *")
             } else {
                 fechaIni = LogUtil.paramsToDateIni(params)
                 fechaFin = LogUtil.paramsToDateFin(params)
                 sbInfo.append(" con fecha inicio ").append(fechaIni).append("-").append(" con fecha fin ").append(fechaFin)
-                if (Environment.current.name.equals("production_wildfly")) {
-                    sbInfo.append("** compania 1061 **")
-                    for (int i = 0; i < 3; i++) {
-                        expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1061", null, i, fechaIni, fechaFin, "ES"))
-                    }
-                } else {
-                    sbInfo.append("** compania 1062 **")
-                    for (int i = 0; i < 3; i++) {
-                        expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1062", null, i, fechaIni, fechaFin, "ES"))
-                    }
-                }
+                sbInfo.append("** compania "+company.codigoSt+" **")
+                expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt, null, 0, fechaIni, fechaFin, company.ou))
+                expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt, null, 1, fechaIni, fechaFin, company.ou))
+                expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt, null, 2, fechaIni, fechaFin, company.ou))
             }
 
             XSDProcessExecutionServiceLocator locator = new XSDProcessExecutionServiceLocator()
@@ -569,34 +557,24 @@ class WsController {
         //http://localhost:8080/scorWebservice/ws/caseresultAma?ini=20171107 00:00:00&fin=20171107 23:59:59
 
         try {
-
-            def company = Company.findByNombre('ama')
+            def company = Company.findByNombre(TipoCompany.AMA.nombre)
+            def companyVida = Company.findByNombre(TipoCompany.AMA_VIDA.nombre)
             def identificadorCaso
             Expediente expediente
             StringBuilder sbInfo = new StringBuilder(" *Realizando proceso envio de informacion para " + company.nombre +" *")
             sbInfo.append("\n")
             if (params.myGroup != null && params.myGroup == 'codigoST' && params.codigoST) {
                 sbInfo.append(" al expediente con codigo ST ${params.codigoST}")
-                expedientes.addAll(tarificadorService.consultaExpedienteCodigoST(params.codigoST, "ES"))
+                expedientes.addAll(expedienteService.consultaExpedienteCodigoST(params.codigoST, company.ou))
                 sbInfo.append(" * se encontraron :  ${expedientes.size()}  expedientes con el codigo ST *")
             } else {
                 fechaIni = LogUtil.paramsToDateIni(params)
                 fechaFin = LogUtil.paramsToDateFin(params)
                 sbInfo.append(" con fecha inicio ").append(fechaIni).append("-").append(" con fecha fin ").append(fechaFin)
-                if (Environment.current.name.equals("production_wildfly")) {
-                    logginService.putInfoMessage(" ** Codigo ST PRD   1059 y 1065**")
-                    for (int i = 1; i < 3; i++) {
-                        //Ambas son companias de AMA en PRODUCCION.
-                        expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1059", null, i, fechaIni, fechaFin, "ES"))
-                        expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1065", null, i, fechaIni, fechaFin, "ES"))
-                    }
-                } else {
-                    for (int i = 1; i < 3; i++) {
-                        //Ambas son companias de AMA en PRE PRODUCCION.
-                        expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1059", null, i, fechaIni, fechaFin, "ES"))
-                        expedientes.addAll(tarificadorService.obtenerInformeExpedientes("1064", null, i, fechaIni, fechaFin, "ES"))
-                    }
-                }
+                expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt, null, 1, fechaIni, fechaFin, company.ou))
+                expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt, null, 2, fechaIni, fechaFin, company.ou))
+                expedientes.addAll(expedienteService.obtenerInformeExpedientes(companyVida.codigoSt, null, 1, fechaIni, fechaFin, company.ou))
+                expedientes.addAll(expedienteService.obtenerInformeExpedientes(companyVida.codigoSt, null, 2, fechaIni, fechaFin, company.ou))
             }
 
             logginService.putInfoMessage(sbInfo.toString())

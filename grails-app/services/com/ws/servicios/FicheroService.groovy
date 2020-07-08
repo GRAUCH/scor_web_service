@@ -69,7 +69,7 @@ class FicheroService {
 
 	def procesarCabezeraFichero(compania){
 		try{
-			SimpleDateFormat formato = new SimpleDateFormat("yyyymmdd");
+			SimpleDateFormat formato = new SimpleDateFormat("yyyymmdd")
 
 			//OBTENEMOS EL SIGUIENTE ID DE FICHERO
 			def lote = ConfFichero.findByName("contador_fichero")
@@ -506,16 +506,16 @@ class FicheroService {
 		switch(nombrePeticion) {
 			case "AfiEscaUnderwrittingCaseManagementRequest":
 				result = DatosEnum
-				break;
+				break
 			case "AlptisUnderwrittingCaseManagementRequest":
 				result = DatosAlptisEnum
-				break;
+				break
 			case "LifesquareUnderwrittingCaseManagementRequest":
 				result = DatosLifesquareEnum
-				break;
+				break
 			case "CajamarUnderwrittingCaseManagementRequest":
 				result = DatosCajamarEnum
-				break;
+				break
 		}
 
 		return result

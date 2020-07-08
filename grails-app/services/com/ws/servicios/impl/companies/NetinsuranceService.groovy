@@ -1,59 +1,80 @@
-package com.ws.servicios
+package com.ws.servicios.impl.companies
 
 import com.scor.comprimirdocumentos.ParametrosEntrada
-import com.scortelemed.Agente
+import com.scor.global.ExceptionUtils
+import com.scor.global.WSException
+import com.scor.srpfileinbound.DATOS
+import com.scor.srpfileinbound.REGISTRODATOS
+import com.scortelemed.*
+import com.scortelemed.schemas.netinsurance.*
+import com.scortelemed.schemas.netinsurance.NetinsuranteGetDossierResponse.ExpedienteConsulta
+import com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCasesResultsResponse.Expediente
 import com.scortelemed.servicios.Candidato
-import com.scortelemed.servicios.FrontalServiceLocator
 import com.scortelemed.servicios.Frontal
-import servicios.RespuestaCRM
-
-import static grails.async.Promises.*
+import com.scortelemed.servicios.FrontalServiceLocator
+import com.ws.servicios.ICompanyService
 import hwsol.webservices.CorreoUtil
-import hwsol.webservices.GenerarZip
 import hwsol.webservices.TransformacionUtil
-
-import java.text.SimpleDateFormat
-
-import javax.xml.bind.JAXBContext
-import javax.xml.bind.JAXBElement
-import javax.xml.bind.Marshaller
-import javax.xml.namespace.QName
-import javax.xml.parsers.DocumentBuilder
-import javax.xml.parsers.DocumentBuilderFactory
-
+import hwsol.webservices.ZipResponse
 import org.w3c.dom.Document
 import org.w3c.dom.Element
 import org.w3c.dom.Node
 import org.w3c.dom.NodeList
 import org.xml.sax.InputSource
+import servicios.RespuestaCRM
 
-import com.scor.global.ExceptionUtils
-import com.scor.global.WSException
-import com.scor.srpfileinbound.DATOS
-import com.scor.srpfileinbound.REGISTRODATOS
-import com.scor.srpfileinbound.RootElement
-import com.scortelemed.Company;
-import com.scortelemed.Conf
-import com.scortelemed.Envio
-import com.scortelemed.Recibido
-import com.scortelemed.schemas.netinsurance.BenefictNameType
-import com.scortelemed.schemas.netinsurance.BenefictResultType
-import com.scortelemed.schemas.netinsurance.BenefitsType
-import com.scortelemed.schemas.netinsurance.NetinsuranteGetDossierRequest
-import com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCaseManagementRequest
-import com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCasesResultsRequest
-import com.scortelemed.schemas.netinsurance.RequestStateType
-import com.scortelemed.schemas.netinsurance.NetinsuranteGetDossierResponse.ExpedienteConsulta
-import com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCasesResultsResponse.Expediente
-import hwsol.webservices.ZipResponse;
+import javax.xml.parsers.DocumentBuilder
+import javax.xml.parsers.DocumentBuilderFactory
+import java.text.SimpleDateFormat
 
-class NetinsuranceService {
+import static grails.async.Promises.task
+
+class NetinsuranceService implements ICompanyService{
 
 	TransformacionUtil util = new TransformacionUtil()
-	def logginService = new LogginService()
-	def tarificadorService = new TarificadorService()
-	GenerarZip generarZip = new GenerarZip()
+	def logginService
+	def requestService
+	def expedienteService
+	def tarificadorService
 	def grailsApplication
+
+
+	String marshall(def objeto) {
+		String nameSpace = "http://www.scortelemed.com/schemas/netinsurance"
+		String result
+		try{
+			if (objeto instanceof NetinsuranteUnderwrittingCaseManagementRequest){
+				result = requestService.marshall(nameSpace, objeto, NetinsuranteUnderwrittingCaseManagementRequest.class)
+			} else if (objeto instanceof NetinsuranteUnderwrittingCasesResultsRequest){
+				result = requestService.marshall(nameSpace, objeto, NetinsuranteUnderwrittingCasesResultsRequest.class)
+			} else if (objeto instanceof NetinsuranteGetDossierRequest){
+				result = requestService.marshall(nameSpace, objeto, NetinsuranteGetDossierRequest.class)
+			}
+		} finally {
+			return result
+		}
+	}
+
+
+	def buildDatos(Request req, String codigoSt) {
+		try {
+			DATOS dato = new DATOS()
+			Company company = req.company
+			dato.registro = rellenaDatos(req, company)
+			//dato.pregunta = rellenaPreguntas(req, company.nombre)
+			dato.servicio = rellenaServicios(req, company.nombre)
+			dato.coberturas = rellenaCoberturas(req)
+
+			return dato
+		} catch (Exception e) {
+			logginService.putError(e.toString())
+		}
+	}
+
+
+	def getCodigoStManual(Request req) {
+		return null
+	}
 
 	 def rellenaDatosSalidaConsulta(servicios.Expediente expedientePoliza, requestDate, logginService) {
 
@@ -146,27 +167,6 @@ class NetinsuranceService {
 			expediente.setPhoneNumber2("")
 		}
 
-		 /*if (expedientePoliza.getCodigoEstado() == servicios.TipoEstadoExpediente.CERRADO) {
-
-             ZipResponse zipResponse = obtenerZip(expedientePoliza.getCodigoST(), expedientePoliza.getNodoAlfresco(), cia);
-
-             if (!zipResponse.getError()) {
-
-                 compressedData = zipResponse.getDatosRespuesta()
-
-
-             } else {
-
-                 compressedData = zipResponse.getDatosRespuesta()
-                 logginService.putErrorEndpoint("rellenaDatosSalidaExpediente", "El método obtener zip ha generado el siguiente error: " + zipResponse.getCodigo() + "-" + zipResponse.getDescripcion())
-                 insertarError(company, expedientePoliza.getNumSolicitud(), "Error en generado de zip", "obtenerZip", zipResponse.getCodigo() + "-" + zipResponse.getDescripcion())
-             }
-
-             expediente.setZip(compressedData)
-         } else {
-             expediente.setZip(new byte[0])
-         }*/
-
 		expediente.setZip(new byte[0])
 		expediente.setNotes(util.devolverDatos(expedientePoliza.getTarificacion().getObservaciones()))
 
@@ -207,212 +207,11 @@ class NetinsuranceService {
 
 	}
 
-	ZipResponse obtenerZip(String expediente, String nodo, String cia){
-
-		ZipResponse response = new ZipResponse()
-
-		try {
-			def parametrosEntrada = new ParametrosEntrada()
-			parametrosEntrada.usuario = Conf.findByName("orabpel.usuario")?.value
-			parametrosEntrada.clave = Conf.findByName("orabpel.clave")?.value
-			parametrosEntrada.refNodo = nodo
-
-			//SOBREESCRIBIMOS LA URL A LA QUE TIENE QUE LLAMAR EL WSDL
-			def ctx = grailsApplication.mainContext
-			def bean = ctx.getBean("soapClientComprimidoAlptis")
-			bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("orabpel.wsdl")?.value)
-
-			def salida=grailsApplication.mainContext.soapClientComprimidoAlptis.process(parametrosEntrada)
-
-			// salida.datosRespuesta.content
-
-			if (salida.codigo.equals("0")) {
-
-				response.setError(false);
-				response.setCodigo(salida.codigo)
-				response.setDescripcion(salida.descripcion)
-				response.setDatosRespuesta(salida.datosRespuesta.content)
-
-			} else {
-
-				response.setError(true);
-				response.setCodigo(salida.codigo)
-				response.setDescripcion(salida.descripcion)
-				response.setDatosRespuesta(salida.datosRespuesta.content)
-
-			}
-
-
-		} catch (Exception e) {
-
-			response.setError(true);
-			response.setCodigo("-1")
-			response.setDescripcion(e.getMessage().toString())
-			response.setDatosRespuesta(null)
-		}
-
-		return response
-	}
-
-
-	/**
-	 *
-	 * @param clase
-	 * @return
-	 */
-	def marshall (nameSpace, clase){
-
-		StringWriter writer = new StringWriter();
-
-		try{
-
-			JAXBContext jaxbContext = JAXBContext.newInstance(clase.class);
-			Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-
-			jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-			def root = null
-			QName qName = null
-
-			if (clase instanceof com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCaseManagementRequest){
-				qName = new QName(nameSpace, "NetinsuranteUnderwrittingCaseManagementRequest");
-				root = new JAXBElement<NetinsuranteUnderwrittingCaseManagementRequest>(qName, NetinsuranteUnderwrittingCaseManagementRequest.class, clase);
-			}
-
-			if (clase instanceof com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCasesResultsRequest){
-				qName = new QName(nameSpace, "NetinsuranteUnderwrittingCasesResultsRequest");
-				root = new JAXBElement<NetinsuranteUnderwrittingCasesResultsRequest>(qName, NetinsuranteUnderwrittingCasesResultsRequest.class, clase);
-			}
-
-			if (clase instanceof com.scortelemed.schemas.netinsurance.NetinsuranteGetDossierRequest){
-				qName = new QName(nameSpace, "NetinsuranteGetDossierRequest");
-				root = new JAXBElement<NetinsuranteGetDossierRequest>(qName, NetinsuranteGetDossierRequest.class, clase);
-			}
-
-			jaxbMarshaller.marshal(root, writer);
-			String result = writer.toString();
-		} finally {
-			writer.close();
-		}
-
-		return writer
-	}
-
-	def crearExpediente = {
-		req ->
-		try {
-			//SOBREESCRIBIMOS LA URL A LA QUE TIENE QUE LLAMAR EL WSDL
-			def ctx = grailsApplication.mainContext
-			def bean = ctx.getBean("soapClientCrearOrabpel")
-			bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("orabpelCreacion.wsdl")?.value)
-			def salida = grailsApplication.mainContext.soapClientCrearOrabpel.initiate(crearExpedienteBPM(req))
-			return "OK"
-		} catch (Exception e) {
-			throw new WSException(this.getClass(), "crearExpediente", ExceptionUtils.composeMessage(null, e));
-		}
-	}
-
-    def consultaExpediente = {
-        ou, filtro ->
-
-            try {
-
-                def ctx = grailsApplication.mainContext
-                def bean = ctx.getBean("soapClientAlptis")
-                bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY,Conf.findByName("frontal.wsdl")?.value)
-
-                def salida=grailsApplication.mainContext.soapClientAlptis.consultaExpediente(tarificadorService.obtenerUsuarioFrontal(ou),filtro)
-
-                return salida
-            } catch (Exception e) {
-                logginService.putError("obtenerInformeExpedientes","No se ha podido obtener el informe de expediente : " + e)
-                return null
-            }
-    }
-
-    com.scortelemed.servicios.RespuestaCRM modificarExpediente (com.scortelemed.servicios.Expediente expediente, String ou) {
-
-        Frontal frontal = instanciarFrontal(Conf.findByName("frontal.wsdl")?.value)
-
-        com.scortelemed.servicios.Usuario usuario = new com.scortelemed.servicios.Usuario()
-
-        usuario.clave = "P@ssword"
-        usuario.dominio = "scor.local"
-        usuario.unidadOrganizativa = "IT"
-        usuario.usuario = "admin-ITA"
-
-        return  frontal.modificaExpediente(usuario,expediente,null,null)
-	}
-
-    def instanciarFrontal(String frontalPortAddress){
-
-        FrontalServiceLocator fs = new FrontalServiceLocator();
-        fs.setFrontalPortEndpointAddress(frontalPortAddress);
-        Frontal frontal = fs.getFrontalPort();
-
-        return frontal;
-    }
-
-	private def crearExpedienteBPM = {
-		req ->
-		def listadoFinal = []
-		RootElement payload = new RootElement()
-
-		listadoFinal.add(buildCabecera(req))
-		listadoFinal.add(buildDatos(req, req.company))
-		listadoFinal.add(buildPie())
-
-		payload.cabeceraOrDATOSOrPIE = listadoFinal
-
-		return payload
-	}
-
-	private def buildCabecera = {
-		req ->
-		def formato = new SimpleDateFormat("yyyyMMdd");
-		RootElement.CABECERA cabecera = new RootElement.CABECERA()
-		cabecera.setCodigoCia(req.company.codigoSt)
-		cabecera.setContadorSecuencial("1")
-		cabecera.setFechaGeneracion(formato.format(new Date()))
-		cabecera.setFiller("")
-		cabecera.setTipoFichero("1")
-
-		return cabecera
-	}
-
-	private def buildPie = {
-
-		RootElement.PIE pie = new RootElement.PIE()
-		pie.setFiller("")
-		pie.setNumFilasFichero(100)
-
-		pie.setNumRegistros(1)
-
-		return pie
-	}
-
-	private def buildDatos = {
-		req, company ->
-
-		try {
-
-			DATOS dato = new DATOS()
-
-			dato.registro = rellenaDatos(req, company)
-			//dato.pregunta = rellenaPreguntas(req, company.nombre)
-			dato.servicio = rellenaServicios(req, company.nombre)
-			dato.coberturas = rellenaCoberturas(req)
-
-			return dato
-		} catch (Exception e) {
-			logginService.putError(e.toString())
-		}
-	}
-
-	 def rellenaDatos (req, company) {
+	def rellenaDatos (req, company) {
 
 		def mapDatos = [:]
 		def listadoPreguntas = []
-		def formato = new SimpleDateFormat("yyyyMMdd");
+		def formato = new SimpleDateFormat("yyyyMMdd")
 		def apellido
 		def telefono1
 		def telefono2
@@ -442,7 +241,7 @@ class NetinsuranceService {
 
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-					Element eElement = (Element) nNode;
+					Element eElement = (Element) nNode
 
 					/**NUMERO DE PRODUCTO
 					 *
@@ -708,7 +507,7 @@ class NetinsuranceService {
 
 			return datosRegistro
 		} catch (Exception e) {
-			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
 		}
 	}
 
@@ -768,7 +567,7 @@ class NetinsuranceService {
 
 					if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-						Element eElement = (Element) nNode;
+						Element eElement = (Element) nNode
 
 						if (eElement.getElementsByTagName("serviceCode").item(0) != null) {
 
@@ -826,7 +625,7 @@ class NetinsuranceService {
 
 				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-					Element eElement = (Element) nNode;
+					Element eElement = (Element) nNode
 
 					DATOS.Coberturas cobertura = new DATOS.Coberturas()
 
@@ -846,94 +645,7 @@ class NetinsuranceService {
 
 			return listadoCoberturas
 		} catch (Exception e) {
-			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
-		}
-	}
-
-	def busquedaCrm (policyNumber, certificado, ou, opername, companyCodigoSt, companyId, requestBBDD, companyName) {
-
-		task {
-
-			logginService.putInfoMessage("BusquedaExpedienteCrm - Buscando en CRM solicitud de " + companyName + " con numero de solicitud: " + certificado)
-
-			def respuestaCrm
-			int limite = 0;
-			boolean encontrado = false;
-
-			servicios.Filtro filtro = new servicios.Filtro()
-			SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
-			CorreoUtil correoUtil = new CorreoUtil()
-
-			Thread.sleep(90000);
-
-			try {
-
-				while( !encontrado && limite < 10) {
-
-					filtro.setClave(servicios.ClaveFiltro.CLIENTE);
-					filtro.setValor(companyCodigoSt.toString());
-
-					servicios.Filtro filtroRelacionado1 = new servicios.Filtro()
-					filtroRelacionado1.setClave(servicios.ClaveFiltro.NUM_SOLICITUD)
-					filtroRelacionado1.setValor(certificado.toString())
-
-					filtro.setFiltroRelacionado(filtroRelacionado1)
-
-					respuestaCrm = consultaExpediente(ou.toString(),filtro)
-
-					if (respuestaCrm != null && respuestaCrm.getListaExpedientes() != null && respuestaCrm.getListaExpedientes().size() > 0) {
-
-						for (int i = 0; i < respuestaCrm.getListaExpedientes().size(); i++) {
-
-							servicios.Expediente exp = respuestaCrm.getListaExpedientes().get(i)
-
-							logginService.putInfoMessage("BusquedaExpedienteCrm - Expediente encontrado: " + exp.getCodigoST() + " para " + companyName)
-
-							String fechaCreacion = format.format(new Date());
-
-							if (exp.getCandidato() != null && exp.getCandidato().getCompanya() != null && exp.getCandidato().getCompanya().getCodigoST().equals(companyCodigoSt.toString()) &&
-							exp.getNumSolicitud() != null && exp.getNumSolicitud().equals(certificado.toString()) && fechaCreacion != null && fechaCreacion.equals(exp.getFechaApertura())){
-
-								/**Alta procesada correctamente
-								 *
-								 */
-
-								encontrado = true
-								logginService.putInfoMessage("BusquedaExpedienteCrm - Nueva alta automatica de " + companyName + " con numero de solicitud: " + certificado.toString() + " procesada correctamente")
-							}
-						}
-					}
-
-					limite++
-					Thread.sleep(10000)
-				}
-
-				/**Alta procesada pero no se ha encontrado en CRM.
-				 *
-				 */
-				if (limite == 10) {
-
-					logginService.putInfoMessage("BusquedaExpedienteCrm - Nueva alta de " + companyName + " con numero de solicitud: " + certificado.toString() + " se ha procesado pero no se ha dado de alta en CRM")
-					correoUtil.envioEmailErrores("BusquedaExpedienteCrm","Nueva alta de " + companyName + " con numero de solicitud: " + certificado.toString() + " se ha procesado pero no se ha dado de alta en CRM",null)
-
-
-					/**Metemos en errores
-					 *
-					 */
-					com.scortelemed.Error error = new com.scortelemed.Error()
-					error.setFecha(new Date())
-					error.setCia(companyId.toString())
-					error.setIdentificador(certificado.toString())
-					error.setInfo(requestBBDD.request)
-					error.setOperacion("ALTA")
-					error.setError("Peticion procesada para numero de solicitud: " + certificado.toString() + ". No encontrada en CRM")
-					error.save(flush:true)
-				}
-			} catch (Exception e) {
-
-				logginService.putInfoMessage("BusquedaExpedienteCrm - Nueva alta de " + companyName + " con numero de solicitud: " + certificado.toString() + ". Error: " + e.getMessage())
-				correoUtil.envioEmailErrores("BusquedaExpedienteCrm","Nueva alta de " + companyName + " con numero de solicitud: " + certificado.toString(), e)
-			}
+			throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
 		}
 	}
 
@@ -960,40 +672,7 @@ class NetinsuranceService {
 		}
 	}
 
-	public void insertarRecibido(Company company, String identificador, String info, String operacion) {
-
-		Recibido recibido = new Recibido()
-		recibido.setFecha(new Date())
-		recibido.setCia(company.id.toString())
-		recibido.setIdentificador(identificador)
-		recibido.setInfo(info)
-		recibido.setOperacion(operacion)
-		recibido.save(flush:true)
-	}
-
-	public void insertarError(Company company, String identificador, String info, String operacion, String detalleError) {
-
-		com.scortelemed.Error error = new com.scortelemed.Error()
-		error.setFecha(new Date())
-		error.setCia(company.id.toString())
-		error.setIdentificador(identificador)
-		error.setInfo(info)
-		error.setOperacion(operacion)
-		error.setError(detalleError)
-		error.save(flush:true)
-	}
-
-	public void insertarEnvio (Company company, String identificador, String info) {
-
-		Envio envio = new Envio()
-		envio.setFecha(new Date())
-		envio.setCia(company.id.toString())
-		envio.setIdentificador(identificador)
-		envio.setInfo(info)
-		envio.save(flush:true)
-	}
-
-	public String traducirEstado(estado) {
+	String traducirEstado(estado) {
 
 		switch(estado){
 			case "PENDIENTE_CONTACTO": return "ATTENDE CONTATTO";
@@ -1043,7 +722,7 @@ class NetinsuranceService {
 		}
 	}
 
-	public servicios.Expediente existeExpediente(String numPoliza, String nombreCia, String companyCodigoSt, String ou) {
+	servicios.Expediente existeExpediente(String numPoliza, String nombreCia, String companyCodigoSt, String ou) {
 
 		logginService.putInfoMessage("Buscando si existe expediente con numero de poliza " + numPoliza + " para " + nombreCia)
 
@@ -1063,7 +742,7 @@ class NetinsuranceService {
 
 			filtro.setFiltroRelacionado(filtroRelacionado1)
 
-			respuestaCrm = consultaExpediente(ou.toString(), filtro)
+			respuestaCrm = expedienteService.consultaExpediente(ou, filtro)
 
 			if (respuestaCrm != null && respuestaCrm.getListaExpedientes() != null && respuestaCrm.getListaExpedientes().size() > 0) {
 
@@ -1091,31 +770,4 @@ class NetinsuranceService {
 
 		return expediente
 	}
-
-    com.scortelemed.servicios.Expediente componerExpedienteModificado(servicios.Expediente expediente, NetinsuranteUnderwrittingCaseManagementRequest.CandidateInformation infoCandidato) {
-
-        com.scortelemed.servicios.Expediente expedienteModificado = new com.scortelemed.servicios.Expediente()
-
-        expedienteModificado.setCodigoST(expediente.getCodigoST())
-        expedienteModificado.setCandidato(new Candidato())
-        expedienteModificado.getCandidato().setDireccion(infoCandidato.getAddress())
-        expedienteModificado.getCandidato().setCodigoPostal(infoCandidato.getPostalCode())
-        expedienteModificado.getCandidato().setProvincia(infoCandidato.getProvince())
-        expedienteModificado.getCandidato().setLocalidad(infoCandidato.getCity())
-
-        if (infoCandidato.getPhoneNumber1() != null && !infoCandidato.getPhoneNumber1().toString().isEmpty()) {
-            expedienteModificado.getCandidato().setTelefono1(infoCandidato.getPhoneNumber1().toString())
-        }
-        if (infoCandidato.getPhoneNumber2() != null && !infoCandidato.getPhoneNumber2().toString().isEmpty()) {
-            expedienteModificado.getCandidato().setTelefono2(infoCandidato.getPhoneNumber2().toString())
-        }
-        if (infoCandidato.getMobileNumber() != null && !infoCandidato.getMobileNumber().toString().isEmpty()) {
-            expedienteModificado.getCandidato().setTelefono3(infoCandidato.getMobileNumber())
-        }
-
-        return expedienteModificado
-
-
-    }
-
 }

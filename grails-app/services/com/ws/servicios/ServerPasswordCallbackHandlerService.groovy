@@ -1,27 +1,18 @@
 package com.ws.servicios
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
-import org.apache.ws.security.WSPasswordCallback
-import org.springframework.beans.factory.InitializingBean
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.security.core.context.SecurityContextHolder
-import org.apache.commons.codec.digest.DigestUtils as DU
-import org.apache.commons.codec.binary.Base64;
-import org.springframework.web.context.request.RequestContextHolder
 
 import com.scortelemed.Person
-import com.scortelemed.Ipcontrol
+import org.springframework.beans.factory.InitializingBean
+import org.springframework.web.context.request.RequestContextHolder
+
+import javax.security.auth.callback.Callback
+import javax.security.auth.callback.CallbackHandler
+import javax.security.auth.callback.UnsupportedCallbackException
 
 class ServerPasswordCallbackHandlerService implements CallbackHandler,InitializingBean{
 
-	def daoAuthenticationProvider
-	def springSecurityService
-	def userService
-	String companyStWs
 	def logginService
 	
-    @Override
+
     void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException{
 		def person
 		
@@ -42,7 +33,7 @@ class ServerPasswordCallbackHandlerService implements CallbackHandler,Initializi
 		}
     }
 
-    @Override
+
     void afterPropertiesSet() {
     }
 	

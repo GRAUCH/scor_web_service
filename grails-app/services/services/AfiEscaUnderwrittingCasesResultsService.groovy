@@ -1,33 +1,27 @@
 package services
 
+import com.scortelemed.Request
+import com.scortelemed.TipoCompany
+import com.scortelemed.TipoOperacion
 import org.grails.cxf.utils.EndpointType
 import org.grails.cxf.utils.GrailsCxfEndpoint
 import org.grails.cxf.utils.GrailsCxfEndpointProperty
 import grails.util.Environment
 
 import com.scortelemed.Company
-import com.scortelemed.Envio
 import com.ws.afiesca.beans.AfiEscaUnderwrittingCasesResultsRequest
 import com.ws.afiesca.beans.AfiEscaUnderwrittingCasesResultsResponse
 import com.ws.afiesca.beans.TuwCase
-import com.ws.enumeration.StatusType;
 
 import hwsol.webservices.CorreoUtil
 import java.text.SimpleDateFormat
-import javax.jws.WebMethod
 import javax.jws.WebParam
 import javax.jws.WebResult
 import javax.jws.WebService
 import javax.jws.soap.SOAPBinding
-import javax.xml.bind.JAXBContext
-import javax.xml.bind.Marshaller
 
 import org.apache.cxf.annotations.SchemaValidation
 import org.springframework.web.context.request.RequestContextHolder
-import org.springframework.security.core.context.SecurityContextHolder
-import servicios.Expediente
-
-import javax.xml.bind.DatatypeConverter
 
 @WebService(targetNamespace = "http://www.scortelemed.com/schemas/afiEsca")
 @SchemaValidation
@@ -38,6 +32,7 @@ import javax.xml.bind.DatatypeConverter
 class AfiEscaUnderwrittingCasesResultsService {
 	
 	def requestService
+	def expedienteService
 	def estadisticasService
 	def tarificadorService
 	def logginService
@@ -51,8 +46,8 @@ class AfiEscaUnderwrittingCasesResultsService {
 		def correoUtil = new CorreoUtil()
 		def requestXML = ""
 		def expedientes
-		def requestBBDD
-		def company = Company.findByNombre('afiesca')
+		Request requestBBDD
+		def company = Company.findByNombre(TipoCompany.AFI_ESCA.getNombre())
 		
 		AfiEscaUnderwrittingCasesResultsResponse result=new AfiEscaUnderwrittingCasesResultsResponse()
 	
@@ -64,38 +59,21 @@ class AfiEscaUnderwrittingCasesResultsService {
 			
 			if(operacion && operacion.activo && afiEscaUnderwrittingCasesResultsRequest && afiEscaUnderwrittingCasesResultsRequest.date){
 				requestXML=requestService.marshall(afiEscaUnderwrittingCasesResultsRequest,AfiEscaUnderwrittingCasesResultsRequest.class)
-				
 				requestBBDD = requestService.crear(opername,requestXML)
-				requestBBDD.fecha_procesado = new Date()
-				requestBBDD.save(flush:true)
 				
 				//PARSEAMOS LA FECHA
-				def fechaHora = new SimpleDateFormat("yyyyMMdd HH:mm");
-				String convertido = fechaHora.format(afiEscaUnderwrittingCasesResultsRequest.date);
+				def fechaHora = new SimpleDateFormat("yyyyMMdd HH:mm")
+				String convertido = fechaHora.format(afiEscaUnderwrittingCasesResultsRequest.date)
 				def fechaFin = convertido
 				fechaFin= fechaFin.toString()+":00"
-				Calendar fecha = Calendar.getInstance();
+				Calendar fecha = Calendar.getInstance()
 				fecha.setTime(afiEscaUnderwrittingCasesResultsRequest.date)
 				fecha.add(Calendar.MINUTE , -120)
 				def fechaIni = fecha.getTime().format ('yyyyMMdd HH:mm')
 				fechaIni= fechaIni.toString()+":00"
-					
-				if (Environment.current.name.equals("production_wildfly")) {
-					expedientes=tarificadorService.obtenerInformeExpedientes("1035",null,1,fechaIni,fechaFin,"FR")
-				} else {
-					expedientes=tarificadorService.obtenerInformeExpedientes("1048",null,1,fechaIni,fechaFin,"FR") 
-				}
-				
-				/**Metemos en enviados
-				 *
-				 */
-				Envio envio = new Envio()
-				envio.setFecha(new Date())
-				envio.setCia(company.id.toString())
-				envio.setIdentificador(afiEscaUnderwrittingCasesResultsRequest.date.toString())
-				envio.setInfo(requestXML.toString())
-				envio.save(flush:true)
-				
+				expedientes=expedienteService.obtenerInformeExpedientes(company.codigoSt,null,1,fechaIni,fechaFin,company.ou.toString())
+				requestService.insertarEnvio(company, afiEscaUnderwrittingCasesResultsRequest.date.toString(), requestXML.toString())
+
 				if(expedientes){
 					def listTuwCases=[]
 					expedientes.each { item ->
@@ -112,15 +90,9 @@ class AfiEscaUnderwrittingCasesResultsService {
 					
 					
 					listTuwCases.each { caso ->
-						envio = new Envio()
-						envio.setFecha(new Date())
-						envio.setCia(company.id.toString())
-						envio.setIdentificador(caso.policy_number!=null?caso.policy_number:caso.reference_number)
-						envio.setInfo("")
-						envio.save(flush:true)
-						
-						logginService.putInfoMessage("Informacion expediente " + envio.getIdentificador() + " enviado a " + company.nombre + " correctamente")
-						
+						String identificador = caso.policy_number!=null ? caso.policy_number : caso.reference_number
+						requestService.insertarEnvio(company, identificador, requestXML.toString())
+						logginService.putInfoMessage("Informacion expediente " + identificador + " enviado a " + company.nombre + " correctamente")
 					}
 					
 					
@@ -144,20 +116,8 @@ class AfiEscaUnderwrittingCasesResultsService {
 			logginService.putErrorEndpoint("Endpoint-"+opername,"Peticion no realizada para fecha: " + afiEscaUnderwrittingCasesResultsRequest.date + ". Error: "+e.getMessage())
 			correoUtil.envioEmailErrores(opername,"Peticion no realizada para fecha: " + afiEscaUnderwrittingCasesResultsRequest.date,e)
 			result.setComments("Error en AfiEscaUnderwrittingCasesResultsRequest: "+e.getMessage())
-			
-			
-			/**Metemos en errores
-			 *
-			 */
-			com.scortelemed.Error error = new com.scortelemed.Error()
-			error.setFecha(new Date())
-			error.setCia(company.id.toString())
-			error.setIdentificador(afiEscaUnderwrittingCasesResultsRequest.date.toString())
-			error.setInfo(requestXML.toString())
-			error.setOperacion("CONSULTA")
-			error.setError(e.getMessage())
-			error.save(flush:true)
-				
+			requestService.insertarError(company, afiEscaUnderwrittingCasesResultsRequest.date.toString(), requestXML.toString(), TipoOperacion.CONSULTA, e.getMessage())
+
 		}finally{
 			
 			def sesion=RequestContextHolder.currentRequestAttributes().getSession()

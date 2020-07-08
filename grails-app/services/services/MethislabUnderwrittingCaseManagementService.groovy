@@ -2,8 +2,13 @@ package services
 
 import com.scortelemed.Company
 import com.scortelemed.Operacion
+import com.scortelemed.Request
+import com.scortelemed.TipoCompany
+import com.scortelemed.TipoOperacion
 import com.scortelemed.schemas.methislab.*
 import com.ws.servicios.*
+import com.ws.servicios.impl.RequestService
+import com.ws.servicios.impl.companies.MethislabService
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
 import hwsol.webservices.WsError
@@ -11,7 +16,7 @@ import org.apache.cxf.annotations.SchemaValidation
 import org.grails.cxf.utils.EndpointType
 import org.grails.cxf.utils.GrailsCxfEndpoint
 import org.grails.cxf.utils.GrailsCxfEndpointProperty
-import org.springframework.beans.factory.annotation.Autowired
+
 import org.springframework.web.context.request.RequestContextHolder
 import servicios.RespuestaCRMInforme
 
@@ -28,16 +33,12 @@ expose = EndpointType.JAX_WS,properties = [@GrailsCxfEndpointProperty(name = "ws
 @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
 class MethislabUnderwrittingCaseManagementService {
 
-	@Autowired
-	private MethislabService methislabService
-	@Autowired
-	private EstadisticasService estadisticasService
-	@Autowired
-	private RequestService requestService
-	@Autowired
-	private LogginService logginService
-	@Autowired
-	private TarificadorService tarificadorService
+	def expedienteService
+	def methislabService
+	def estadisticasService
+	def requestService
+	def logginService
+	def tarificadorService
 
 	@WebResult(name = "caseManagementResponse")
 	MethislabUnderwrittingCaseManagementResponse methislabUnderwrittingCaseManagementResponse(@WebParam(partName = "CaseManagementRequest",name = "CaseManagementRequest")
@@ -49,14 +50,13 @@ class MethislabUnderwrittingCaseManagementService {
 
 		def opername="MethislabUnderwrittingCaseManagementRequest"
 		def requestXML = ""
-		def requestBBDD
-		def tarificadorService
+		Request requestBBDD
 		List<WsError> wsErrors = new ArrayList<WsError>()
 		String message = null
 		StatusType status = null
 		String code = 0
 
-		def company = Company.findByNombre('methislab')
+		def company = Company.findByNombre(TipoCompany.METHIS_LAB.getNombre())
 
         logginService.putInfoMessage("Realizando peticion de informacion de servicio GestionReconocimientoMedico para la cia " + company.nombre)
 
@@ -66,32 +66,30 @@ class MethislabUnderwrittingCaseManagementService {
 
 			if (operacion && operacion.activo){
 
-				if (Company.findByNombre("methislab").generationAutomatic) {
+				if (company.generationAutomatic) {
 
-					requestXML=methislabService.marshall("http://www.scortelemed.com/schemas/methislab",methislabUnderwrittingCaseManagementRequest)
+					requestXML=methislabService.marshall(methislabUnderwrittingCaseManagementRequest)
 					requestBBDD = requestService.crear(opername,requestXML)
-					requestBBDD.fecha_procesado = new Date()
-					requestBBDD.save(flush:true)
 
 					wsErrors = methislabService.validarDatosObligatorios(requestBBDD)
 
 					if (wsErrors != null && wsErrors.size() == 0) {
 
-						message = "Il caso e stato elaborato correttamente";
+						message = "Il caso e stato elaborato correttamente"
 						status = StatusType.OK
 						code = 0
 
 						logginService.putInfoMessage("Se procede el alta automatica de " + company.nombre + " con numero de solicitud " + methislabUnderwrittingCaseManagementRequest.candidateInformation.requestNumber)
 
-						methislabService.crearExpediente(requestBBDD)
+						expedienteService.crearExpediente(requestBBDD, TipoCompany.METHIS_LAB)
 
-						methislabService.insertarRecibido(company, methislabUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, requestXML.toString(), "ALTA")
+						requestService.insertarRecibido(company, methislabUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, requestXML.toString(), TipoOperacion.ALTA)
 
 						/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
 						 *
 						 */
 						logginService.putInfoMessage("Buscando en CRM solicitud de " + company.nombre + " con numero de solicitud: " + methislabUnderwrittingCaseManagementRequest.candidateInformation.requestNumber)
-						methislabService.busquedaCrm(methislabUnderwrittingCaseManagementRequest.candidateInformation.policyNumber, company.ou, methislabUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, opername, company.codigoSt, company.id, requestBBDD, methislabUnderwrittingCaseManagementRequest.candidateInformation.certificateNumber, company.nombre)
+						expedienteService.busquedaCrm(requestBBDD, company, methislabUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, methislabUnderwrittingCaseManagementRequest.candidateInformation.certificateNumber, null)
 
 					} else {
 
@@ -101,7 +99,7 @@ class MethislabUnderwrittingCaseManagementService {
 						status = StatusType.ERROR
 						code = 8
 
-						methislabService.insertarError(company, methislabUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + methislabUnderwrittingCaseManagementRequest.candidateInformation.requestNumber + ". Error de validacion: " + error)
+						requestService.insertarError(company, methislabUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, requestXML.toString(), TipoOperacion.ALTA, "Peticion no realizada para solicitud: " + methislabUnderwrittingCaseManagementRequest.candidateInformation.requestNumber + ". Error de validacion: " + error)
 						logginService.putErrorEndpoint("GestionReconocimientoMedico","Peticion no realizada de " + company.nombre + " con numero de solicitud: " + methislabUnderwrittingCaseManagementRequest.candidateInformation.requestNumber + ". Error de validacion: " + error)
 
 					}
@@ -109,7 +107,7 @@ class MethislabUnderwrittingCaseManagementService {
 				
 			} else {
 
-				message = "L'operazione viene disattivata temporaneamente";
+				message = "L'operazione viene disattivata temporaneamente"
 				status = StatusType.OK
 				code = 1
 
@@ -118,11 +116,11 @@ class MethislabUnderwrittingCaseManagementService {
 			}
 		} catch (Exception e){
 
-			message = "Error: " + e.printStackTrace();
+			message = "Error: " + e.printStackTrace()
 			status = StatusType.ERROR
 			code = 2
 
-			methislabService.insertarError(company, methislabUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + methislabUnderwrittingCaseManagementRequest.candidateInformation.requestNumber + ". Error: " + e.getMessage())
+			requestService.insertarError(company, methislabUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, requestXML.toString(), TipoOperacion.ALTA, "Peticion no realizada para solicitud: " + methislabUnderwrittingCaseManagementRequest.candidateInformation.requestNumber + ". Error: " + e.getMessage())
 
 			logginService.putErrorEndpoint("GestionReconocimientoMedico","Peticion no realizada de " + company.nombre + " con numero de solicitud: " + methislabUnderwrittingCaseManagementRequest.candidateInformation.requestNumber + ". Error: " + e.getMessage())
 			correoUtil.envioEmailErrores("GestionReconocimientoMedico","Peticion de " + company.nombre + " con numero de solicitud: " + methislabUnderwrittingCaseManagementRequest.candidateInformation.requestNumber,e.getMessage())
@@ -149,7 +147,8 @@ class MethislabUnderwrittingCaseManagementService {
 
 		def opername="MethislabUnderwrittingCaseManagementResponse"
 		def requestXML = ""
-		List<RespuestaCRMInforme> expedientes = new ArrayList<RespuestaCRMInforme>();
+		Request requestBBDD
+		List<RespuestaCRMInforme> expedientes = new ArrayList<RespuestaCRMInforme>()
 		TransformacionUtil util = new TransformacionUtil()
 		CorreoUtil correoUtil = new CorreoUtil()
 
@@ -158,7 +157,7 @@ class MethislabUnderwrittingCaseManagementService {
 		int code = 0
 
 		MethislabUnderwrittingCasesResultsResponse resultado =new MethislabUnderwrittingCasesResultsResponse()
-		Company company = Company.findByNombre("methislab")
+		Company company = Company.findByNombre(TipoCompany.METHIS_LAB.getNombre())
 
 		def timedelay = System.currentTimeMillis()
 		logginService.putInfoEndpoint("Endpoint-" + opername + "Tiempo inicial: ", timedelay)
@@ -169,22 +168,19 @@ class MethislabUnderwrittingCaseManagementService {
 
 				if (methislabUnderwrittingCasesResults && methislabUnderwrittingCasesResults.dateStart && methislabUnderwrittingCasesResults.dateEnd){
 
-					requestXML=methislabService.marshall("http://www.scortelemed.com/schemas/methislab",methislabUnderwrittingCasesResults)
-
-					requestService.crear(opername,requestXML)
+					requestXML=methislabService.marshall(methislabUnderwrittingCasesResults)
+					requestBBDD = requestService.crear(opername,requestXML)
 
 					Date date = methislabUnderwrittingCasesResults.dateStart.toGregorianCalendar().getTime()
-					SimpleDateFormat sdfr = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
-					String fechaIni = sdfr.format(date);
+					SimpleDateFormat sdfr = new SimpleDateFormat("yyyyMMdd HH:mm:ss")
+					String fechaIni = sdfr.format(date)
 					date = methislabUnderwrittingCasesResults.dateEnd.toGregorianCalendar().getTime()
-					String fechaFin = sdfr.format(date);
+					String fechaFin = sdfr.format(date)
 
+					expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt,null,1,fechaIni,fechaFin,company.ou))
+					expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt,null,2,fechaIni,fechaFin,company.ou))
 
-					for (int i = 1; i < 3; i++){
-						expedientes.addAll(tarificadorService.obtenerInformeExpedientes(company.codigoSt,null,i,fechaIni,fechaFin,"IT"))
-					}
-
-					methislabService.insertarEnvio(company, methislabUnderwrittingCasesResults.dateStart.toString().substring(0,10) + "-" + methislabUnderwrittingCasesResults.dateEnd.toString().substring(0,10), requestXML.toString())
+					requestService.insertarEnvio(company, methislabUnderwrittingCasesResults.dateStart.toString().substring(0,10) + "-" + methislabUnderwrittingCasesResults.dateEnd.toString().substring(0,10), requestXML.toString())
 
 					if(expedientes){
 						expedientes.each { expedientePoliza ->
@@ -229,7 +225,7 @@ class MethislabUnderwrittingCaseManagementService {
 			logginService.putErrorEndpoint("ResultadoReconocimientoMedico","Peticion realizada para " + company.nombre + " con fecha: " + methislabUnderwrittingCasesResults.dateStart.toString() + "-" + methislabUnderwrittingCasesResults.dateEnd.toString() + ". Error: " + e.getMessage())
 			correoUtil.envioEmailErrores("ResultadoReconocimientoMedico","Peticion realizada para " + company.nombre + " con fecha: " + methislabUnderwrittingCasesResults.dateStart.toString() + "-" + methislabUnderwrittingCasesResults.dateEnd.toString(), e)
 
-			methislabService.insertarError(company, methislabUnderwrittingCasesResults.dateStart.toString().substring(0,10) + "-" + methislabUnderwrittingCasesResults.dateEnd.toString().substring(0,10), requestXML.toString(), "CONSULTA", "Peticion no realizada para solicitud: " + methislabUnderwrittingCasesResults.dateStart.toString() + "-" + methislabUnderwrittingCasesResults.dateEnd.toString() + ". Error: " + e.getMessage())
+			requestService.insertarError(company, methislabUnderwrittingCasesResults.dateStart.toString().substring(0,10) + "-" + methislabUnderwrittingCasesResults.dateEnd.toString().substring(0,10), requestXML.toString(), TipoOperacion.CONSULTA, "Peticion no realizada para solicitud: " + methislabUnderwrittingCasesResults.dateStart.toString() + "-" + methislabUnderwrittingCasesResults.dateEnd.toString() + ". Error: " + e.getMessage())
 			
 		}finally{
 

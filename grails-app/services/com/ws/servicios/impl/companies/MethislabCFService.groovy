@@ -1,17 +1,15 @@
-package com.ws.servicios
+package com.ws.servicios.impl.companies
 
 import com.scor.global.ExceptionUtils
 import com.scor.global.WSException
 import com.scor.srpfileinbound.DATOS
 import com.scor.srpfileinbound.REGISTRODATOS
-import com.scor.srpfileinbound.RootElement
 import com.scortelemed.Company
-import com.scortelemed.Conf
-import com.scortelemed.Envio
-import com.scortelemed.Recibido
+import com.scortelemed.Request
+import com.scortelemed.TipoOperacion
 import com.scortelemed.schemas.methislabCF.*
+import com.ws.servicios.ICompanyService
 import hwsol.webservices.CorreoUtil
-import hwsol.webservices.GenerarZip
 import hwsol.webservices.TransformacionUtil
 import hwsol.webservices.WsError
 import org.w3c.dom.Document
@@ -20,24 +18,54 @@ import org.w3c.dom.Node
 import org.w3c.dom.NodeList
 import org.xml.sax.InputSource
 
-import javax.xml.bind.JAXBContext
-import javax.xml.bind.JAXBElement
-import javax.xml.bind.Marshaller
-import javax.xml.namespace.QName
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 import java.text.SimpleDateFormat
 
 import static grails.async.Promises.task
 
-class MethislabCFService {
+class MethislabCFService implements ICompanyService{
 
     TransformacionUtil util = new TransformacionUtil()
     def grailsApplication
-    def logginService = new LogginService()
-    GenerarZip generarZip = new GenerarZip()
+    def requestService
+    def expedienteService
+    def logginService
     def tarificadorService
-    TransformacionUtil transformacionUtil = new TransformacionUtil()
+
+
+    String marshall(def objeto) {
+        String nameSpace = "http://www.scortelemed.com/schemas/methislabCF"
+        String result
+        try {
+            if (objeto instanceof MethislabCFUnderwrittingCaseManagementRequest) {
+                result = requestService.marshall(nameSpace, objeto, MethislabCFUnderwrittingCaseManagementRequest.class)
+            } else if (objeto instanceof MethislabCFUnderwrittingCasesResultsRequest) {
+                result = requestService.marshall(nameSpace, objeto, MethislabCFUnderwrittingCasesResultsRequest.class)
+            }
+        } finally {
+            return result
+        }
+    }
+
+
+    def buildDatos(Request req, String codigoSt) {
+        try {
+            DATOS dato = new DATOS()
+            Company company = req.company
+            dato.registro = rellenaDatos(req, company)
+            dato.servicio = rellenaServicios(req, company.nombre)
+            dato.coberturas = rellenaCoberturas(req)
+            return dato
+        } catch (Exception e) {
+            logginService.putError(e.toString())
+        }
+    }
+
+
+    def getCodigoStManual(Request req) {
+        return null
+    }
 
     def rellenaDatosSalidaConsulta(expedientePoliza, requestDate, logginService) {
 
@@ -102,118 +130,6 @@ class MethislabCFService {
         }
 
         return expediente
-    }
-
-    def marshall(nameSpace, clase) {
-
-        StringWriter writer = new StringWriter()
-
-        try {
-
-            JAXBContext jaxbContext = JAXBContext.newInstance(clase.class)
-            Marshaller jaxbMarshaller = jaxbContext.createMarshaller()
-
-            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true)
-            def root = null
-            QName qName = null
-
-            if (clase instanceof MethislabCFUnderwrittingCaseManagementRequest) {
-                qName = new QName(nameSpace, "MethislabCFUnderwrittingCaseManagementRequest")
-                root = new JAXBElement<MethislabCFUnderwrittingCaseManagementRequest>(qName, MethislabCFUnderwrittingCaseManagementRequest.class, clase)
-            }
-
-            if (clase instanceof MethislabCFUnderwrittingCasesResultsRequest) {
-                qName = new QName(nameSpace, "MethislabCFUnderwrittingCasesResultsRequest")
-                root = new JAXBElement<MethislabCFUnderwrittingCasesResultsRequest>(qName, MethislabCFUnderwrittingCasesResultsRequest.class, clase)
-            }
-            jaxbMarshaller.marshal(root, writer)
-        } finally {
-            writer.close()
-        }
-
-        return writer
-    }
-
-    def crearExpediente = { req ->
-        try {
-            //SOBREESCRIBIMOS LA URL A LA QUE TIENE QUE LLAMAR EL WSDL
-            def ctx = grailsApplication.mainContext
-            def bean = ctx.getBean("soapClientCrearOrabpel")
-            bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("orabpelCreacion.wsdl")?.value)
-            def salida = grailsApplication.mainContext.soapClientCrearOrabpel.initiate(crearExpedienteBPM(req))
-            return "OK"
-        } catch (Exception e) {
-            throw new WSException(this.getClass(), "Error al crearExpediente", ExceptionUtils.composeMessage(null, e));
-        }
-    }
-
-    def consultaExpediente = { ou, filtro ->
-
-        try {
-
-            def ctx = grailsApplication.mainContext
-            def bean = ctx.getBean("soapClientAlptis")
-            bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("frontal.wsdl")?.value)
-
-            def salida = grailsApplication.mainContext.soapClientAlptis.consultaExpediente(tarificadorService.obtenerUsuarioFrontal(ou), filtro)
-
-            return salida
-        } catch (Exception e) {
-            logginService.putError("obtenerInformeExpedientes de MethislabFC", "No se ha podido obtener el informe de expediente : " + e)
-            return null
-        }
-    }
-
-    private def crearExpedienteBPM = { req ->
-        def listadoFinal = []
-        RootElement payload = new RootElement()
-
-        listadoFinal.add(buildCabecera(req))
-        listadoFinal.add(buildDatos(req, req.company))
-        listadoFinal.add(buildPie())
-
-        payload.cabeceraOrDATOSOrPIE = listadoFinal
-
-        return payload
-    }
-
-    private def buildCabecera = { req ->
-        def formato = new SimpleDateFormat("yyyyMMdd");
-        RootElement.CABECERA cabecera = new RootElement.CABECERA()
-        cabecera.setCodigoCia(req.company.codigoSt)
-        cabecera.setContadorSecuencial("1")
-        cabecera.setFechaGeneracion(formato.format(new Date()))
-        cabecera.setFiller("")
-        cabecera.setTipoFichero("1")
-
-        return cabecera
-    }
-
-    private def buildPie = {
-
-        RootElement.PIE pie = new RootElement.PIE()
-        pie.setFiller("")
-        pie.setNumFilasFichero(100)
-
-        pie.setNumRegistros(1)
-
-        return pie
-    }
-
-    private def buildDatos = { req, company ->
-
-        try {
-
-            DATOS dato = new DATOS()
-
-            dato.registro = rellenaDatos(req, company)
-            dato.servicio = rellenaServicios(req, company.nombre)
-            dato.coberturas = rellenaCoberturas(req)
-
-            return dato
-        } catch (Exception e) {
-            logginService.putError(e.toString())
-        }
     }
 
     def rellenaDatos(req, company) {
@@ -476,7 +392,7 @@ class MethislabCFService {
 
             return datosRegistro
         } catch (Exception e) {
-            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
         }
     }
 
@@ -536,7 +452,7 @@ class MethislabCFService {
 
                     if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-                        Element eElement = (Element) nNode;
+                        Element eElement = (Element) nNode
 
                         if (eElement.getElementsByTagName("serviceCode").item(0) != null) {
 
@@ -593,7 +509,7 @@ class MethislabCFService {
 
                 if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-                    Element eElement = (Element) nNode;
+                    Element eElement = (Element) nNode
 
                     /**PREGUNTAS PREVIAS
                      *
@@ -618,7 +534,7 @@ class MethislabCFService {
 
             return listadoPreguntas
         } catch (Exception e) {
-            throw new WSException(this.getClass(), "rellenaPreguntas", ExceptionUtils.composeMessage(null, e));
+            throw new WSException(this.getClass(), "rellenaPreguntas", ExceptionUtils.composeMessage(null, e))
         }
     }
 
@@ -645,7 +561,7 @@ class MethislabCFService {
 
                 if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-                    Element eElement = (Element) nNode;
+                    Element eElement = (Element) nNode
 
                     DATOS.Coberturas cobertura = new DATOS.Coberturas()
 
@@ -665,150 +581,17 @@ class MethislabCFService {
 
             return listadoCoberturas
         } catch (Exception e) {
-            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
         }
-    }
-
-    def busquedaCrm(policyNumber, ou, requestNumber, opername, companyCodigoSt, companyId, requestBBDD, certificateNumber, String companyName) {
-
-        task {
-
-            logginService.putInfoMessage("BusquedaExpedienteCrm - Buscando en CRM solicitud de " + companyName + " con numero de solicitud: " + requestNumber + " y num. certificado: " + certificateNumber.toString())
-
-            def respuestaCrm
-            int limite = 0;
-            boolean encontrado = false;
-
-            servicios.Filtro filtro = new servicios.Filtro()
-            SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
-            CorreoUtil correoUtil = new CorreoUtil()
-
-            Thread.sleep(30000);
-
-
-            try {
-
-
-                while (!encontrado && limite < 10) {
-
-                    filtro.setClave(servicios.ClaveFiltro.CLIENTE);
-                    filtro.setValor(companyCodigoSt.toString());
-
-                    servicios.Filtro filtroRelacionado1 = new servicios.Filtro()
-                    filtroRelacionado1.setClave(servicios.ClaveFiltro.NUM_SOLICITUD)
-                    filtroRelacionado1.setValor(requestNumber.toString())
-
-                    servicios.Filtro filtroRelacionado2 = new servicios.Filtro()
-                    filtroRelacionado2.setClave(servicios.ClaveFiltro.NUM_CERTIFICADO);
-                    filtroRelacionado2.setValor(certificateNumber.toString())
-                    filtroRelacionado1.setFiltroRelacionado(filtroRelacionado2)
-
-                    filtro.setFiltroRelacionado(filtroRelacionado1)
-
-                    respuestaCrm = consultaExpediente(ou.toString(), filtro)
-
-                    if (respuestaCrm != null && respuestaCrm.getListaExpedientes() != null && respuestaCrm.getListaExpedientes().size() > 0) {
-
-                        for (int i = 0; i < respuestaCrm.getListaExpedientes().size(); i++) {
-
-                            servicios.Expediente exp = respuestaCrm.getListaExpedientes().get(i)
-
-                            logginService.putInfoMessage("BusquedaExpedienteCrm - Expediente encontrado: " + exp.getCodigoST() + " para " + companyName)
-
-                            String fechaCreacion = format.format(new Date());
-
-                            if (exp.getCandidato() != null && exp.getCandidato().getCompanya() != null && exp.getCandidato().getCompanya().getCodigoST().equals(companyCodigoSt.toString()) &&
-                                    exp.getNumSolicitud() != null && exp.getNumSolicitud().equals(requestNumber.toString()) && fechaCreacion != null && fechaCreacion.equals(exp.getFechaApertura()) && exp.getNumCertificado() != null && exp.getNumCertificado().equals(certificateNumber)) {
-
-                                /**Alta procesada correctamente
-                                 *
-                                 */
-
-                                encontrado = true
-                                logginService.putInfoMessage("BusquedaExpedienteCrm - Nueva alta automatica de " + companyName + " con numero de solicitud: " + requestNumber.toString() + " y num. certificado: " + certificateNumber.toString() + " procesada correctamente")
-
-                            }
-                        }
-                    }
-
-
-                    limite++
-                    Thread.sleep(10000)
-                }
-
-                /**Alta procesada pero no se ha encontrado en CRM.
-                 *
-                 */
-                if (limite == 10) {
-
-                    logginService.putInfoMessage("BusquedaExpedienteCrm - Nueva alta de " + companyName + " con numero de solicitud: " + requestNumber.toString() + " y num. certificado: " + certificateNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM")
-                    correoUtil.envioEmailErrores("BusquedaExpedienteCrm", "Nueva alta de " + companyName + " con numero de solicitud: " + requestNumber.toString() + " y num. certificado: " + certificateNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM", null)
-
-                    /**Metemos en errores
-                     *
-                     */
-                    com.scortelemed.Error error = new com.scortelemed.Error()
-                    error.setFecha(new Date())
-                    error.setCia(companyId.toString())
-                    error.setIdentificador(requestNumber.toString())
-                    error.setInfo(requestBBDD.request)
-                    error.setOperacion("ALTA")
-                    error.setError("Peticion procesada para numero de solicitud: " + requestNumber.toString() + " y num. certificado: " + certificateNumber.toString() + ". No encontrada en CRM")
-                    error.save(flush: true)
-                }
-            } catch (Exception e) {
-
-                logginService.putInfoMessage("BusquedaExpedienteCrm - Nueva alta de " + companyName + " con numero de solicitud: " + requestNumber.toString() + " y num. certificado: " + certificateNumber.toString() + ". Error: " + e.getMessage())
-                correoUtil.envioEmailErrores("BusquedaExpedienteCrm", "Nueva alta de " + companyName + " con numero de solicitud: " + requestNumber.toString() + " y num. certificado: " + certificateNumber.toString(), e)
-            }
-        }
-    }
-
-    void insertarRecibido(Company company, String identificador, String info, String operacion) {
-
-        Recibido recibido = new Recibido()
-        recibido.setFecha(new Date())
-        recibido.setCia(company.id.toString())
-        recibido.setIdentificador(identificador)
-        recibido.setInfo(info)
-        recibido.setOperacion(operacion)
-        recibido.save(flush: true)
-    }
-
-    void insertarError(Company company, String identificador, String info, String operacion, String detalleError) {
-
-        com.scortelemed.Error error = new com.scortelemed.Error()
-        error.setFecha(new Date())
-        error.setCia(company.id.toString())
-        error.setIdentificador(identificador)
-        error.setInfo(info)
-        error.setOperacion(operacion)
-        error.setError(detalleError)
-        error.save(flush: true)
-    }
-
-    void insertarEnvio(Company company, String identificador, String info) {
-
-        Envio envio = new Envio()
-        envio.setFecha(new Date())
-        envio.setCia(company.id.toString())
-        envio.setIdentificador(identificador)
-        envio.setInfo(info)
-        envio.save(flush: true)
-    }
-
-
-    private def obtenerProductos(req, nameCompany) {
-        return null
     }
 
     def devolverStateType(estado) {
 
         switch (estado) {
-            case "CERRADO": return RequestStateType.CLOSED;
-            case "ANULADO": return RequestStateType.CANCELLED;
-            case "RECHAZADO": return RequestStateType.REJECTED;
-            default: return null;
+            case "CERRADO": return RequestStateType.CLOSED
+            case "ANULADO": return RequestStateType.CANCELLED
+            case "RECHAZADO": return RequestStateType.REJECTED
+            default: return null
         }
 
     }
@@ -834,7 +617,7 @@ class MethislabCFService {
     List<WsError> validarDatosObligatorios(requestBBDD) {
 
         List<WsError> wsErrors = new ArrayList<WsError>()
-        SimpleDateFormat formato = new SimpleDateFormat("yyyyMMdd");
+        SimpleDateFormat formato = new SimpleDateFormat("yyyyMMdd")
         String telefono1 = null
         String telefono2 = null
         String telefonoMovil = null
@@ -859,7 +642,7 @@ class MethislabCFService {
 
                 if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-                    Element eElement = (Element) nNode;
+                    Element eElement = (Element) nNode
 
                     /**CODIGO DE PRODUCTO
                      *
@@ -967,7 +750,7 @@ class MethislabCFService {
             return wsErrors
 
         } catch (Exception e) {
-            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
         }
     }
 }

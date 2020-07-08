@@ -1,6 +1,8 @@
 package services
 
-import com.scortelemed.Recibido
+import com.scortelemed.Request
+import com.scortelemed.TipoCompany
+import com.scortelemed.TipoOperacion
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
 import hwsol.webservices.WsError
@@ -15,7 +17,7 @@ import org.apache.cxf.annotations.SchemaValidation
 import org.grails.cxf.utils.EndpointType
 import org.grails.cxf.utils.GrailsCxfEndpoint
 import org.grails.cxf.utils.GrailsCxfEndpointProperty
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.web.context.request.RequestContextHolder
 
 import com.scortelemed.Company
@@ -33,8 +35,8 @@ import com.scortelemed.schemas.psn.ResultadoReconocimientoMedicoResponse
 import com.scortelemed.schemas.psn.StatusType
 import com.ws.servicios.EstadisticasService
 import com.ws.servicios.LogginService
-import com.ws.servicios.PsnService
-import com.ws.servicios.RequestService
+import com.ws.servicios.impl.companies.PsnService
+import com.ws.servicios.impl.RequestService
 import com.ws.servicios.TarificadorService
 
 import servicios.Expediente
@@ -50,16 +52,12 @@ expose = EndpointType.JAX_WS,properties = [@GrailsCxfEndpointProperty(name = "ws
 @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
 class PsnUnderwrittingCaseManagementService	 {
 
-	@Autowired
-	private PsnService psnService
-	@Autowired
-	private EstadisticasService estadisticasService
-	@Autowired
-	private RequestService requestService
-	@Autowired
-	private LogginService logginService
-	@Autowired
-	private TarificadorService tarificadorService
+	def expedienteService
+	def psnService
+	def estadisticasService
+	def requestService
+	def logginService
+	def tarificadorService
 
 	@WebResult(name = "GestionReconocimientoMedicoResponse")
 	GestionReconocimientoMedicoResponse gestionReconocimientoMedico(
@@ -71,14 +69,14 @@ class PsnUnderwrittingCaseManagementService	 {
 		List<WsError> wsErrors = new ArrayList<WsError>()
 		def requestXML = ""
 		def crearExpedienteService
-		def requestBBDD
+		Request requestBBDD
 		def respuestaCrm
 
 		String message = null
 		StatusType status = null
 		int code = 0
 
-		Company company = Company.findByNombre("psn")
+		Company company = Company.findByNombre(TipoCompany.PSN.getNombre())
 		SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
 		TransformacionUtil util = new TransformacionUtil()
 		GestionReconocimientoMedicoResponse resultado=new GestionReconocimientoMedicoResponse()
@@ -91,14 +89,12 @@ class PsnUnderwrittingCaseManagementService	 {
 
 			if (operacion && operacion.activo) {
 
-				if (Company.findByNombre("psn").generationAutomatic) {
+				if (company.generationAutomatic) {
 
 					logginService.putErrorEndpoint("GestionReconocimientoMedico", "Realizando peticion " + gestionReconocimientoMedico.getCandidateInformation().getOperation().toString() + " para " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber)
 
-					requestXML = psnService.marshall("http://www.scortelemed.com/schemas/psn", gestionReconocimientoMedico)
+					requestXML = psnService.marshall(gestionReconocimientoMedico)
 					requestBBDD = requestService.crear(opername, requestXML)
-					requestBBDD.fecha_procesado = new Date()
-					requestBBDD.save(flush: true)
 
 					wsErrors = psnService.validarDatosObligatorios(requestBBDD)
 
@@ -107,33 +103,26 @@ class PsnUnderwrittingCaseManagementService	 {
 						if (gestionReconocimientoMedico.getCandidateInformation().getOperation().toString().equals("A")) {
 
 
-							psnService.crearExpediente(requestBBDD)
+							expedienteService.crearExpediente(requestBBDD, TipoCompany.PSN)
 
 							message = "El caso se ha procesado correctamente"
 							status = StatusType.OK
 							code = 0
 
-							psnService.insertarRecibido(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), "ALTA")
+							requestService.insertarRecibido(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), TipoOperacion.ALTA)
 
 							/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
 							 *                                */
-							psnService.busquedaCrm(gestionReconocimientoMedico.candidateInformation.requestNumber, company.ou, opername, company.codigoSt, company.id, requestBBDD, gestionReconocimientoMedico.candidateInformation.certificateNumber, company.nombre)
+							expedienteService.busquedaCrm(requestBBDD, company, gestionReconocimientoMedico.candidateInformation.requestNumber, gestionReconocimientoMedico.candidateInformation.certificateNumber, null)
 
 
 						}
 
 						if (gestionReconocimientoMedico.getCandidateInformation().getOperation().toString().equals("B")) {
 
-							requestXML = psnService.marshall("http://www.scortelemed.com/schemas/psn", gestionReconocimientoMedico)
+							requestXML = psnService.marshall(gestionReconocimientoMedico)
 							requestBBDD = requestService.crear(opername, requestXML)
-
-							Recibido recibido = new Recibido()
-							recibido.setFecha(new Date())
-							recibido.setCia(company.id.toString())
-							recibido.setIdentificador(gestionReconocimientoMedico.candidateInformation.requestNumber)
-							recibido.setInfo(requestBBDD.request)
-							recibido.setOperacion("BAJA")
-							recibido.save(flush: true)
+							requestService.insertarRecibido(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestBBDD.request, TipoOperacion.BAJA)
 
 							message = "La baja se ha procesado correctamente"
 							status = StatusType.OK
@@ -146,16 +135,9 @@ class PsnUnderwrittingCaseManagementService	 {
 
 						if (gestionReconocimientoMedico.getCandidateInformation().getOperation().toString().equals("M")) {
 
-							requestXML = psnService.marshall("http://www.scortelemed.com/schemas/psn", gestionReconocimientoMedico)
+							requestXML = psnService.marshall(gestionReconocimientoMedico)
 							requestBBDD = requestService.crear(opername, requestXML)
-
-							Recibido recibido = new Recibido()
-							recibido.setFecha(new Date())
-							recibido.setCia(company.id.toString())
-							recibido.setIdentificador(gestionReconocimientoMedico.candidateInformation.requestNumber)
-							recibido.setInfo(requestBBDD.request)
-							recibido.setOperacion("MODIFICACION")
-							recibido.save(flush: true)
+							requestService.insertarRecibido(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestBBDD.request, TipoOperacion.MODIFICACION)
 
 							message = "La modificacion se ha procesado correctamente"
 							status = StatusType.OK
@@ -174,7 +156,7 @@ class PsnUnderwrittingCaseManagementService	 {
 						status = StatusType.ERROR
 						code = 8
 
-						psnService.insertarError(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber + ". Error de validacion: " + error)
+						requestService.insertarError(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), TipoOperacion.ALTA, "Peticion no realizada para solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber + ". Error de validacion: " + error)
 						logginService.putErrorEndpoint("GestionReconocimientoMedico", "Peticion no realizada de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber + ". Error de validacion: " + error)
 
 					}
@@ -194,7 +176,7 @@ class PsnUnderwrittingCaseManagementService	 {
 			status = StatusType.ERROR
 			code = 2
 
-			psnService.insertarError(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), "ALTA", "Peticion no realizada para solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber + ". Error: " + e.getMessage())
+			requestService.insertarError(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), TipoOperacion.ALTA, "Peticion no realizada para solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber + ". Error: " + e.getMessage())
 
 			logginService.putErrorEndpoint("GestionReconocimientoMedico","Peticion no realizada de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber + ". Error: " + e.getMessage())
 			correoUtil.envioEmailErrores("GestionReconocimientoMedico","Peticion de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.candidateInformation.requestNumber, e)
@@ -223,7 +205,8 @@ class PsnUnderwrittingCaseManagementService	 {
 
 		def opername="PsnResultadoReconocimientoMedicoResponse"
 		def requestXML = ""
-		List<RespuestaCRMInforme> expedientes = new ArrayList<RespuestaCRMInforme>();
+		Request requestBBDD
+		List<RespuestaCRMInforme> expedientes = new ArrayList<RespuestaCRMInforme>()
 		TransformacionUtil util = new TransformacionUtil()
 		CorreoUtil correoUtil = new CorreoUtil()
 		RespuestaCRM respuestaCRM = new RespuestaCRM()
@@ -232,7 +215,7 @@ class PsnUnderwrittingCaseManagementService	 {
 		StatusType status = null
 		int code = 0
 
-		Company company = Company.findByNombre("psn")
+		Company company = Company.findByNombre(TipoCompany.PSN.getNombre())
 
 		logginService.putInfoMessage("Realizando peticion de informacion de servicio ResultadoReconocimientoMedico para la cia " + company.nombre)
 
@@ -244,28 +227,27 @@ class PsnUnderwrittingCaseManagementService	 {
 
 				if (resultadoReconocimientoMedico.numSolicitud != null && !resultadoReconocimientoMedico.numSolicitud.isEmpty()){
 
-					requestXML=psnService.marshall("http://www.scortelemed.com/schemas/psn",resultadoReconocimientoMedico)
+					requestXML=psnService.marshall(resultadoReconocimientoMedico)
+					requestBBDD=requestService.crear(opername,requestXML)
 
-					requestService.crear(opername,requestXML)
-
-					psnService.insertarEnvio (company, resultadoReconocimientoMedico.numSolicitud.toString(), requestXML.toString())
+					requestService.insertarEnvio (company, resultadoReconocimientoMedico.numSolicitud.toString(), requestXML.toString())
 
 					logginService.putInfoEndpoint("ResultadoReconocimientoMedico","Realizando peticion para " + company.nombre + " con numero de solicitud: " + resultadoReconocimientoMedico.numSolicitud.toString())
 
 					/** numSolicitud
 					 *
 					 */
-					Filtro filtro = new Filtro();
+					Filtro filtro = new Filtro()
 
-					filtro = new Filtro();
-					filtro.setClave(ClaveFiltro.CLIENTE);
-					filtro.setValor(company.codigoSt);
+					filtro = new Filtro()
+					filtro.setClave(ClaveFiltro.CLIENTE)
+					filtro.setValor(company.codigoSt)
 					Filtro filtroRelacionado = new Filtro()
 					filtroRelacionado.setClave(ClaveFiltro.NUM_SOLICITUD)
 					filtroRelacionado.setValor(resultadoReconocimientoMedico.numSolicitud)
 					filtro.setFiltroRelacionado(filtroRelacionado)
 
-					respuestaCRM = psnService.informeExpedientePorFiltro(filtro,"ES")
+					respuestaCRM = expedienteService.informeExpedientePorFiltro(filtro,company.ou)
 
 					if(respuestaCRM != null && respuestaCRM.getListaExpedientesInforme() != null && respuestaCRM.getListaExpedientesInforme().size() > 0){
 
@@ -345,7 +327,7 @@ class PsnUnderwrittingCaseManagementService	 {
 			status = StatusType.ERROR
 			code = 2
 
-			psnService.insertarError(company,resultadoReconocimientoMedico.numSolicitud.toString(), requestXML.toString(), "CONSULTA", "Peticion no realizada para solicitud: " + resultadoReconocimientoMedico.numSolicitud.toString() + ". Error: " + e.getMessage())
+			requestService.insertarError(company,resultadoReconocimientoMedico.numSolicitud.toString(), requestXML.toString(), TipoOperacion.CONSULTA, "Peticion no realizada para solicitud: " + resultadoReconocimientoMedico.numSolicitud.toString() + ". Error: " + e.getMessage())
 		}finally{
 
 			def sesion=RequestContextHolder.currentRequestAttributes().getSession()
@@ -369,14 +351,13 @@ class PsnUnderwrittingCaseManagementService	 {
 		def opername="PsnConsolidacionPolizaResponse"
 		def correoUtil = new CorreoUtil()
 		def requestXML = ""
-		def crearExpedienteService
-		def requestBBDD
+		Request requestBBDD
 
 		String notes = null
 		StatusType status = null
 
-		Company company = Company.findByNombre("psn")
-		RespuestaCRM expediente = new RespuestaCRM();
+		Company company = Company.findByNombre(TipoCompany.PSN.getNombre())
+		RespuestaCRM expediente = new RespuestaCRM()
 		TransformacionUtil util = new TransformacionUtil()
 		ConsolidacionPolizaResponse resultado=new ConsolidacionPolizaResponse()
 		String identificador = ""
@@ -389,16 +370,14 @@ class PsnUnderwrittingCaseManagementService	 {
 
 			if (operacion && operacion.activo){
 
-				requestXML=psnService.marshall("http://www.scortelemed.com/schemas/psn",consolidacionPoliza)
+				requestXML=psnService.marshall(consolidacionPoliza)
 				requestBBDD = requestService.crear(opername,requestXML)
-				requestBBDD.fecha_procesado = new Date()
-				requestBBDD.save(flush:true)
 
 				if (consolidacionPoliza.requestNumber != null && !consolidacionPoliza.requestNumber.isEmpty() && consolidacionPoliza.policyNumber != null && !consolidacionPoliza.policyNumber.isEmpty()){
 
-					Filtro filtro = new Filtro();
-					filtro.setClave(ClaveFiltro.CLIENTE);
-					filtro.setValor(company.getCodigoSt());
+					Filtro filtro = new Filtro()
+					filtro.setClave(ClaveFiltro.CLIENTE)
+					filtro.setValor(company.getCodigoSt())
 					Filtro filtroRelacionado = new Filtro()
 					filtroRelacionado.setClave(ClaveFiltro.NUM_SOLICITUD)
 					filtroRelacionado.setValor(consolidacionPoliza.requestNumber)
@@ -417,9 +396,9 @@ class PsnUnderwrittingCaseManagementService	 {
 
 					filtro.setFiltroRelacionado(filtroRelacionado)
 
-					psnService.insertarRecibido(company, identificador, requestXML.toString(), "CONSOLIDACION")
+					requestService.insertarRecibido(company, identificador, requestXML.toString(), TipoOperacion.CONSOLIDACION)
 
-					expediente = psnService.informeExpedientePorFiltro(filtro,"ES")
+					expediente = expedienteService.informeExpedientePorFiltro(filtro,company.ou)
 
 					if (expediente != null && expediente.getErrorCRM() == null && expediente.getListaExpedientesInforme() != null && expediente.getListaExpedientesInforme().size() > 0) {
 
@@ -430,7 +409,7 @@ class PsnUnderwrittingCaseManagementService	 {
 
 							logginService.putInfoEndpoint("ConsolidacionPoliza","Se procede a la modificacion de " + company.nombre + " con " + identificador)
 
-							RespuestaCRM respuestaCrmExpediente = tarificadorService.modificaExpediente("ES",eModificado,null,null)
+							RespuestaCRM respuestaCrmExpediente = expedienteService.modificaExpediente(company.ou,eModificado,null,null)
 
 							if (respuestaCrmExpediente.getErrorCRM() != null && respuestaCrmExpediente.getErrorCRM().getDetalle() != null && !respuestaCrmExpediente.getErrorCRM().getDetalle().isEmpty()){
 
@@ -440,7 +419,7 @@ class PsnUnderwrittingCaseManagementService	 {
 								correoUtil.envioEmail("ConsolidacionPoliza","Error en la modificacion de " + company.nombre + " con " + identificador + ". Error: " + respuestaCrmExpediente.getErrorCRM().getDetalle(), null)
 								logginService.putInfoEndpoint("ConsolidacionPoliza","Error en la modificacion de " + company.nombre + " con " + identificador + ". Error: " + respuestaCrmExpediente.getErrorCRM().getDetalle())
 
-								psnService.insertarError(company, identificador, requestXML.toString(), "CONSOLIDACION", "Peticion no realizada para solicitud: " + identificador + ". Error: " + respuestaCrmExpediente.getErrorCRM().getDetalle())
+								requestService.insertarError(company, identificador, requestXML.toString(), TipoOperacion.CONSOLIDACION, "Peticion no realizada para solicitud: " + identificador + ". Error: " + respuestaCrmExpediente.getErrorCRM().getDetalle())
 							} else {
 
 								notes = "El caso se ha procesado correctamente"
@@ -485,7 +464,7 @@ class PsnUnderwrittingCaseManagementService	 {
 			logginService.putErrorEndpoint("ConsolidacionPoliza","Peticion realizada para " + company.nombre + " con con numero de expiente: " + consolidacionPoliza.requestNumber + ". Error: " + e.getMessage())
 			correoUtil.envioEmailErrores("ConsolidacionPoliza","Peticion realizada para " + company.nombre + " con numero de expiente: " + consolidacionPoliza.requestNumber, e)
 
-			psnService.insertarError(company, identificador, requestXML.toString(), "CONSOLIDACION", "Peticion no realizada para solicitud: " + consolidacionPoliza.requestNumber + ". Error: " + e.getMessage())
+			requestService.insertarError(company, identificador, requestXML.toString(), TipoOperacion.CONSOLIDACION, "Peticion no realizada para solicitud: " + consolidacionPoliza.requestNumber + ". Error: " + e.getMessage())
 		}finally{
 
 			def sesion=RequestContextHolder.currentRequestAttributes().getSession()
@@ -509,7 +488,8 @@ class PsnUnderwrittingCaseManagementService	 {
 
 		def opername="PsnConsultaExpediente"
 		def requestXML = ""
-		RespuestaCRM respuestaCRM = new RespuestaCRM();
+		Request requestBBDD
+		RespuestaCRM respuestaCRM = new RespuestaCRM()
 		TransformacionUtil util = new TransformacionUtil()
 		CorreoUtil correoUtil = new CorreoUtil()
 		String identificador = ""
@@ -518,7 +498,7 @@ class PsnUnderwrittingCaseManagementService	 {
 		StatusType status = null
 		int code = 0
 
-		Company company = Company.findByNombre("psn")
+		Company company = Company.findByNombre(TipoCompany.PSN.getNombre())
 
 		logginService.putInfoMessage("Realizando peticion de informacion de servicio ConsultaExpediente para la cia " + company.nombre)
 
@@ -531,20 +511,19 @@ class PsnUnderwrittingCaseManagementService	 {
 
 				if ((consultaExpediente.numSolicitud != null && !consultaExpediente.numSolicitud.isEmpty()) || (consultaExpediente.numExpediente != null  && !consultaExpediente.numExpediente.isEmpty()) || (consultaExpediente.numSumplemento != null && !consultaExpediente.numSumplemento.isEmpty())){
 
-					requestXML=psnService.marshall("http://www.scortelemed.com/schemas/psn",consultaExpediente)
+					requestXML=psnService.marshall(consultaExpediente)
+					requestBBDD=requestService.crear(opername,requestXML)
 
-					requestService.crear(opername,requestXML)
-
-					Filtro filtro = new Filtro();
+					Filtro filtro = new Filtro()
 
 					/**Si numExpediente esta relleno buscamos por codigost que es unico y el resto da igual
 					 *
 					 */
 					if (consultaExpediente.numExpediente != null && !consultaExpediente.numExpediente.isEmpty()) {
 
-						filtro = new Filtro();
-						filtro.setClave(ClaveFiltro.EXPEDIENTE);
-						filtro.setValor(consultaExpediente.numExpediente);
+						filtro = new Filtro()
+						filtro.setClave(ClaveFiltro.EXPEDIENTE)
+						filtro.setValor(consultaExpediente.numExpediente)
 
 						identificador = "numExp: " +consultaExpediente.numExpediente
 					} else if ((consultaExpediente.numSolicitud != null && !consultaExpediente.numSolicitud.isEmpty()) && (consultaExpediente.numSumplemento == null || consultaExpediente.numSumplemento.isEmpty())){
@@ -552,9 +531,9 @@ class PsnUnderwrittingCaseManagementService	 {
 						/** numSolicitud
 						 * 
 						 */
-						filtro = new Filtro();
-						filtro.setClave(ClaveFiltro.CLIENTE);
-						filtro.setValor(company.codigoSt);
+						filtro = new Filtro()
+						filtro.setClave(ClaveFiltro.CLIENTE)
+						filtro.setValor(company.codigoSt)
 						Filtro filtroRelacionado = new Filtro()
 						filtroRelacionado.setClave(ClaveFiltro.NUM_SOLICITUD)
 						filtroRelacionado.setValor(consultaExpediente.numSolicitud)
@@ -567,9 +546,9 @@ class PsnUnderwrittingCaseManagementService	 {
 						 *
 						 */
 
-						filtro = new Filtro();
-						filtro.setClave(ClaveFiltro.CLIENTE);
-						filtro.setValor(company.codigoSt);
+						filtro = new Filtro()
+						filtro.setClave(ClaveFiltro.CLIENTE)
+						filtro.setValor(company.codigoSt)
 
 						Filtro filtroRelacionado = new Filtro()
 						filtroRelacionado.setClave(ClaveFiltro.NUM_SOLICITUD)
@@ -585,11 +564,11 @@ class PsnUnderwrittingCaseManagementService	 {
 						identificador = "num_sol: " + consultaExpediente.numSolicitud + "-numSup: " + consultaExpediente.numSumplemento
 					}
 
-					psnService.insertarEnvio (company, identificador, requestXML.toString())
+					requestService.insertarEnvio (company, identificador, requestXML.toString())
 
 					logginService.putInfoEndpoint("ConsultaExpediente","Realizando peticion para " + company.nombre + " con " + identificador)
 
-					respuestaCRM = psnService.informeExpedientePorFiltro(filtro,"ES")
+					respuestaCRM = expedienteService.informeExpedientePorFiltro(filtro,company.ou)
 
 					if(respuestaCRM != null && respuestaCRM.getListaExpedientesInforme() != null && respuestaCRM.getListaExpedientesInforme().size() > 0){
 
@@ -650,7 +629,7 @@ class PsnUnderwrittingCaseManagementService	 {
 			status = StatusType.ERROR
 			code = 2
 
-			psnService.insertarError(company, identificador, requestXML.toString(), "CONSULTA", "Peticion no realizada para " + identificador + ". Error: " + e.getMessage())
+			requestService.insertarError(company, identificador, requestXML.toString(), TipoOperacion.CONSULTA, "Peticion no realizada para " + identificador + ". Error: " + e.getMessage())
 		}finally{
 			//BORRAMOS VARIABLES DE SESION
 			def sesion=RequestContextHolder.currentRequestAttributes().getSession()
@@ -675,13 +654,13 @@ class PsnUnderwrittingCaseManagementService	 {
 
 		def opername="PsnConsultaDocumento"
 		def requestXML = ""
-
+		Request requestBBDD
 		TransformacionUtil util = new TransformacionUtil()
 		CorreoUtil correoUtil = new CorreoUtil()
-		Filtro filtro = new Filtro();
-		Company company = Company.findByNombre("psn")
+		Filtro filtro = new Filtro()
+		Company company = Company.findByNombre(TipoCompany.PSN.getNombre())
 		String indentificador = null
-		RespuestaCRM respuestaCRM = new RespuestaCRM();
+		RespuestaCRM respuestaCRM = new RespuestaCRM()
 		String identificador = ""
 		String messages = null
 		StatusType status = null
@@ -696,11 +675,11 @@ class PsnUnderwrittingCaseManagementService	 {
 
 				if (consultaDocumento && consultaDocumento.codigoSt != null && !consultaDocumento.codigoSt.isEmpty()){
 
-					filtro = new Filtro();
-					filtro.setClave(ClaveFiltro.EXPEDIENTE);
-					filtro.setValor(consultaDocumento.codigoSt);
+					filtro = new Filtro()
+					filtro.setClave(ClaveFiltro.EXPEDIENTE)
+					filtro.setValor(consultaDocumento.codigoSt)
 
-					respuestaCRM = psnService.informeExpedientePorFiltro(filtro,"ES")
+					respuestaCRM = expedienteService.informeExpedientePorFiltro(filtro,company.ou)
 
 					if (consultaDocumento.nodoAlfresco != null && !consultaDocumento.nodoAlfresco.isEmpty()) {
 
@@ -708,11 +687,10 @@ class PsnUnderwrittingCaseManagementService	 {
 
 							identificador = "nodo: " + consultaDocumento.nodoAlfresco.substring(consultaDocumento.nodoAlfresco.lastIndexOf("/")+1,consultaDocumento.nodoAlfresco.length())
 
-							requestXML=psnService.marshall("http://www.scortelemed.com/schemas/psn",consultaDocumento)
+							requestXML=psnService.marshall(consultaDocumento)
+							requestBBDD=requestService.crear(opername,requestXML)
 
-							requestService.crear(opername,requestXML)
-
-							psnService.insertarEnvio(company, identificador, requestXML.toString())
+							requestService.insertarEnvio(company, identificador, requestXML.toString())
 
 							logginService.putInfoEndpoint("ConsultaDocumento","Realizando peticion para " + company.nombre + " con numero de expiente: " + consultaDocumento.codigoSt + " y " + identificador)
 
@@ -746,11 +724,10 @@ class PsnUnderwrittingCaseManagementService	 {
 
 							identificador = "documentacionId: " + consultaDocumento.documentacionId
 
-							requestXML=psnService.marshall("http://www.scortelemed.com/schemas/psn",consultaDocumento)
+							requestXML=psnService.marshall(consultaDocumento)
+							requestBBDD=requestService.crear(opername,requestXML)
 
-							requestService.crear(opername,requestXML)
-
-							psnService.insertarEnvio(company, identificador, requestXML.toString())
+							requestService.insertarEnvio(company, identificador, requestXML.toString())
 
 							logginService.putInfoEndpoint("ConsultaDocumento","Realizando peticion para " + company.nombre + " con numero de expiente: " + consultaDocumento.codigoSt + " y " + identificador)
 
@@ -805,7 +782,7 @@ class PsnUnderwrittingCaseManagementService	 {
 			messages = "Error en ConsultaExpediente: " + e.getMessage()
 			status = StatusType.ERROR
 
-			psnService.insertarError(company, identificador, requestXML.toString(), "CONSULTA", "Peticion no realizada para solicitud: " + identificador + ". Error: " + e.getMessage())
+			requestService.insertarError(company, identificador, requestXML.toString(), TipoOperacion.CONSULTA, "Peticion no realizada para solicitud: " + identificador + ". Error: " + e.getMessage())
 			
 		}finally{
 			//BORRAMOS VARIABLES DE SESION

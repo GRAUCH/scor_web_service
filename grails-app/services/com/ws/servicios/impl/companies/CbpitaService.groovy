@@ -1,21 +1,17 @@
-package com.ws.servicios
+package com.ws.servicios.impl.companies
 
 import com.scor.global.ExceptionUtils
 import com.scor.global.WSException
 import com.scor.global.ZipUtils
 import com.scor.srpfileinbound.DATOS
 import com.scor.srpfileinbound.REGISTRODATOS
-import com.scor.srpfileinbound.RootElement
-import com.scortelemed.Company
-import com.scortelemed.Conf
-import com.scortelemed.Envio
-import com.scortelemed.Recibido
+import com.scortelemed.*
 import com.scortelemed.schemas.cbpita.*
 import com.scortelemed.servicios.Candidato
 import com.scortelemed.servicios.Frontal
 import com.scortelemed.servicios.FrontalServiceLocator
+import com.ws.servicios.ICompanyService
 import hwsol.webservices.CorreoUtil
-import hwsol.webservices.GenerarZip
 import hwsol.webservices.TransformacionUtil
 import hwsol.webservices.WsError
 import org.w3c.dom.Document
@@ -27,57 +23,56 @@ import servicios.RespuestaCRM
 import servicios.TipoEstadoExpediente
 import servicios.TipoMotivoAnulacion
 
-import javax.xml.bind.JAXBContext
-import javax.xml.bind.JAXBElement
-import javax.xml.bind.Marshaller
-import javax.xml.namespace.QName
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 import java.text.SimpleDateFormat
 
 import static grails.async.Promises.task
 
-class CbpitaService {
+class CbpitaService implements ICompanyService{
 
     TransformacionUtil util = new TransformacionUtil()
     def grailsApplication
-    def logginService = new LogginService()
-    GenerarZip generarZip = new GenerarZip()
+    def requestService
+    def expedienteService
+    def logginService
     def tarificadorService
-    TransformacionUtil transformacionUtil = new TransformacionUtil()
     ZipUtils zipUtils = new ZipUtils()
     CorreoUtil correoUtil = new CorreoUtil()
 
-    def marshall(nameSpace, clase) {
 
-        StringWriter writer = new StringWriter();
-
+    String marshall(def objeto) {
+        String nameSpace = "http://www.scortelemed.com/schemas/cbpita"
+        String result
         try {
-
-            JAXBContext jaxbContext = JAXBContext.newInstance(clase.class);
-            Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-
-            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            def root = null
-            QName qName = null
-
-            if (clase instanceof com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCasesResultsRequest) {
-                qName = new QName(nameSpace, "CbpitaUnderwrittingCasesResultsRequest");
-                root = new JAXBElement<CbpitaUnderwrittingCasesResultsRequest>(qName, CbpitaUnderwrittingCasesResultsRequest.class, clase);
+            if (objeto instanceof CbpitaUnderwrittingCasesResultsRequest) {
+                result = requestService.marshall(nameSpace, objeto, CbpitaUnderwrittingCasesResultsRequest.class)
+            } else if (objeto instanceof CbpitaUnderwrittingCaseManagementRequest) {
+                result = requestService.marshall(nameSpace, objeto, CbpitaUnderwrittingCaseManagementRequest.class)
             }
-
-            if (clase instanceof com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCaseManagementRequest) {
-                qName = new QName(nameSpace, "CbpitaUnderwrittingCaseManagementRequest");
-                root = new JAXBElement<CbpitaUnderwrittingCaseManagementRequest>(qName, CbpitaUnderwrittingCaseManagementRequest.class, clase);
-            }
-
-            jaxbMarshaller.marshal(root, writer);
-            String result = writer.toString();
         } finally {
-            writer.close();
+            return result
         }
+    }
 
-        return writer
+
+    def buildDatos(Request req, String codigoSt) {
+        try {
+            DATOS dato = new DATOS()
+            Company company = req.company
+            dato.registro = rellenaDatos(req, company)
+            dato.pregunta = rellenaPreguntas(req, company.nombre)
+            dato.servicio = rellenaServicios(req, company.nombre)
+            dato.coberturas = rellenaCoberturas(req)
+            return dato
+        } catch (Exception e) {
+            logginService.putError(e.toString())
+        }
+    }
+
+
+    def getCodigoStManual(Request req) {
+        return null
     }
 
     com.scortelemed.servicios.RespuestaCRM modificarExpediente(com.scortelemed.servicios.Expediente expediente, String ou) {
@@ -96,11 +91,11 @@ class CbpitaService {
 
     def instanciarFrontal(String frontalPortAddress) {
 
-        FrontalServiceLocator fs = new FrontalServiceLocator();
-        fs.setFrontalPortEndpointAddress(frontalPortAddress);
-        Frontal frontal = fs.getFrontalPort();
+        FrontalServiceLocator fs = new FrontalServiceLocator()
+        fs.setFrontalPortEndpointAddress(frontalPortAddress)
+        Frontal frontal = fs.getFrontalPort()
 
-        return frontal;
+        return frontal
     }
 
     List<servicios.Expediente> existeExpediente(String numPoliza, String nombreCia, String companyCodigoSt, String ou) {
@@ -113,8 +108,8 @@ class CbpitaService {
 
         try {
 
-            filtro.setClave(servicios.ClaveFiltro.CLIENTE);
-            filtro.setValor(companyCodigoSt.toString());
+            filtro.setClave(servicios.ClaveFiltro.CLIENTE)
+            filtro.setValor(companyCodigoSt.toString())
 
             servicios.Filtro filtroRelacionado1 = new servicios.Filtro()
             filtroRelacionado1.setClave(servicios.ClaveFiltro.NUM_SOLICITUD)
@@ -122,7 +117,7 @@ class CbpitaService {
 
             filtro.setFiltroRelacionado(filtroRelacionado1)
 
-            respuestaCrm = consultaExpediente(ou.toString(), filtro)
+            respuestaCrm = expedienteService.consultaExpediente(ou, filtro)
 
             if (respuestaCrm != null && respuestaCrm.getListaExpedientes() != null && respuestaCrm.getListaExpedientes().size() > 0) {
 
@@ -150,94 +145,11 @@ class CbpitaService {
         return expedientes
     }
 
-    def crearExpediente = { req ->
-        try {
-            //SOBREESCRIBIMOS LA URL A LA QUE TIENE QUE LLAMAR EL WSDL
-            def ctx = grailsApplication.mainContext
-            def bean = ctx.getBean("soapClientCrearOrabpel")
-            bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("orabpelCreacion.wsdl")?.value)
-            def salida = grailsApplication.mainContext.soapClientCrearOrabpel.initiate(crearExpedienteBPM(req))
-            return "OK"
-        } catch (Exception e) {
-            throw new WSException(this.getClass(), "crearExpediente", ExceptionUtils.composeMessage(null, e));
-        }
-    }
-
-    def consultaExpediente = { ou, filtro ->
-
-        try {
-
-            def ctx = grailsApplication.mainContext
-            def bean = ctx.getBean("soapClientAlptis")
-            bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("frontal.wsdl")?.value)
-
-            def salida = grailsApplication.mainContext.soapClientAlptis.consultaExpediente(tarificadorService.obtenerUsuarioFrontal(ou), filtro)
-
-            return salida
-        } catch (Exception e) {
-            logginService.putError("obtenerInformeExpedientes de Methislab", "No se ha podido obtener el informe de expediente : " + e)
-            return null
-        }
-    }
-
-    private def crearExpedienteBPM = { req ->
-        def listadoFinal = []
-        RootElement payload = new RootElement()
-
-        listadoFinal.add(buildCabecera(req))
-        listadoFinal.add(buildDatos(req, req.company))
-        listadoFinal.add(buildPie())
-
-        payload.cabeceraOrDATOSOrPIE = listadoFinal
-
-        return payload
-    }
-
-    private def buildCabecera = { req ->
-        def formato = new SimpleDateFormat("yyyyMMdd");
-        RootElement.CABECERA cabecera = new RootElement.CABECERA()
-        cabecera.setCodigoCia(req.company.codigoSt)
-        cabecera.setContadorSecuencial("1")
-        cabecera.setFechaGeneracion(formato.format(new Date()))
-        cabecera.setFiller("")
-        cabecera.setTipoFichero("1")
-
-        return cabecera
-    }
-
-    private def buildPie = {
-
-        RootElement.PIE pie = new RootElement.PIE()
-        pie.setFiller("")
-        pie.setNumFilasFichero(100)
-
-        pie.setNumRegistros(1)
-
-        return pie
-    }
-
-    private def buildDatos = { req, company ->
-
-        try {
-
-            DATOS dato = new DATOS()
-
-            dato.registro = rellenaDatos(req, company)
-            dato.pregunta = rellenaPreguntas(req, company.nombre)
-            dato.servicio = rellenaServicios(req, company.nombre)
-            dato.coberturas = rellenaCoberturas(req)
-
-            return dato
-        } catch (Exception e) {
-            logginService.putError(e.toString())
-        }
-    }
-
-    public def rellenaDatos(req, company) {
+    def rellenaDatos(req, company) {
 
         def mapDatos = [:]
         def listadoPreguntas = []
-        def formato = new SimpleDateFormat("yyyyMMdd");
+        def formato = new SimpleDateFormat("yyyyMMdd")
         def apellido
         def telefono1
         def telefono2
@@ -266,7 +178,7 @@ class CbpitaService {
 
                 if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-                    Element eElement = (Element) nNode;
+                    Element eElement = (Element) nNode
 
                     /**NUMERO DE PRODUCTO
                      *
@@ -532,7 +444,7 @@ class CbpitaService {
 
             return datosRegistro
         } catch (Exception e) {
-            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
         }
     }
 
@@ -593,7 +505,7 @@ class CbpitaService {
 
                     if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-                        Element eElement = (Element) nNode;
+                        Element eElement = (Element) nNode
 
                         if (eElement.getElementsByTagName("serviceCode").item(0) != null) {
 
@@ -650,7 +562,7 @@ class CbpitaService {
 
                 if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-                    Element eElement = (Element) nNode;
+                    Element eElement = (Element) nNode
 
                     /**PREGUNTAS PREVIAS
                      *
@@ -675,7 +587,7 @@ class CbpitaService {
 
             return listadoPreguntas
         } catch (Exception e) {
-            throw new WSException(this.getClass(), "rellenaPreguntas", ExceptionUtils.composeMessage(null, e));
+            throw new WSException(this.getClass(), "rellenaPreguntas", ExceptionUtils.composeMessage(null, e))
         }
     }
 
@@ -702,7 +614,7 @@ class CbpitaService {
 
                 if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-                    Element eElement = (Element) nNode;
+                    Element eElement = (Element) nNode
 
                     DATOS.Coberturas cobertura = new DATOS.Coberturas()
 
@@ -722,133 +634,8 @@ class CbpitaService {
 
             return listadoCoberturas
         } catch (Exception e) {
-            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
         }
-    }
-
-    def busquedaCrm(solicitud, ou, companyCodigoSt, companyId, requestBBDD, String nombrecia) {
-
-        task {
-
-            logginService.putInfoMessage("Buscando en CRM solicitud de " + nombrecia + " con requestNumber: " + solicitud.toString())
-
-            def respuestaCrm
-            int limite = 0;
-            boolean encontrado = false;
-
-            servicios.Filtro filtro = new servicios.Filtro()
-            SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
-            Thread.sleep(90000);
-
-
-            try {
-
-
-                while (!encontrado && limite < 10) {
-
-                    filtro.setClave(servicios.ClaveFiltro.CLIENTE);
-                    filtro.setValor(companyCodigoSt.toString());
-
-                    servicios.Filtro filtroRelacionado1 = new servicios.Filtro()
-                    filtroRelacionado1.setClave(servicios.ClaveFiltro.NUM_SOLICITUD)
-                    filtroRelacionado1.setValor(solicitud.toString())
-
-                    filtro.setFiltroRelacionado(filtroRelacionado1)
-
-                    respuestaCrm = consultaExpediente(ou.toString(), filtro)
-
-                    if (respuestaCrm != null && respuestaCrm.getListaExpedientes() != null && respuestaCrm.getListaExpedientes().size() > 0) {
-
-                        for (int i = 0; i < respuestaCrm.getListaExpedientes().size(); i++) {
-
-                            servicios.Expediente exp = respuestaCrm.getListaExpedientes().get(i)
-
-                            String fechaCreacion = format.format(new Date());
-
-                            if (exp.getCandidato() != null && exp.getCandidato().getCompanya() != null && exp.getCandidato().getCompanya().getCodigoST().equals(companyCodigoSt.toString()) &&
-                                    exp.getNumSolicitud() != null && exp.getNumSolicitud().equals(solicitud.toString()) && fechaCreacion != null && fechaCreacion.equals(exp.getFechaApertura())) {
-
-                                /**Alta procesada correctamente
-                                 *
-                                 */
-
-                                encontrado = true
-                            }
-                        }
-                    }
-
-                    if (encontrado) {
-
-                        logginService.putInfoMessage("Nueva alta automatica de " + nombrecia + " con numero de solicitud: " + solicitud.toString() + " procesada correctamente")
-                    }
-
-                    limite++
-                    Thread.sleep(10000)
-                }
-
-                /**Alta procesada pero no se ha encontrado en CRM.
-                 *
-                 */
-                if (limite == 10) {
-
-
-                    logginService.putInfoMessage("Nueva alta de " + nombrecia + " con numero de solicitud: " + solicitud.toString() + " se ha procesado pero no se ha dado de alta en CRM")
-                    correoUtil.envioEmailErrores("ERROR en alta de HMI-CBP", "Nueva alta de " + nombrecia + " con numero de solicitud: " + solicitud.toString() + " se ha procesado pero no se ha dado de alta en CRM", null)
-
-                    /**Metemos en errores
-                     *
-                     */
-                    com.scortelemed.Error error = new com.scortelemed.Error()
-                    error.setFecha(new Date())
-                    error.setCia(companyId.toString())
-                    error.setIdentificador(solicitud.toString())
-                    error.setInfo(requestBBDD.request)
-                    error.setOperacion("ALTA")
-                    error.setError("Peticion procesada para numero de solicitud: " + solicitud.toString() + ". No encontrada en CRM")
-                    error.save(flush: true)
-                }
-            } catch (Exception e) {
-
-
-                logginService.putErrorMessage("Nueva alta de " + nombrecia + " con numero de solicitud: " + solicitud.toString() + " no se ha procesado: Motivo: " + e.getMessage())
-                correoUtil.envioEmailErrores("ERROR en alta de HMI-CBP", "Nueva alta de " + nombrecia + " con numero de solicitud: " + solicitud.toString() + " no se ha procesado: Motivo: " + e.getMessage(), null)
-
-            }
-        }
-    }
-
-    public void insertarRecibido(Company company, String identificador, String info, String operacion) {
-
-        Recibido recibido = new Recibido()
-        recibido.setFecha(new Date())
-        recibido.setCia(company.id.toString())
-        recibido.setIdentificador(identificador)
-        recibido.setInfo(info)
-        recibido.setOperacion(operacion)
-        recibido.save(flush: true)
-    }
-
-    public void insertarError(Company company, String identificador, String info, String operacion, String detalleError) {
-
-        com.scortelemed.Error error = new com.scortelemed.Error()
-        error.setFecha(new Date())
-        error.setCia(company.id.toString())
-        error.setIdentificador(identificador)
-        error.setInfo(info)
-        error.setOperacion(operacion)
-        error.setError(detalleError)
-        error.save(flush: true)
-    }
-
-    void insertarEnvio(Company company, String identificador, String info) {
-
-        Envio envio = new Envio()
-        envio.setFecha(new Date())
-        envio.setCia(company.id.toString())
-        envio.setIdentificador(identificador)
-        envio.setInfo(info)
-        envio.save(flush: true)
-        envio.hasErrors()
     }
 
     /**Devuelve lista con los errores de validacion
@@ -856,10 +643,10 @@ class CbpitaService {
      * @param requestBBDD
      * @return
      */
-    public List<WsError> validarDatosObligatorios(requestBBDD) {
+    List<WsError> validarDatosObligatorios(requestBBDD) {
 
         List<WsError> wsErrors = new ArrayList<WsError>()
-        SimpleDateFormat formato = new SimpleDateFormat("yyyyMMdd");
+        SimpleDateFormat formato = new SimpleDateFormat("yyyyMMdd")
         String telefono1 = null
         String telefono2 = null
         String telefonoMovil = null
@@ -884,7 +671,7 @@ class CbpitaService {
 
                 if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-                    Element eElement = (Element) nNode;
+                    Element eElement = (Element) nNode
 
                     /**CODIGO DE PRODUCTO
                      *
@@ -992,7 +779,7 @@ class CbpitaService {
             return wsErrors
 
         } catch (Exception e) {
-            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e));
+            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
         }
     }
 
@@ -1026,8 +813,8 @@ class CbpitaService {
             expediente.setPhoneNumber2("")
         }
 
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        String dateString = formatter.format(requestDate.toGregorianCalendar().getTime());
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd")
+        String dateString = formatter.format(requestDate.toGregorianCalendar().getTime())
 
         logginService.putInfoMessage("Iniciado generacion de zip para expediente " + codigoSt)
 
@@ -1086,7 +873,7 @@ class CbpitaService {
         return expediente
     }
 
-    public String traducirMotivo(String motivo) {
+    String traducirMotivo(String motivo) {
 
         String motivoTraducido = null
 
@@ -1140,10 +927,10 @@ class CbpitaService {
     def devolverStateType(estado) {
 
         switch (estado) {
-            case "CERRADO": return RequestStateType.CLOSED;
-            case "ANULADO": return RequestStateType.CANCELLED;
-            case "RECHAZADO": return RequestStateType.REJECTED;
-            default: return null;
+            case "CERRADO": return RequestStateType.CLOSED
+            case "ANULADO": return RequestStateType.CANCELLED
+            case "RECHAZADO": return RequestStateType.REJECTED
+            default: return null
         }
     }
 
@@ -1163,7 +950,7 @@ class CbpitaService {
     com.scortelemed.servicios.Expediente componerExpedienteModificado(servicios.Expediente expediente, CbpitaUnderwrittingCaseManagementRequest.CandidateInformation infoCandidato) {
 
         com.scortelemed.servicios.Expediente expedienteModificado = new com.scortelemed.servicios.Expediente()
-        SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy")
         String observaciones = ""
         String modificaciones = ""
 

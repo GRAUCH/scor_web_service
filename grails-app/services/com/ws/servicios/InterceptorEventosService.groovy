@@ -38,10 +38,10 @@ class InterceptorEventosService {
 
     }
 
-    /**String getCompanyFromHeader() {//Map<String, List<String>> headers = CastUtils.cast((Map)message.get(Message.PROTOCOL_HEADERS));
+    /**String getCompanyFromHeader() {//Map<String, List<String>> headers = CastUtils.cast((Map)message.get(Message.PROTOCOL_HEADERS))
 
-     if (headers != null) {List<String> sa = headers.get("SOAPAction");
-     if (sa != null && sa.size() > 0) {action = sa.get(0).replace("\"", "");
+     if (headers != null) {List<String> sa = headers.get("SOAPAction")
+     if (sa != null && sa.size() > 0) {action = sa.get(0).replace("\"", "")
      if (action.equals("http://www.scortelemed.com/schemas/enginyers/addExp")) {companyName = "enginyers"}}}}**/
 
 }

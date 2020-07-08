@@ -1,5 +1,8 @@
 package services
 
+import com.scortelemed.Request
+import com.scortelemed.TipoCompany
+import com.scortelemed.TipoOperacion
 import hwsol.webservices.CorreoUtil
 
 import java.text.SimpleDateFormat
@@ -15,19 +18,15 @@ import org.grails.cxf.utils.EndpointType
 import org.grails.cxf.utils.GrailsCxfEndpoint
 import org.grails.cxf.utils.GrailsCxfEndpointProperty
 import org.springframework.web.context.request.RequestContextHolder
-
-import servicios.ClaveFiltro
-import servicios.Expediente
 import servicios.Filtro
 
 import com.scortelemed.Company
-import com.scortelemed.Recibido
 import com.ws.enumeration.StatusType
 import com.ws.lifesquare.beans.LifesquareUnderwrittingCaseManagementRequest
 import com.ws.lifesquare.beans.LifesquareUnderwrittingCaseManagementResponse
 import com.ws.servicios.EstadisticasService
 import com.ws.servicios.LogginService
-import com.ws.servicios.RequestService
+import com.ws.servicios.impl.RequestService
 
 @WebService(targetNamespace = "http://www.scortelemed.com/schemas/lifesquare")
 @SchemaValidation
@@ -39,7 +38,8 @@ class LifesquareUnderwrittingCaseManagementService {
 	def protected estadisticasService = new EstadisticasService()
 	def protected requestService = new RequestService()
 	def protected logginService = new LogginService()
-	def crearExpedienteService
+	def expedienteService
+	def francesasService
 	def tarificadorService
 	
 	@WebResult(name = "LifesquareUnderwrittingCaseManagementResponse")
@@ -51,10 +51,9 @@ class LifesquareUnderwrittingCaseManagementService {
 		def opername = "LifesquareUnderwrittingCaseManagementRequest"
 		def correoUtil = new CorreoUtil()
 		def requestXML = ""
-		def requestBBDD
-		def company = Company.findByNombre('lifesquare')
-		def respuestaCrm
-		
+		Request requestBBDD
+		def company = Company.findByNombre(TipoCompany.ZEN_UP.getNombre())
+
 		Filtro filtro = new Filtro()
 		SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
 		LifesquareUnderwrittingCaseManagementResponse resultado = new LifesquareUnderwrittingCaseManagementResponse()
@@ -71,35 +70,21 @@ class LifesquareUnderwrittingCaseManagementService {
 
 					requestXML = requestService.marshall(lifesquareUnderwrittingCaseManagementRequest,LifesquareUnderwrittingCaseManagementRequest.class)
 					requestBBDD = requestService.crear(opername,requestXML)
-					requestBBDD.fecha_procesado = new Date()
-					requestBBDD.save(flush:true)
+
 					resultado.setStatusType(StatusType.ok)
 					resultado.setComments("ok mensaje")
 
-					if (Company.findByNombre("lifesquare").generationAutomatic) {
+					if (company.generationAutomatic) {
 
 						logginService.putInfoMessage("Se procede el alta automatica de Lifesquare con numero de solicitud " + lifesquareUnderwrittingCaseManagementRequest.policy.policy_number)
-						crearExpedienteService.crearExpediente(requestBBDD)
+						expedienteService.crearExpediente(requestBBDD, TipoCompany.ZEN_UP)
+						requestService.insertarRecibido(company,lifesquareUnderwrittingCaseManagementRequest.policy.policy_number,requestBBDD.request, TipoOperacion.ALTA)
 
-
-						/**Metemos en recibidos
-						 *
-						 */
-						Recibido recibido = new Recibido()
-						recibido.setFecha(new Date())
-						recibido.setCia(company.id.toString())
-						recibido.setIdentificador(lifesquareUnderwrittingCaseManagementRequest.policy.policy_number)
-						recibido.setInfo(requestBBDD.request)
-						recibido.setOperacion("ALTA")
-						recibido.save(flush:true)
-						
-						
-						
 						/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
 						 *
 						 */
 						correoUtil.envioEmail(opername, null, 1)
-						tarificadorService.busquedaLifesquareCrm(lifesquareUnderwrittingCaseManagementRequest.policy.policy_number, company.ou, opername, company.codigoSt, company.id, requestBBDD)
+						expedienteService.busquedaCrm(requestBBDD, company, null, null, lifesquareUnderwrittingCaseManagementRequest.policy.policy_number)
 						
 					}
 					
@@ -121,19 +106,9 @@ class LifesquareUnderwrittingCaseManagementService {
 			correoUtil.envioEmailErrores(opername,"Peticion no realizada para solicitud: " + lifesquareUnderwrittingCaseManagementRequest.policy.policy_number.toString(),e)
 			resultado.setStatusType(StatusType.error)
 			resultado.setComments("Error en "+opername+ ": "+e.getMessage())
-			
-			/**Metemos en errores
-			 *
-			 */
-			com.scortelemed.Error error = new com.scortelemed.Error()
-			error.setFecha(new Date())
-			error.setCia(company.id.toString())
-			error.setIdentificador(lifesquareUnderwrittingCaseManagementRequest.policy.policy_number.toString())
-			error.setInfo(requestBBDD.request)
-			error.setOperacion("ALTA")
-			error.setError("Peticion no realizada para solicitud: " + lifesquareUnderwrittingCaseManagementRequest.policy.policy_number.toString() + "- Error: "+e.getMessage())
-			error.save(flush:true)
-			
+			requestService.insertarError(company, lifesquareUnderwrittingCaseManagementRequest.policy.policy_number.toString(), requestBBDD.request, TipoOperacion.ALTA,
+										  "Peticion no realizada para solicitud: " + lifesquareUnderwrittingCaseManagementRequest.policy.policy_number.toString() + "- Error: "+e.getMessage())
+
 		} finally {
 
 			def sesion=RequestContextHolder.currentRequestAttributes().getSession()

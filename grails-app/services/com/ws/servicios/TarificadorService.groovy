@@ -2,6 +2,8 @@ package com.ws.servicios
 
 import com.scor.comprimirdocumentos.ParametrosEntrada
 import com.scortelemed.Conf
+import com.scortelemed.TipoOperacion
+import com.ws.enumeration.UnidadOrganizativa
 import grails.util.Environment
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.FetchUtilLagunaro
@@ -25,12 +27,14 @@ class TarificadorService {
      Se conecta al CRM y devuelve los expedientes tarificados para una fecha
      */
     def grailsApplication
-    def hwSoapClientService
+    def expedienteService
+    def requestService
     def fetchUtil = new FetchUtilLagunaro()
     def soapAlptisRecetteWSPRO
     def soapAlptisRecetteWS
     def logginService = new LogginService()
     CorreoUtil correoUtil = new CorreoUtil()
+
     def tarificador = { fecha ->
         def listaExpedientes = []
         try {
@@ -41,7 +45,7 @@ class TarificadorService {
             tarificador = tarificador.trim().toLowerCase()
 
             /////////////////////////////////////////////////////////////////////////
-            def sqlXml = fetchUtil.dameExpedientesTarificados(fecha, "1004")
+            def sqlXml = fetchUtil.dameExpedientesTarificados(fecha, "1004") //Lagunaro
             def crmService = new ServiceCrmService()
             xmlResultado = crmService.conexion(sqlXml)
             listaExpedientes = fetchUtil.rellenaExpedientesTarificados(xmlResultado)
@@ -68,7 +72,7 @@ class TarificadorService {
                 xmlResultado = crmService.conexion(sqlXml)
                 listaExpedientes[i] = fetchUtil.rellenaExpedienteServicio(xmlResultado, expediente)
 
-                def nodo = obtenerNodoConsultaExpediente(expediente.scorName.toString())
+                def nodo = obtenerNodoConsultaExpediente(expediente.scorName.toString(), UnidadOrganizativa.ES)
                 if (nodo) {
                     expediente = asignarZipExpediente(expediente, nodo)
                 }
@@ -184,29 +188,13 @@ class TarificadorService {
         return result
     }
 
-    def obtenerNodoConsultaExpediente(String idExpediente) {
+    private def obtenerNodoConsultaExpediente(String idExpediente, UnidadOrganizativa pais) {
         try {
-            def usuario = new UsuarioGorm()
-            usuario.clave = Conf.findByName("frontal.clave")?.value
-            usuario.dominio = Conf.findByName("frontal.dominio")?.value
-            usuario.usuario = Conf.findByName("frontal.usuario")?.value
-
-            def filtro = new FiltroGorm()
-            filtro.clave = "EXPEDIENTE"
-            filtro.valor = idExpediente
-
-            //SOBREESCRIBIMOS LA URL A LA QUE TIENE QUE LLAMAR EL WSDL
-            def ctx = grailsApplication.mainContext
-            def bean = ctx.getBean("soapClientAlptis")
-            bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("frontal.wsdl")?.value)
-
-            def salida = grailsApplication.mainContext.soapClientAlptis.consultaExpediente(usuario, filtro)
-//(countryName:"Spain")
-
+            def salida = expedienteService.consultaExpedienteCodigoST(idExpediente, pais)
             if (salida.listaExpedientes) {
                 return salida.listaExpedientes[0].nodoAlfresco
             } else {
-                return false
+                return null
             }
         } catch (Exception e) {
             logginService.putError("obtenerNodoConsultaExpediente", "No se ha podido obtener el nodo de expedientes " + idExpediente + ": " + e)
@@ -244,36 +232,6 @@ class TarificadorService {
             correoUtil.envioEmailErrores("No se ha podido obtener el zip del nodo", "No se ha podido obtener el ZIP", e)
         }
         return response
-    }
-
-    def obtenerInformeExpedientes(String codigost, String arg2, int arg3, String fechaIni, String fechaFin, String pais) {
-        try {
-            //SOBREESCRIBIMOS LA URL A LA QUE TIENE QUE LLAMAR EL WSDL
-            def ctx = grailsApplication.mainContext
-            def bean = ctx.getBean("soapClientAlptis")
-            bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("frontal.wsdl")?.value)
-            def salida = grailsApplication.mainContext.soapClientAlptis.informeExpedientes(obtenerUsuarioFrontal(pais), codigost, arg2, arg3, fechaIni, fechaFin)
-            return salida.listaExpedientesInforme
-        } catch (Throwable e) {
-            logginService.putError("obtenerInformeExpedientes", "No se ha podido obtener el informe de expediente : " + e)
-            correoUtil.envioEmailErrores("obtenerInformeExpedientes", "No se ha podido obtener el informe de expediente", e)
-            return false
-        }
-    }
-
-    def obtenerInformeExpedientesSiniestros(String arg1, String arg2, String arg3, String arg4, String arg5, String arg6) {
-
-        try {
-            def ctx = grailsApplication.mainContext
-            def bean = ctx.getBean("soapClientAlptis")
-            bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("frontal.wsdl")?.value)
-            def salida = grailsApplication.mainContext.soapClientAlptis.informeExpedientesSiniestros(obtenerUsuarioFrontal(arg6), arg1, arg2, arg3, arg4, arg5)
-            return salida.listaExpedientes
-        } catch (Exception e) {
-            logginService.putError("obtenerInformeExpedientes", "No se ha podido obtener el informe de expediente : " + e)
-            correoUtil.envioEmailErrores("obtenerInformeExpedientes", "No se ha podido obtener el informe de expediente ->   Error msg: "  + e.getMessage()+"    Causa : " + e.getCause())
-            return false
-        }
     }
 
     def obtenerInformeCitas(String arg1, String arg2, String arg3, String arg4, String arg5) {
@@ -314,86 +272,6 @@ class TarificadorService {
         }
     }
 
-    def consultaExpedienteNumSolicitud(String requestNumber, String pais, String codigoST) {
-
-        try {
-
-            def ctx = grailsApplication.mainContext
-            def bean = ctx.getBean("soapClientAlptis")
-            bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("frontal.wsdl")?.value)
-
-            Filtro filtro = new Filtro()
-            filtro.setClave(ClaveFiltro.CLIENTE)
-            filtro.setValor(codigoST)
-            Filtro filtroRelacionado = new Filtro()
-            filtroRelacionado.setClave(ClaveFiltro.NUM_SOLICITUD)
-            filtroRelacionado.setValor(requestNumber)
-            filtro.setFiltroRelacionado(filtroRelacionado)
-
-            def salida = grailsApplication.mainContext.soapClientAlptis.consultaExpediente(obtenerUsuarioFrontal(pais), filtro)
-
-            return salida
-        } catch (Exception e) {
-            logginService.putError("consultaExpedienteNumSolicitud de Caser", "No se ha podido obtener el informe de expediente : " + e)
-            return null
-        }
-    }
-    def consultaExpedienteCodigoST(String codigoST, String pais) {
-
-        try {
-
-            def ctx = grailsApplication.mainContext
-            def bean = ctx.getBean("soapClientAlptis")
-            bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("frontal.wsdl")?.value)
-
-            Filtro filtro = new Filtro()
-            filtro.setClave(ClaveFiltro.EXPEDIENTE)
-            filtro.setValor(codigoST)
-
-
-            return grailsApplication.mainContext.soapClientAlptis.consultaExpediente(obtenerUsuarioFrontal(pais), filtro)?.listaExpedientes
-        } catch (Exception e) {
-            logginService.putError("consultaExpedienteNumSolicitud de Caser", "No se ha podido obtener el informe de expediente : " + e)
-            return null
-        }
-    }
-
-    def consultaExpediente = { ou, filtro ->
-
-        try {
-
-            def ctx = grailsApplication.mainContext
-            def bean = ctx.getBean("soapClientAlptis")
-            bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("frontal.wsdl")?.value)
-
-            def salida = grailsApplication.mainContext.soapClientAlptis.consultaExpediente(obtenerUsuarioFrontal(ou), filtro)
-
-            return salida
-        } catch (Exception e) {
-            logginService.putError("obtenerInformeExpedientes", "No se ha podido obtener el informe de expediente : " + e)
-            return null
-        }
-    }
-
-    def modificaExpediente(String arg1, Expediente arg2, String arg3, String arg4) {
-
-        def response
-
-        try {
-
-            def ctx = grailsApplication.mainContext
-            def bean = ctx.getBean("soapClientAlptis")
-            bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("frontal.wsdl")?.value)
-
-            def salida = grailsApplication.mainContext.soapClientAlptis.modificaExpediente(obtenerUsuarioFrontal(arg1), arg2, arg3, arg4)
-
-            return salida
-        } catch (Exception e) {
-            logginService.putError("obtenerInformeExpedientes", "No se ha podido ejecutar la operacion de modificacion : " + e)
-            response = false
-        }
-    }
-
     def obtenerXMLExpedientePorZip(resultComprimidos) {
         StringBuilder sb = new StringBuilder()
         byte[] decodedBytes = Base64.decodeBase64(resultComprimidos.getBytes("UTF-8"))
@@ -421,6 +299,9 @@ class TarificadorService {
         return sb.toString().replace('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>', "")
     }
 
+    /**
+     * NO UTILIZADO
+     *
     def notificarCaseResultsAlptis() {
         def contadorResultados = 0
         def i = 0
@@ -448,7 +329,7 @@ class TarificadorService {
                 }
             }
         }
-    }
+    }*/
 
     def obtenerUsuarioFrontal(String unidadOrganizativa) {
         def usuario = new UsuarioGorm()
@@ -497,272 +378,4 @@ class TarificadorService {
 
         return usuario
     }
-
-    def busquedaAfiescaCrm(policyNumber, ou, opername, companyCodigoSt, companyId, requestBBDD) {
-
-        task {
-
-            logginService.putInfoMessage("Buscando en CRM solicitud de AFiesca con policyNumber: " + policyNumber.toString())
-
-            def respuestaCrm
-            int limite = 0;
-            boolean encontrado = false;
-
-            servicios.Filtro filtro = new servicios.Filtro()
-            SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
-            def correoUtil = new CorreoUtil()
-
-            Thread.sleep(90000);
-
-            try {
-                while (!encontrado && limite < 10) {
-
-                    filtro.setClave(servicios.ClaveFiltro.CLIENTE);
-                    filtro.setValor(companyCodigoSt.toString());
-                    servicios.Filtro filtroRelacionado = new servicios.Filtro()
-                    filtroRelacionado.setClave(servicios.ClaveFiltro.NUM_SOLICITUD)
-                    filtroRelacionado.setValor(policyNumber.toString())
-                    filtro.setFiltroRelacionado(filtroRelacionado)
-
-                    respuestaCrm = consultaExpediente(ou.toString(), filtro)
-
-                    if (respuestaCrm != null && respuestaCrm.getListaExpedientes() != null && respuestaCrm.getListaExpedientes().size() > 0) {
-
-                        for (int i = 0; i < respuestaCrm.getListaExpedientes().size(); i++) {
-
-                            servicios.Expediente exp = respuestaCrm.getListaExpedientes().get(i)
-
-                            String fechaCreacion = format.format(new Date());
-
-                            if (exp.getCandidato() != null && exp.getCandidato().getCompanya() != null && exp.getCandidato().getCompanya().getCodigoST().equals(companyCodigoSt.toString()) &&
-                                    exp.getNumSolicitud() != null && exp.getNumSolicitud().equals(policyNumber.toString()) && fechaCreacion != null && fechaCreacion.equals(exp.getFechaApertura())) {
-
-                                /**Alta procesada correctamente
-                                 *
-                                 */
-
-                                encontrado = true
-
-                            }
-                        }
-                    }
-
-                    if (encontrado) {
-
-                        logginService.putInfoMessage("Nueva alta automatica de Afiesca con numero de solicitud " + policyNumber.toString() + " procesada correctamente")
-
-                    }
-
-                    limite++
-                    Thread.sleep(10000)
-                }
-
-                /**Alta procesada pero no se ha encontrado en CRM.
-                 *
-                 */
-                if (limite == 10) {
-
-                    logginService.putInfoMessage("Nueva alta de Afiesca con numero de solicitud: " + policyNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM")
-                    correoUtil.envioEmailErrores(opername, "Nueva alta de Afiesca con numero de solicitud: " + policyNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM", null)
-
-                    /**Metemos en errores
-                     *
-                     */
-                    com.scortelemed.Error error = new com.scortelemed.Error()
-                    error.setFecha(new Date())
-                    error.setCia(companyId.toString())
-                    error.setIdentificador(companyCodigoSt.toString())
-                    error.setInfo(requestBBDD.request)
-                    error.setOperacion("ALTA")
-                    error.setError("Peticion procesada para solitud: " + companyCodigoSt.toString() + ". Error: No encontrada en CRM")
-                    error.save(flush: true)
-                }
-
-            } catch (Exception e) {
-
-                logginService.putErrorMessage("Nueva alta de Afiesca con numero de solicitud: " + policyNumber.toString() + " no se ha procesado: Motivo: " + e.getMessage())
-                correoUtil.envioEmailErrores(opername, "Nueva alta de Afiesca con numero de solicitud: " + policyNumber.toString() + " no se ha procesado: Motivo: " + e.getMessage(), null)
-
-            }
-
-        }
-    }
-
-    def busquedaAlptisCrm(policyNumber, ou, opername, companyCodigoSt, companyId, requestBBDD) {
-
-        task {
-
-            logginService.putInfoMessage("Buscando en CRM solicitud de Alptis con policyNumber: " + policyNumber.toString())
-
-            def respuestaCrm
-            int limite = 0;
-            boolean encontrado = false;
-
-            servicios.Filtro filtro = new servicios.Filtro()
-            SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
-            CorreoUtil correoUtil = new CorreoUtil()
-
-            Thread.sleep(90000);
-
-            try {
-
-                while (!encontrado && limite < 10) {
-
-                    filtro.setClave(servicios.ClaveFiltro.NUM_POLIZA);
-                    filtro.setValor(policyNumber.toString());
-
-                    respuestaCrm = consultaExpediente(ou.toString(), filtro)
-
-                    if (respuestaCrm != null && respuestaCrm.getListaExpedientes() != null && respuestaCrm.getListaExpedientes().size() > 0) {
-
-                        for (int i = 0; i < respuestaCrm.getListaExpedientes().size(); i++) {
-
-                            servicios.Expediente exp = respuestaCrm.getListaExpedientes().get(i)
-
-                            String fechaCreacion = format.format(new Date());
-
-                            if (exp.getCandidato() != null && exp.getCandidato().getCompanya() != null && exp.getCandidato().getCompanya().getCodigoST().equals(companyCodigoSt.toString()) &&
-                                    exp.getNumPoliza() != null && exp.getNumPoliza().equals(policyNumber.toString()) && fechaCreacion != null && fechaCreacion.equals(exp.getFechaApertura())) {
-
-                                /**Alta procesada correctamente
-                                 *
-                                 */
-
-                                encontrado = true
-
-                            }
-                        }
-                    }
-
-                    if (encontrado) {
-
-                        logginService.putInfoMessage("Nueva alta automatica de Alptis con numero de solicitud: " + policyNumber.toString() + " procesada correctamente")
-
-                    }
-
-                    limite++
-                    Thread.sleep(10000)
-
-                }
-
-                /**Alta procesada pero no se ha encontrado en CRM.
-                 *
-                 */
-                if (limite == 10) {
-
-                    logginService.putInfoMessage("Nueva alta de Alptis con numero de solicitud: " + policyNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM")
-                    correoUtil.envioEmailErrores(opername, " Nueva alta de Alptis con numero de solicitud: " + policyNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM", null)
-
-                    /**Metemos en errores
-                     *
-                     */
-                    com.scortelemed.Error error = new com.scortelemed.Error()
-                    error.setFecha(new Date())
-                    error.setCia(companyId.toString())
-                    error.setIdentificador(policyNumber.toString())
-                    error.setInfo(requestBBDD.request)
-                    error.setOperacion("ALTA")
-                    error.setError("Peticion procesada para solitud: " + policyNumber.toString() + ". Error: No encontrada en CRM")
-                    error.save(flush: true)
-
-                }
-
-
-            } catch (Exception e) {
-
-                logginService.putErrorMessage("Nueva alta de Alptis con numero de solicitud: " + policyNumber.toString() + " no se ha procesado: Motivo: " + e.getMessage())
-                correoUtil.envioEmailErrores(opername, "Nueva alta de Alptis con numero de solicitud: " + policyNumber.toString() + " no se ha procesado: Motivo: " + e.getMessage(), null)
-
-            }
-
-        }
-
-    }
-
-    def busquedaLifesquareCrm(policyNumber, ou, opername, companyCodigoSt, companyId, requestBBDD) {
-
-        task {
-
-            logginService.putInfoMessage("Buscando en CRM solicitud de Lifesaure con policyNumber: " + policyNumber.toString())
-
-            def respuestaCrm
-            int limite = 0;
-            boolean encontrado = false;
-
-            servicios.Filtro filtro = new servicios.Filtro()
-            SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
-            CorreoUtil correoUtil = new CorreoUtil()
-
-            Thread.sleep(90000);
-
-            try {
-
-                while (!encontrado && limite < 10) {
-
-                    filtro.setClave(servicios.ClaveFiltro.NUM_POLIZA);
-                    filtro.setValor(policyNumber.toString());
-
-                    respuestaCrm = consultaExpediente(ou.toString(), filtro)
-
-                    if (respuestaCrm != null && respuestaCrm.getListaExpedientes() != null && respuestaCrm.getListaExpedientes().size() > 0) {
-
-                        for (int i = 0; i < respuestaCrm.getListaExpedientes().size(); i++) {
-
-                            servicios.Expediente exp = respuestaCrm.getListaExpedientes().get(i)
-
-                            String fechaCreacion = format.format(new Date());
-
-                            if (exp.getCandidato() != null && exp.getCandidato().getCompanya() != null && exp.getCandidato().getCompanya().getCodigoST().equals(companyCodigoSt.toString()) &&
-                                    exp.getNumPoliza() != null && exp.getNumPoliza().equals(policyNumber.toString()) && fechaCreacion != null && fechaCreacion.equals(exp.getFechaApertura())) {
-
-                                /**Alta procesada correctamente
-                                 *
-                                 */
-
-                                encontrado = true
-
-                            }
-                        }
-                    }
-
-                    if (encontrado) {
-                        logginService.putInfoMessage("Nueva alta automatica de Lifesquare con numero de solicitud: " + policyNumber.toString() + " procesada correctamente")
-                    }
-
-                    limite++
-                    Thread.sleep(10000)
-
-                }
-
-                /**Alta procesada pero no se ha encontrado en CRM.
-                 *
-                 */
-                if (limite == 10) {
-
-                    logginService.putInfoMessage("Nueva alta automatica de Lifesquare con numero de solicitud: " + policyNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM")
-                    correoUtil.envioEmailErrores(opername, "Nueva alta automatica de Lifesquare con numero de solicitud: " + policyNumber.toString() + " se ha procesado pero no se ha dado de alta en CRM", null)
-
-                    /**Metemos en errores
-                     *
-                     */
-                    com.scortelemed.Error error = new com.scortelemed.Error()
-                    error.setFecha(new Date())
-                    error.setCia(companyId.toString())
-                    error.setIdentificador(policyNumber.toString())
-                    error.setInfo(requestBBDD.request)
-                    error.setOperacion("ALTA")
-                    error.setError("Peticion procesada para solitud: " + policyNumber.toString() + ". No encontrada en CRM")
-                    error.save(flush: true)
-
-                }
-
-            } catch (Exception e) {
-
-                logginService.putErrorMessage("Nueva alta automatica de Lifesquare con numero de solicitud: " + policyNumber.toString() + " no se ha procesado: Motivo: " + e.getMessage())
-                correoUtil.envioEmailErrores(opername, "Nueva alta automatica de Lifesquare con numero de solicitud: " + policyNumber.toString() + " no se ha procesado: Motivo: " + e.getMessage(), null)
-            }
-
-        }
-    }
-
 }
