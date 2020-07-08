@@ -22,8 +22,6 @@ import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 import java.text.SimpleDateFormat
 
-import static grails.async.Promises.task
-
 class CajamarService implements ICompanyService{
 
 	TransformacionUtil transformacion = new TransformacionUtil()
@@ -284,7 +282,6 @@ class CajamarService implements ICompanyService{
 		}
 	}
 
-
 	private void setCamposGenericos(REGISTRODATOS datos) {
 
 		datos.telefono3 = ""
@@ -318,9 +315,6 @@ class CajamarService implements ICompanyService{
 		datos.campo19 = ""
 		datos.campo20 = ""
 	}
-
-
-
 
 	private def rellenaPreguntas (req, nameCompany) {
 

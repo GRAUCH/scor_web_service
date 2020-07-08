@@ -18,6 +18,7 @@ import hwsol.webservices.CorreoUtil
 import servicios.ClaveFiltro
 import servicios.Expediente
 import servicios.Filtro
+import servicios.RespuestaCRM
 import servicios.Usuario
 
 import java.text.SimpleDateFormat
@@ -152,14 +153,14 @@ class ExpedienteService implements IExpedienteService {
      * @param TipoCompany comp
      * @return
      */
-    def crearExpediente(Request req, TipoCompany comp) {
+    boolean crearExpediente(Request req, TipoCompany comp) {
         try {
             //SOBREESCRIBIMOS LA URL A LA QUE TIENE QUE LLAMAR EL WSDL
             def ctx = grailsApplication.mainContext
             def bean = ctx.getBean("soapClientCrearOrabpel")
             bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("orabpelCreacion.wsdl")?.value)
             def salida = grailsApplication.mainContext.soapClientCrearOrabpel.initiate(crearExpedienteBPM(req, comp))
-            return "OK"
+            return true
         } catch (Exception e) {
             throw new WSException(this.getClass(), "crearExpediente", ExceptionUtils.composeMessage(null, e))
         }
@@ -204,7 +205,7 @@ class ExpedienteService implements IExpedienteService {
         return pie
     }
 
-    def obtenerUsuarioFrontal(UnidadOrganizativa unidadOrganizativa) {
+    Usuario obtenerUsuarioFrontal(UnidadOrganizativa unidadOrganizativa) {
         def usuario = new Usuario()
 
         switch(unidadOrganizativa) {
@@ -258,7 +259,7 @@ class ExpedienteService implements IExpedienteService {
             String opername = "ExpedienteService BusquedaCrm"
             String logExpediente = getLogExpediente(policyNumber, requestNumber, certificateNumber, company.codigoSt)
             logginService.putInfoMessage(opername+" - Buscando en CRM solicitud de "+logExpediente)
-            def respuestaCrm
+            RespuestaCRM respuestaCrm
             int limite = 0
             boolean encontrado = false
             SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")

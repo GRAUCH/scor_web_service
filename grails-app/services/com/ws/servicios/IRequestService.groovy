@@ -7,12 +7,12 @@ import com.scortelemed.TipoOperacion
 
 interface IRequestService {
 
-    def getBBDDRequest(Request requestInstance, String opername, String schema, Class<?> myObjectClass)
+    Request getBBDDRequest(Request requestInstance, String opername, String schema, Class<?> myObjectClass)
     def unmarshall(String entrada, Class<?> myObjectClass)
-    def marshall(def objetoRelleno, TipoCompany company)
-    def marshall(def objetoRelleno, Class<?> clase)
-    def marshall(String nameSpace, def objetoRelleno, Class<?> clase)
-    def crear(message, requestXML)
+    String marshall(def objetoRelleno, TipoCompany company)
+    String marshall(def objetoRelleno, Class<?> clase)
+    String marshall(String nameSpace, def objetoRelleno, Class<?> clase)
+    Request crear(String message, String requestXML)
     void insertarRecibido(Company company, String identificador, String info, TipoOperacion operacion)
     void insertarError(Company company, String identificador, String info, TipoOperacion operacion, String detalleError)
     void insertarEnvio (Company company, String identificador, String info)

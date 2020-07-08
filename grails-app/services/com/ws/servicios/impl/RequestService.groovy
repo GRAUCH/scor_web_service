@@ -1,17 +1,10 @@
 package com.ws.servicios.impl
 
-import com.scortelemed.Company
-import com.scortelemed.Envio
-import com.scortelemed.Recibido
-import com.scortelemed.Request
-import com.scortelemed.Error
-import com.scortelemed.TipoCompany
-import com.scortelemed.TipoOperacion
+import com.scortelemed.*
 import com.ws.servicios.CompanyFactory
-import com.ws.servicios.EstadisticasService
 import com.ws.servicios.ICompanyService
 import com.ws.servicios.IRequestService
-import com.ws.servicios.LogginService
+import grails.transaction.Transactional
 import org.springframework.web.context.request.RequestContextHolder
 
 import javax.xml.bind.JAXBContext
@@ -23,23 +16,21 @@ import javax.xml.transform.stream.StreamSource
 import java.text.Normalizer
 import java.util.regex.Pattern
 
-import grails.transaction.Transactional
-
 @Transactional
 class RequestService implements IRequestService {
 
     def logginService
     def estadisticasService
 
-    def getBBDDRequest(Request requestInstance, String opername, String schema, Class<?> myObjectClass) {
+    Request getBBDDRequest(Request requestInstance, String opername, String schema, Class<?> myObjectClass) {
         def object = unmarshall(requestInstance.getRequest(), myObjectClass)
-        def requestXML
+        String requestXML
         if (schema) {
             requestXML = marshall(schema, object, myObjectClass)
         } else {
             requestXML = marshall(object, myObjectClass)
         }
-        def requestBBDD = crear(opername, requestXML)
+        Request requestBBDD = crear(opername, requestXML)
         logginService.putInfoMessage("Se ha procesado una request manualmente para: " + requestInstance.company)
         return requestBBDD
     }
@@ -56,7 +47,7 @@ class RequestService implements IRequestService {
         return object
     }
 
-    def marshall(def objetoRelleno, TipoCompany tipo) {
+    String marshall(def objetoRelleno, TipoCompany tipo) {
         String salida = null
         ICompanyService service = CompanyFactory.getCompanyImpl(tipo)
         if(service) {
@@ -65,7 +56,7 @@ class RequestService implements IRequestService {
         return salida
     }
 
-    def marshall(def objetoRelleno, Class<?> clase) {
+    String marshall(def objetoRelleno, Class<?> clase) {
         StringWriter writer = new StringWriter()
         try {
             JAXBContext jaxbContext = JAXBContext.newInstance(clase)
@@ -78,7 +69,7 @@ class RequestService implements IRequestService {
         return writer
     }
 
-    def marshall(String nameSpace, def objetoRelleno, Class<?> clase) {
+    String marshall(String nameSpace, def objetoRelleno, Class<?> clase) {
         StringWriter writer = new StringWriter()
         String result
         try {
@@ -95,42 +86,36 @@ class RequestService implements IRequestService {
         return result
     }
 
-    def crear(message, requestXML) {
-        def result
+    Request crear(String message, String requestXML) {
+        Request result
         def operacion = estadisticasService.obtenerObjetoOperacion(message)
         def sesion = RequestContextHolder.currentRequestAttributes().getSession()
         def idCompania = sesion.companyST
 
         if (idCompania) {
-            Company.withNewSession {
-                def compania = Company.findByCodigoSt(idCompania)
-
-                if (compania && operacion.activo) {
-                    result = new Request()
-                    result.operacion = operacion
-                    requestXML = convertirHexCode(requestXML.toString())
-                    result.request = requestXML
-                    result.company = compania
-                    //agrego un caso nuevo CaserResultadoReconocimientoMedicoRequest para cuando se procesa desde el boton.
-//                    if (operacion.clave == "TramitacionReconocimientoMedicoRequest") {
-                    result.fecha_procesado = new Date()
-//                    }
-                    if (!result.save(flush: true)) {
-                        result.errors.each {
-                            logginService.putErrorMessage("No se ha podido guardar los request: " + it)
-                        }
-                    } else {
-                        StringBuilder sbInfo = new StringBuilder("Se ha guardado la request correctamente para la operacion [");
-                        sbInfo.append(message).append("] para la compania: ").append(compania.nombre);
-                        logginService.putInfoMessage(sbInfo.toString())
+            def compania = Company.findByCodigoSt(idCompania)
+            if (compania && operacion.activo) {
+                result = new Request()
+                result.operacion = operacion
+                requestXML = convertirHexCode(requestXML.toString())
+                result.request = requestXML
+                result.company = compania
+                result.fecha_procesado = new Date()
+                if (!result.save(flush: true)) {
+                    result.errors.each {
+                        logginService.putErrorMessage("No se ha podido guardar los request: " + it)
                     }
-
-                    def salida = estadisticasService.crear(result, operacion, requestXML.toString())
-                    //AHORA MISMO ESTO NO HACE NADA ASI QUE SE COMENTA
-//					avisosService.enviarAvisos(salida.operacion, salida.claveProceso)
                 } else {
-                    throw new Exception("No se ha encontrado la cia o la operacion activa.")
+                    StringBuilder sbInfo = new StringBuilder("Se ha guardado la request correctamente para la operacion [");
+                    sbInfo.append(message).append("] para la compania: ").append(compania.nombre);
+                    logginService.putInfoMessage(sbInfo.toString())
                 }
+
+                def salida = estadisticasService.crear(result, operacion, requestXML.trim())
+                //AHORA MISMO ESTO NO HACE NADA ASI QUE SE COMENTA
+//					avisosService.enviarAvisos(salida.operacion, salida.claveProceso)
+            } else {
+                throw new Exception("No se ha encontrado la cia o la operacion activa.")
             }
         } else {
             throw new Exception("No se ha encontrado el id de compania.")
@@ -180,42 +165,9 @@ class RequestService implements IRequestService {
         envio.setInfo(info)
         envio.save(flush:true)
     }
-    /**
-     * No utilizado
 
-    def unmarshall = { objetoRelleno, clase ->
-
-        StringWriter writer = new StringWriter();
-
-        try {
-            JAXBContext jaxbContext = JAXBContext.newInstance(Employees.class);
-            Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-
-            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-            jaxbMarshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
-
-            jaxbMarshaller.marshal(objetoRelleno, writer);
-        } finally {
-            writer.close();
-        }
-
-        return writer
-    }
-     */
-
-    def convertir(cadena) {
-        String original = "áàäéèëíìïóòöúùüñÁÀÄÉÈËÍÌÏÓÒÖÚÙÜÑçÇ";
-        String ascii = "aaaeeeiiiooouuunAAAEEEIIIOOOUUUNcC";
-
-        for (int i = 0; i < original.length(); i++) {
-            cadena = cadena.replace(original.charAt(i), ascii.charAt(i));
-        }
-
-        return cadena
-    }
-
-    def convertirHexCode(cadena) {
-        def result = cadena.replace("á", "&#xE1;").replace("à", "&#xe0;").replace("ä", "&#xE4;").replace("Á", "&#xC1;").replace("À", "&#xC0;").replace("Ä", "&#xC4;").replace("â", "&#xE2;").replace("Â", "&#xC2;")
+    String convertirHexCode(String cadena) {
+        String result = cadena.replace("á", "&#xE1;").replace("à", "&#xe0;").replace("ä", "&#xE4;").replace("Á", "&#xC1;").replace("À", "&#xC0;").replace("Ä", "&#xC4;").replace("â", "&#xE2;").replace("Â", "&#xC2;")
         result = result.replace("é", "&#xe9;").replace("è", "&#xe8;").replace("ë", "&#xEB;").replace("É", "&#xC9;").replace("È", "&#xC8;").replace("Ë", "&#xCB;").replace("ê", "&#xEA;").replace("Ê", "&#xCA;")
         result = result.replace("í", "&#xED;").replace("ì", "&#xEC;").replace("ï", "&#xEF;").replace("Í", "&#xCD;").replace("Ì", "&#xCC;").replace("Ï", "&#xCF;").replace("î", "&#xEE;").replace("Î", "&#xCE;")
         result = result.replace("ó", "&#xF3;").replace("ò", "&#xF2;").replace("ö", "&#xF6;").replace("Ó", "&#xD3;").replace("Ò", "&#xD2;").replace("Ö", "&#xD6;").replace("ô", "&#xf4;").replace("Ô", "&#xD4;")
@@ -225,10 +177,10 @@ class RequestService implements IRequestService {
         return result
     }
 
-    def convertirAscii = { cadena ->
-        String normalized = Normalizer.normalize(cadena, Normalizer.Form.NFD);
+    String convertirAscii(String cadena) {
+        String normalized = Normalizer.normalize(cadena, Normalizer.Form.NFD)
         // Nos quedamos ÃƒÂºnicamente con los caracteres ASCII
-        Pattern pattern = Pattern.compile("\\P{ASCII}+");
-        return pattern.matcher(normalized).replaceAll("").toUpperCase();
+        Pattern pattern = Pattern.compile("\\P{ASCII}+")
+        return pattern.matcher(normalized).replaceAll("").toUpperCase()
     }
 }
