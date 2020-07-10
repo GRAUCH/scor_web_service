@@ -79,7 +79,7 @@ class ExpedienteService implements IExpedienteService {
      * @param pais
      * @return
      */
-    def obtenerInformeExpedientes(String companya, String servicioScor, int estado, String fechaIni, String fechaFin, UnidadOrganizativa pais) {
+    def obtenerInformeExpedientes(String companya, String servicioScor, Integer estado, String fechaIni, String fechaFin, UnidadOrganizativa pais) {
         try {
             //SOBREESCRIBIMOS LA URL A LA QUE TIENE QUE LLAMAR EL WSDL
             def ctx = grailsApplication.mainContext
@@ -105,7 +105,7 @@ class ExpedienteService implements IExpedienteService {
      * @param pais
      * @return
      */
-    def obtenerInformeExpedientesSiniestros(String companya, String producto, int estado, String fechaIni, String fechaFin, UnidadOrganizativa pais) {
+    def obtenerInformeExpedientesSiniestros(String companya, String producto, Integer estado, String fechaIni, String fechaFin, UnidadOrganizativa pais) {
         try {
             def ctx = grailsApplication.mainContext
             def bean = ctx.getBean("soapClientAlptis")
