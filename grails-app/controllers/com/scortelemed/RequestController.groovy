@@ -162,43 +162,13 @@ class RequestController {
 
 	def listbuscador = {
 
-		if(!params.pag && (params.webservice || params.operacion || params.claveProceso || params.request || params.descartado || params.fecha_procesado || params.errores || params.condiciones || params.company)) {
-			session['operacion'] = params.operacion
-			session['claveProceso'] = params.claveProceso
-			session['request'] = params.request
-			session['descartado'] = params.descartado
-			session['fecha_procesado'] = params.fecha_procesado
-			session['fecha_procesadoFin'] = params.fecha_procesadoFin
-			session['errores'] = params.errores
-			session['condiciones'] = params.condiciones
-			session['company'] = params.company
-			session['webservice'] = params.webservice
-			session['fecha_creacion'] = params.fecha_creacion
-			session['fecha_creacionFin'] = params.fecha_creacionFin
-			session['bus'] = params.input
-		}
-
+		//Ajustamos parámetros de paginación
 		if(params.pag){
 			session['sort'] = params.sort
 			session['order'] = params.order
 			session['max'] = params.max
 			session['offset'] = params.offset
 		}
-
-		params.operacion = session['operacion']
-		params.claveProceso = session['claveProceso']
-		params.request = session['request']
-		params.descartado = session['descartado']
-		params.fecha_procesado = session['fecha_procesado']
-		params.fecha_procesadoFin = session['fecha_procesadoFin']
-		params.errores = session['errores']
-		params.condiciones = session['condiciones']
-		params.company = session['company']
-		params.webservice = session['webservice']
-		params.fecha_creacion = session['fecha_creacion']
-		params.fecha_creacionFin = session['fecha_creacionFin']
-		params.input = session['bus']
-
 		if(session['max']) params.max = session['max']
 		else params.max = Math.min(params?.max?.toInteger() ?: Holders.config.pag.maximo, Holders.config.pag.maximo)
 
@@ -211,119 +181,145 @@ class RequestController {
 		if(session['order']) params.order = session['order']
 		else params.order = params?.order ?: "desc"
 
-		if(params.input == 'Buscar' || params.pag) {
-			def opera
-			if(params.operacion){
-				opera = Operacion.findAllByClave(params.operacion)
-			}
-			def comp
-			if(params.company){
-				comp = Company.findAllByNombre(params.company)
-			}
-
-			def descartado
-			if(params.descartado == 'on') descartado = true
-
-			def webs
-			if(params.webservice) {
-				webs = Webservice.findAllByClaveLike(params.webservice.replaceAll(" ", "%"))
-			}
-
-			def cTotal = Request.createCriteria()
-			def total = cTotal {
-				if(params.condiciones == 'on') {
-					and {
-						if(params.operacion && params.operacion != 'null') 'in'("operacion", opera)
-						if(params.request) ilike("request", "%" + params.request.replaceAll(" ", "%") + "%")
-						if(params.claveProceso) ilike("claveProceso", "%" + params.claveProceso + "%")
-						if(params.fecha_procesado) between("fecha_procesado",params.fecha_procesado, params.fecha_procesadoFin + 1)
-						if(params.descartado ==  'on') eq("descartado", descartado)
-						if(params.company && params.company != 'null') 'in'("company", comp)
-						if(params.fecha_creacion) between("fecha_creacion",params.fecha_creacion, params.fecha_creacionFin + 1)
-						if(params.errores ==  'on') ne("errores", "")
-						if(params.webservice && params.webservice != 'null' && webs?.operaciones[0]) 'in'("operacion", webs?.operaciones[0])
-					}
-				} else {
-					or {
-						if(params.operacion && params.operacion != 'null') 'in'("operacion", opera)
-						if(params.request) ilike("request", "%" + params.request.replaceAll(" ", "%") + "%")
-						if(params.claveProceso) ilike("claveProceso", "%" + params.claveProceso + "%")
-						if(params.fecha_procesado) between("fecha_procesado",params.fecha_procesado, params.fecha_procesadoFin + 1)
-						if(params.descartado ==  'on') eq("descartado", descartado)
-						if(params.company && params.company != 'null') 'in'("company", comp)
-						if(params.fecha_creacion) between("fecha_creacion",params.fecha_creacion, params.fecha_creacionFin + 1)
-						if(params.errores ==  'on') ne("errores", "")
-						if(params.webservice && params.webservice != 'null' && webs?.operaciones[0]) 'in'("operacion", webs?.operaciones[0])
-					}
-				}
-			}
-
-			def c = Request.createCriteria()
-			def results = c {
-				if(params.condiciones == 'on') {
-					and {
-						if(params.operacion && params.operacion != 'null') 'in'("operacion", opera)
-						if(params.request) ilike("request", "%" + params.request.replaceAll(" ", "%") + "%")
-						if(params.claveProceso) ilike("claveProceso", "%" + params.claveProceso + "%")
-						if(params.fecha_procesado) between("fecha_procesado",params.fecha_procesado, params.fecha_procesadoFin + 1)
-						if(params.descartado ==  'on') eq("descartado", descartado)
-						if(params.company && params.company != 'null') 'in'("company", comp)
-						if(params.fecha_creacion) between("fecha_creacion",params.fecha_creacion, params.fecha_creacionFin + 1)
-						if(params.errores ==  'on') ne("errores", "")
-						if(params.webservice && params.webservice != 'null' && webs?.operaciones[0]) 'in'("operacion", webs?.operaciones[0])
-					}
-				} else {
-					or {
-						if(params.operacion && params.operacion != 'null') 'in'("operacion", opera)
-						if(params.request) ilike("request", "%" + params.request.replaceAll(" ", "%") + "%")
-						if(params.claveProceso) ilike("claveProceso", "%" + params.claveProceso + "%")
-						if(params.fecha_procesado) between("fecha_procesado",params.fecha_procesado, params.fecha_procesadoFin + 1)
-						if(params.descartado ==  'on') eq("descartado", descartado)
-						if(params.company && params.company != 'null') 'in'("company", comp)
-						if(params.fecha_creacion) between("fecha_creacion",params.fecha_creacion, params.fecha_creacionFin + 1)
-						if(params.errores ==  'on') ne("errores", "")
-						if(params.webservice && params.webservice != 'null' && webs?.operaciones[0]) 'in'("operacion", webs?.operaciones[0])
-					}
-				}
-				order(params.sort, params.order)
-				if(params.max) {
-					maxResults(params.max?.toInteger())
-					firstResult(params.offset?.toInteger())
-				} else {
-					maxResults(session.max?.toInteger())
-					firstResult(session.offset?.toInteger())
-					params.max = session.max
-					params.offset = session.offset
-				}
-			}
-
-			[requestInstanceList: results, params: params, requestInstanceTotal: total.size()]
+		// Filtramos valores generales
+		if(!params.pag && (!params.input || params.input == "Ver Todo")) {
+			params.input = null
+			session['operacion'] = ''
+			session['claveProceso'] = ''
+			session['request'] = ''
+			session['descartado'] = ''
+			session['fecha_procesado'] = ''
+			session['fecha_procesadoFin'] = ''
+			session['errores'] = ''
+			session['condiciones'] = ''
+			session['company'] = ''
+			session['webservice'] = ''
+			session['fecha_creacion'] = ''
+			session['fecha_creacionFin'] = ''
+			session['bus'] = ''
+			[requestInstanceList: Request.list(params), requestInstanceTotal: Request.count(), params: params]
 		} else {
-			if(params.input == "Ver Todo") {
+			//Consolidamos datos
+			if (!params.pag && (params.webservice || params.operacion || params.claveProceso || params.request || params.descartado || params.fecha_procesado || params.errores || params.condiciones || params.company)) {
+				session['operacion'] = params.operacion
+				session['claveProceso'] = params.claveProceso
+				session['request'] = params.request
+				session['descartado'] = params.descartado
+				session['fecha_procesado'] = params.fecha_procesado
+				session['fecha_procesadoFin'] = params.fecha_procesadoFin
+				session['errores'] = params.errores
+				session['condiciones'] = params.condiciones
+				session['company'] = params.company
+				session['webservice'] = params.webservice
+				session['fecha_creacion'] = params.fecha_creacion
+				session['fecha_creacionFin'] = params.fecha_creacionFin
+				session['bus'] = params.input
+			}
+			params.operacion = session['operacion']
+			params.claveProceso = session['claveProceso']
+			params.request = session['request']
+			params.descartado = session['descartado']
+			params.fecha_procesado = session['fecha_procesado']
+			params.fecha_procesadoFin = session['fecha_procesadoFin']
+			params.errores = session['errores']
+			params.condiciones = session['condiciones']
+			params.company = session['company']
+			params.webservice = session['webservice']
+			params.fecha_creacion = session['fecha_creacion']
+			params.fecha_creacionFin = session['fecha_creacionFin']
+			params.input = session['bus']
 
-				session['operacion'] = ''
-				session['claveProceso'] = ''
-				session['request'] = ''
-				session['descartado'] = ''
-				session['fecha_procesado'] = ''
-				session['fecha_procesadoFin'] = ''
-				session['errores'] = ''
-				session['condiciones'] = ''
-				session['company'] = ''
-				session['webservice'] = ''
-				session['fecha_creacion'] = ''
-				session['fecha_creacionFin'] = ''
-				session['bus'] = ''
+			// Procedemos a la búsqueda
+			if (params.input == 'Buscar' || params.pag) {
+				def opera
+				if (params.operacion) {
+					opera = Operacion.findAllByClave(params.operacion.replaceAll(" ", "%"))
+				}
+				def comp
+				if (params.company) {
+					comp = Company.findAllByNombre(params.company)
+				}
 
-				session['sort'] = ''
-				session['order'] = ''
-				session['max'] = ''
-				session['offset'] = ''
+				def descartado
+				if (params.descartado == 'on') descartado = true
 
-				redirect(action:"listbuscador")
-			} else {
+				def webs
+				if (params.webservice) {
+					webs = Webservice.findAllByClave(params.webservice.replaceAll(" ", "%"))
+				}
 
-				[requestInstanceList: Request.list(params), requestInstanceTotal: Request.count(), params: params]
+				def cTotal = Request.createCriteria()
+				def total = cTotal {
+					if (params.condiciones == 'on') {
+						and {
+							if (params.operacion && params.operacion != 'null') 'in'("operacion", opera)
+							if (params.request) ilike("request", "%" + params.request.replaceAll(" ", "%") + "%")
+							if (params.claveProceso) ilike("claveProceso", "%" + params.claveProceso + "%")
+							if (params.fecha_procesado) between("fecha_procesado", params.fecha_procesado, params.fecha_procesadoFin + 1)
+							if (params.descartado == 'on') eq("descartado", descartado)
+							if (params.company && params.company != 'null') 'in'("company", comp)
+							if (params.fecha_creacion) between("fecha_creacion", params.fecha_creacion, params.fecha_creacionFin + 1)
+							if (params.errores == 'on') ne("errores", "")
+							if (params.webservice && params.webservice != 'null' && webs?.operaciones[0] && !opera) 'in'("operacion", webs?.operaciones[0])
+						}
+					} else {
+						or {
+							if (params.operacion && params.operacion != 'null') 'in'("operacion", opera)
+							if (params.request) ilike("request", "%" + params.request.replaceAll(" ", "%") + "%")
+							if (params.claveProceso) ilike("claveProceso", "%" + params.claveProceso + "%")
+							if (params.fecha_procesado) between("fecha_procesado", params.fecha_procesado, params.fecha_procesadoFin + 1)
+							if (params.descartado == 'on') eq("descartado", descartado)
+							if (params.company && params.company != 'null') 'in'("company", comp)
+							if (params.fecha_creacion) between("fecha_creacion", params.fecha_creacion, params.fecha_creacionFin + 1)
+							if (params.errores == 'on') ne("errores", "")
+							if (params.webservice && params.webservice != 'null' && webs?.operaciones[0] && !opera) 'in'("operacion", webs?.operaciones[0])
+						}
+					}
+					projections {
+						count()
+					}
+				}
+
+				def c = Request.createCriteria()
+				def results = c {
+					if (params.condiciones == 'on') {
+						and {
+							if (params.operacion && params.operacion != 'null') 'in'("operacion", opera)
+							if (params.request) ilike("request", "%" + params.request.replaceAll(" ", "%") + "%")
+							if (params.claveProceso) ilike("claveProceso", "%" + params.claveProceso + "%")
+							if (params.fecha_procesado) between("fecha_procesado", params.fecha_procesado, params.fecha_procesadoFin + 1)
+							if (params.descartado == 'on') eq("descartado", descartado)
+							if (params.company && params.company != 'null') 'in'("company", comp)
+							if (params.fecha_creacion) between("fecha_creacion", params.fecha_creacion, params.fecha_creacionFin + 1)
+							if (params.errores == 'on') ne("errores", "")
+							if (params.webservice && params.webservice != 'null' && webs?.operaciones[0] && !opera) 'in'("operacion", webs?.operaciones[0])
+						}
+					} else {
+						or {
+							if (params.operacion && params.operacion != 'null') 'in'("operacion", opera)
+							if (params.request) ilike("request", "%" + params.request.replaceAll(" ", "%") + "%")
+							if (params.claveProceso) ilike("claveProceso", "%" + params.claveProceso + "%")
+							if (params.fecha_procesado) between("fecha_procesado", params.fecha_procesado, params.fecha_procesadoFin + 1)
+							if (params.descartado == 'on') eq("descartado", descartado)
+							if (params.company && params.company != 'null') 'in'("company", comp)
+							if (params.fecha_creacion) between("fecha_creacion", params.fecha_creacion, params.fecha_creacionFin + 1)
+							if (params.errores == 'on') ne("errores", "")
+							if (params.webservice && params.webservice != 'null' && webs?.operaciones[0] && !opera) 'in'("operacion", webs?.operaciones[0])
+						}
+					}
+					order(params.sort, params.order)
+					if (params.max) {
+						maxResults(params.max?.toInteger())
+						firstResult(params.offset?.toInteger())
+					} else {
+						maxResults(session.max?.toInteger())
+						firstResult(session.offset?.toInteger())
+						params.max = session.max
+						params.offset = session.offset
+					}
+				}
+
+				[requestInstanceList: results, params: params, requestInstanceTotal: total.get(0)]
 			}
 		}
 	}
