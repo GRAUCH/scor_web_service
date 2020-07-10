@@ -184,6 +184,7 @@ class RequestController {
 		// Filtramos valores generales
 		if(!params.pag && (!params.input || params.input == "Ver Todo")) {
 			params.input = null
+			params.condiciones = 'on'
 			session['operacion'] = ''
 			session['claveProceso'] = ''
 			session['request'] = ''
@@ -243,36 +244,35 @@ class RequestController {
 				def descartado
 				if (params.descartado == 'on') descartado = true
 
-				def webs
+				def listOperaciones
 				if (params.webservice) {
-					webs = Webservice.findAllByClave(params.webservice.replaceAll(" ", "%"))
+					def webs = Webservice.findByClave(params.webservice.replaceAll(" ", "%"))
+					listOperaciones = Operacion.findAllByWebservice(webs)
 				}
 
 				def cTotal = Request.createCriteria()
 				def total = cTotal {
 					if (params.condiciones == 'on') {
 						and {
-							if (params.operacion && params.operacion != 'null') 'in'("operacion", opera)
+							if (opera) 'in'("operacion", opera)
 							if (params.request) ilike("request", "%" + params.request.replaceAll(" ", "%") + "%")
 							if (params.claveProceso) ilike("claveProceso", "%" + params.claveProceso + "%")
 							if (params.fecha_procesado) between("fecha_procesado", params.fecha_procesado, params.fecha_procesadoFin + 1)
 							if (params.descartado == 'on') eq("descartado", descartado)
-							if (params.company && params.company != 'null') 'in'("company", comp)
+							if (comp) 'in'("company", comp)
 							if (params.fecha_creacion) between("fecha_creacion", params.fecha_creacion, params.fecha_creacionFin + 1)
 							if (params.errores == 'on') ne("errores", "")
-							if (params.webservice && params.webservice != 'null' && webs?.operaciones[0] && !opera) 'in'("operacion", webs?.operaciones[0])
 						}
 					} else {
 						or {
-							if (params.operacion && params.operacion != 'null') 'in'("operacion", opera)
+							if (opera) 'in'("operacion", opera)
 							if (params.request) ilike("request", "%" + params.request.replaceAll(" ", "%") + "%")
 							if (params.claveProceso) ilike("claveProceso", "%" + params.claveProceso + "%")
 							if (params.fecha_procesado) between("fecha_procesado", params.fecha_procesado, params.fecha_procesadoFin + 1)
 							if (params.descartado == 'on') eq("descartado", descartado)
-							if (params.company && params.company != 'null') 'in'("company", comp)
+							if (comp) 'in'("company", comp)
 							if (params.fecha_creacion) between("fecha_creacion", params.fecha_creacion, params.fecha_creacionFin + 1)
 							if (params.errores == 'on') ne("errores", "")
-							if (params.webservice && params.webservice != 'null' && webs?.operaciones[0] && !opera) 'in'("operacion", webs?.operaciones[0])
 						}
 					}
 					projections {
@@ -284,27 +284,25 @@ class RequestController {
 				def results = c {
 					if (params.condiciones == 'on') {
 						and {
-							if (params.operacion && params.operacion != 'null') 'in'("operacion", opera)
+							if (opera) 'in'("operacion", opera)
 							if (params.request) ilike("request", "%" + params.request.replaceAll(" ", "%") + "%")
 							if (params.claveProceso) ilike("claveProceso", "%" + params.claveProceso + "%")
 							if (params.fecha_procesado) between("fecha_procesado", params.fecha_procesado, params.fecha_procesadoFin + 1)
 							if (params.descartado == 'on') eq("descartado", descartado)
-							if (params.company && params.company != 'null') 'in'("company", comp)
+							if (comp) 'in'("company", comp)
 							if (params.fecha_creacion) between("fecha_creacion", params.fecha_creacion, params.fecha_creacionFin + 1)
 							if (params.errores == 'on') ne("errores", "")
-							if (params.webservice && params.webservice != 'null' && webs?.operaciones[0] && !opera) 'in'("operacion", webs?.operaciones[0])
 						}
 					} else {
 						or {
-							if (params.operacion && params.operacion != 'null') 'in'("operacion", opera)
+							if (opera) 'in'("operacion", opera)
 							if (params.request) ilike("request", "%" + params.request.replaceAll(" ", "%") + "%")
 							if (params.claveProceso) ilike("claveProceso", "%" + params.claveProceso + "%")
 							if (params.fecha_procesado) between("fecha_procesado", params.fecha_procesado, params.fecha_procesadoFin + 1)
 							if (params.descartado == 'on') eq("descartado", descartado)
-							if (params.company && params.company != 'null') 'in'("company", comp)
+							if (comp) 'in'("company", comp)
 							if (params.fecha_creacion) between("fecha_creacion", params.fecha_creacion, params.fecha_creacionFin + 1)
 							if (params.errores == 'on') ne("errores", "")
-							if (params.webservice && params.webservice != 'null' && webs?.operaciones[0] && !opera) 'in'("operacion", webs?.operaciones[0])
 						}
 					}
 					order(params.sort, params.order)
@@ -475,6 +473,27 @@ class RequestController {
 				def operacionListado = webserviceElegido.operaciones.flatten().unique()
 
 				['operacionListado': operacionListado]
+			}
+		}
+	}
+
+	def operationget = {
+
+		if(params.id) {
+
+			session['company'] = params.id
+
+			def companyElegida = Company.findByNombreLike(params.id)
+
+			if(companyElegida) {
+				List<Webservice> webserviceListado = companyElegida.usuarios.webservices.flatten().unique()
+				if (webserviceListado.size()) {
+					List<Operacion> operacionListado = new ArrayList<>()
+					for(Webservice webserviceElegido:webserviceListado) {
+						operacionListado.addAll(Operacion.findAllByWebservice(webserviceElegido))
+					}
+					['operacionListado': operacionListado]
+				}
 			}
 		}
 	}
