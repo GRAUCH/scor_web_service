@@ -1,7 +1,7 @@
 package com.ws.servicios.impl
 
 import com.scortelemed.*
-import com.ws.servicios.CompanyFactory
+import com.ws.servicios.ServiceFactory
 import com.ws.servicios.ICompanyService
 import com.ws.servicios.IRequestService
 import grails.transaction.Transactional
@@ -49,7 +49,7 @@ class RequestService implements IRequestService {
 
     String marshall(def objetoRelleno, TipoCompany tipo) {
         String salida = null
-        ICompanyService service = CompanyFactory.getCompanyImpl(tipo)
+        ICompanyService service = ServiceFactory.getCompanyImpl(tipo)
         if(service) {
             salida = service.marshall(objetoRelleno)
         }

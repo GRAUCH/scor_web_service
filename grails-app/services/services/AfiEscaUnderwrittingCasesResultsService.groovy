@@ -3,6 +3,8 @@ package services
 import com.scortelemed.Request
 import com.scortelemed.TipoCompany
 import com.scortelemed.TipoOperacion
+import com.ws.servicios.IComprimidoService
+import com.ws.servicios.ServiceFactory
 import org.grails.cxf.utils.EndpointType
 import org.grails.cxf.utils.GrailsCxfEndpoint
 import org.grails.cxf.utils.GrailsCxfEndpointProperty
@@ -34,9 +36,10 @@ class AfiEscaUnderwrittingCasesResultsService {
 	def requestService
 	def expedienteService
 	def estadisticasService
-	def tarificadorService
 	def logginService
-	
+	IComprimidoService zipService = ServiceFactory.getComprimidoImpl(TipoCompany.AFI_ESCA)
+
+
 	@WebResult(name = "AfiEscaUnderwrittingCasesResultsResponse")
 	AfiEscaUnderwrittingCasesResultsResponse AfiEscaUnderwrittingCasesResults(
 		@WebParam(partName = "AfiEscaUnderwrittingCasesResultsRequest", name = "AfiEscaUnderwrittingCasesResultsRequest") 
@@ -80,7 +83,7 @@ class AfiEscaUnderwrittingCasesResultsService {
 						def tuwCases=new TuwCase() 
 						tuwCases.policy_number=item.numSolicitud
 						tuwCases.reference_number=item.numPoliza
-						tuwCases.zip=tarificadorService.obtenerZip(item.nodoAlfresco)
+						tuwCases.zip=zipService.obtenerZip(item.nodoAlfresco)
 						listTuwCases.add(tuwCases)
 					}
 				

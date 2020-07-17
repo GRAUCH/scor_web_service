@@ -234,6 +234,8 @@ class TarificadorService {
         return response
     }
 
+    /**
+     * NO UTILIZADO
     def obtenerInformeCitas(String arg1, String arg2, String arg3, String arg4, String arg5) {
 
         def response
@@ -251,8 +253,10 @@ class TarificadorService {
             logginService.putError("obtenerInformeExpedientes", "No se ha podido obtener el informe de expediente : " + e)
             response = false
         }
-    }
+    }*/
 
+    /**
+     * NO UTILIZADO
     def obtenerInformeActividades(String arg1, String arg2, String arg3, String arg4, String arg5) {
 
         def response
@@ -270,7 +274,7 @@ class TarificadorService {
             logginService.putError("obtenerInformeExpedientes", "No se ha podido obtener el informe de expediente : " + e)
             response = false
         }
-    }
+    }*/
 
     def obtenerXMLExpedientePorZip(resultComprimidos) {
         StringBuilder sb = new StringBuilder()
@@ -331,6 +335,8 @@ class TarificadorService {
         }
     }*/
 
+    /**
+     * NO UTILIZADO
     def obtenerUsuarioFrontal(String unidadOrganizativa) {
         def usuario = new UsuarioGorm()
 
@@ -377,5 +383,5 @@ class TarificadorService {
         }
 
         return usuario
-    }
+    } */
 }

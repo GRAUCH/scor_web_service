@@ -9,7 +9,7 @@ import com.scortelemed.Request
 import com.scortelemed.TipoCompany
 import com.scortelemed.TipoOperacion
 import com.ws.enumeration.UnidadOrganizativa
-import com.ws.servicios.CompanyFactory
+import com.ws.servicios.ServiceFactory
 import com.ws.servicios.ICompanyService
 import com.ws.servicios.IExpedienteService
 import grails.transaction.Transactional
@@ -167,7 +167,7 @@ class ExpedienteService implements IExpedienteService {
     }
 
     private def crearExpedienteBPM(Request req, TipoCompany comp) {
-        companyService = CompanyFactory.getCompanyImpl(comp)
+        companyService = ServiceFactory.getCompanyImpl(comp)
         def listadoFinal = []
         RootElement payload = new RootElement()
         try {

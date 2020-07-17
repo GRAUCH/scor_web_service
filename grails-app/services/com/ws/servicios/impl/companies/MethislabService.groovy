@@ -6,10 +6,13 @@ import com.scor.srpfileinbound.DATOS
 import com.scor.srpfileinbound.REGISTRODATOS
 import com.scortelemed.Company
 import com.scortelemed.Request
+import com.scortelemed.TipoCompany
 import com.scortelemed.TipoOperacion
 import com.scortelemed.schemas.methislab.*
 import com.scortelemed.schemas.methislab.MethislabUnderwrittingCasesResultsResponse.Expediente
 import com.ws.servicios.ICompanyService
+import com.ws.servicios.IComprimidoService
+import com.ws.servicios.ServiceFactory
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
 import hwsol.webservices.WsError
@@ -32,7 +35,7 @@ class MethislabService implements ICompanyService{
     def requestService
     def expedienteService
     def logginService
-    def tarificadorService
+    IComprimidoService zipService = ServiceFactory.getComprimidoImpl(TipoCompany.METHIS_LAB)
 
 
     String marshall(def objeto) {
@@ -93,7 +96,7 @@ class MethislabService implements ICompanyService{
             expediente.setPhoneNumber2("")
         }
 
-        byte[] compressedData = tarificadorService.obtenerZip(expedientePoliza.getNodoAlfresco())
+        byte[] compressedData = zipService.obtenerZip(expedientePoliza.getNodoAlfresco())
 
         expediente.setZip(compressedData)
 

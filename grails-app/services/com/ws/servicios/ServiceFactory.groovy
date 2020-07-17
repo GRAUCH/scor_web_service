@@ -15,8 +15,9 @@ import com.ws.servicios.impl.companies.NnService
 import com.ws.servicios.impl.companies.PsnService
 import com.ws.servicios.impl.companies.SimplefrService
 import com.ws.servicios.impl.companies.SocieteGeneraleService
+import com.ws.servicios.impl.comprimidos.CommonZipService
 
-class CompanyFactory {
+class ServiceFactory {
 
     static ICompanyService getCompanyImpl(TipoCompany company) {
         ICompanyService servicio
@@ -67,5 +68,15 @@ class CompanyFactory {
                 break
         }
         return servicio
+    }
+
+    static IComprimidoService getComprimidoImpl(TipoCompany company) {
+        IComprimidoService salida
+        switch(company) {
+            default:
+                salida = new CommonZipService()
+                break
+        }
+        return salida
     }
 }

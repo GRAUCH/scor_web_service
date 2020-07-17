@@ -16,6 +16,8 @@ import com.scortelemed.schemas.caser.XSDProcessExecutionPort
 import com.scortelemed.schemas.caser.XSDProcessExecutionServiceLocator
 import com.ws.alptis.sp.beans.AlptisUnderwrittingCaseResultsRequest
 import com.ws.cajamar.beans.Cobertura
+import com.ws.servicios.IComprimidoService
+import com.ws.servicios.ServiceFactory
 import com.ws.servicios.impl.companies.AmaService
 import grails.plugin.springsecurity.annotation.Secured
 import grails.util.Environment
@@ -35,26 +37,17 @@ import java.text.SimpleDateFormat
 @Secured('permitAll')
 class WsController {
     def estadisticasService
-    def alptisService
-
     def logginService
-    def HwSoapClientAlptisService
-
+    def amaService
     def soapAlptisRecetteWS
     def soapAlptisRecetteWSPRO
     def soapCajamarRecetteWS
-    def soapCajamarRecetteWSPRO
     def soapCaserRecetteWS
-    def soapCaserRecetteWSPRO
-    CorreoUtil correoUtil = new CorreoUtil()
     def requestService
     def expedienteService
     def tarificadorService
-    def francesasService
-
-
-    @Autowired
-    private AmaService amaService
+    IComprimidoService zipService
+    CorreoUtil correoUtil = new CorreoUtil()
 
     def caseresult = {
 
@@ -65,7 +58,7 @@ class WsController {
         def opername = "caseresult"
         def cases = []
         def resulExpedienteSoap
-
+        zipService = ServiceFactory.getComprimidoImpl(TipoCompany.ALPTIS)
 
         try {
             def company = Company.findByNombre('alptis')
@@ -100,7 +93,7 @@ class WsController {
                 resulExpedienteSoap.each { item ->
                     if (item && item.nodoAlfresco) {
                         logginService.putInfoMessage("Obteniendo comprimido para expediente: " + item.getCodigoST() + " con numero de poliza: " + item.getNumPoliza())
-                        def comprimido = tarificadorService.obtenerZip(item.nodoAlfresco)
+                        def comprimido = zipService.obtenerZip(item.nodoAlfresco)
 
                         if (comprimido) {
                             def xml = tarificadorService.obtenerXMLExpedientePorZip(comprimido)
@@ -542,8 +535,8 @@ class WsController {
         def cases = []
         def estadoCausa = []
         def coberturas = []
+        zipService = ServiceFactory.getComprimidoImpl(TipoCompany.AMA)
 
-        AmaService amaService = new AmaService()
         List<RespuestaCRMInforme> expedientesInforme = new ArrayList<RespuestaCRMInforme>()
         List<Expediente> expedientes = new ArrayList<Expediente>()
         List<Cita> citas = new ArrayList<Cita>()
@@ -824,7 +817,7 @@ class WsController {
                                     listaBenefitInformation.add(benefitInformation)
                                 }
                                 logginService.putInfoMessage("Agrego ZIP")
-                                byte[] compressedData = tarificadorService.obtenerZip(expediente.getNodoAlfresco())
+                                byte[] compressedData = zipService.obtenerZip(expediente.getNodoAlfresco())
 
                                 File file = new File()
                                 file.setFileBase64(new String(compressedData))
