@@ -1,31 +1,15 @@
 package com.ws.servicios
 
-import com.scor.comprimirdocumentos.ParametrosEntrada
 import com.scortelemed.Company
-import com.scortelemed.Conf
-import com.scortelemed.Datowebservice
-import com.scortelemed.Estadistica
-import com.scortelemed.Operacion
-import com.scortelemed.Request
 import com.scortelemed.TipoCompany
-import com.scortelemed.TipoOperacion
 import com.ws.enumeration.UnidadOrganizativa
-import grails.util.Environment
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.FetchUtilLagunaro
 import hwsol.webservices.ScorExpedienteTarificado
 import org.apache.commons.codec.binary.Base64
-import servicios.ClaveFiltro
-import servicios.Expediente
-import servicios.Filtro
-import servicios.Filtro as FiltroGorm
-import servicios.Usuario as UsuarioGorm
 
-import java.text.SimpleDateFormat
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
-
-import static grails.async.Promises.task
 
 class TarificadorService {
 
