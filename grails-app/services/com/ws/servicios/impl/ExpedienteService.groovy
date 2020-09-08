@@ -36,7 +36,7 @@ class ExpedienteService implements IExpedienteService {
     ICompanyService companyService
 
 
-    def consultaExpediente(UnidadOrganizativa pais, Filtro filtro) {
+    def consultaExpediente(pais,filtro) {
         try {
             def ctx = grailsApplication.mainContext
             def bean = ctx.getBean("soapClientAlptis")
@@ -204,12 +204,15 @@ class ExpedienteService implements IExpedienteService {
         pie.setNumRegistros(1)
         return pie
     }
+    enum pais{
+        IT, ES, FR
+    }
 
-    Usuario obtenerUsuarioFrontal(UnidadOrganizativa unidadOrganizativa) {
+    Usuario obtenerUsuarioFrontal(unidadOrganizativa) {
+
         def usuario = new Usuario()
-
         switch(unidadOrganizativa) {
-            case UnidadOrganizativa.ES:
+            case "ES":
                 if (Environment.current.name.equals("production_wildfly")) {
                     usuario.clave = "7Q%NN!v5"
                     usuario.dominio = "SCOR-TELEMED"
@@ -222,7 +225,7 @@ class ExpedienteService implements IExpedienteService {
                     usuario.usuario = "gcaballero-es"
                 }
                 break
-            case UnidadOrganizativa.IT:
+            case "IT":
                 if (Environment.current.name.equals("production_wildfly")) {
                     usuario.clave = "sc5t4!QAZ123"
                     usuario.dominio = "SCOR-TELEMED"
@@ -235,7 +238,7 @@ class ExpedienteService implements IExpedienteService {
                     usuario.usuario = "admin-ITA"
                 }
                 break
-            case UnidadOrganizativa.FR:
+            case "FR":
                 if (Environment.current.name.equals("production_wildfly")) {
                     usuario.clave = "5#6GAkXP456"
                     usuario.dominio = "SCOR-TELEMED"
