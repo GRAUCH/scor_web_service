@@ -204,15 +204,12 @@ class ExpedienteService implements IExpedienteService {
         pie.setNumRegistros(1)
         return pie
     }
-    enum pais{
-        IT, ES, FR
-    }
 
     Usuario obtenerUsuarioFrontal(unidadOrganizativa) {
 
         def usuario = new Usuario()
         switch(unidadOrganizativa) {
-            case "ES":
+            case UnidadOrganizativa.ES:
                 if (Environment.current.name.equals("production_wildfly")) {
                     usuario.clave = "7Q%NN!v5"
                     usuario.dominio = "SCOR-TELEMED"
@@ -225,7 +222,7 @@ class ExpedienteService implements IExpedienteService {
                     usuario.usuario = "gcaballero-es"
                 }
                 break
-            case "IT":
+            case UnidadOrganizativa.IT:
                 if (Environment.current.name.equals("production_wildfly")) {
                     usuario.clave = "sc5t4!QAZ123"
                     usuario.dominio = "SCOR-TELEMED"
@@ -238,7 +235,7 @@ class ExpedienteService implements IExpedienteService {
                     usuario.usuario = "admin-ITA"
                 }
                 break
-            case "FR":
+            case UnidadOrganizativa.FR:
                 if (Environment.current.name.equals("production_wildfly")) {
                     usuario.clave = "5#6GAkXP456"
                     usuario.dominio = "SCOR-TELEMED"
