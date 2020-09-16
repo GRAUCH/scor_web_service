@@ -925,5 +925,15 @@ class WsController {
         }
     }
 
+    def generarZip() {
+//        params.codigotST
+//        params.companyName_
+//        def unidad = expedienteService.obtenerUnidadOrganizativa(company)
+//        def expediente = expedienteService.informeExpedienteCodigoST(codigost, unidad)
+//        def zipService = ServiceFactory.getComprimidoImpl(company)
+        def zip = zipService.obtenerZip(expediente)
+        return zip
+    }
+
 
 }

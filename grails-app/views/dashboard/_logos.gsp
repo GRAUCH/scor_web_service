@@ -4,7 +4,8 @@
             <% def variable = 0 %>
             <g:each in="${ciasLog}" status="i" var="cia">
                 <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
-                    <div id="${cia.id}-${cia.name}" onclick="myFunction(this);" class="quick-btn " style="background: none">
+                    <div id="${cia.id}-${cia.name}" onclick="myFunction(this);" class="quick-btn "
+                         style="background: none">
                         <i><asset:image style="height: 70px !important; width: 70px !important;"
                                         src="logos/${cia.logo}"/></i>
                         %{--<span class="label label-default">${cia.recibidos.size()}</span>--}%
@@ -16,7 +17,7 @@
                     <% variable = 0 %>
                 </g:if>
             </g:each>
-       </div>
+        </div>
 
         <div class=""
              style=" width: 330px; padding: 20px; float: left; border-left-style: solid; border-width: 1px; border-color: #ADADAD;">
@@ -67,11 +68,16 @@
         </div>
     </div>
 </div>
+
+
 <div class="contenedor" style="background-color: #F0F0F0;">
     <div class="contenido">
-<div id="panelForzarEnvio" style="display: none;  padding-bottom: 70px;  display:block; ">
+        <div id="panelForzarEnvio" style="display: none;  padding-bottom: 70px;  display:block; ">
+            <g:each in="${ciasLog}" status="i" var="cia">
+                <g:render template="generarZips" model="['cia': cia]"/>
+            </g:each>
+            <g:render template="enviosWS" model="['cia': cia]"/>
 
-    <g:render template="enviosWS" model="['cia': cia]"/>
-</div>
-</div>
+        </div>
+    </div>
 </div>

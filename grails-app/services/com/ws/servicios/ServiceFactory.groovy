@@ -16,6 +16,7 @@ import com.ws.servicios.impl.companies.PsnService
 import com.ws.servicios.impl.companies.SimplefrService
 import com.ws.servicios.impl.companies.SocieteGeneraleService
 import com.ws.servicios.impl.comprimidos.CommonZipService
+import com.ws.servicios.impl.comprimidos.CustomZipService
 
 class ServiceFactory {
 
@@ -73,6 +74,9 @@ class ServiceFactory {
     static IComprimidoService getComprimidoImpl(TipoCompany company) {
         IComprimidoService salida
         switch(company) {
+            case TipoCompany.CBP_ITALIA:
+                salida = new CustomZipService(company)
+                break
             default:
                 salida = new CommonZipService()
                 break

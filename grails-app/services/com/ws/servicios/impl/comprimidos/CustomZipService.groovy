@@ -1,43 +1,76 @@
 package com.ws.servicios.impl.comprimidos
 
-import com.scor.comprimirdocumentos.ParametrosEntrada
+import com.scor.global.ZipUtils
+import com.scortelemed.Company
 import com.scortelemed.Conf
+import com.scortelemed.TipoCompany
+import com.scortelemed.TipoOperacion
+import com.scortelemed.schemas.cbpita.BenefictResultType
+import com.scortelemed.schemas.cbpita.BenefitsType
+import com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCasesResultsResponse
 import com.ws.servicios.IComprimidoService
 import grails.transaction.Transactional
 import hwsol.webservices.CorreoUtil
+import servicios.Documentacion
 import servicios.ExpedienteInforme
+import servicios.TipoEstadoExpediente
+import servicios.TipoMotivoAnulacion
+
+import java.text.SimpleDateFormat
 
 @Transactional
-class CommonZipService implements IComprimidoService{
+class CustomZipService implements IComprimidoService{
 
     def grailsApplication
     def logginService
+    def requestService
     def correoUtil = new CorreoUtil()
+    def zipUtils = new ZipUtils()
+    TipoCompany company
+
+    CustomZipService(TipoCompany tipoCompany) {
+        this.company = tipoCompany
+    }
 
     @Override
     def obtenerZip(String nodo) {
-        def response = new byte[0]
-        try {
-            def parametrosEntrada = new ParametrosEntrada()
-            parametrosEntrada.usuario = Conf.findByName("orabpel.usuario")?.value
-            parametrosEntrada.clave = Conf.findByName("orabpel.clave")?.value
-            parametrosEntrada.refNodo = nodo
-            //SOBREESCRIBIMOS LA URL A LA QUE TIENE QUE LLAMAR EL WSDL
-            def ctx = grailsApplication.mainContext
-            def bean = ctx.getBean("soapClientComprimidoAlptis")
-            bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("orabpel.wsdl")?.value)
-            def salida = grailsApplication.mainContext.soapClientComprimidoAlptis.process(parametrosEntrada)
-            return salida.datosRespuesta.content
-        } catch (Exception e) {
-            logginService.putErrorMessage("No se ha podido obtener el zip del nodo : " + nodo + ". Error msg: "  + e.getMessage())
-            logginService.putErrorMessage("Causa : " + e.getCause())
-            correoUtil.envioEmailErrores("No se ha podido obtener el zip del nodo", "No se ha podido obtener el ZIP", e)
-        }
-        return response
+        return null
     }
 
     def obtenerZip(ExpedienteInforme expediente) {
-        return obtenerZip(expediente.getNodoAlfresco())
+        def resultado
+        if (expediente.getCodigoEstado()== TipoEstadoExpediente.CERRADO) {
+            logginService.putInfoMessage("Iniciado generacion de zip para expediente " + expediente.codigoST)
+            List<Documentacion> listaDocumentosAudio = new ArrayList<Documentacion>()
+            boolean audioEncontrado = false
+
+            listaDocumentosAudio = zipUtils.obtenerAudios(expediente, null)
+
+            if (listaDocumentosAudio != null && listaDocumentosAudio.size() > 0) {
+
+                for (int i = 0; i < listaDocumentosAudio.size(); i++) {
+                    if (listaDocumentosAudio.get(i).getNombre().contains(company.audio)) {
+                        audioEncontrado = true
+                        break
+                    }
+                }
+            }
+
+            if (audioEncontrado) {
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd")
+                String dateString = formatter.format(new Date().getTime())
+                resultado = zipUtils.generarZips(expediente, company.zip, dateString, Conf.findByName("rutaFicheroZip")?.value, Conf.findByName("usuarioZip")?.value, Conf.findByName("passwordZip")?.value)
+                logginService.putInfoEndpoint("ResultadoReconocimientoMedico", "Expediente  con codigo ST: " + expediente.getCodigoST() + " y codigo cia: " + expediente.getNumSolicitud() + " para la cia: " + company.nombre + " se ha enviado correctamente")
+
+            } else {
+                logginService.putInfoEndpoint("ResultadoReconocimientoMedico", "No se han encontardo audio necesarios para completar ZIP para " + company.nombre + " con expediente " + expediente.getCodigoST())
+                resultado = new byte[0]
+            }
+        } else {
+            logginService.putInfoEndpoint("obtenerZip(Expediente)", "Expediente  con codigo ST: " + expediente.getCodigoST() + " no se ha generado zip porque el expediente no está CERRADO")
+            resultado = new byte[0]
+        }
+        return resultado
     }
 
 }

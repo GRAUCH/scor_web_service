@@ -2,34 +2,47 @@ package com.scortelemed
 
 enum TipoCompany {
 
-    LAGUN_ARO("lagunaro"),
-    ALPTIS("alptis"),
-    AFI_ESCA("afiesca"),
-    CAJAMAR("cajamar"),
-    AMA("ama"),
-    AMA_VIDA("amaVida"),
-    PSN("psn"),
-    CASER("caser"),
-    NET_INSURANCE("netinsurance"),
-    MALAKOFF_MEDERIC("simplefr"),
-    NATIONALE_NETHERLANDEN("nn"),
-    SOCIETE_GENERALE("societeGenerale"),
-    METHIS_LAB("methislab"),
-    CBP_ITALIA("cbp-italia"),
-    ZEN_UP("lifesquare"),
-    ENGINYERS("enginyers"),
-    CF_LIFE("methislabCF"),
-    SCOR("Scor"),
-    DEFAULT("default")
+    LAGUN_ARO("lagunaro", null, null),
+    ALPTIS("alptis", null, null),
+    AFI_ESCA("afiesca", null, null),
+    CAJAMAR("cajamar", null, null),
+    AMA("ama", null, null),
+    AMA_VIDA("amaVida", null, null),
+    PSN("psn", null, null),
+    CASER("caser", null, null),
+    NET_INSURANCE("netinsurance", null, null),
+    MALAKOFF_MEDERIC("simplefr", null, null),
+    NATIONALE_NETHERLANDEN("nn", null, null),
+    SOCIETE_GENERALE("societeGenerale", null, null),
+    METHIS_LAB("methislab", null, null),
+    CBP_ITALIA("cbp-italia", "CBP", "TUW realizzata"),
+    ZEN_UP("lifesquare", null, null),
+    ENGINYERS("enginyers", null, null),
+    CF_LIFE("methislabCF", null, null),
+    SCOR("Scor", null, null),
+    DEFAULT("default", null, null)
 
     private final String nombre
+    private final String zip
+    private final String audio
 
-    TipoCompany(String nombre) {
+
+    TipoCompany(String nombre, String zip, String audio) {
         this.nombre = nombre
+        this.zip = zip
+        this.audio = audio
     }
 
     String getNombre() {
         return nombre
+    }
+
+    String getZip() {
+        return zip
+    }
+
+    String getAudio() {
+        return audio
     }
 
     static TipoCompany fromValue(String string) {

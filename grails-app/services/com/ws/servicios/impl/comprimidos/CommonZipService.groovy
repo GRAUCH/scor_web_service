@@ -5,6 +5,7 @@ import com.scortelemed.Conf
 import com.ws.servicios.IComprimidoService
 import grails.transaction.Transactional
 import hwsol.webservices.CorreoUtil
+import servicios.ExpedienteInforme
 
 @Transactional
 class CommonZipService implements IComprimidoService{
@@ -34,4 +35,9 @@ class CommonZipService implements IComprimidoService{
         }
         return response
     }
+
+    def obtenerZip(ExpedienteInforme expediente) {
+        return obtenerZip(expediente.getNodoAlfresco())
+    }
+
 }

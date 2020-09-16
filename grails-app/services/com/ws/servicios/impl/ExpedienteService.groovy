@@ -132,6 +132,13 @@ class ExpedienteService implements IExpedienteService {
         }
     }
 
+    def informeExpedienteCodigoST(String codigoST, UnidadOrganizativa pais) {
+        Filtro filtro = new Filtro()
+        filtro.setClave(ClaveFiltro.EXPEDIENTE)
+        filtro.setValor(codigoST)
+        return consultaExpediente(pais, filtro)
+    }
+
     def modificaExpediente(UnidadOrganizativa pais, Expediente expediente, def servicioScorList, def paqueteScorList) {
         try {
             def ctx = grailsApplication.mainContext
@@ -203,6 +210,11 @@ class ExpedienteService implements IExpedienteService {
         pie.setNumFilasFichero(100)
         pie.setNumRegistros(1)
         return pie
+    }
+
+    UnidadOrganizativa obtenerUnidadOrganizativa(TipoCompany tipo) {
+        Company company = Company.findByNombre(tipo.nombre)
+        return company?.ou
     }
 
     Usuario obtenerUsuarioFrontal(UnidadOrganizativa unidadOrganizativa) {
