@@ -926,13 +926,16 @@ class WsController {
     }
 
     def generarZip() {
+        params
 //        params.codigotST
-//        params.companyName_
+//        params.companyName
 //        def unidad = expedienteService.obtenerUnidadOrganizativa(company)
 //        def expediente = expedienteService.informeExpedienteCodigoST(codigost, unidad)
 //        def zipService = ServiceFactory.getComprimidoImpl(company)
-        def zip = zipService.obtenerZip(expediente)
-        return zip
+        //def zip = zipService.obtenerZip(expediente)
+        //return zip
+        flash.message = params.companyName
+        return redirect(controller: 'dashboard', action: 'index',params: [idCia: ''])
     }
 
 

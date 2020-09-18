@@ -6,8 +6,9 @@
                 <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
                     <div id="${cia.id}-${cia.name}" onclick="myFunction(this);" class="quick-btn "
                          style="background: none">
-                        <i><asset:image style="height: 70px !important; width: 70px !important;"
-                                        src="logos/${cia.logo}"/></i>
+                        <i>
+                            <asset:image style="height: 70px !important; width: 70px !important;"
+                                         src="logos/${cia.logo}" /></i>
                         %{--<span class="label label-default">${cia.recibidos.size()}</span>--}%
                     </div>
                 </tr>
@@ -35,8 +36,9 @@
 
             <div>
                 <p>
-                    Valor máximo  <g:textField style="width:50px; margin-bottom: -0.08px;" name="max" required=""
-                                               value="${max}" class="form-control"/>
+                    Valor máximo
+                    <g:textField style="width:50px; margin-bottom: -0.08px;" name="max" required="" value="${max}"
+                                 class="form-control" />
                 </p>
             </div>
 
@@ -62,8 +64,8 @@
 
             <div style="text-align: center;">
                 <g:submitButton name="create" class="btn btn-blue"
-                                value="${message(code: 'default.button.find', default: 'Create')}"/>
-                <input type="hidden" id="idCia" name="idCia" value="${idCia}"/>
+                                value="${message(code: 'default.button.find', default: 'Create')}" />
+                <input type="hidden" id="idCia" name="idCia" value="${idCia}" />
             </div>
         </div>
     </div>
@@ -73,11 +75,14 @@
 <div class="contenedor" style="background-color: #F0F0F0;">
     <div class="contenido">
         <div id="panelForzarEnvio" style="display: none;  padding-bottom: 70px;  display:block; ">
-            <g:each in="${ciasLog}" status="i" var="cia">
-                <g:render template="generarZips" model="['cia': cia]"/>
-            </g:each>
-            <g:render template="enviosWS" model="['cia': cia]"/>
 
+%{--            <g:if test="${cia != null}">--}%
+                <g:render template="generarZips" />
+%{--            </g:if>--}%
+
+%{--            <g:each in="${ciasLog}" status="i" var="cia">--}%
+%{--             </g:each>--}%
+            <g:render template="enviosWS" model="['cia': cia]" />
         </div>
     </div>
 </div>

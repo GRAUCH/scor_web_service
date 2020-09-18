@@ -82,13 +82,32 @@
         document.getElementById(cia.id).classList.toggle('quick-btn_Selected');
         //Con esto mostramos o no el panel de envios
         <g:each in="${ciasLog}" status="i" var="cia">
-        var element = document.getElementById('panel${cia.name}');
-        if (element != null)
-            element.style.display = 'none';
+            var element = document.getElementById('panel${cia.name}');
+            if (element != null)
+                element.style.display = 'none';
+
+            //Generador de zip
+            //Busca todos los textos hidden
+            var element1 = document.getElementById('txt${cia.name}');
+            if (element1 != null)
+                element1.parentNode.removeChild(element1);
+            ////////////////////////////////////////
+
         </g:each>
         var ciaattr = cia.id.split('-')
-        document.getElementById('panel' + ciaattr[1]).style.display = 'inline';
+        if (document.getElementById('panel' + ciaattr[1]) !== null)
+            document.getElementById('panel' + ciaattr[1]).style.display = 'inline';
 
+        ////////////////////////////////////////
+        //Generador de zip
+        var nodo = document.createElement("input");
+        nodo.type = "hidden";
+        nodo.value = ciaattr[1];
+        nodo.id = "txt" + ciaattr[1];
+        nodo.name = "companyName";
+        document.getElementById('panelzip').appendChild(nodo);
+        document.getElementById('panelzip').style.display = 'inline';
+        ////////////////////////////////////////
     }
 
     function busquedaPor(id) {
