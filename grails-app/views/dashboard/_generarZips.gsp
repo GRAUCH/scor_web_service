@@ -15,7 +15,7 @@
             <label for="codigoSTzip">Envio por Numero de Caso</label>
 
             <div id="codigoSTzip">
-                <g:textField style="width: 100px;" name="codigoST" placeholder="Codigo ST" />
+                <g:textField id="txtcodigoSTzip" style="width: 100px;" name="codigoST" placeholder="Codigo ST" />
             </div>
         </div>
 

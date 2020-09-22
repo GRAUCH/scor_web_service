@@ -31,7 +31,7 @@ class CustomZipService implements IComprimidoService{
         return null
     }
 
-    def obtenerZip(Expediente expediente) {
+    def obtenerZip(TipoCompany tipoCompany, Expediente expediente) {
         def resultado
         if (expediente.getCodigoEstado()== TipoEstadoExpediente.CERRADO) {
             logginService.putInfoMessage("Iniciado generacion de zip para expediente " + expediente.codigoST)
@@ -67,4 +67,8 @@ class CustomZipService implements IComprimidoService{
         return resultado
     }
 
+
+    def obtenerZip(Expediente expediente) {
+        return null
+    }
 }

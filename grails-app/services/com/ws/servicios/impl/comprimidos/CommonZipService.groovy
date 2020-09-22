@@ -2,6 +2,7 @@ package com.ws.servicios.impl.comprimidos
 
 import com.scor.comprimirdocumentos.ParametrosEntrada
 import com.scortelemed.Conf
+import com.scortelemed.TipoCompany
 import com.ws.servicios.IComprimidoService
 import com.ws.servicios.LogginService
 import grails.transaction.Transactional
@@ -42,4 +43,7 @@ class CommonZipService implements IComprimidoService{
         return obtenerZip(expediente.getNodoAlfresco())
     }
 
+    def obtenerZip(TipoCompany tipoCompany, Expediente expediente) {
+        return null
+    }
 }

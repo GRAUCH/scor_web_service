@@ -35,6 +35,7 @@ import wslite.soap.SOAPResponse
 import javax.xml.rpc.holders.StringHolder
 import java.text.SimpleDateFormat
 
+
 @Secured('permitAll')
 class WsController {
     def estadisticasService
@@ -928,19 +929,16 @@ class WsController {
 
 
     def generarZip() {
+        flash.message = ""
         String codigost = params.codigoST
         String company = params.companyName
         String unidad = expedienteService.obtenerUnidadOrganizativa(TipoCompany.fromNombre(company))
         RespuestaCRM expediente = expedienteService.informeExpedienteCodigoST(codigost, UnidadOrganizativa.fromNombre(unidad))
        if(expediente?.listaExpedientes != null && expediente?.listaExpedientes.size() > 0) {
            Expediente exp = expediente.listaExpedientes[0]
-           //CPB- va por el otro servicio
-           //       IComprimidoService zipService = ServiceFactory.getComprimidoImpl(TipoCompany.fromNombre(company))
-//        def zip =   commonZipService.obtenerZip(exp.getNodoAlfresco())
-//        def zip = zipService.obtenerZip(exp)
            def zip
-           if (company.contains('CBP')){
-       //        zip = customZipService.obtenerZip(exp.getNodoAlfresco())
+           if (company.contains('cbp')){
+               zip = commonZipService.obtenerZip(TipoCompany.CBP_ITALIA, exp)
            }
             else{
                zip = commonZipService.obtenerZip(exp.getNodoAlfresco())
@@ -949,10 +947,13 @@ class WsController {
            String contentDisposition = 'attachment'
            String mimeType2 = 'APPLICATION/OCTET-STREAM'
 
+           response.resetBuffer()
            response.setContentType(mimeType2)
            response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "${contentDisposition};filename=${zip.nombre}")
-           byte[] decodedBytes = Base64.getDecoder().decode(zip.content);
+           byte[] decodedBytes = Base64.getDecoder().decode(zip.content)
            response.outputStream << decodedBytes
+           response.flushBuffer()
+
        }else{
            flash.message = "No hay documentación"
            redirect(controller: 'dashboard', action: 'index', params: [idCia: ''])

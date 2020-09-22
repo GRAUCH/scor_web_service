@@ -74,21 +74,7 @@
     function myFunction(cia) {
 
         const listaSoporteZip = ["lagunaro", "caser", "methislabCF", "methislab", "netinsurance", "psn", "afiesca", "lifesquare", "cbp-italia", "alptis", "ama"];
-        const soporteZip = {
-            LAGUN_ARO: 'lagunaro',
-            CASER: 'caser',
-            CF_LIFE: 'methislabCF',
-            METHIS_LAB: 'methislab',
-            NET_INSURANCE: 'netinsurance',
-            PSN: 'psn',
-            AFI_ESCA: 'afiesca',
-            ZEN_UP: 'lifesquare',
-            CBP_ITALIA: 'cbp-italia',
-            ALPTIS: 'alptis',
-            AMA: 'ama'
-        }
-
-
+        
         // Con esto le enviamos al controllador la CIA que queremos consultar
         $('#idCia').val(cia.id);
         //Con esto dejamos el efecto de que se hizo click en la compania
@@ -128,6 +114,7 @@
                 nodo.name = "companyName";
                 document.getElementById('panelzip').appendChild(nodo);
                 document.getElementById('panelzip').style.display = 'inline';
+                document.getElementById('txtcodigoSTzip').value = '';
                 break;
             }
         }
