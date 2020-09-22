@@ -7,16 +7,28 @@ enum UnidadOrganizativa {
 	PT ("PT"),
 	IT ("IT")
 
-	final String value
+	private final String value
 
 	UnidadOrganizativa(String value) {
 		this.value = value
 	}
 
 	String toString() {
-		value
+		return this.value
 	}
 	String getKey() {
-		name()
+		return this.name()
+	}
+
+	static UnidadOrganizativa fromNombre( String value ) {
+		if(value != null && !value.isEmpty()) {
+			for (UnidadOrganizativa actual : UnidadOrganizativa.values()) {
+				if (actual.value == value) {
+					return actual
+				}
+			}
+		}
+
+		//values().find { it.value == value }
 	}
 }

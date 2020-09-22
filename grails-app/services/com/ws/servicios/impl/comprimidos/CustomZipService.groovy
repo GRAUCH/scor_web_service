@@ -1,30 +1,24 @@
 package com.ws.servicios.impl.comprimidos
 
 import com.scor.global.ZipUtils
-import com.scortelemed.Company
 import com.scortelemed.Conf
 import com.scortelemed.TipoCompany
-import com.scortelemed.TipoOperacion
-import com.scortelemed.schemas.cbpita.BenefictResultType
-import com.scortelemed.schemas.cbpita.BenefitsType
-import com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCasesResultsResponse
 import com.ws.servicios.IComprimidoService
+import com.ws.servicios.LogginService
 import grails.transaction.Transactional
-import hwsol.webservices.CorreoUtil
 import servicios.Documentacion
-import servicios.ExpedienteInforme
+import servicios.Expediente
 import servicios.TipoEstadoExpediente
-import servicios.TipoMotivoAnulacion
 
 import java.text.SimpleDateFormat
 
 @Transactional
 class CustomZipService implements IComprimidoService{
 
-    def grailsApplication
-    def logginService
-    def requestService
-    def correoUtil = new CorreoUtil()
+    //def grailsApplication
+    LogginService logginService
+    //def requestService
+    //def correoUtil = new CorreoUtil()
     def zipUtils = new ZipUtils()
     TipoCompany company
 
@@ -37,7 +31,7 @@ class CustomZipService implements IComprimidoService{
         return null
     }
 
-    def obtenerZip(ExpedienteInforme expediente) {
+    def obtenerZip(Expediente expediente) {
         def resultado
         if (expediente.getCodigoEstado()== TipoEstadoExpediente.CERRADO) {
             logginService.putInfoMessage("Iniciado generacion de zip para expediente " + expediente.codigoST)

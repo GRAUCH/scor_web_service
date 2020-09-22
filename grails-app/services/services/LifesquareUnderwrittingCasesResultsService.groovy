@@ -40,7 +40,7 @@ class LifesquareUnderwrittingCasesResultsService {
 	def expedienteService
 	def estadisticasService
 	def logginService
-	IComprimidoService zipService = ServiceFactory.getComprimidoImpl(TipoCompany.PSN)
+	IComprimidoService zipService = ServiceFactory.getComprimidoImpl(TipoCompany.ZEN_UP)
 
 
 	@WebResult(name = "LifesquareUnderwrittingCasesResultsResponse")
