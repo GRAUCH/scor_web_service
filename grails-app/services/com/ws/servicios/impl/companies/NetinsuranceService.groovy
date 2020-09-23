@@ -13,6 +13,8 @@ import com.scortelemed.servicios.Candidato
 import com.scortelemed.servicios.Frontal
 import com.scortelemed.servicios.FrontalServiceLocator
 import com.ws.servicios.ICompanyService
+import com.ws.servicios.IComprimidoService
+import com.ws.servicios.ServiceFactory
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
 import hwsol.webservices.ZipResponse
@@ -35,8 +37,9 @@ class NetinsuranceService implements ICompanyService{
 	def logginService
 	def requestService
 	def expedienteService
-	def tarificadorService
 	def grailsApplication
+	IComprimidoService zipService = ServiceFactory.getComprimidoImpl(TipoCompany.NET_INSURANCE)
+
 
 
 	String marshall(def objeto) {
@@ -100,7 +103,7 @@ class NetinsuranceService implements ICompanyService{
 			expediente.setPhoneNumber2("")
 		}
 
-		byte[] compressedData=tarificadorService.obtenerZip(expedientePoliza.getNodoAlfresco())
+		byte[] compressedData=zipService.obtenerZip(expedientePoliza.getNodoAlfresco())
 
 		expediente.setZip(compressedData)
 

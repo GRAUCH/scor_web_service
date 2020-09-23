@@ -16,14 +16,17 @@ import com.scortelemed.schemas.caser.XSDProcessExecutionPort
 import com.scortelemed.schemas.caser.XSDProcessExecutionServiceLocator
 import com.ws.alptis.sp.beans.AlptisUnderwrittingCaseResultsRequest
 import com.ws.cajamar.beans.Cobertura
-import com.ws.servicios.impl.companies.AmaService
+import com.ws.enumeration.UnidadOrganizativa
+import com.ws.servicios.IComprimidoService
+import com.ws.servicios.ServiceFactory
+import com.ws.servicios.impl.comprimidos.CommonZipService
 import grails.plugin.springsecurity.annotation.Secured
 import grails.util.Environment
 import hwsol.entities.parser.RegistrarEventoSCOR
 import hwsol.utilities.LogUtil
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
-import org.springframework.beans.factory.annotation.Autowired
+import org.codehaus.groovy.grails.web.servlet.HttpHeaders
 import servicios.*
 import wslite.http.auth.HTTPBasicAuthorization
 import wslite.soap.SOAPClient
@@ -32,30 +35,23 @@ import wslite.soap.SOAPResponse
 import javax.xml.rpc.holders.StringHolder
 import java.text.SimpleDateFormat
 
+
 @Secured('permitAll')
 class WsController {
     def estadisticasService
-    def alptisService
-
     def logginService
-    def HwSoapClientAlptisService
-
+    def amaService
     def soapAlptisRecetteWS
     def soapAlptisRecetteWSPRO
     def soapCajamarRecetteWS
-    def soapCajamarRecetteWSPRO
     def soapCaserRecetteWS
-    def soapCaserRecetteWSPRO
-    CorreoUtil correoUtil = new CorreoUtil()
     def requestService
     def expedienteService
     def tarificadorService
-    def francesasService
-
-
-    @Autowired
-    private AmaService amaService
-
+    IComprimidoService zipService
+    CorreoUtil correoUtil = new CorreoUtil()
+    CommonZipService commonZipService
+   //CustomZipService customZipService
     def caseresult = {
 
         def fechaFin
@@ -65,7 +61,7 @@ class WsController {
         def opername = "caseresult"
         def cases = []
         def resulExpedienteSoap
-
+        zipService = ServiceFactory.getComprimidoImpl(TipoCompany.ALPTIS)
 
         try {
             def company = Company.findByNombre('alptis')
@@ -100,7 +96,7 @@ class WsController {
                 resulExpedienteSoap.each { item ->
                     if (item && item.nodoAlfresco) {
                         logginService.putInfoMessage("Obteniendo comprimido para expediente: " + item.getCodigoST() + " con numero de poliza: " + item.getNumPoliza())
-                        def comprimido = tarificadorService.obtenerZip(item.nodoAlfresco)
+                        def comprimido = zipService.obtenerZip(item.nodoAlfresco)
 
                         if (comprimido) {
                             def xml = tarificadorService.obtenerXMLExpedientePorZip(comprimido)
@@ -178,12 +174,12 @@ class WsController {
 
             }
             flash.message = "** Se procesaron :" + resulExpedienteSoap.size() + " **  " + " Compania : " + company.nombre + " *"
-            return redirect(controller: 'dashboard', action: 'index',params: [idCia: ''])
+            return redirect(controller: 'dashboard', action: 'index', params: [idCia: ''])
         } catch (Exception ex) {
             logginService.putError("Endpoint-" + opername, "Error en al obtener resultados para las fechas " + fechaIni + "-" + fechaFin + ":" + ex)
             correoUtil.envioEmail("AlptisUnderwrittingCasesResultsRequest", cases.toString(), ex)
             flash.message = "KO - Ver logs"
-            return redirect(controller: 'dashboard', action: 'index',params: [idCia: ''])
+            return redirect(controller: 'dashboard', action: 'index', params: [idCia: ''])
 //            responseRecette = soap.send(connectTimeout: 300000, readTimeout: 300000) {
 //                body {
 //                    AlptisUnderwrittingCaseResultsRequest(xmlns: "http://www.scortelemed.com/schemas/alptis") {
@@ -410,11 +406,11 @@ class WsController {
             sbInfo.append(" se procesaron cantidad : ${resulExpedienteSoap.size()}")
             logginService.putInfoMessage(" * proceso envio de informacion para " + company.nombre + " terminado. *")
             flash.message = sbInfo.toString()
-            return redirect(controller: 'dashboard', action: 'index',params: [idCia: ''])
+            return redirect(controller: 'dashboard', action: 'index', params: [idCia: ''])
         } catch (Exception ex) {
             logginService.putErrorMessage("Error: " + opername + ". " + ex.getMessage().toString() + ". Detalles:" + ex.printStackTrace())
             flash.message = "KO - Ver logs"
-            return redirect(controller: 'dashboard', action: 'index',params: [idCia: ''])
+            return redirect(controller: 'dashboard', action: 'index', params: [idCia: ''])
         }
     }
 
@@ -440,7 +436,7 @@ class WsController {
         TransformacionUtil transformacion = new TransformacionUtil()
         def company = Company.findByNombre('caser')
         try {
-            StringBuilder sbInfo = new StringBuilder(" * Realizando proceso envio de informacion para " + company.nombre+" *")
+            StringBuilder sbInfo = new StringBuilder(" * Realizando proceso envio de informacion para " + company.nombre + " *")
             sbInfo.append("\n")
             if (params.myGroup != null && params.myGroup == 'codigoST' && params.codigoST) {
                 sbInfo.append(" al expediente con codigo ST ${params.codigoST}")
@@ -450,7 +446,7 @@ class WsController {
                 fechaIni = LogUtil.paramsToDateIni(params)
                 fechaFin = LogUtil.paramsToDateFin(params)
                 sbInfo.append(" con fecha inicio ").append(fechaIni).append("-").append(" con fecha fin ").append(fechaFin)
-                sbInfo.append("** compania "+company.codigoSt+" **")
+                sbInfo.append("** compania " + company.codigoSt + " **")
                 expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt, null, 0, fechaIni, fechaFin, company.ou))
                 expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt, null, 1, fechaIni, fechaFin, company.ou))
                 expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt, null, 2, fechaIni, fechaFin, company.ou))
@@ -516,7 +512,7 @@ class WsController {
             sbInfo.append("\n")
             sbInfo.append("* se procesaron cantidad : ${expedientes.size()} *")
             flash.message = sbInfo.toString()
-            return redirect(controller: 'dashboard', action: 'index',params: [idCia: ''])
+            return redirect(controller: 'dashboard', action: 'index', params: [idCia: ''])
         } catch (Exception ex) {
             logginService.putErrorMessage("Error: " + opername + ". " + ex.getMessage() + ". Detalles:" + ex.getMessage())
             com.scortelemed.Error error = new com.scortelemed.Error()
@@ -528,7 +524,7 @@ class WsController {
             error.setError("Peticion no realizada para solicitud: " + ex.getMessage() + ". Error: " + ex.getMessage())
             error.save(flush: true)
             flash.message = "KO - Ver logs"
-            return redirect(controller: 'dashboard', action: 'index',params: [idCia: ''])
+            return redirect(controller: 'dashboard', action: 'index', params: [idCia: ''])
         }
     }
 
@@ -542,8 +538,8 @@ class WsController {
         def cases = []
         def estadoCausa = []
         def coberturas = []
+        zipService = ServiceFactory.getComprimidoImpl(TipoCompany.AMA)
 
-        AmaService amaService = new AmaService()
         List<RespuestaCRMInforme> expedientesInforme = new ArrayList<RespuestaCRMInforme>()
         List<Expediente> expedientes = new ArrayList<Expediente>()
         List<Cita> citas = new ArrayList<Cita>()
@@ -561,7 +557,7 @@ class WsController {
             def companyVida = Company.findByNombre(TipoCompany.AMA_VIDA.nombre)
             def identificadorCaso
             Expediente expediente
-            StringBuilder sbInfo = new StringBuilder(" *Realizando proceso envio de informacion para " + company.nombre +" *")
+            StringBuilder sbInfo = new StringBuilder(" *Realizando proceso envio de informacion para " + company.nombre + " *")
             sbInfo.append("\n")
             if (params.myGroup != null && params.myGroup == 'codigoST' && params.codigoST) {
                 sbInfo.append(" al expediente con codigo ST ${params.codigoST}")
@@ -632,7 +628,6 @@ class WsController {
                              *
                              */
                             com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.Company cia = new com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.Company()
-
 
 
                             if (expediente.getCandidato() != null && expediente.getCandidato().getCompanya() != null && expediente.getCandidato().getCompanya().getCodigoST().equals("1064")) {
@@ -824,7 +819,7 @@ class WsController {
                                     listaBenefitInformation.add(benefitInformation)
                                 }
                                 logginService.putInfoMessage("Agrego ZIP")
-                                byte[] compressedData = tarificadorService.obtenerZip(expediente.getNodoAlfresco())
+                                byte[] compressedData = zipService.obtenerZip(expediente.getNodoAlfresco())
 
                                 File file = new File()
                                 file.setFileBase64(new String(compressedData))
@@ -928,9 +923,40 @@ class WsController {
 
             logginService.putErrorMessage("Error: " + opername + ". No se ha podido mandar el caso a Ama. Detalles:" + ex.getMessage())
             flash.message = "KO - Ver logs"
-            return redirect(controller: 'dashboard', action: 'index',params: [idCia: ''])
+            return redirect(controller: 'dashboard', action: 'index', params: [idCia: ''])
         }
     }
 
 
+    def generarZip() {
+        flash.message = ""
+        String codigost = params.codigoST
+        String company = params.companyName
+        String unidad = expedienteService.obtenerUnidadOrganizativa(TipoCompany.fromNombre(company))
+        RespuestaCRM expediente = expedienteService.informeExpedienteCodigoST(codigost, UnidadOrganizativa.fromNombre(unidad))
+       if(expediente?.listaExpedientes != null && expediente?.listaExpedientes.size() > 0) {
+           Expediente exp = expediente.listaExpedientes[0]
+           def zip
+           if (company.contains('cbp')){
+               zip = commonZipService.obtenerZip(TipoCompany.CBP_ITALIA, exp)
+           }
+            else{
+               zip = commonZipService.obtenerZip(exp.getNodoAlfresco())
+           }
+
+           String contentDisposition = 'attachment'
+           String mimeType2 = 'APPLICATION/OCTET-STREAM'
+
+           response.resetBuffer()
+           response.setContentType(mimeType2)
+           response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "${contentDisposition};filename=${zip.nombre}")
+           byte[] decodedBytes = Base64.getDecoder().decode(zip.content)
+           response.outputStream << decodedBytes
+           response.flushBuffer()
+
+       }else{
+           flash.message = "No hay documentación"
+           redirect(controller: 'dashboard', action: 'index', params: [idCia: ''])
+       }
+    }
 }

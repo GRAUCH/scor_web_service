@@ -6,11 +6,14 @@ import com.scor.srpfileinbound.DATOS
 import com.scor.srpfileinbound.REGISTRODATOS
 import com.scortelemed.Company
 import com.scortelemed.Request
+import com.scortelemed.TipoCompany
 import com.scortelemed.TipoOperacion
 import com.scortelemed.schemas.caser.*
 import com.scortelemed.schemas.caser.ConsultaExpedienteResponse.ExpedienteConsulta
 import com.scortelemed.schemas.caser.ResultadoReconocimientoMedicoResponse.Expediente
 import com.ws.servicios.ICompanyService
+import com.ws.servicios.IComprimidoService
+import com.ws.servicios.ServiceFactory
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
 import org.w3c.dom.Document
@@ -33,7 +36,7 @@ class CaserService implements ICompanyService{
     def logginService
     def requestService
     def expedienteService
-    def tarificadorService
+    IComprimidoService zipService = ServiceFactory.getComprimidoImpl(TipoCompany.CASER)
     CorreoUtil correoUtil = new CorreoUtil()
 
 
@@ -107,7 +110,7 @@ class CaserService implements ICompanyService{
             expediente.setProvincia("")
         }
 
-        byte[] compressedData = tarificadorService.obtenerZip(expedientePoliza.getNodoAlfresco())
+        byte[] compressedData = zipService.obtenerZip(expedientePoliza.getNodoAlfresco())
 
         expediente.setZip(compressedData)
 
@@ -179,7 +182,7 @@ class CaserService implements ICompanyService{
             expediente.setProvincia("")
         }
 
-        byte[] compressedData = tarificadorService.obtenerZip(expedientePoliza.getNodoAlfresco())
+        byte[] compressedData = zipService.obtenerZip(expedientePoliza.getNodoAlfresco())
 
         expediente.setZip(compressedData)
 

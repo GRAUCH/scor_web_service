@@ -11,6 +11,8 @@ import com.scortelemed.schemas.psn.ConsultaDocumentoResponse.Documento
 import com.scortelemed.schemas.psn.ResultadoReconocimientoMedicoResponse.Expediente
 import com.scortelemed.servicios.TipoSexo
 import com.ws.servicios.ICompanyService
+import com.ws.servicios.IComprimidoService
+import com.ws.servicios.ServiceFactory
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
 import hwsol.webservices.WsError
@@ -33,8 +35,8 @@ class PsnService implements ICompanyService{
 	def logginService
 	def requestService
 	def expedienteService
-	def tarificadorService
 	def grailsApplication
+	IComprimidoService zipService = ServiceFactory.getComprimidoImpl(TipoCompany.PSN)
 	ContentResult contentResult = new ContentResult()
 
 
@@ -295,7 +297,7 @@ class PsnService implements ICompanyService{
 			expediente.setPhoneNumber2("")
 		}
 
-		byte[] compressedData=tarificadorService.obtenerZip(expedientePoliza.getNodoAlfresco())
+		byte[] compressedData=zipService.obtenerZip(expedientePoliza.getNodoAlfresco())
 
 		expediente.setZip(compressedData)
 

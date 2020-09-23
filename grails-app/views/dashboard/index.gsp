@@ -72,6 +72,9 @@
 <script>
 
     function myFunction(cia) {
+
+        const listaSoporteZip = ["lagunaro", "caser", "methislabCF", "methislab", "netinsurance", "psn", "afiesca", "lifesquare", "cbp-italia", "alptis", "ama"];
+        
         // Con esto le enviamos al controllador la CIA que queremos consultar
         $('#idCia').val(cia.id);
         //Con esto dejamos el efecto de que se hizo click en la compania
@@ -80,15 +83,42 @@
             elements[0].classList.remove('quick-btn_Selected');
         }
         document.getElementById(cia.id).classList.toggle('quick-btn_Selected');
+
         //Con esto mostramos o no el panel de envios
         <g:each in="${ciasLog}" status="i" var="cia">
-        var element = document.getElementById('panel${cia.name}');
-        if (element != null)
-            element.style.display = 'none';
+            var element = document.getElementById('panel${cia.name}');
+            if (element != null)
+                element.style.display = 'none';
+
+            //Generador de zip
+            //Busca todos los textos hidden
+            var element1 = document.getElementById('txt${cia.name}');
+            if (element1 != null)
+                element1.parentNode.removeChild(element1);
+            ////////////////////////////////////////
+
         </g:each>
         var ciaattr = cia.id.split('-')
-        document.getElementById('panel' + ciaattr[1]).style.display = 'inline';
+        if (document.getElementById('panel' + ciaattr[1]) !== null)
+            document.getElementById('panel' + ciaattr[1]).style.display = 'inline';
 
+        ////////////////////////////////////////
+        //Generador de zip
+        document.getElementById('panelzip').style.display = 'none';
+        for (let valor of listaSoporteZip){
+            if (valor.includes(ciaattr[1])){
+                var nodo = document.createElement("input");
+                nodo.type = "hidden";
+                nodo.value = ciaattr[1];
+                nodo.id = "txt" + ciaattr[1];
+                nodo.name = "companyName";
+                document.getElementById('panelzip').appendChild(nodo);
+                document.getElementById('panelzip').style.display = 'inline';
+                document.getElementById('txtcodigoSTzip').value = '';
+                break;
+            }
+        }
+        ////////////////////////////////////////
     }
 
     function busquedaPor(id) {

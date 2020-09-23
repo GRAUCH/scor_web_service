@@ -9,7 +9,7 @@ import com.scortelemed.Request
 import com.scortelemed.TipoCompany
 import com.scortelemed.TipoOperacion
 import com.ws.enumeration.UnidadOrganizativa
-import com.ws.servicios.CompanyFactory
+import com.ws.servicios.ServiceFactory
 import com.ws.servicios.ICompanyService
 import com.ws.servicios.IExpedienteService
 import grails.transaction.Transactional
@@ -132,6 +132,13 @@ class ExpedienteService implements IExpedienteService {
         }
     }
 
+    def informeExpedienteCodigoST(String codigoST, UnidadOrganizativa pais) {
+        Filtro filtro = new Filtro()
+        filtro.setClave(ClaveFiltro.EXPEDIENTE)
+        filtro.setValor(codigoST)
+        return consultaExpediente(pais, filtro)
+    }
+
     def modificaExpediente(UnidadOrganizativa pais, Expediente expediente, def servicioScorList, def paqueteScorList) {
         try {
             def ctx = grailsApplication.mainContext
@@ -167,7 +174,7 @@ class ExpedienteService implements IExpedienteService {
     }
 
     private def crearExpedienteBPM(Request req, TipoCompany comp) {
-        companyService = CompanyFactory.getCompanyImpl(comp)
+        companyService = ServiceFactory.getCompanyImpl(comp)
         def listadoFinal = []
         RootElement payload = new RootElement()
         try {
@@ -205,7 +212,13 @@ class ExpedienteService implements IExpedienteService {
         return pie
     }
 
-    Usuario obtenerUsuarioFrontal(unidadOrganizativa) {
+    UnidadOrganizativa obtenerUnidadOrganizativa(TipoCompany tipo) {
+        Company company = Company.findByNombre(tipo.nombre)
+        return company?.ou
+    }
+
+    Usuario obtenerUsuarioFrontal(UnidadOrganizativa unidadOrganizativa) {
+        def usuario = new Usuario()
 
         def usuario = new Usuario()
         switch(unidadOrganizativa) {

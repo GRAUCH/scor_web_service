@@ -1,25 +1,15 @@
 package com.ws.servicios
 
-import com.scor.comprimirdocumentos.ParametrosEntrada
-import com.scortelemed.Conf
-import com.scortelemed.TipoOperacion
+import com.scortelemed.Company
+import com.scortelemed.TipoCompany
 import com.ws.enumeration.UnidadOrganizativa
-import grails.util.Environment
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.FetchUtilLagunaro
 import hwsol.webservices.ScorExpedienteTarificado
 import org.apache.commons.codec.binary.Base64
-import servicios.ClaveFiltro
-import servicios.Expediente
-import servicios.Filtro
-import servicios.Filtro as FiltroGorm
-import servicios.Usuario as UsuarioGorm
 
-import java.text.SimpleDateFormat
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
-
-import static grails.async.Promises.task
 
 class TarificadorService {
 
@@ -30,29 +20,21 @@ class TarificadorService {
     def expedienteService
     def requestService
     def fetchUtil = new FetchUtilLagunaro()
-    def soapAlptisRecetteWSPRO
-    def soapAlptisRecetteWS
     def logginService = new LogginService()
     CorreoUtil correoUtil = new CorreoUtil()
 
-    def tarificador = { fecha ->
+    def tarificador(Date fecha) {
+        IComprimidoService zipService = ServiceFactory.getComprimidoImpl(TipoCompany.LAGUN_ARO)
+        Company company = Company.findByNombre(TipoCompany.LAGUN_ARO.nombre) //Lagunaro
         def listaExpedientes = []
         try {
-            def expediente = new ScorExpedienteTarificado()
-            def xmlResultado = ""
-            def tarificador = "  Tarificad o "
-
-            tarificador = tarificador.trim().toLowerCase()
-
-            /////////////////////////////////////////////////////////////////////////
-            def sqlXml = fetchUtil.dameExpedientesTarificados(fecha, "1004") //Lagunaro
+            def sqlXml = fetchUtil.dameExpedientesTarificados(fecha, company.codigoSt)
             def crmService = new ServiceCrmService()
-            xmlResultado = crmService.conexion(sqlXml)
+            def xmlResultado = crmService.conexion(sqlXml)
             listaExpedientes = fetchUtil.rellenaExpedientesTarificados(xmlResultado)
 
             //Buscamos si tienen algun paquete o servicios asociados
-            for (int i = 0; i < listaExpedientes.size(); i++) {
-                expediente = listaExpedientes[i]
+            for (ScorExpedienteTarificado expediente:listaExpedientes) {
                 sqlXml = fetchUtil.dameCoberturasExpediente((String) expediente.id)
                 xmlResultado = crmService.conexion(sqlXml)
                 expediente = fetchUtil.rellenaCoberturasExpediente(xmlResultado, expediente)
@@ -63,18 +45,18 @@ class TarificadorService {
 
 
                 if (expediente.codTipoRMedico) {
-                    sqlXml = fetchUtil.dameServiciosPaquete((String) expediente.codTipoRMedico, "1004")
+                    sqlXml = fetchUtil.dameServiciosPaquete((String) expediente.codTipoRMedico, company.codigoSt)
                     xmlResultado = crmService.conexion(sqlXml)
                     expediente = fetchUtil.rellenaServiciosPaquete(xmlResultado, expediente)
                 }
 
                 sqlXml = fetchUtil.dameExpedienteServicio((String) expediente.id)
                 xmlResultado = crmService.conexion(sqlXml)
-                listaExpedientes[i] = fetchUtil.rellenaExpedienteServicio(xmlResultado, expediente)
+                expediente = fetchUtil.rellenaExpedienteServicio(xmlResultado, expediente)
 
                 def nodo = obtenerNodoConsultaExpediente(expediente.scorName.toString(), UnidadOrganizativa.ES)
                 if (nodo) {
-                    expediente = asignarZipExpediente(expediente, nodo)
+                    expediente = zipService.obtenerZip(nodo)
                 }
             }
 
@@ -87,43 +69,75 @@ class TarificadorService {
 
     }
 
-    /*
-     * Borra las estadisticas de una Requests pasandole el ID
-     */
-
-    def borrar(idReq) {
-        def req = Request.get(idReq)
-        def estadisticas = Estadistica.findAllByRequest(req)
-        estadisticas.each { it.delete() }
+    private def obtenerNodoConsultaExpediente(String idExpediente, UnidadOrganizativa pais) {
+        try {
+            def salida = expedienteService.consultaExpedienteCodigoST(idExpediente, pais)
+            if (salida.listaExpedientes) {
+                return salida.listaExpedientes[0].nodoAlfresco
+            } else {
+                return null
+            }
+        } catch (Exception e) {
+            logginService.putError("obtenerNodoConsultaExpediente", "No se ha podido obtener el nodo de expedientes " + idExpediente + ": " + e)
+        }
     }
 
-    /*
-     * Obtiene las claves definidas en la tabla Datowebservice
-     */
+    def obtenerXMLExpedientePorZip(resultComprimidos) {
+        StringBuilder sb = new StringBuilder()
+        byte[] decodedBytes = Base64.decodeBase64(resultComprimidos.getBytes("UTF-8"))
+        ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(decodedBytes))
+        ZipEntry entrada
 
-    def obtenerClaves(opera) {
-        def operacion = Operacion.findByClave(opera)
-        def claves = Datowebservice.findAllByOperacion(operacion)
+        while ((entrada = zis.getNextEntry()) != null) {
+            String filename = entrada.getName()
 
+            logginService.putInfoMessage("El nombre del fichero es: " + filename)
+
+            if (filename.contains("xml")) {
+                Reader r = new InputStreamReader(zis, "UTF-8");  //or whatever encoding
+                char[] buf = new char[1024]
+                int amt = r.read(buf)
+                while (amt > 0) {
+                    sb.append(buf, 0, amt)
+                    amt = r.read(buf)
+                }
+            }
+        }
+
+        zis.close()
+
+        return sb.toString().replace('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>', "")
     }
 
-    /*
-     * Obtiene las datos directamente de un mensaje dato
-     */
+    def obtenerTipoReconocomiento = { expediente ->
+        def result = ""
 
-    def obtenerDatos(String mensaje) {
-
-        def mapaEsta = [:]
-        def rootNode = new XmlSlurper().parseText(mensaje)
-        def body = rootNode.Body
-        re(body.GestionReconocimientoMedicoRequest, mapaEsta)
-
-        return mapaEsta
+        if (expediente.tipoRMedico) {
+            if (expediente.tipoRMedico == "19a" || expediente.tipoRMedico == "19b")
+                result = "19"
+            else if (expediente.tipoRMedico == "16a" || expediente.tipoRMedico == "16b")
+                result = "16"
+            else if (expediente.tipoRMedico == "06a" || expediente.tipoRMedico == "06b")
+                result = "06"
+            else
+                result = expediente.tipoRMedico
+        } else {
+            if (expediente.pruebasMedicas) {
+                if (expediente.pruebasMedicas.size() <= 2) {
+                    result = expediente.pruebasMedicas[0].codigo
+                    expediente.pruebasMedicas.each {
+                        if (it.codigo == "15") {
+                            result = "12"
+                        }
+                    }
+                }
+            }
+        }
+        return result
     }
 
-    /*
-     * Crea un mapa con los datos
-     */
+    /**
+    // Crea un mapa con los datos
 
     def obtenMapa(nodo, mapaEsta, nombre) {
         nodo.childNodes().each {
@@ -160,80 +174,10 @@ class TarificadorService {
         }
     }
 
-    def obtenerTipoReconocomiento = { expediente ->
-        def result = ""
+    */
 
-        if (expediente.tipoRMedico) {
-            if (expediente.tipoRMedico == "19a" || expediente.tipoRMedico == "19b")
-                result = "19"
-            else if (expediente.tipoRMedico == "16a" || expediente.tipoRMedico == "16b")
-                result = "16"
-            else if (expediente.tipoRMedico == "06a" || expediente.tipoRMedico == "06b")
-                result = "06"
-            else
-                result = expediente.tipoRMedico
-        } else {
-            if (expediente.pruebasMedicas) {
-                if (expediente.pruebasMedicas.size() <= 2) {
-                    result = expediente.pruebasMedicas[0].codigo
-                    expediente.pruebasMedicas.each {
-                        if (it.codigo == "15") {
-                            result = "12"
-                        }
-                    }
-                }
-            }
-        }
-
-        return result
-    }
-
-    private def obtenerNodoConsultaExpediente(String idExpediente, UnidadOrganizativa pais) {
-        try {
-            def salida = expedienteService.consultaExpedienteCodigoST(idExpediente, pais)
-            if (salida.listaExpedientes) {
-                return salida.listaExpedientes[0].nodoAlfresco
-            } else {
-                return null
-            }
-        } catch (Exception e) {
-            logginService.putError("obtenerNodoConsultaExpediente", "No se ha podido obtener el nodo de expedientes " + idExpediente + ": " + e)
-        }
-    }
-
-    def asignarZipExpediente(ScorExpedienteTarificado expediente, String nodo) {
-        def response
-        try {
-            expediente.zip = obtenerZip(nodo).toString()
-
-            return expediente
-        } catch (Exception e) {
-            logginService.putError("asignarZipExpediente", "No se ha podido asignar el zip del expediente : " + e)
-            response = false
-        }
-    }
-
-    def obtenerZip(String nodo) {
-        def response = new byte[0]
-        try {
-            def parametrosEntrada = new ParametrosEntrada()
-            parametrosEntrada.usuario = Conf.findByName("orabpel.usuario")?.value
-            parametrosEntrada.clave = Conf.findByName("orabpel.clave")?.value
-            parametrosEntrada.refNodo = nodo
-            //SOBREESCRIBIMOS LA URL A LA QUE TIENE QUE LLAMAR EL WSDL
-            def ctx = grailsApplication.mainContext
-            def bean = ctx.getBean("soapClientComprimidoAlptis")
-            bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("orabpel.wsdl")?.value)
-            def salida = grailsApplication.mainContext.soapClientComprimidoAlptis.process(parametrosEntrada)
-            return salida.datosRespuesta.content
-        } catch (Exception e) {
-            logginService.putErrorMessage("No se ha podido obtener el zip del nodo : " + nodo + ". Error msg: "  + e.getMessage())
-            logginService.putErrorMessage("Causa : " + e.getCause())
-            correoUtil.envioEmailErrores("No se ha podido obtener el zip del nodo", "No se ha podido obtener el ZIP", e)
-        }
-        return response
-    }
-
+    /**
+     * NO UTILIZADO
     def obtenerInformeCitas(String arg1, String arg2, String arg3, String arg4, String arg5) {
 
         def response
@@ -272,36 +216,6 @@ class TarificadorService {
         }
     }
 
-    def obtenerXMLExpedientePorZip(resultComprimidos) {
-        StringBuilder sb = new StringBuilder()
-        byte[] decodedBytes = Base64.decodeBase64(resultComprimidos.getBytes("UTF-8"))
-        ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(decodedBytes))
-        ZipEntry entrada
-
-        while ((entrada = zis.getNextEntry()) != null) {
-            String filename = entrada.getName()
-
-            logginService.putInfoMessage("El nombre del fichero es: " + filename)
-
-            if (filename.contains("xml")) {
-                Reader r = new InputStreamReader(zis, "UTF-8");  //or whatever encoding
-                char[] buf = new char[1024]
-                int amt = r.read(buf)
-                while (amt > 0) {
-                    sb.append(buf, 0, amt)
-                    amt = r.read(buf)
-                }
-            }
-        }
-
-        zis.close()
-
-        return sb.toString().replace('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>', "")
-    }
-
-    /**
-     * NO UTILIZADO
-     *
     def notificarCaseResultsAlptis() {
         def contadorResultados = 0
         def i = 0
@@ -329,8 +243,8 @@ class TarificadorService {
                 }
             }
         }
-    }*/
-
+    }
+     
     def obtenerUsuarioFrontal(String unidadOrganizativa) {
         def usuario = new UsuarioGorm()
 
@@ -377,5 +291,5 @@ class TarificadorService {
         }
 
         return usuario
-    }
+    } */
 }
