@@ -220,7 +220,6 @@ class ExpedienteService implements IExpedienteService {
     Usuario obtenerUsuarioFrontal(UnidadOrganizativa unidadOrganizativa) {
         def usuario = new Usuario()
 
-        def usuario = new Usuario()
         switch(unidadOrganizativa) {
             case UnidadOrganizativa.ES:
                 if (Environment.current.name.equals("production_wildfly")) {

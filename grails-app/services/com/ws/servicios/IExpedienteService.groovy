@@ -18,6 +18,6 @@ interface IExpedienteService {
     def modificaExpediente(UnidadOrganizativa pais, Expediente expediente, def servicioScorList, def paqueteScorList)
     boolean crearExpediente(Request req, TipoCompany comp)
     def busquedaCrm(Request requestBBDD, Company company, String requestNumber, String certificateNumber, String policyNumber)
-    Usuario obtenerUsuarioFrontal(unidadOrganizativa)
+    Usuario obtenerUsuarioFrontal(UnidadOrganizativa unidadOrganizativa)
 
 }
