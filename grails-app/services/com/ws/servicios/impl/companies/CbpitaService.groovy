@@ -405,7 +405,7 @@ class CbpitaService implements ICompanyService{
                      */
 
                     if (eElement.getElementsByTagName("agent").item(0) != null) {
-                        datosRegistro.codigoAgencia = codificarAgente(eElement.getElementsByTagName("agent").item(0).getTextContent())
+                        datosRegistro.codigoAgencia = codificarAgente(eElement.getElementsByTagName("agent").item(0).getTextContent()).substring(0,20)
                     }
 
                     /**NOMBRE DE AGENTE
