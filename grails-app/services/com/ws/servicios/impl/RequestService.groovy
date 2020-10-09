@@ -183,4 +183,22 @@ class RequestService implements IRequestService {
         Pattern pattern = Pattern.compile("\\P{ASCII}+")
         return pattern.matcher(normalized).replaceAll("").toUpperCase()
     }
+
+    String obtenerAgente(String valor, Company company, boolean substring) {
+        String salida
+        Agente instituto = Agente.findByValorAndCia(valor, company)
+
+        if (instituto != null && instituto.getAgente() != null && !instituto.getAgente().isEmpty()) {
+            salida = instituto.getAgente()
+        } else {
+            salida = valor
+        }
+
+        if(substring) {
+            salida = salida.substring(0,20)
+        }
+
+        return salida
+    }
+
 }

@@ -479,27 +479,9 @@ class NetinsuranceService implements ICompanyService{
 					 */
 
 					if (eElement.getElementsByTagName("agency").item(0) != null && !eElement.getElementsByTagName("agency").item(0).getTextContent().isEmpty()) {
-
-						Agente instituto = Agente.findByValor(eElement.getElementsByTagName("agency").item(0).getTextContent().toString())
-
-						if (instituto != null && instituto.getAgente() != null && !instituto.getAgente().isEmpty()) {
-
-							if (instituto.getAgente().length() > 20) {
-								datosRegistro.codigoAgencia = instituto.getAgente().substring(0, 19)
-							} else {
-								datosRegistro.codigoAgencia = instituto.getAgente()
-							}
-
-							datosRegistro.nomApellAgente = instituto.getAgente()
-
-						} else {
-
-							datosRegistro.codigoAgencia = eElement.getElementsByTagName("agency").item(0).getTextContent().toString()
-							datosRegistro.nomApellAgente = eElement.getElementsByTagName("agency").item(0).getTextContent().toString()
-						}
-
+						datosRegistro.codigoAgencia = requestService.obtenerAgente(eElement.getElementsByTagName("agency").item(0).getTextContent().toString(), company, true)
+						datosRegistro.nomApellAgente = requestService.obtenerAgente(eElement.getElementsByTagName("agency").item(0).getTextContent().toString(), company, false)
 					} else {
-
 						datosRegistro.codigoAgencia = "."
 						datosRegistro.nomApellAgente = "."
 					}
