@@ -25,7 +25,7 @@ class FetchUtilLagunaro {
 	
 		Date fechaSig = new Date(tiempoActual - horas1*2)
 
-		//devuelvo las 2 últimas horas.		
+		//devuelvo las 2 ï¿½ltimas horas.		
 		def fechaInicio = formatoDelTexto.format(fechaSig)
 		def fechaFin= formatoDelTexto.format(tiempoActual)
 		
@@ -243,9 +243,12 @@ private static String parseoCobertura(String codigo){
 	 if (codigo == "COB5")
 	 	return "Fallecimiento"
 	 if (codigo == "COB8")
-	 	return "Incapacidad 30" 
-	 	
-	 return ""	
+	 	return "Incapacidad 30"
+	if (codigo == "COB222")
+		return "Fallecimiento por accidente"
+
+
+	return ""
 
 }	
 

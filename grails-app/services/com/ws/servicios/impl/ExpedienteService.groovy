@@ -184,7 +184,7 @@ class ExpedienteService implements IExpedienteService {
             listadoFinal.add(buildPie(null))
             payload.cabeceraOrDATOSOrPIE = listadoFinal
         } catch (Exception e) {
-            logginService.putError(e.toString())
+           logginService.putError("Error en el metodo crearExpedienteBPM: " + e)
         }
         return payload
     }

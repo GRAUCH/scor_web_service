@@ -35,13 +35,11 @@ expose = EndpointType.JAX_WS,properties = [@GrailsCxfEndpointProperty(name = "ws
 @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
 class LifesquareUnderwrittingCaseManagementService {
 	
-	def protected estadisticasService = new EstadisticasService()
-	def protected requestService = new RequestService()
-	def protected logginService = new LogginService()
+	def estadisticasService
+	def requestService
+	def logginService
 	def expedienteService
-	def francesasService
-	def tarificadorService
-	
+
 	@WebResult(name = "LifesquareUnderwrittingCaseManagementResponse")
 	@WebMethod
 	LifesquareUnderwrittingCaseManagementResponse LifesquareUnderwrittingCaseManagement(

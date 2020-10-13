@@ -282,6 +282,9 @@ class GestionReconocimientosMedicosService {
         if (cover.equals("Fallecimiento accidente")) {
             result = TipoGarantiaType.Fallecimiento_accidente
         }
+        if (cover.equals("Fallecimiento por accidente")) {
+            result = TipoGarantiaType.Fallecimiento_accidente
+        }
 
         if (cover.equals("Enfermedades graves")) {
             result = TipoGarantiaType.Enfermedades_graves
@@ -290,7 +293,6 @@ class GestionReconocimientosMedicosService {
         if (cover.equals("Invalidez permanente absoluta")) {
             result = TipoGarantiaType.Invalidez_permanente_absoluta
         }
-
         if (cover.equals("Incapacidad 30")) {
             result = TipoGarantiaType.Incapacidad_30
         }

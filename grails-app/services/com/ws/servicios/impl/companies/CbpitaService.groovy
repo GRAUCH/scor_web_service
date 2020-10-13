@@ -132,12 +132,10 @@ class CbpitaService implements ICompanyService{
                     }
                 }
             } else {
-
                 logginService.putInfoMessage("Expediente con número de poliza " + numPoliza + " para " + nombreCia + " no se existe en el sistema")
             }
 
         } catch (Exception e) {
-
             logginService.putInfoMessage("Buscando si existe expediente con numero de poliza " + numPoliza + " para " + nombreCia + " . Error: " + +e.getMessage())
             correoUtil.envioEmailErrores("ERROR en búsqueda de duplicados para " + nombreCia, "Buscando si existe expediente con numero de poliza " + numPoliza + " para " + nombreCia, e)
         }
