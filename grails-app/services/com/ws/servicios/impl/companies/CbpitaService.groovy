@@ -10,6 +10,7 @@ import com.scortelemed.schemas.cbpita.*
 import com.scortelemed.servicios.Candidato
 import com.scortelemed.servicios.Frontal
 import com.scortelemed.servicios.FrontalServiceLocator
+import com.ws.enumeration.UnidadOrganizativa
 import com.ws.servicios.ICompanyService
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
@@ -23,6 +24,7 @@ import servicios.RespuestaCRM
 import servicios.TipoEstadoExpediente
 import servicios.TipoMotivoAnulacion
 
+import javax.xml.datatype.XMLGregorianCalendar
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 import java.text.SimpleDateFormat
@@ -98,26 +100,16 @@ class CbpitaService implements ICompanyService{
         return frontal
     }
 
-    List<servicios.Expediente> existeExpediente(String numPoliza, String nombreCia, String companyCodigoSt, String ou) {
+    List<servicios.Expediente> existeExpediente(String numPoliza, String nombreCia, String companyCodigoSt, UnidadOrganizativa ou) {
 
         logginService.putInfoMessage("Buscando si existe expediente con numero de poliza " + numPoliza + " para " + nombreCia)
 
-        servicios.Filtro filtro = new servicios.Filtro()
         List<servicios.Expediente> expedientes = new ArrayList<servicios.Expediente>()
         RespuestaCRM respuestaCrm
 
         try {
 
-            filtro.setClave(servicios.ClaveFiltro.CLIENTE)
-            filtro.setValor(companyCodigoSt.toString())
-
-            servicios.Filtro filtroRelacionado1 = new servicios.Filtro()
-            filtroRelacionado1.setClave(servicios.ClaveFiltro.NUM_SOLICITUD)
-            filtroRelacionado1.setValor(numPoliza.toString())
-
-            filtro.setFiltroRelacionado(filtroRelacionado1)
-
-            respuestaCrm = expedienteService.consultaExpediente(ou, filtro)
+            respuestaCrm = expedienteService.consultaExpedienteNumSolicitud(numPoliza, ou, companyCodigoSt)
 
             if (respuestaCrm != null && respuestaCrm.getListaExpedientes() != null && respuestaCrm.getListaExpedientes().size() > 0) {
 
@@ -781,7 +773,7 @@ class CbpitaService implements ICompanyService{
         }
     }
 
-    def rellenaDatosSalidaConsulta(servicios.ExpedienteInforme expedientePoliza, codigoSt, requestDate, String zipPath, String user, String password) {
+    def rellenaDatosSalidaConsulta(servicios.ExpedienteInforme expedientePoliza, String codigoSt, def requestDate, String zipPath, String user, String password) {
 
         CbpitaUnderwrittingCasesResultsResponse.Expediente expediente = new CbpitaUnderwrittingCasesResultsResponse.Expediente()
 

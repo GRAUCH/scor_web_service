@@ -36,7 +36,7 @@ class ExpedienteService implements IExpedienteService {
     ICompanyService companyService
 
 
-    def consultaExpediente(pais,filtro) {
+    def consultaExpediente(UnidadOrganizativa pais, Filtro filtro) {
         try {
             def ctx = grailsApplication.mainContext
             def bean = ctx.getBean("soapClientAlptis")
@@ -205,7 +205,7 @@ class ExpedienteService implements IExpedienteService {
         return pie
     }
 
-    Usuario obtenerUsuarioFrontal(unidadOrganizativa) {
+    Usuario obtenerUsuarioFrontal(UnidadOrganizativa unidadOrganizativa) {
 
         def usuario = new Usuario()
         switch(unidadOrganizativa) {

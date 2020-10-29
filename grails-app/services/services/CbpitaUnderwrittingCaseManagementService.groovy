@@ -82,7 +82,7 @@ class CbpitaUnderwrittingCaseManagementService {
                     if (wsErrors != null && wsErrors.size() == 0) {
 
 
-                        expedientes = cbpitaService.existeExpediente(cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, company.nombre, company.codigoSt, company.ou.toString())
+                        expedientes = cbpitaService.existeExpediente(cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, company.nombre, company.codigoSt, company.ou)
 
                         if (expedientes != null && expedientes.size() == 0) {
 

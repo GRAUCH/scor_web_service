@@ -10,6 +10,7 @@ import com.scortelemed.TipoOperacion
 import com.scortelemed.schemas.caser.*
 import com.scortelemed.schemas.caser.ConsultaExpedienteResponse.ExpedienteConsulta
 import com.scortelemed.schemas.caser.ResultadoReconocimientoMedicoResponse.Expediente
+import com.ws.enumeration.UnidadOrganizativa
 import com.ws.servicios.ICompanyService
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
@@ -825,25 +826,16 @@ class CaserService implements ICompanyService{
         }
     }
 
-    List<servicios.Expediente> existeExpediente(String numeroSolicitud, String nombreCia, String companyCodigoSt, String unidadOrganizativa) {
+    List<servicios.Expediente> existeExpediente(String numeroSolicitud, String nombreCia, String companyCodigoSt, UnidadOrganizativa unidadOrganizativa) {
 
         logginService.putInfoMessage("Buscando si existe expediente con numero de solicitud " + numeroSolicitud + " para " + nombreCia)
 
-        servicios.Filtro filtro = new servicios.Filtro()
         List<servicios.Expediente> expedientes = new ArrayList<servicios.Expediente>()
         RespuestaCRM respuestaCrm
 
         try {
 
-            filtro.setClave(servicios.ClaveFiltro.CLIENTE)
-            filtro.setValor(companyCodigoSt)
-
-            servicios.Filtro filtroRelacionado1 = new servicios.Filtro()
-            filtroRelacionado1.setClave(servicios.ClaveFiltro.NUM_SOLICITUD)
-            filtroRelacionado1.setValor(numeroSolicitud)
-            filtro.setFiltroRelacionado(filtroRelacionado1)
-
-            respuestaCrm = expedienteService.consultaExpediente(unidadOrganizativa, filtro)
+            respuestaCrm = expedienteService.consultaExpedienteNumSolicitud(numeroSolicitud, unidadOrganizativa, companyCodigoSt)
 
             if (respuestaCrm != null && respuestaCrm.getListaExpedientes() != null && respuestaCrm.getListaExpedientes().size() > 0) {
 

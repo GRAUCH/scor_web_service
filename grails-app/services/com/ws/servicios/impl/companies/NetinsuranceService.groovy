@@ -12,6 +12,7 @@ import com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCasesResult
 import com.scortelemed.servicios.Candidato
 import com.scortelemed.servicios.Frontal
 import com.scortelemed.servicios.FrontalServiceLocator
+import com.ws.enumeration.UnidadOrganizativa
 import com.ws.servicios.ICompanyService
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
@@ -720,54 +721,5 @@ class NetinsuranceService implements ICompanyService{
 			case "PENDIENTE_CIA": return "ATTENDE CO";
 			default: return null;
 		}
-	}
-
-	servicios.Expediente existeExpediente(String numPoliza, String nombreCia, String companyCodigoSt, String ou) {
-
-		logginService.putInfoMessage("Buscando si existe expediente con numero de poliza " + numPoliza + " para " + nombreCia)
-
-		CorreoUtil correoUtil = new CorreoUtil()
-		servicios.Filtro filtro = new servicios.Filtro()
-        servicios.Expediente expediente = null;
-		RespuestaCRM respuestaCrm
-
-		try {
-
-			filtro.setClave(servicios.ClaveFiltro.CLIENTE);
-			filtro.setValor(companyCodigoSt.toString());
-
-			servicios.Filtro filtroRelacionado1 = new servicios.Filtro()
-			filtroRelacionado1.setClave(servicios.ClaveFiltro.NUM_SOLICITUD)
-			filtroRelacionado1.setValor(numPoliza.toString())
-
-			filtro.setFiltroRelacionado(filtroRelacionado1)
-
-			respuestaCrm = expedienteService.consultaExpediente(ou, filtro)
-
-			if (respuestaCrm != null && respuestaCrm.getListaExpedientes() != null && respuestaCrm.getListaExpedientes().size() > 0) {
-
-				for (int i = 0; i < respuestaCrm.getListaExpedientes().size(); i++) {
-
-					servicios.Expediente exp = respuestaCrm.getListaExpedientes().get(i)
-
-					if (exp.getCandidato() != null && exp.getCandidato().getCompanya() != null && exp.getCandidato().getCompanya().getCodigoST().equals(companyCodigoSt.toString()) && exp.getNumSolicitud() != null && exp.getNumSolicitud().equals(numPoliza.toString())) {
-
-						logginService.putInfoMessage("Expediente con número de poliza " + numPoliza + " y expediente " + exp.getCodigoST() + " para " + nombreCia + " ya existe en el sistema")
-						expediente = respuestaCrm.getListaExpedientes().get(i)
-					}
-				}
-			} else {
-
-                logginService.putInfoMessage("Expediente con número de poliza " + numPoliza + " para " + nombreCia + " no se existe en el sistema")
-                expediente = null
-            }
-
-		} catch (Exception e) {
-
-			logginService.putInfoMessage("Buscando si existe expediente con numero de poliza " + numPoliza + " para " + nombreCia + " . Error: " + + e.getMessage())
-			correoUtil.envioEmailErrores("ERROR en búsqueda de duplicados para " + nombreCia,"Buscando si existe expediente con numero de poliza " + numPoliza + " para " + nombreCia, e)
-		}
-
-		return expediente
 	}
 }
