@@ -14,6 +14,7 @@ import com.ws.servicios.ICompanyService
 import com.ws.servicios.IExpedienteService
 import grails.transaction.Transactional
 import grails.util.Environment
+import grails.util.Holders
 import hwsol.webservices.CorreoUtil
 import servicios.ClaveFiltro
 import servicios.Expediente
@@ -28,10 +29,10 @@ import static grails.async.Promises.task
 @Transactional
 class ExpedienteService implements IExpedienteService {
 
-    def logginService
-    def requestService
-    def tarificadorService
-    def grailsApplication
+    def logginService = Holders.grailsApplication.mainContext.getBean("logginService")
+    def requestService = Holders.grailsApplication.mainContext.getBean("requestService")
+
+    def grailsApplication = Holders.getGrailsApplication()
     CorreoUtil correoUtil = new CorreoUtil()
     ICompanyService companyService
 
@@ -177,7 +178,7 @@ class ExpedienteService implements IExpedienteService {
             listadoFinal.add(buildPie(null))
             payload.cabeceraOrDATOSOrPIE = listadoFinal
         } catch (Exception e) {
-           logginService.putError("Error en el metodo crearExpedienteBPM: " + e)
+           logginService.putError("crearExpedienteBPM","Error en el metodo crearExpedienteBPM: " + e)
         }
         return payload
     }

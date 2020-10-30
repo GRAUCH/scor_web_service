@@ -6,12 +6,12 @@ import com.scor.srpfileinbound.DATOS
 import com.scor.srpfileinbound.REGISTRODATOS
 import com.scortelemed.Company
 import com.scortelemed.Request
-import com.scortelemed.TipoOperacion
 import com.scortelemed.schemas.caser.*
 import com.scortelemed.schemas.caser.ConsultaExpedienteResponse.ExpedienteConsulta
 import com.scortelemed.schemas.caser.ResultadoReconocimientoMedicoResponse.Expediente
 import com.ws.enumeration.UnidadOrganizativa
 import com.ws.servicios.ICompanyService
+import grails.util.Holders
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
 import org.w3c.dom.Document
@@ -25,16 +25,13 @@ import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 import java.text.SimpleDateFormat
 
-import static grails.async.Promises.task
-
 class CaserService implements ICompanyService{
 
     TransformacionUtil util = new TransformacionUtil()
-    def grailsApplication
-    def logginService
-    def requestService
-    def expedienteService
-    def tarificadorService
+    def logginService = Holders.getGrailsApplication().mainContext.getBean("logginService")
+    def requestService = Holders.getGrailsApplication().mainContext.getBean("requestService")
+    def expedienteService = Holders.getGrailsApplication().mainContext.getBean("expedienteService")
+    def tarificadorService = Holders.getGrailsApplication().mainContext.getBean("tarificadorService")
     CorreoUtil correoUtil = new CorreoUtil()
 
 
@@ -67,7 +64,7 @@ class CaserService implements ICompanyService{
             dato.servicio = rellenaServicios(req)
             return dato
         } catch (Exception e) {
-            logginService.putError(e.toString())
+            logginService.putError("buildDatos",e.toString())
         }
     }
 

@@ -6,11 +6,10 @@ import com.scor.srpfileinbound.DATOS
 import com.scor.srpfileinbound.REGISTRODATOS
 import com.scortelemed.Company
 import com.scortelemed.Request
-import com.scortelemed.TipoOperacion
 import com.ws.lagunaro.beans.GestionReconocimientoMedicoRequest
 import com.ws.lagunaro.beans.TramitacionReconocimientoMedicoRequest
 import com.ws.servicios.ICompanyService
-import hwsol.webservices.CorreoUtil
+import grails.util.Holders
 import hwsol.webservices.TransformacionUtil
 import org.w3c.dom.Document
 import org.w3c.dom.Element
@@ -22,16 +21,12 @@ import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 import java.text.SimpleDateFormat
 
-import static grails.async.Promises.task
-
 class LagunaroService implements ICompanyService{
 
 	TransformacionUtil util = new TransformacionUtil()
-	def grailsApplication
-	def requestService
-	def expedienteService
-	def logginService
-	def tarificadorService
+	def requestService = Holders.grailsApplication.mainContext.getBean("requestService")
+	def logginService = Holders.grailsApplication.mainContext.getBean("logginService")
+
 
 	/**
 	 * LAGUNARO  (Beans, sin namespace)
@@ -60,7 +55,7 @@ class LagunaroService implements ICompanyService{
 			dato.coberturas = rellenaCoberturas(req)
 			return dato
 		} catch (Exception e) {
-			logginService.putError(e.toString())
+			logginService.putError("buildDatos",e.toString())
 		}
 	}
 

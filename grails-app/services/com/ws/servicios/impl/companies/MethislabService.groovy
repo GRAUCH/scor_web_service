@@ -6,11 +6,10 @@ import com.scor.srpfileinbound.DATOS
 import com.scor.srpfileinbound.REGISTRODATOS
 import com.scortelemed.Company
 import com.scortelemed.Request
-import com.scortelemed.TipoOperacion
 import com.scortelemed.schemas.methislab.*
 import com.scortelemed.schemas.methislab.MethislabUnderwrittingCasesResultsResponse.Expediente
 import com.ws.servicios.ICompanyService
-import hwsol.webservices.CorreoUtil
+import grails.util.Holders
 import hwsol.webservices.TransformacionUtil
 import hwsol.webservices.WsError
 import org.w3c.dom.Document
@@ -23,16 +22,12 @@ import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 import java.text.SimpleDateFormat
 
-import static grails.async.Promises.task
-
 class MethislabService implements ICompanyService{
 
     TransformacionUtil util = new TransformacionUtil()
-    def grailsApplication
-    def requestService
-    def expedienteService
-    def logginService
-    def tarificadorService
+    def requestService = Holders.grailsApplication.mainContext.getBean("requestService")
+    def logginService = Holders.grailsApplication.mainContext.getBean("logginService")
+    def tarificadorService = Holders.grailsApplication.mainContext.getBean("tarificadorService")
 
 
     String marshall(def objeto) {
@@ -60,7 +55,7 @@ class MethislabService implements ICompanyService{
             dato.coberturas = rellenaCoberturas(req)
             return dato
         } catch (Exception e) {
-            logginService.putError(e.toString())
+            logginService.putError("buildDatos",e.toString())
         }
     }
 

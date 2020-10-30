@@ -1,44 +1,34 @@
 package com.ws.servicios.impl.companies
 
-import com.scor.comprimirdocumentos.ParametrosEntrada
 import com.scor.global.ExceptionUtils
 import com.scor.global.WSException
 import com.scor.srpfileinbound.DATOS
 import com.scor.srpfileinbound.REGISTRODATOS
-import com.scortelemed.*
+import com.scortelemed.Agente
+import com.scortelemed.Company
+import com.scortelemed.Request
 import com.scortelemed.schemas.netinsurance.*
 import com.scortelemed.schemas.netinsurance.NetinsuranteGetDossierResponse.ExpedienteConsulta
 import com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCasesResultsResponse.Expediente
-import com.scortelemed.servicios.Candidato
-import com.scortelemed.servicios.Frontal
-import com.scortelemed.servicios.FrontalServiceLocator
-import com.ws.enumeration.UnidadOrganizativa
 import com.ws.servicios.ICompanyService
-import hwsol.webservices.CorreoUtil
+import grails.util.Holders
 import hwsol.webservices.TransformacionUtil
-import hwsol.webservices.ZipResponse
 import org.w3c.dom.Document
 import org.w3c.dom.Element
 import org.w3c.dom.Node
 import org.w3c.dom.NodeList
 import org.xml.sax.InputSource
-import servicios.RespuestaCRM
 
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 import java.text.SimpleDateFormat
 
-import static grails.async.Promises.task
-
 class NetinsuranceService implements ICompanyService{
 
 	TransformacionUtil util = new TransformacionUtil()
-	def logginService
-	def requestService
-	def expedienteService
-	def tarificadorService
-	def grailsApplication
-
+	def logginService = Holders.grailsApplication.mainContext.getBean("logginService")
+	def requestService = Holders.grailsApplication.mainContext.getBean("requestService")
+	def tarificadorService = Holders.grailsApplication.mainContext.getBean("tarificadorService")
 
 	String marshall(def objeto) {
 		String nameSpace = "http://www.scortelemed.com/schemas/netinsurance"
@@ -68,7 +58,7 @@ class NetinsuranceService implements ICompanyService{
 
 			return dato
 		} catch (Exception e) {
-			logginService.putError(e.toString())
+			logginService.putError("buildDatos",e.toString())
 		}
 	}
 
@@ -385,13 +375,7 @@ class NetinsuranceService implements ICompanyService{
 							datosRegistro.telefono1 = "999999999"
 						}
 					}
-                    log.info("***         Netinsurance           ***")
-					log.info("** Los telefonos que quedaron fueron: ")
-					log.info("Telefono1 :  ${datosRegistro.telefono1}")
-					log.info("Telefono2 :  ${datosRegistro.telefono2}")
-					log.info("Telefono3 :  ${datosRegistro.telefono3}")
-					log.info("***      Fin de los telefonos       ***")
-                    log.info("***         Netinsurance           ***")
+
 					/**CODIGO CIA
 					 *
 					 */
@@ -481,19 +465,20 @@ class NetinsuranceService implements ICompanyService{
 						Agente instituto = Agente.findByValor(eElement.getElementsByTagName("agency").item(0).getTextContent().toString())
 
 						if (instituto != null && instituto.getAgente() != null && !instituto.getAgente().isEmpty()) {
-
 							if (instituto.getAgente().length() > 20) {
 								datosRegistro.codigoAgencia = instituto.getAgente().substring(0, 19)
 							} else {
 								datosRegistro.codigoAgencia = instituto.getAgente()
 							}
-
 							datosRegistro.nomApellAgente = instituto.getAgente()
-
 						} else {
-
-							datosRegistro.codigoAgencia = eElement.getElementsByTagName("agency").item(0).getTextContent().toString()
-							datosRegistro.nomApellAgente = eElement.getElementsByTagName("agency").item(0).getTextContent().toString()
+							String agente = eElement.getElementsByTagName("agency").item(0).getTextContent().toString()
+							if (agente.length() > 20) {
+								datosRegistro.codigoAgencia = agente.substring(0, 19)
+							} else {
+								datosRegistro.codigoAgencia = agente
+							}
+							datosRegistro.nomApellAgente = agente
 						}
 
 					} else {
