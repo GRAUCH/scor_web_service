@@ -14,6 +14,7 @@ import com.ws.servicios.ICompanyService
 import com.ws.servicios.IExpedienteService
 import grails.transaction.Transactional
 import grails.util.Environment
+import grails.util.Holders
 import hwsol.webservices.CorreoUtil
 import servicios.ClaveFiltro
 import servicios.Expediente
@@ -28,15 +29,15 @@ import static grails.async.Promises.task
 @Transactional
 class ExpedienteService implements IExpedienteService {
 
-    def logginService
-    def requestService
-    def tarificadorService
-    def grailsApplication
+    def logginService = Holders.grailsApplication.mainContext.getBean("logginService")
+    def requestService = Holders.grailsApplication.mainContext.getBean("requestService")
+
+    def grailsApplication = Holders.getGrailsApplication()
     CorreoUtil correoUtil = new CorreoUtil()
     ICompanyService companyService
 
 
-    def consultaExpediente(pais,filtro) {
+    def consultaExpediente(UnidadOrganizativa pais, Filtro filtro) {
         try {
             def ctx = grailsApplication.mainContext
             def bean = ctx.getBean("soapClientAlptis")
@@ -177,7 +178,7 @@ class ExpedienteService implements IExpedienteService {
             listadoFinal.add(buildPie(null))
             payload.cabeceraOrDATOSOrPIE = listadoFinal
         } catch (Exception e) {
-           logginService.putError("Error en el metodo crearExpedienteBPM: " + e)
+           logginService.putError("crearExpedienteBPM","Error en el metodo crearExpedienteBPM: " + e)
         }
         return payload
     }
@@ -205,7 +206,7 @@ class ExpedienteService implements IExpedienteService {
         return pie
     }
 
-    Usuario obtenerUsuarioFrontal(unidadOrganizativa) {
+    Usuario obtenerUsuarioFrontal(UnidadOrganizativa unidadOrganizativa) {
 
         def usuario = new Usuario()
         switch(unidadOrganizativa) {
@@ -256,37 +257,35 @@ class ExpedienteService implements IExpedienteService {
 
     def busquedaCrm(Request requestBBDD, Company company, String requestNumber, String certificateNumber, String policyNumber) {
         task {
+
             String opername = "ExpedienteService BusquedaCrm"
             String logExpediente = getLogExpediente(policyNumber, requestNumber, certificateNumber, company.codigoSt)
             logginService.putInfoMessage(opername+" - Buscando en CRM solicitud de "+logExpediente)
             RespuestaCRM respuestaCrm
-            int limite = 0
+            int limite = 1
             boolean encontrado = false
             SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd")
             Filtro filtro = getFiltradoCRM(policyNumber, requestNumber, certificateNumber, company.codigoSt)
-            Thread.sleep(90000)
+            Thread.currentThread().sleep(25000)
 
             try {
-                while( !encontrado && limite < 10) {
+                while( !encontrado && limite < 20) {
+                    Thread.currentThread().sleep(5000)
                     respuestaCrm = consultaExpediente(company.ou, filtro)
-
                     if (respuestaCrm != null && respuestaCrm.getListaExpedientes() != null && respuestaCrm.getListaExpedientes().size() > 0) {
-                        for (int i = 0; i < respuestaCrm.getListaExpedientes().size(); i++) {
-                            Expediente exp = respuestaCrm.getListaExpedientes().get(i)
+                        for (Expediente exp: respuestaCrm.getListaExpedientes()) {
                             logginService.putInfoMessage(opername+" - Expediente encontrado: " + exp.getCodigoST() + " para " + company.nombre)
 
                             String fechaCreacion = format.format(new Date())
                             if (exp.getCandidato() != null && exp.getCandidato().getCompanya() != null && exp.getCandidato().getCompanya().getCodigoST().equals(company.codigoSt) &&
-                                    exp.getNumSolicitud() != null && exp.getNumSolicitud() != null && exp.getNumSolicitud().equals(requestNumber)
-                                    && fechaCreacion != null && fechaCreacion.equals(exp.getFechaApertura())){
+                                    fechaCreacion != null && fechaCreacion.equals(exp.getFechaApertura())){
                                 /**Alta procesada correctamente*/
                                 encontrado = true
-                                logginService.putInfoMessage(opername+" - Nueva alta automatica de "+logExpediente+" procesada correctamente")
+                                logginService.putInfoMessage(opername+" - Nueva alta automatica de "+logExpediente+" procesada correctamente. Verificado tras "+limite+" intentos")
                             }
                         }
                     }
                     limite++
-                    Thread.sleep(10000)
                 }
 
                 /**Alta procesada pero no se ha encontrado en CRM.*/
@@ -317,12 +316,11 @@ class ExpedienteService implements IExpedienteService {
     }
 
     private Filtro getFiltradoCRM(String numPoliza, String numSolicitud, String numCertificado, String codigoStCompany) {
+        Filtro filtro = new Filtro()
         if(numPoliza) {
-            Filtro filtro = new Filtro()
             filtro.setClave(ClaveFiltro.NUM_POLIZA)
             filtro.setValor(numPoliza)
         } else if(codigoStCompany && numSolicitud) {
-            Filtro filtro = new Filtro()
             filtro.setClave(ClaveFiltro.CLIENTE)
             filtro.setValor(codigoStCompany)
             Filtro filtroRelacionado = new Filtro()
@@ -336,5 +334,6 @@ class ExpedienteService implements IExpedienteService {
             }
             filtro.setFiltroRelacionado(filtroRelacionado)
         }
+        return filtro
     }
 }

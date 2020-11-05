@@ -6,12 +6,11 @@ import com.scor.srpfileinbound.DATOS
 import com.scor.srpfileinbound.REGISTRODATOS
 import com.scortelemed.Company
 import com.scortelemed.Request
-import com.scortelemed.TipoOperacion
 import com.scortelemed.schemas.nn.GestionReconocimientoMedicoRequest
 import com.scortelemed.schemas.nn.ResultadoReconocimientoMedicoRequest
 import com.ws.servicios.ICompanyService
 import grails.transaction.Transactional
-import hwsol.webservices.CorreoUtil
+import grails.util.Holders
 import hwsol.webservices.WsError
 import org.w3c.dom.Document
 import org.w3c.dom.Element
@@ -23,16 +22,11 @@ import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 import java.text.SimpleDateFormat
 
-import static grails.async.Promises.task
-
 @Transactional
 class NnService implements ICompanyService{
 
-    def logginService
-    def requestService
-    def expedienteService
-    def grailsApplication
-
+    def logginService = Holders.grailsApplication.mainContext.getBean("logginService")
+    def requestService = Holders.grailsApplication.mainContext.getBean("requestService")
 
     String marshall(def objeto) {
         String nameSpace = "http://www.scortelemed.com/schemas/nn"
@@ -59,7 +53,7 @@ class NnService implements ICompanyService{
             dato.coberturas = rellenaCoberturas(req)
             return dato
         } catch (Exception e) {
-            logginService.putError(e.toString())
+            logginService.putError("buildDatos",e.toString())
         }
     }
 

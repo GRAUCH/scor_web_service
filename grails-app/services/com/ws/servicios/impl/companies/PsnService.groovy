@@ -5,13 +5,14 @@ import com.scor.global.ExceptionUtils
 import com.scor.global.WSException
 import com.scor.srpfileinbound.DATOS
 import com.scor.srpfileinbound.REGISTRODATOS
-import com.scortelemed.*
+import com.scortelemed.Company
+import com.scortelemed.Request
 import com.scortelemed.schemas.psn.*
 import com.scortelemed.schemas.psn.ConsultaDocumentoResponse.Documento
 import com.scortelemed.schemas.psn.ResultadoReconocimientoMedicoResponse.Expediente
 import com.scortelemed.servicios.TipoSexo
 import com.ws.servicios.ICompanyService
-import hwsol.webservices.CorreoUtil
+import grails.util.Holders
 import hwsol.webservices.TransformacionUtil
 import hwsol.webservices.WsError
 import org.w3c.dom.Document
@@ -25,16 +26,12 @@ import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 import java.text.SimpleDateFormat
 
-import static grails.async.Promises.task
-
 class PsnService implements ICompanyService{
 
 	TransformacionUtil util = new TransformacionUtil()
-	def logginService
-	def requestService
-	def expedienteService
-	def tarificadorService
-	def grailsApplication
+	def logginService = Holders.grailsApplication.mainContext.getBean("logginService")
+	def requestService = Holders.grailsApplication.mainContext.getBean("requestService")
+	def tarificadorService = Holders.grailsApplication.mainContext.getBean("tarificadorService")
 	ContentResult contentResult = new ContentResult()
 
 
@@ -69,7 +66,7 @@ class PsnService implements ICompanyService{
 			dato.coberturas = rellenaCoberturas(req)
 			return dato
 		} catch (Exception e) {
-			logginService.putError(e.toString())
+			logginService.putError("buildDatos",e.toString())
 		}
 	}
 

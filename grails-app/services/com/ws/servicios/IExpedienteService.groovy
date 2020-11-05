@@ -10,7 +10,7 @@ import servicios.Usuario
 
 interface IExpedienteService {
 
-    def consultaExpediente(pais, filtro)
+    def consultaExpediente(UnidadOrganizativa pais, Filtro filtro)
     def consultaExpedienteCodigoST(String codigoST, UnidadOrganizativa pais)
     def consultaExpedienteNumSolicitud(String requestNumber, UnidadOrganizativa pais, String codigoST)
     def obtenerInformeExpedientes(String companya, String servicioScor, Integer estado, String fechaIni, String fechaFin, UnidadOrganizativa pais)
@@ -18,6 +18,6 @@ interface IExpedienteService {
     def modificaExpediente(UnidadOrganizativa pais, Expediente expediente, def servicioScorList, def paqueteScorList)
     boolean crearExpediente(Request req, TipoCompany comp)
     def busquedaCrm(Request requestBBDD, Company company, String requestNumber, String certificateNumber, String policyNumber)
-    Usuario obtenerUsuarioFrontal(unidadOrganizativa)
+    Usuario obtenerUsuarioFrontal(UnidadOrganizativa unidadOrganizativa)
 
 }
