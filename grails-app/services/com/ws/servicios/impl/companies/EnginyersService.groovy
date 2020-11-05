@@ -5,13 +5,10 @@ import com.scor.global.WSException
 import com.scor.srpfileinbound.DATOS
 import com.scor.srpfileinbound.REGISTRODATOS
 import com.scortelemed.Company
-import com.scortelemed.Recibido
 import com.scortelemed.Request
-import com.scortelemed.TipoOperacion
 import com.scortelemed.schemas.enginyers.AddExp
 import com.ws.servicios.ICompanyService
 import grails.util.Environment
-import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
 import hwsol.webservices.WsError
 import org.w3c.dom.Document
@@ -23,8 +20,6 @@ import org.xml.sax.InputSource
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 import java.text.SimpleDateFormat
-
-import static grails.async.Promises.task
 
 class EnginyersService implements ICompanyService{
 
@@ -58,7 +53,7 @@ class EnginyersService implements ICompanyService{
             dato.coberturas = rellenaCoberturas(req)
             return dato
         } catch (Exception e) {
-            logginService.putError(e.toString())
+            logginService.putError("buildDatos",e.toString())
         }
     }
 

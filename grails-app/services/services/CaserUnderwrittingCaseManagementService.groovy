@@ -82,7 +82,7 @@ class CaserUnderwrittingCaseManagementService {
 
 //Chequeo si existe el expediente.
 
-                    expedientes = caserService.existeExpediente(gestionReconocimientoMedico.policyHolderInformation.requestNumber, company.nombre, company.codigoSt, company.ou.toString())
+                    expedientes = caserService.existeExpediente(gestionReconocimientoMedico.policyHolderInformation.requestNumber, company.nombre, company.codigoSt, company.ou)
                     if(expedientes != null)
                     logginService.putInfoMessage("Exisiten ${expedientes.size()}  con numero de solicitud " + gestionReconocimientoMedico.policyHolderInformation.requestNumber)
                     if (expedientes != null && expedientes.size() == 0) {
@@ -175,7 +175,7 @@ class CaserUnderwrittingCaseManagementService {
 
                         expedientes.each { expedientePoliza ->
 
-                            resultado.getExpediente().add(caserService.rellenaDatosSalida(expedientePoliza, resultadoReconocimientoMedico.dateStart, logginService))
+                            resultado.getExpediente().add(caserService.rellenaDatosSalida(expedientePoliza, resultadoReconocimientoMedico.dateStart))
                         }
 
                         notes = "Resultados devueltos"

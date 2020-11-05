@@ -5,12 +5,16 @@ import com.scor.global.WSException
 import com.scor.global.ZipUtils
 import com.scor.srpfileinbound.DATOS
 import com.scor.srpfileinbound.REGISTRODATOS
-import com.scortelemed.*
+import com.scortelemed.Company
+import com.scortelemed.Conf
+import com.scortelemed.Request
 import com.scortelemed.schemas.cbpita.*
 import com.scortelemed.servicios.Candidato
 import com.scortelemed.servicios.Frontal
 import com.scortelemed.servicios.FrontalServiceLocator
+import com.ws.enumeration.UnidadOrganizativa
 import com.ws.servicios.ICompanyService
+import grails.util.Holders
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
 import hwsol.webservices.WsError
@@ -27,16 +31,12 @@ import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 import java.text.SimpleDateFormat
 
-import static grails.async.Promises.task
-
 class CbpitaService implements ICompanyService{
 
     TransformacionUtil util = new TransformacionUtil()
-    def grailsApplication
-    def requestService
-    def expedienteService
-    def logginService
-    def tarificadorService
+    def requestService = Holders.grailsApplication.mainContext.getBean("requestService")
+    def expedienteService = Holders.grailsApplication.mainContext.getBean("expedienteService")
+    def logginService = Holders.grailsApplication.mainContext.getBean("logginService")
     ZipUtils zipUtils = new ZipUtils()
     CorreoUtil correoUtil = new CorreoUtil()
 
@@ -66,7 +66,7 @@ class CbpitaService implements ICompanyService{
             dato.coberturas = rellenaCoberturas(req)
             return dato
         } catch (Exception e) {
-            logginService.putError(e.toString())
+            logginService.putError("buildDatos",e.toString())
         }
     }
 
@@ -98,26 +98,16 @@ class CbpitaService implements ICompanyService{
         return frontal
     }
 
-    List<servicios.Expediente> existeExpediente(String numPoliza, String nombreCia, String companyCodigoSt, String ou) {
+    List<servicios.Expediente> existeExpediente(String numPoliza, String nombreCia, String companyCodigoSt, UnidadOrganizativa ou) {
 
         logginService.putInfoMessage("Buscando si existe expediente con numero de poliza " + numPoliza + " para " + nombreCia)
 
-        servicios.Filtro filtro = new servicios.Filtro()
         List<servicios.Expediente> expedientes = new ArrayList<servicios.Expediente>()
         RespuestaCRM respuestaCrm
 
         try {
 
-            filtro.setClave(servicios.ClaveFiltro.CLIENTE)
-            filtro.setValor(companyCodigoSt.toString())
-
-            servicios.Filtro filtroRelacionado1 = new servicios.Filtro()
-            filtroRelacionado1.setClave(servicios.ClaveFiltro.NUM_SOLICITUD)
-            filtroRelacionado1.setValor(numPoliza.toString())
-
-            filtro.setFiltroRelacionado(filtroRelacionado1)
-
-            respuestaCrm = expedienteService.consultaExpediente(ou, filtro)
+            respuestaCrm = expedienteService.consultaExpedienteNumSolicitud(numPoliza, ou, companyCodigoSt)
 
             if (respuestaCrm != null && respuestaCrm.getListaExpedientes() != null && respuestaCrm.getListaExpedientes().size() > 0) {
 
@@ -781,7 +771,7 @@ class CbpitaService implements ICompanyService{
         }
     }
 
-    def rellenaDatosSalidaConsulta(servicios.ExpedienteInforme expedientePoliza, codigoSt, requestDate, String zipPath, String user, String password) {
+    def rellenaDatosSalidaConsulta(servicios.ExpedienteInforme expedientePoliza, String codigoSt, def requestDate, String zipPath, String user, String password) {
 
         CbpitaUnderwrittingCasesResultsResponse.Expediente expediente = new CbpitaUnderwrittingCasesResultsResponse.Expediente()
 
@@ -983,22 +973,26 @@ class CbpitaService implements ICompanyService{
     }
 
 
-    String codificarAgente(String agente) {
+    String codificarAgente(String agente, boolean substring) {
+        String salida = agente
 
         switch (agente) {
 
-            case "300.CBPPIT": return "PITAGORA"
-            case "300.CBPSPE": return "SPEFIN"
-            case "300.CBPPRO": return "BANCA PROGETTO"
-            case "300.CBPWEF": return "WE FINANCE"
-            case "300.CBPRAC": return "RACES"
-            case "300.CBPSIR": return "SIRIOFIN"
-            case "300.CBPDYN": return "DYNAMICA RETAIL"
-            case "300.CBPCOF": return "COFIDIS"
-            case "300.CBPBPF": return "BANCA POPOLARE DEL FRUSINATE"
+            case "300.CBPPIT": salida = "PITAGORA"; break
+            case "300.CBPSPE": salida ="SPEFIN"; break
+            case "300.CBPPRO": salida ="BANCA PROGETTO"; break
+            case "300.CBPWEF": salida ="WE FINANCE"; break
+            case "300.CBPRAC": salida ="RACES"; break
+            case "300.CBPSIR": salida ="SIRIOFIN"; break
+            case "300.CBPDYN": salida ="DYNAMICA RETAIL"; break
+            case "300.CBPCOF": salida ="COFIDIS"; break
+            case "300.CBPBPF": salida ="BANCA POPOLARE DEL FRUSINATE"; break
 
-            default:
-                return agente
+        }
+        if(salida.length() > 20 && substring) {
+            return salida.substring(0,19)
+        } else {
+            return salida
         }
     }
 

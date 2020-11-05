@@ -6,11 +6,10 @@ import com.scor.srpfileinbound.DATOS
 import com.scor.srpfileinbound.REGISTRODATOS
 import com.scortelemed.Company
 import com.scortelemed.Request
-import com.scortelemed.TipoOperacion
 import com.scortelemed.schemas.simplefr.SimplefrUnderwrittingCaseManagementRequest
 import com.scortelemed.schemas.simplefr.SimplefrUnderwrittingCasesResultsRequest
 import com.ws.servicios.ICompanyService
-import hwsol.webservices.CorreoUtil
+import grails.util.Holders
 import hwsol.webservices.TransformacionUtil
 import org.w3c.dom.Document
 import org.w3c.dom.Element
@@ -20,17 +19,11 @@ import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 import java.text.SimpleDateFormat
 
-import static grails.async.Promises.task
-
 class SimplefrService implements ICompanyService{
 
 	TransformacionUtil util = new TransformacionUtil()
-	def logginService
-	def requestService
-	def expedienteService
-	def tarificadorService
-	def grailsApplication
-
+	def logginService = Holders.grailsApplication.mainContext.getBean("logginService")
+	def requestService = Holders.grailsApplication.mainContext.getBean("requestService")
 
 	String marshall(def objeto) {
 		String nameSpace = "http://www.scortelemed.com/schemas/simplefr"
@@ -57,7 +50,7 @@ class SimplefrService implements ICompanyService{
 			dato.coberturas = rellenaCoberturas(req)
 			return dato
 		} catch (Exception e) {
-			logginService.putError(e.toString())
+			logginService.putError("buildDatos",e.toString())
 		}
 	}
 

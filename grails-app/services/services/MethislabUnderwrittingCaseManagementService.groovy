@@ -184,7 +184,7 @@ class MethislabUnderwrittingCaseManagementService {
 
 					if(expedientes){
 						expedientes.each { expedientePoliza ->
-							resultado.getExpediente().add(methislabService.rellenaDatosSalidaConsulta(expedientePoliza, methislabUnderwrittingCasesResults.dateStart, logginService))
+							resultado.getExpediente().add(methislabService.rellenaDatosSalidaConsulta(expedientePoliza, methislabUnderwrittingCasesResults.dateStart))
 						}
 						messages = "Risultati restituiti"
 						status = StatusType.OK

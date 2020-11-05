@@ -16,6 +16,7 @@ import com.scortelemed.schemas.ama.ResultadoSiniestroResponse.Expediente.Siniest
 import com.scortelemed.schemas.ama.ResultadoSiniestroResponse.Expediente.Siniestro.Provision
 import com.scortelemed.servicios.TipoSexo
 import com.ws.servicios.ICompanyService
+import grails.util.Holders
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
 import org.w3c.dom.Document
@@ -29,16 +30,12 @@ import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 import java.text.SimpleDateFormat
 
-import static grails.async.Promises.task
 
 class AmaService implements ICompanyService{
 
 	TransformacionUtil util = new TransformacionUtil()
-	def requestService
-	def expedienteService
-	def logginService
-	def tarificadorService
-	def grailsApplication
+	def requestService = Holders.grailsApplication.mainContext.getBean("requestService")
+	def logginService = Holders.grailsApplication.mainContext.getBean("logginService")
 	ContentResult contentResult = new ContentResult()
 
 	String marshall(def objeto) {
@@ -72,7 +69,7 @@ class AmaService implements ICompanyService{
 			dato.pregunta = rellenaPreguntas(req)
 			return dato
 		} catch (Exception e) {
-			logginService.putError(e.toString())
+			logginService.putError("buildDatos",e.toString())
 		}
 	}
 
@@ -110,10 +107,10 @@ class AmaService implements ICompanyService{
 					codigoCiaAma = eElement.getElementsByTagName("ciaCode").item(0).getTextContent()
 					if (codigoCiaAma != null && !codigoCiaAma.isEmpty()){
 						if (codigoCiaAma.equals("C0803")){
-							codigoCia = Company.findByNombre(TipoCompany.AMA_VIDA.nombre)
+							codigoCia = Company.findByNombre(TipoCompany.AMA_VIDA.nombre).codigoSt
 						}
 						if (codigoCiaAma.equals("M0328")){
-							codigoCia = Company.findByNombre(TipoCompany.AMA.nombre)
+							codigoCia = Company.findByNombre(TipoCompany.AMA.nombre).codigoSt
 						}
 					}
 				}
