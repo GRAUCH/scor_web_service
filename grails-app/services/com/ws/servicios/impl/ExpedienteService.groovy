@@ -133,6 +133,13 @@ class ExpedienteService implements IExpedienteService {
         }
     }
 
+    def informeExpedienteCodigoST(String codigoST, UnidadOrganizativa pais) {
+        Filtro filtro = new Filtro()
+        filtro.setClave(ClaveFiltro.EXPEDIENTE)
+        filtro.setValor(codigoST)
+        return consultaExpediente(pais, filtro)?.getListaExpedientes()
+    }
+
     def modificaExpediente(UnidadOrganizativa pais, Expediente expediente, def servicioScorList, def paqueteScorList) {
         try {
             def ctx = grailsApplication.mainContext
