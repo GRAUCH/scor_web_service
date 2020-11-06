@@ -37,7 +37,6 @@ class AfiEscaUnderwrittingCasesResultsService {
 	def expedienteService
 	def estadisticasService
 	def logginService
-	IComprimidoService zipService = ServiceFactory.getComprimidoImpl(TipoCompany.AFI_ESCA)
 
 
 	@WebResult(name = "AfiEscaUnderwrittingCasesResultsResponse")
@@ -50,6 +49,7 @@ class AfiEscaUnderwrittingCasesResultsService {
 		def requestXML = ""
 		def expedientes
 		Request requestBBDD
+		IComprimidoService zipService = ServiceFactory.getComprimidoImpl(TipoCompany.AFI_ESCA)
 		def company = Company.findByNombre(TipoCompany.AFI_ESCA.getNombre())
 		
 		AfiEscaUnderwrittingCasesResultsResponse result=new AfiEscaUnderwrittingCasesResultsResponse()

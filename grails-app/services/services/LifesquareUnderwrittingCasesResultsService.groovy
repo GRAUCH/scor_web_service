@@ -40,7 +40,6 @@ class LifesquareUnderwrittingCasesResultsService {
 	def expedienteService
 	def estadisticasService
 	def logginService
-	IComprimidoService zipService = ServiceFactory.getComprimidoImpl(TipoCompany.ZEN_UP)
 
 
 	@WebResult(name = "LifesquareUnderwrittingCasesResultsResponse")
@@ -54,6 +53,7 @@ class LifesquareUnderwrittingCasesResultsService {
 		def requestXML = ""
 		Request requestBBDD
 		def expedientes
+		IComprimidoService zipService = ServiceFactory.getComprimidoImpl(TipoCompany.ZEN_UP)
 		def company = Company.findByNombre(TipoCompany.ZEN_UP.getNombre())
 		
 		LifesquareUnderwrittingCasesResultsResponse result=new LifesquareUnderwrittingCasesResultsResponse()
@@ -91,7 +91,7 @@ class LifesquareUnderwrittingCasesResultsService {
 						def tuwCases=new TuwCase() 
 						tuwCases.policy_number=item.numSolicitud
 						tuwCases.reference_number=item.numPoliza
-						tuwCases.zip=zipService.obtenerZip(item.nodoAlfresco)
+						tuwCases.zip=zipService.obtenerZip((String)item.nodoAlfresco)
 						listTuwCases.add(tuwCases)
 					}
 				
