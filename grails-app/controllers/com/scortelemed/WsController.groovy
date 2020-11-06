@@ -95,7 +95,7 @@ class WsController {
             if (resulExpedienteSoap && resulExpedienteSoap.size() > 0) {
                 resulExpedienteSoap.each { item ->
                     if (item && item.nodoAlfresco) {
-                        logginService.putInfoMessage("Obteniendo comprimido para expediente: " + item.getCodigoST() + " con numero de poliza: " + item.getNumPoliza())
+                        logginService.putInfoMessage("Obteniendo comprimido para expediente: " + item?.getCodigoST() + " con numero de poliza: " + item.getNumPoliza())
                         def comprimido = zipService.obtenerZip(item.nodoAlfresco)
 
                         if (comprimido) {
@@ -247,7 +247,7 @@ class WsController {
                     if (cal.getTime().after(fechaSalida) || cal.getTime().equals(fechaSalida)) {
 
                         def wpers = transformacion.transformarCodigoCliente(expediente.getObservaciones())
-                        def numeroSolicitud = expediente.getNumSolicitud()
+                        def numeroSolicitud = expediente?.getNumSolicitud()
                         def producto = expediente.getProducto().getCodigoProductoCompanya()
                         def ramo = transformacion.transformarRamo(expediente.getProducto().getCodigoProductoCompanya())
                         estadoCausa = transformacion.transformarTipoCausaTerminacion(expediente.getCodigoEstado(), expediente.getMotivoAnulacion())
@@ -307,10 +307,10 @@ class WsController {
                                     if (codigoCobertura != "10001" && codigoCobertura != "10002") {
 
                                         try {
-                                            cober = transformacion.devolverCoberturaCm(codigoCobertura, i, expediente.getNumSolicitud())
+                                            cober = transformacion.devolverCoberturaCm(codigoCobertura, i, expediente?.getNumSolicitud())
                                         } catch (Exception ex) {
                                             excluirDelEnvio = true
-                                            logginService.putInfoMessage("Expediente " + expediente.getCodigoST() + " no tiene tarificacion para la cobertura: " + i.getNombreCobertura() + ". Se excluye del envio")
+                                            logginService.putInfoMessage("Expediente " + expediente?.getCodigoST() + " no tiene tarificacion para la cobertura: " + i.getNombreCobertura() + ". Se excluye del envio")
 
                                         }
 
@@ -387,16 +387,16 @@ class WsController {
                                 Envio envio = new Envio()
                                 envio.setFecha(new Date())
                                 envio.setCia(company.id.toString())
-                                envio.setIdentificador(expediente.getNumSolicitud())
+                                envio.setIdentificador(expediente?.getNumSolicitud())
                                 envio.setInfo(response.getText().trim())
                                 envio.save(flush: true)
-                                logginService.putInfoMessage("Informacion expediente " + expediente.getCodigoST() + " enviado a " + company.nombre + " correctamente")
+                                logginService.putInfoMessage("Informacion expediente " + expediente?.getCodigoST() + " enviado a " + company.nombre + " correctamente")
                             }
 
 
                         } else {
 
-                            logginService.putInfoMessage("Expediente " + expediente.getCodigoST() + " no cumple con ningun estado de notificacion")
+                            logginService.putInfoMessage("Expediente " + expediente?.getCodigoST() + " no cumple con ningun estado de notificacion")
 
                         }
                     }
@@ -599,12 +599,12 @@ class WsController {
                     try {
 
                         expediente = expedientes.get(i)
-                        logginService.putInfoMessage(" ** Comienzo el proceso para el dossier: ${expediente.getNumSolicitud()} de AMA**")
+                        logginService.putInfoMessage(" ** Comienzo el proceso para el dossier: ${expediente?.getNumSolicitud()} de AMA**")
                         if (!amaService.seExcluyeEnvio(expediente)) {
-                            identificadorCaso = expediente.getNumSolicitud()
+                            identificadorCaso = expediente?.getNumSolicitud()
                             files = new ArrayList<File>()
                             listaBenefitInformation = new ArrayList<BenefitInformation>()
-                            dossier.setDossierCode(expediente.getNumSolicitud())
+                            dossier.setDossierCode(expediente?.getNumSolicitud())
                             dossier.setResultsCode("OK")
                             dossier.setState((short) 1)
 
@@ -630,11 +630,11 @@ class WsController {
                             com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.Company cia = new com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.Company()
 
 
-                            if (expediente.getCandidato() != null && expediente.getCandidato().getCompanya() != null && expediente.getCandidato().getCompanya().getCodigoST().equals("1064")) {
+                            if (expediente.getCandidato() != null && expediente.getCandidato().getCompanya() != null && expediente.getCandidato().getCompanya()?.getCodigoST().equals("1064")) {
                                 cia.setCompanyCode("C0803")
                                 cia.setCompanyDescription("A.M.A. Vida")
                             }
-                            if (expediente.getCandidato() != null && expediente.getCandidato().getCompanya() != null && expediente.getCandidato().getCompanya().getCodigoST().equals("1059")) {
+                            if (expediente.getCandidato() != null && expediente.getCandidato().getCompanya() != null && expediente.getCandidato().getCompanya()?.getCodigoST().equals("1059")) {
                                 cia.setCompanyCode("M0328")
                                 cia.setCompanyDescription("A.M.A.")
                             }
@@ -843,13 +843,13 @@ class WsController {
                                     com.scortelemed.Envio envio = new com.scortelemed.Envio()
                                     envio.setFecha(new Date())
                                     envio.setCia(company.id.toString())
-                                    envio.setIdentificador(expediente.getNumSolicitud())
+                                    envio.setIdentificador(expediente?.getNumSolicitud())
                                     envio.setInfo("Estado: " + expediente.getCodigoEstado().toString() + "-Respuesta: " + respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localDescriptionResultList[0])
                                     envio.save(flush: true)
 
-                                    logginService.putInfoMessage("Informacion de salida de expediente " + expediente.getCodigoST() + ". Codigo AMA: " + expediente.getNumSolicitud())
-                                    logginService.putInfoMessage("Respuesta desde AMA al envio de informacion para expediente " + expediente.getCodigoST() + ". " + respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localDescriptionResultList[0])
-                                    logginService.putInfoMessage("Informacion expediente " + expediente.getCodigoST() + " enviado a " + company.nombre + " correctamente")
+                                    logginService.putInfoMessage("Informacion de salida de expediente " + expediente?.getCodigoST() + ". Codigo AMA: " + expediente?.getNumSolicitud())
+                                    logginService.putInfoMessage("Respuesta desde AMA al envio de informacion para expediente " + expediente?.getCodigoST() + ". " + respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localDescriptionResultList[0])
+                                    logginService.putInfoMessage("Informacion expediente " + expediente?.getCodigoST() + " enviado a " + company.nombre + " correctamente")
 
                                 } else if (respuestaCRM != null && respuestaCRM.localSaveDossierResultsResponse != null && respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT() != null && respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localTypeResult.equals("ERROR")) {
 
@@ -862,9 +862,9 @@ class WsController {
                                     error.setError("Peticion no realizada para solicitud: " + identificadorCaso + ". Error: " + respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localDescriptionResultList[0])
                                     error.save(flush: true)
 
-                                    logginService.putInfoMessage("Informacion de salida de expediente " + expediente.getCodigoST() + ". Codigo AMA: " + expediente.getNumSolicitud())
-                                    logginService.putInfoMessage("Respuesta desde AMA al envio de informacion para expediente " + expediente.getCodigoST() + ". ERROR:" + respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localDescriptionResultList[0])
-                                    logginService.putInfoMessage("Informacion expediente " + expediente.getCodigoST() + " no enviado a " + company.nombre + " correctamente")
+                                    logginService.putInfoMessage("Informacion de salida de expediente " + expediente?.getCodigoST() + ". Codigo AMA: " + expediente?.getNumSolicitud())
+                                    logginService.putInfoMessage("Respuesta desde AMA al envio de informacion para expediente " + expediente?.getCodigoST() + ". ERROR:" + respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localDescriptionResultList[0])
+                                    logginService.putInfoMessage("Informacion expediente " + expediente?.getCodigoST() + " no enviado a " + company.nombre + " correctamente")
 
                                 } else {
 
@@ -877,9 +877,9 @@ class WsController {
                                     error.setError("Peticion no realizada para solicitud: " + identificadorCaso + ". Error: desconocido")
                                     error.save(flush: true)
 
-                                    logginService.putInfoMessage("Informacion de salida de expediente " + expediente.getCodigoST() + ". Codigo AMA: " + expediente.getNumSolicitud())
-                                    logginService.putInfoMessage("Respuesta desde AMA al envio de informacion para expediente " + expediente.getCodigoST() + ". ERROR: Desconocido")
-                                    logginService.putInfoMessage("IInformacion expediente " + expediente.getCodigoST() + " no enviado a " + company.nombre + " correctamente")
+                                    logginService.putInfoMessage("Informacion de salida de expediente " + expediente?.getCodigoST() + ". Codigo AMA: " + expediente?.getNumSolicitud())
+                                    logginService.putInfoMessage("Respuesta desde AMA al envio de informacion para expediente " + expediente?.getCodigoST() + ". ERROR: Desconocido")
+                                    logginService.putInfoMessage("IInformacion expediente " + expediente?.getCodigoST() + " no enviado a " + company.nombre + " correctamente")
 
                                 }
                                 logginService.putInfoMessage("** TERMINO PROCESO **")
@@ -896,14 +896,14 @@ class WsController {
                         error.setOperacion("ENVIO")
                         if (respuestaCRM != null && respuestaCRM.localSaveDossierResultsResponse != null && respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT() != null && respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localTypeResult.equals("ERROR")) {
                             error.setError("Peticion no realizada para solicitud: " + identificadorCaso + ". Error: " + respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localDescriptionResultList[0])
-                            logginService.putInfoMessage("Informacion de salida de expediente " + expediente.getCodigoST() + ". Codigo AMA: " + expediente.getNumSolicitud())
-                            logginService.putInfoMessage("Respuesta desde AMA al envio de informacion para expediente " + expediente.getCodigoST() + ". ERROR: " + respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localDescriptionResultList[0])
-                            logginService.putInfoMessage("Informacion expediente " + expediente.getCodigoST() + " no enviado a " + company.nombre)
+                            logginService.putInfoMessage("Informacion de salida de expediente " + expediente?.getCodigoST() + ". Codigo AMA: " + expediente?.getNumSolicitud())
+                            logginService.putInfoMessage("Respuesta desde AMA al envio de informacion para expediente " + expediente?.getCodigoST() + ". ERROR: " + respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localDescriptionResultList[0])
+                            logginService.putInfoMessage("Informacion expediente " + expediente?.getCodigoST() + " no enviado a " + company.nombre)
                         } else {
                             error.setError("Peticion no realizada para solicitud: " + identificadorCaso + ". Error: " + ex.getMessage())
-                            logginService.putInfoMessage("Informacion de salida de expediente " + expediente.getCodigoST() + ". Codigo AMA: " + expediente.getNumSolicitud())
-                            logginService.putInfoMessage("Respuesta desde AMA al envio de informacion para expediente " + expediente.getCodigoST() + ". ERROR: " + ex.getMessage())
-                            logginService.putInfoMessage("Informacion expediente " + expediente.getCodigoST() + " no enviado a " + company.nombre)
+                            logginService.putInfoMessage("Informacion de salida de expediente " + expediente?.getCodigoST() + ". Codigo AMA: " + expediente?.getNumSolicitud())
+                            logginService.putInfoMessage("Respuesta desde AMA al envio de informacion para expediente " + expediente?.getCodigoST() + ". ERROR: " + ex.getMessage())
+                            logginService.putInfoMessage("Informacion expediente " + expediente?.getCodigoST() + " no enviado a " + company.nombre)
                         }
                         error.save(flush: true)
                         flash.message = "KO - Ver logs"
