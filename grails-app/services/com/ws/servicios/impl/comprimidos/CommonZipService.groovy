@@ -43,7 +43,4 @@ class CommonZipService implements IComprimidoService{
         return obtenerZip(expediente.getNodoAlfresco())
     }
 
-    def obtenerZip(TipoCompany tipoCompany, Expediente expediente) {
-        return null
-    }
 }

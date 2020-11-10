@@ -7,6 +7,7 @@ import hwsol.webservices.CorreoUtil
 import hwsol.webservices.FetchUtilLagunaro
 import hwsol.webservices.ScorExpedienteTarificado
 import org.apache.commons.codec.binary.Base64
+import servicios.Expediente
 
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
@@ -71,9 +72,10 @@ class TarificadorService {
 
     private def obtenerNodoConsultaExpediente(String idExpediente, UnidadOrganizativa pais) {
         try {
-            def salida = expedienteService.consultaExpedienteCodigoST(idExpediente, pais)
-            if (salida.listaExpedientes) {
-                return salida.listaExpedientes[0].nodoAlfresco
+            List<Expediente> salida = new ArrayList<>()
+            salida.addAll(expedienteService.informeExpedienteCodigoST(idExpediente, pais))
+            if (salida?.size() > 0) {
+                return salida?.get(0).nodoAlfresco
             } else {
                 return null
             }

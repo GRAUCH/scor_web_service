@@ -112,7 +112,7 @@ class ExpedienteService implements IExpedienteService {
             def bean = ctx.getBean("soapClientAlptis")
             bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("frontal.wsdl")?.value)
             def salida = grailsApplication.mainContext.soapClientAlptis.informeExpedientesSiniestros(obtenerUsuarioFrontal(pais), companya, producto, estado, fechaIni, fechaFin)
-            return salida.listaExpedientes
+            return salida.listaExpedientesInforme
         } catch (Exception e) {
             logginService.putError("obtenerInformeExpedientesSiniestros", "No se ha podido obtener el informe de expediente " + e)
             correoUtil.envioEmailErrores("obtenerInformeExpedientesSiniestros", "No se ha podido obtener el informe de expediente ->   Error msg: "  + e.getMessage()+"    Causa : " + e.getCause())
@@ -126,18 +126,18 @@ class ExpedienteService implements IExpedienteService {
             def bean = ctx.getBean("soapClientAlptis")
             bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY,Conf.findByName("frontal.wsdl")?.value)
             def salida=grailsApplication.mainContext.soapClientAlptis.informeExpedientesPorFiltro(obtenerUsuarioFrontal(pais),filtro)
-            return salida
+            return salida.listaExpedientesInforme
         } catch (Exception e) {
             logginService.putError("informeExpedientePorFiltro de ama","No se ha podido obtener el informe de expediente : " + e)
             return null
         }
     }
 
-    def informeExpedienteCodigoST(String codigoST, UnidadOrganizativa pais) {
+    List<Expediente> informeExpedienteCodigoST(String codigoST, UnidadOrganizativa pais) {
         Filtro filtro = new Filtro()
         filtro.setClave(ClaveFiltro.EXPEDIENTE)
         filtro.setValor(codigoST)
-        return consultaExpediente(pais, filtro)
+        return consultaExpediente(pais, filtro).listaExpedientes
     }
 
     def modificaExpediente(UnidadOrganizativa pais, Expediente expediente, def servicioScorList, def paqueteScorList) {

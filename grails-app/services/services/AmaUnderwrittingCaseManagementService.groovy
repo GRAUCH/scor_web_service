@@ -6,6 +6,7 @@ import com.scortelemed.TipoOperacion
 import grails.util.Environment
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
+import servicios.ExpedienteInforme
 
 import java.text.SimpleDateFormat
 
@@ -179,7 +180,7 @@ class AmaUnderwrittingCaseManagementService	 {
 		CorreoUtil correoUtil = new CorreoUtil()
 		def requestXML = ""
 		Request requestBBDD
-		List<RespuestaCRMInforme> expedientes = new ArrayList<RespuestaCRMInforme>()
+		List<ExpedienteInforme> expedientes = new ArrayList<ExpedienteInforme>()
 		Company company = Company.findByNombre(TipoCompany.AMA.getNombre())
 		TransformacionUtil util = new TransformacionUtil()
 
@@ -306,7 +307,7 @@ class AmaUnderwrittingCaseManagementService	 {
 		int codigo = 0
 
 		Company company = Company.findByNombre(TipoCompany.AMA.getNombre())
-		RespuestaCRM expediente = new RespuestaCRM()
+		RespuestaCRM respuestaCRM = new RespuestaCRM()
 		TransformacionUtil util = new TransformacionUtil()
 		ConsolidacionPolizaResponse resultado=new ConsolidacionPolizaResponse()
 
@@ -332,15 +333,15 @@ class AmaUnderwrittingCaseManagementService	 {
 
 					requestService.insertarRecibido(company, consolidacionPoliza.requestNumber, requestXML.toString(), TipoOperacion.CONSOLIDACION)
 
-					expediente = expedienteService.consultaExpedienteNumSolicitud(consolidacionPoliza.requestNumber,company.ou,codigoSt )
+					respuestaCRM = expedienteService.consultaExpedienteNumSolicitud(consolidacionPoliza.requestNumber,company.ou,codigoSt )
 
-					if (expediente != null && expediente.getErrorCRM() == null && expediente.getListaExpedientes() != null && expediente.getListaExpedientes().size() > 0){
+					if (respuestaCRM != null && respuestaCRM.getErrorCRM() == null && respuestaCRM.getListaExpedientes() != null && respuestaCRM.getListaExpedientes().size() > 0){
 
-						if (expediente.getListaExpedientes().size() == 1) {
+						if (respuestaCRM.getListaExpedientes().size() == 1) {
 
 							logginService.putInfoEndpoint("ConsolidacionPoliza","Se procede a la modificacion de " + company.nombre + " con numero de solicitud " + consolidacionPoliza.requestNumber)
 
-							Expediente eModificado = expediente.getListaExpedientes().get(0)
+							Expediente eModificado = respuestaCRM.getListaExpedientes().get(0)
 							eModificado.setNumPoliza(consolidacionPoliza.policyNumber.toString())
 
 							RespuestaCRM respuestaCrmExpediente = expedienteService.modificaExpediente(company.ou,eModificado,null,null)

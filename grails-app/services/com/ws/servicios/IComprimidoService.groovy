@@ -8,5 +8,5 @@ interface IComprimidoService {
 
     def obtenerZip(String nodo)
     def obtenerZip(Expediente expediente)
-    def obtenerZip(TipoCompany tipoCompany, Expediente expediente)
+
 }
