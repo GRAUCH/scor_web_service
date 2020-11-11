@@ -181,6 +181,7 @@ class AmaUnderwrittingCaseManagementService	 {
 		def requestXML = ""
 		Request requestBBDD
 		List<ExpedienteInforme> expedientes = new ArrayList<ExpedienteInforme>()
+
 		Company company = Company.findByNombre(TipoCompany.AMA.getNombre())
 		TransformacionUtil util = new TransformacionUtil()
 
