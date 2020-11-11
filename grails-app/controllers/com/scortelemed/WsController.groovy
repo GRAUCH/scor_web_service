@@ -594,7 +594,7 @@ class WsController {
 
                         expediente = expedientes?.get(i)
                         logginService.putInfoMessage(" ** Comienzo el proceso para el dossier: ${expediente?.getNumSolicitud()} de AMA**")
-                        if (seExcluyeEnvio(expediente)) {
+                        if (!seExcluyeEnvio(expediente)) {
                             identificadorCaso = expediente?.getNumSolicitud()
                             files = new ArrayList<File>()
                             listaBenefitInformation = new ArrayList<BenefitInformation>()
