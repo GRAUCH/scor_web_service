@@ -671,17 +671,20 @@ class WsController {
 
                                     benefitResultValue.setDescLoadingCapital("");
                                     benefitResultValue.setDescLoadingPremium("");
-                                    benefitResultValue.setLoadingCapital(BigDecimal.valueOf(Long.valueOf("0")));
-                                    benefitResultValue.setLoadingPremium(BigDecimal.valueOf(Long.valueOf("0")));
+                                    benefitResultValue.setLoadingCapital(BigDecimal.valueOf(0));
+                                    benefitResultValue.setLoadingPremium(BigDecimal.valueOf(0));
 
 
-                                    if (coberturasPoliza?.getCodResultadoCobertura() != null && coberturasPoliza?.getCodResultadoCobertura()?.trim()?.startsWith("3")) {
+                                    if (coberturasPoliza?.getCodResultadoCobertura()?.trim()?.startsWith("3") && (notNullNotEmpty(coberturasPoliza?.getValoracionCapital()) || notNullNotEmpty(coberturasPoliza?.getValoracionPrima()))) {
+                                        if(notNullNotEmpty(coberturasPoliza?.getValoracionCapital()) && notNullNotEmpty(coberturasPoliza?.getValoracionPrima())) {
+                                            benefitInformation.setBenefitResultCode("3");
+                                            benefitInformation.setBenefitResultType("Combinado");
+                                            benefitResultValue.setDescLoadingCapital(coberturasPoliza?.getCodResultadoCobertura()?.toString())
+                                            benefitResultValue.setDescLoadingPremium(coberturasPoliza?.getCodResultadoCobertura()?.toString())
+                                            benefitResultValue.setLoadingCapital(new BigDecimal(coberturasPoliza?.getValoracionCapital()?.replace(",", ".")))
+                                            benefitResultValue.setLoadingPremium(new BigDecimal(coberturasPoliza?.getValoracionPrima()?.replace(",", ".")))
 
-                                        /**
-                                         * SOBREMORTALIDAD (EXTRAPRIMA para AMA)
-                                         */
-                                        if (coberturasPoliza?.getValoracionCapital() != null && !coberturasPoliza?.getValoracionCapital()?.trim()?.isEmpty() && (coberturasPoliza?.getValoracionPrima() == null || coberturasPoliza?.getValoracionPrima()?.trim()?.isEmpty())) {
-
+                                        } else if (notNullNotEmpty(coberturasPoliza?.getValoracionCapital())) {
                                             benefitInformation.setBenefitResultCode("31");
                                             benefitInformation.setBenefitResultType("Sobremortalidad");
                                             benefitResultValue.setDescLoadingCapital(coberturasPoliza?.getCodResultadoCobertura()?.toString());
@@ -689,11 +692,7 @@ class WsController {
                                             benefitResultValue.setLoadingCapital(new BigDecimal(coberturasPoliza?.getValoracionCapital()?.replace(",", ".")));
                                             benefitResultValue.setLoadingPremium(new BigDecimal(0));
 
-                                            /**
-                                             * SOBREPRIMA
-                                             */
-                                        } else if (coberturasPoliza?.getValoracionPrima() != null && !coberturasPoliza?.getValoracionPrima()?.trim()?.isEmpty() && (coberturasPoliza?.getValoracionCapital() == null || coberturasPoliza?.getValoracionCapital()?.trim()?.isEmpty())) {
-
+                                        } else if (notNullNotEmpty(coberturasPoliza?.getValoracionPrima())) {
                                             benefitInformation.setBenefitResultCode("30");
                                             benefitInformation.setBenefitResultType("Sobreprima");
                                             benefitResultValue.setDescLoadingCapital("");
@@ -701,21 +700,8 @@ class WsController {
                                             benefitResultValue.setLoadingCapital(new BigDecimal(0));
                                             benefitResultValue.setLoadingPremium(new BigDecimal(coberturasPoliza?.getValoracionPrima()?.replace(",", ".")));
 
-                                        } else {
-
-                                            if (coberturasPoliza?.getCodResultadoCobertura() != null) {
-
-                                                benefitInformation.setBenefitResultCode("3");
-                                                benefitInformation.setBenefitResultType("Combinado");
-                                                benefitResultValue.setDescLoadingCapital(coberturasPoliza?.getCodResultadoCobertura()?.toString())
-                                                benefitResultValue.setDescLoadingPremium(coberturasPoliza?.getCodResultadoCobertura()?.toString())
-                                                benefitResultValue.setLoadingCapital(new BigDecimal(coberturasPoliza?.getValoracionCapital()?.replace(",", ".")))
-                                                benefitResultValue.setLoadingPremium(new BigDecimal(coberturasPoliza?.getValoracionPrima()?.replace(",", ".")))
-                                            }
                                         }
                                     } else if (coberturasPoliza?.getCodResultadoCobertura() != null) {
-
-
                                         benefitInformation.setBenefitResultCode(coberturasPoliza?.getCodResultadoCobertura());
                                         benefitInformation.setBenefitResultType(devolverLiteralCobertura(coberturasPoliza?.getCodResultadoCobertura()));
                                         benefitResultValue.setDescLoadingCapital("");
@@ -724,7 +710,6 @@ class WsController {
                                         benefitResultValue.setLoadingPremium(new BigDecimal(0));
 
                                     } else {
-
                                         benefitInformation.setBenefitResultCode("");
                                         benefitInformation.setBenefitResultType("");
                                         benefitResultValue.setDescLoadingCapital("");
@@ -804,7 +789,7 @@ class WsController {
                                         benefitInformation.addTemporalLoadingsList(null);
                                     }
 
-                                    if (coberturasPoliza?.getCapitalCobertura() != null && !coberturasPoliza?.getCapitalCobertura()?.isEmpty()) {
+                                    if (notNullNotEmpty(coberturasPoliza?.getCapitalCobertura())) {
                                         dossier.setCapitalInsured(new BigDecimal(coberturasPoliza?.getCapitalCobertura()))
                                     } else {
                                         dossier.setCapitalInsured(new BigDecimal(0))
@@ -986,6 +971,10 @@ class WsController {
 
         return false
 
+    }
+
+    boolean notNullNotEmpty(String entrada) {
+        return(entrada != null && !entrada.trim().isEmpty())
     }
 
 
