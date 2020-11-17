@@ -977,7 +977,7 @@ class TransformacionUtil {
 
     }
 
-    def devolverDatosDecimal(dato) {
+    BigDecimal devolverDatosDecimal(dato) {
 
         if (dato != null) {
             Float floatNumber = Float.parseFloat(dato.toString());
@@ -985,7 +985,7 @@ class TransformacionUtil {
             return bd.setScale(2, BigDecimal.ROUND_UP)
 
         } else {
-            return ""
+            return new BigDecimal(0)
         }
     }
 

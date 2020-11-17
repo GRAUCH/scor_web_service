@@ -1,51 +1,22 @@
 package services
 
-import com.scortelemed.Request
-import com.scortelemed.TipoCompany
-import com.scortelemed.TipoOperacion
+import com.scortelemed.*
+import com.scortelemed.schemas.ama.*
 import grails.util.Environment
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
-import servicios.ExpedienteInforme
-
-import java.text.SimpleDateFormat
+import org.apache.cxf.annotations.SchemaValidation
+import org.grails.cxf.utils.EndpointType
+import org.grails.cxf.utils.GrailsCxfEndpoint
+import org.grails.cxf.utils.GrailsCxfEndpointProperty
+import org.springframework.web.context.request.RequestContextHolder
+import servicios.*
 
 import javax.jws.WebParam
 import javax.jws.WebResult
 import javax.jws.WebService
 import javax.jws.soap.SOAPBinding
-
-import org.apache.cxf.annotations.SchemaValidation
-import org.grails.cxf.utils.EndpointType
-import org.grails.cxf.utils.GrailsCxfEndpoint
-import org.grails.cxf.utils.GrailsCxfEndpointProperty
-
-import org.springframework.web.context.request.RequestContextHolder
-
-import servicios.ClaveFiltro
-import servicios.Expediente
-import servicios.Filtro
-import servicios.RespuestaCRM
-import servicios.RespuestaCRMInforme
-
-import com.scortelemed.Company
-import com.scortelemed.Operacion
-import com.scortelemed.schemas.ama.ConsolidacionPolizaRequest
-import com.scortelemed.schemas.ama.ConsolidacionPolizaResponse
-import com.scortelemed.schemas.ama.ConsultaDocumentoRequest
-import com.scortelemed.schemas.ama.ConsultaDocumentoResponse
-import com.scortelemed.schemas.ama.ConsultaExpedienteRequest
-import com.scortelemed.schemas.ama.ConsultaExpedienteResponse
-import com.scortelemed.schemas.ama.GestionReconocimientoMedicoRequest
-import com.scortelemed.schemas.ama.GestionReconocimientoMedicoResponse
-import com.scortelemed.schemas.ama.ResultadoSiniestroRequest
-import com.scortelemed.schemas.ama.ResultadoSiniestroResponse
-import com.scortelemed.schemas.ama.StatusType
-import com.ws.servicios.impl.companies.AmaService
-import com.ws.servicios.EstadisticasService
-import com.ws.servicios.LogginService
-import com.ws.servicios.impl.RequestService
-import com.ws.servicios.TarificadorService
+import java.text.SimpleDateFormat
 
 @WebService(targetNamespace = "http://www.scortelemed.com/schemas/ama")
 @SchemaValidation
@@ -222,7 +193,7 @@ class AmaUnderwrittingCaseManagementService	 {
 
 					if(expedientes){
 
-						expedientes.each { expedientePoliza ->
+						for(Expediente expedientePoliza: expedientes) {
 
 							/**
 							 * VALIDACION PARA VER QUE TODOS LOS DATOS CENESARIOS PARA AMA ESTAN RELLENOS 
