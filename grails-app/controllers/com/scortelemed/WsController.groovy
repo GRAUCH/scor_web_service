@@ -19,6 +19,7 @@ import com.ws.cajamar.beans.Cobertura
 import com.ws.enumeration.UnidadOrganizativa
 import com.ws.servicios.IComprimidoService
 import com.ws.servicios.ServiceFactory
+import com.ws.servicios.impl.companies.AmaService
 import com.ws.servicios.impl.comprimidos.CommonZipService
 import grails.plugin.springsecurity.annotation.Secured
 import grails.util.Environment
@@ -40,7 +41,6 @@ import java.text.SimpleDateFormat
 class WsController {
     def estadisticasService
     def logginService
-    def amaService
     def soapAlptisRecetteWS
     def soapAlptisRecetteWSPRO
     def soapCajamarRecetteWS
@@ -48,10 +48,8 @@ class WsController {
     def requestService
     def expedienteService
     def tarificadorService
-    IComprimidoService zipService
     CorreoUtil correoUtil = new CorreoUtil()
-    CommonZipService commonZipService
-   //CustomZipService customZipService
+
     def caseresult = {
 
         def fechaFin
@@ -60,23 +58,23 @@ class WsController {
         def soap
         def opername = "caseresult"
         def cases = []
-        def resulExpedienteSoap
-        zipService = ServiceFactory.getComprimidoImpl(TipoCompany.ALPTIS)
+        List<Expediente> expedientes = new ArrayList<>()
+        IComprimidoService zipService = ServiceFactory.getComprimidoImpl(TipoCompany.ALPTIS)
 
         try {
             def company = Company.findByNombre('alptis')
             StringBuilder sbInfo = new StringBuilder("* Realizando proceso envio de informacion para " + company.nombre + " *")
             if (params.myGroup != null && params.myGroup == 'codigoST' && params.codigoST) {
                 sbInfo.append(" al expediente con codigo ST ${params.codigoST}")
-                resulExpedienteSoap = expedienteService.consultaExpedienteCodigoST(params.codigoST, company.ou)
-                sbInfo.append(" * se encontraron :  ${resulExpedienteSoap.size()}  expedientes con el codigo ST *")
+                expedientes.addAll(expedienteService.informeExpedienteCodigoST(params.codigoST, company.ou))
+                sbInfo.append(" * se encontraron :  ${expedientes.size()}  expedientes con el codigo ST *")
             } else {
                 //EJEMPLO DE URL:
                 //http://192.168.1.188:8080/scorWebservice/ws/caseresult?ini=20150512 00:00:00:00&fin=20150512 23:59:59:59
                 fechaIni = LogUtil.paramsToDateIni(params)
                 fechaFin = LogUtil.paramsToDateFin(params)
                 sbInfo.append(" con fecha inicio ").append(fechaIni).append("-").append(" con fecha fin ").append(fechaFin)
-                resulExpedienteSoap = expedienteService.obtenerInformeExpedientes(company.codigoSt, null, 1, fechaIni, fechaFin, company.ou)
+                expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt, null, 1, fechaIni, fechaFin, company.ou))
             }
             if (Environment.current.name.equals("production_wildfly")) {
                 logginService.putInfoMessage("WS PRD")
@@ -92,10 +90,10 @@ class WsController {
 
             logginService.putInfoMessage(sbInfo.toString())
 
-            if (resulExpedienteSoap && resulExpedienteSoap.size() > 0) {
-                resulExpedienteSoap.each { item ->
+            if (expedientes && expedientes.size() > 0) {
+                expedientes.each { item ->
                     if (item && item.nodoAlfresco) {
-                        logginService.putInfoMessage("Obteniendo comprimido para expediente: " + item.getCodigoST() + " con numero de poliza: " + item.getNumPoliza())
+                        logginService.putInfoMessage("Obteniendo comprimido para expediente: " + item?.getCodigoST() + " con numero de poliza: " + item.getNumPoliza())
                         def comprimido = zipService.obtenerZip(item.nodoAlfresco)
 
                         if (comprimido) {
@@ -128,7 +126,7 @@ class WsController {
                 responseRecette = soap.send(connectTimeout: 600000, readTimeout: 600000) {
                     body {
                         AlptisUnderwrittingCaseResultsRequest(xmlns: "http://www.scortelemed.com/schemas/alptis") {
-                            resulExpedienteSoap.each { item ->
+                            expedientes.each { item ->
                                 tuw_cases() {
                                     //AQUI OBTENEMOS EL ZIP EN BYTES Y EL CONTENIDO DEL XML
                                     if (resulComprimidos[i]) {
@@ -173,7 +171,7 @@ class WsController {
                 logginService.putInfoMessage("No hay resultados para " + company.nombre)
 
             }
-            flash.message = "** Se procesaron :" + resulExpedienteSoap.size() + " **  " + " Compania : " + company.nombre + " *"
+            flash.message = "** Se procesaron :" + expedientes.size() + " **  " + " Compania : " + company.nombre + " *"
             return redirect(controller: 'dashboard', action: 'index', params: [idCia: ''])
         } catch (Exception ex) {
             logginService.putError("Endpoint-" + opername, "Error en al obtener resultados para las fechas " + fechaIni + "-" + fechaFin + ":" + ex)
@@ -217,7 +215,7 @@ class WsController {
             sbInfo.append("\n")
             if (params.myGroup != null && params.myGroup == 'codigoST' && params.codigoST) {
                 sbInfo.append(" al expediente con codigo ST ${params.codigoST}")
-                resulExpedienteSoap.addAll(expedienteService.consultaExpedienteCodigoST(params.codigoST, company.ou))
+                resulExpedienteSoap.addAll(expedienteService.informeExpedienteCodigoST(params.codigoST, company.ou))
                 sbInfo.append("se encontraron :  ${resulExpedienteSoap.size()}  expedientes con el codigo ST")
             } else {
                 fechaIni = LogUtil.paramsToDateIni(params)
@@ -247,7 +245,7 @@ class WsController {
                     if (cal.getTime().after(fechaSalida) || cal.getTime().equals(fechaSalida)) {
 
                         def wpers = transformacion.transformarCodigoCliente(expediente.getObservaciones())
-                        def numeroSolicitud = expediente.getNumSolicitud()
+                        def numeroSolicitud = expediente?.getNumSolicitud()
                         def producto = expediente.getProducto().getCodigoProductoCompanya()
                         def ramo = transformacion.transformarRamo(expediente.getProducto().getCodigoProductoCompanya())
                         estadoCausa = transformacion.transformarTipoCausaTerminacion(expediente.getCodigoEstado(), expediente.getMotivoAnulacion())
@@ -307,10 +305,10 @@ class WsController {
                                     if (codigoCobertura != "10001" && codigoCobertura != "10002") {
 
                                         try {
-                                            cober = transformacion.devolverCoberturaCm(codigoCobertura, i, expediente.getNumSolicitud())
+                                            cober = transformacion.devolverCoberturaCm(codigoCobertura, i, expediente?.getNumSolicitud())
                                         } catch (Exception ex) {
                                             excluirDelEnvio = true
-                                            logginService.putInfoMessage("Expediente " + expediente.getCodigoST() + " no tiene tarificacion para la cobertura: " + i.getNombreCobertura() + ". Se excluye del envio")
+                                            logginService.putInfoMessage("Expediente " + expediente?.getCodigoST() + " no tiene tarificacion para la cobertura: " + i.getNombreCobertura() + ". Se excluye del envio")
 
                                         }
 
@@ -387,16 +385,16 @@ class WsController {
                                 Envio envio = new Envio()
                                 envio.setFecha(new Date())
                                 envio.setCia(company.id.toString())
-                                envio.setIdentificador(expediente.getNumSolicitud())
+                                envio.setIdentificador(expediente?.getNumSolicitud())
                                 envio.setInfo(response.getText().trim())
                                 envio.save(flush: true)
-                                logginService.putInfoMessage("Informacion expediente " + expediente.getCodigoST() + " enviado a " + company.nombre + " correctamente")
+                                logginService.putInfoMessage("Informacion expediente " + expediente?.getCodigoST() + " enviado a " + company.nombre + " correctamente")
                             }
 
 
                         } else {
 
-                            logginService.putInfoMessage("Expediente " + expediente.getCodigoST() + " no cumple con ningun estado de notificacion")
+                            logginService.putInfoMessage("Expediente " + expediente?.getCodigoST() + " no cumple con ningun estado de notificacion")
 
                         }
                     }
@@ -440,7 +438,7 @@ class WsController {
             sbInfo.append("\n")
             if (params.myGroup != null && params.myGroup == 'codigoST' && params.codigoST) {
                 sbInfo.append(" al expediente con codigo ST ${params.codigoST}")
-                expedientes.addAll(expedienteService.consultaExpedienteCodigoST(params.codigoST, company.ou))
+                expedientes.addAll(expedienteService.informeExpedienteCodigoST(params.codigoST, company.ou))
                 sbInfo.append(" * se encontraron :  ${expedientes.size()}  expedientes con el codigo ST *")
             } else {
                 fechaIni = LogUtil.paramsToDateIni(params)
@@ -493,7 +491,7 @@ class WsController {
                         /**Metemos en errores
                          *
                          */
-                        com.scortelemed.Error error = new com.scortelemed.Error()
+                        Error error = new Error()
                         error.setFecha(new Date())
                         error.setCia(company.id.toString())
                         error.setIdentificador(entradaDetalle.getIdExpediente())
@@ -515,7 +513,7 @@ class WsController {
             return redirect(controller: 'dashboard', action: 'index', params: [idCia: ''])
         } catch (Exception ex) {
             logginService.putErrorMessage("Error: " + opername + ". " + ex.getMessage() + ". Detalles:" + ex.getMessage())
-            com.scortelemed.Error error = new com.scortelemed.Error()
+            Error error = new Error()
             error.setFecha(new Date())
             error.setCia(company.id.toString())
             error.setIdentificador(" ")
@@ -538,9 +536,8 @@ class WsController {
         def cases = []
         def estadoCausa = []
         def coberturas = []
-        zipService = ServiceFactory.getComprimidoImpl(TipoCompany.AMA)
+        IComprimidoService zipService = ServiceFactory.getComprimidoImpl(TipoCompany.AMA)
 
-        List<RespuestaCRMInforme> expedientesInforme = new ArrayList<RespuestaCRMInforme>()
         List<Expediente> expedientes = new ArrayList<Expediente>()
         List<Cita> citas = new ArrayList<Cita>()
         List<Actividad> actividades = new ArrayList<Actividad>()
@@ -561,7 +558,7 @@ class WsController {
             sbInfo.append("\n")
             if (params.myGroup != null && params.myGroup == 'codigoST' && params.codigoST) {
                 sbInfo.append(" al expediente con codigo ST ${params.codigoST}")
-                expedientes.addAll(expedienteService.consultaExpedienteCodigoST(params.codigoST, company.ou))
+                expedientes.addAll(expedienteService.informeExpedienteCodigoST(params.codigoST, company.ou))
                 sbInfo.append(" * se encontraron :  ${expedientes.size()}  expedientes con el codigo ST *")
             } else {
                 fechaIni = LogUtil.paramsToDateIni(params)
@@ -599,12 +596,12 @@ class WsController {
                     try {
 
                         expediente = expedientes.get(i)
-                        logginService.putInfoMessage(" ** Comienzo el proceso para el dossier: ${expediente.getNumSolicitud()} de AMA**")
-                        if (!amaService.seExcluyeEnvio(expediente)) {
-                            identificadorCaso = expediente.getNumSolicitud()
+                        logginService.putInfoMessage(" ** Comienzo el proceso para el dossier: ${expediente?.getNumSolicitud()} de AMA**")
+                        if (!seExcluyeEnvio(expediente)) {
+                            identificadorCaso = expediente?.getNumSolicitud()
                             files = new ArrayList<File>()
                             listaBenefitInformation = new ArrayList<BenefitInformation>()
-                            dossier.setDossierCode(expediente.getNumSolicitud())
+                            dossier.setDossierCode(expediente?.getNumSolicitud())
                             dossier.setResultsCode("OK")
                             dossier.setState((short) 1)
 
@@ -630,11 +627,11 @@ class WsController {
                             com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.Company cia = new com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.Company()
 
 
-                            if (expediente.getCandidato() != null && expediente.getCandidato().getCompanya() != null && expediente.getCandidato().getCompanya().getCodigoST().equals("1064")) {
+                            if (expediente.getCandidato() != null && expediente.getCandidato().getCompanya() != null && expediente.getCandidato().getCompanya()?.getCodigoST().equals("1064")) {
                                 cia.setCompanyCode("C0803")
                                 cia.setCompanyDescription("A.M.A. Vida")
                             }
-                            if (expediente.getCandidato() != null && expediente.getCandidato().getCompanya() != null && expediente.getCandidato().getCompanya().getCodigoST().equals("1059")) {
+                            if (expediente.getCandidato() != null && expediente.getCandidato().getCompanya() != null && expediente.getCandidato().getCompanya()?.getCodigoST().equals("1059")) {
                                 cia.setCompanyCode("M0328")
                                 cia.setCompanyDescription("A.M.A.")
                             }
@@ -723,7 +720,7 @@ class WsController {
 
 
                                         benefitInformation.setBenefitResultCode(coberturasPoliza.getCodResultadoCobertura());
-                                        benefitInformation.setBenefitResultType(amaService.devolverLiteralCobertura(coberturasPoliza.getCodResultadoCobertura()));
+                                        benefitInformation.setBenefitResultType(devolverLiteralCobertura(coberturasPoliza.getCodResultadoCobertura()));
                                         benefitResultValue.setDescLoadingCapital("");
                                         benefitResultValue.setDescLoadingPremium("");
                                         benefitResultValue.setLoadingCapital(new BigDecimal(0));
@@ -843,17 +840,17 @@ class WsController {
                                     com.scortelemed.Envio envio = new com.scortelemed.Envio()
                                     envio.setFecha(new Date())
                                     envio.setCia(company.id.toString())
-                                    envio.setIdentificador(expediente.getNumSolicitud())
+                                    envio.setIdentificador(expediente?.getNumSolicitud())
                                     envio.setInfo("Estado: " + expediente.getCodigoEstado().toString() + "-Respuesta: " + respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localDescriptionResultList[0])
                                     envio.save(flush: true)
 
-                                    logginService.putInfoMessage("Informacion de salida de expediente " + expediente.getCodigoST() + ". Codigo AMA: " + expediente.getNumSolicitud())
-                                    logginService.putInfoMessage("Respuesta desde AMA al envio de informacion para expediente " + expediente.getCodigoST() + ". " + respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localDescriptionResultList[0])
-                                    logginService.putInfoMessage("Informacion expediente " + expediente.getCodigoST() + " enviado a " + company.nombre + " correctamente")
+                                    logginService.putInfoMessage("Informacion de salida de expediente " + expediente?.getCodigoST() + ". Codigo AMA: " + expediente?.getNumSolicitud())
+                                    logginService.putInfoMessage("Respuesta desde AMA al envio de informacion para expediente " + expediente?.getCodigoST() + ". " + respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localDescriptionResultList[0])
+                                    logginService.putInfoMessage("Informacion expediente " + expediente?.getCodigoST() + " enviado a " + company.nombre + " correctamente")
 
                                 } else if (respuestaCRM != null && respuestaCRM.localSaveDossierResultsResponse != null && respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT() != null && respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localTypeResult.equals("ERROR")) {
 
-                                    com.scortelemed.Error error = new com.scortelemed.Error()
+                                    Error error = new Error()
                                     error.setFecha(new Date())
                                     error.setCia(company.id.toString())
                                     error.setIdentificador(identificadorCaso)
@@ -862,13 +859,13 @@ class WsController {
                                     error.setError("Peticion no realizada para solicitud: " + identificadorCaso + ". Error: " + respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localDescriptionResultList[0])
                                     error.save(flush: true)
 
-                                    logginService.putInfoMessage("Informacion de salida de expediente " + expediente.getCodigoST() + ". Codigo AMA: " + expediente.getNumSolicitud())
-                                    logginService.putInfoMessage("Respuesta desde AMA al envio de informacion para expediente " + expediente.getCodigoST() + ". ERROR:" + respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localDescriptionResultList[0])
-                                    logginService.putInfoMessage("Informacion expediente " + expediente.getCodigoST() + " no enviado a " + company.nombre + " correctamente")
+                                    logginService.putInfoMessage("Informacion de salida de expediente " + expediente?.getCodigoST() + ". Codigo AMA: " + expediente?.getNumSolicitud())
+                                    logginService.putInfoMessage("Respuesta desde AMA al envio de informacion para expediente " + expediente?.getCodigoST() + ". ERROR:" + respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localDescriptionResultList[0])
+                                    logginService.putInfoMessage("Informacion expediente " + expediente?.getCodigoST() + " no enviado a " + company.nombre + " correctamente")
 
                                 } else {
 
-                                    com.scortelemed.Error error = new com.scortelemed.Error()
+                                    Error error = new Error()
                                     error.setFecha(new Date())
                                     error.setCia(company.id.toString())
                                     error.setIdentificador(identificadorCaso)
@@ -877,9 +874,9 @@ class WsController {
                                     error.setError("Peticion no realizada para solicitud: " + identificadorCaso + ". Error: desconocido")
                                     error.save(flush: true)
 
-                                    logginService.putInfoMessage("Informacion de salida de expediente " + expediente.getCodigoST() + ". Codigo AMA: " + expediente.getNumSolicitud())
-                                    logginService.putInfoMessage("Respuesta desde AMA al envio de informacion para expediente " + expediente.getCodigoST() + ". ERROR: Desconocido")
-                                    logginService.putInfoMessage("IInformacion expediente " + expediente.getCodigoST() + " no enviado a " + company.nombre + " correctamente")
+                                    logginService.putInfoMessage("Informacion de salida de expediente " + expediente?.getCodigoST() + ". Codigo AMA: " + expediente?.getNumSolicitud())
+                                    logginService.putInfoMessage("Respuesta desde AMA al envio de informacion para expediente " + expediente?.getCodigoST() + ". ERROR: Desconocido")
+                                    logginService.putInfoMessage("IInformacion expediente " + expediente?.getCodigoST() + " no enviado a " + company.nombre + " correctamente")
 
                                 }
                                 logginService.putInfoMessage("** TERMINO PROCESO **")
@@ -888,7 +885,7 @@ class WsController {
                             }
                         }
                     } catch (Exception ex) {
-                        com.scortelemed.Error error = new com.scortelemed.Error()
+                        Error error = new Error()
                         error.setFecha(new Date())
                         error.setCia(company.id.toString())
                         error.setIdentificador(identificadorCaso)
@@ -896,14 +893,14 @@ class WsController {
                         error.setOperacion("ENVIO")
                         if (respuestaCRM != null && respuestaCRM.localSaveDossierResultsResponse != null && respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT() != null && respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localTypeResult.equals("ERROR")) {
                             error.setError("Peticion no realizada para solicitud: " + identificadorCaso + ". Error: " + respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localDescriptionResultList[0])
-                            logginService.putInfoMessage("Informacion de salida de expediente " + expediente.getCodigoST() + ". Codigo AMA: " + expediente.getNumSolicitud())
-                            logginService.putInfoMessage("Respuesta desde AMA al envio de informacion para expediente " + expediente.getCodigoST() + ". ERROR: " + respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localDescriptionResultList[0])
-                            logginService.putInfoMessage("Informacion expediente " + expediente.getCodigoST() + " no enviado a " + company.nombre)
+                            logginService.putInfoMessage("Informacion de salida de expediente " + expediente?.getCodigoST() + ". Codigo AMA: " + expediente?.getNumSolicitud())
+                            logginService.putInfoMessage("Respuesta desde AMA al envio de informacion para expediente " + expediente?.getCodigoST() + ". ERROR: " + respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localDescriptionResultList[0])
+                            logginService.putInfoMessage("Informacion expediente " + expediente?.getCodigoST() + " no enviado a " + company.nombre)
                         } else {
                             error.setError("Peticion no realizada para solicitud: " + identificadorCaso + ". Error: " + ex.getMessage())
-                            logginService.putInfoMessage("Informacion de salida de expediente " + expediente.getCodigoST() + ". Codigo AMA: " + expediente.getNumSolicitud())
-                            logginService.putInfoMessage("Respuesta desde AMA al envio de informacion para expediente " + expediente.getCodigoST() + ". ERROR: " + ex.getMessage())
-                            logginService.putInfoMessage("Informacion expediente " + expediente.getCodigoST() + " no enviado a " + company.nombre)
+                            logginService.putInfoMessage("Informacion de salida de expediente " + expediente?.getCodigoST() + ". Codigo AMA: " + expediente?.getNumSolicitud())
+                            logginService.putInfoMessage("Respuesta desde AMA al envio de informacion para expediente " + expediente?.getCodigoST() + ". ERROR: " + ex.getMessage())
+                            logginService.putInfoMessage("Informacion expediente " + expediente?.getCodigoST() + " no enviado a " + company.nombre)
                         }
                         error.save(flush: true)
                         flash.message = "KO - Ver logs"
@@ -932,17 +929,12 @@ class WsController {
         flash.message = ""
         String codigost = params.codigoST
         String company = params.companyName
-        String unidad = expedienteService.obtenerUnidadOrganizativa(TipoCompany.fromNombre(company))
-        RespuestaCRM expediente = expedienteService.informeExpedienteCodigoST(codigost, UnidadOrganizativa.fromNombre(unidad))
-       if(expediente?.listaExpedientes != null && expediente?.listaExpedientes.size() > 0) {
-           Expediente exp = expediente.listaExpedientes[0]
-           def zip
-           if (company.contains('cbp')){
-               zip = commonZipService.obtenerZip(TipoCompany.CBP_ITALIA, exp)
-           }
-            else{
-               zip = commonZipService.obtenerZip(exp.getNodoAlfresco())
-           }
+        UnidadOrganizativa unidad = expedienteService.obtenerUnidadOrganizativa(TipoCompany.fromNombre(company))
+        IComprimidoService zipService = ServiceFactory.getComprimidoImpl()
+        RespuestaCRM respuestaCRM = expedienteService.consultaExpedienteCodigoST(codigost, unidad)
+       if(respuestaCRM?.getListaExpedientes()?.size() > 0) {
+           Expediente expediente = respuestaCRM?.getListaExpedientes()?.get(0)
+           def zip = zipService.obtenerZip(expediente)
 
            String contentDisposition = 'attachment'
            String mimeType2 = 'APPLICATION/OCTET-STREAM'
@@ -958,5 +950,71 @@ class WsController {
            flash.message = "No hay documentación"
            redirect(controller: 'dashboard', action: 'index', params: [idCia: ''])
        }
+    }
+
+    boolean seExcluyeEnvio(Expediente expediente){
+
+        if (expediente?.getServicios()?.size() == 1){
+
+            return expediente?.getServicios()?.get(0)?.getCompanyaServicio()?.getCodigoST()?.equals("002561")
+
+        }
+
+        return false
+
+    }
+
+    String devolverLiteralCobertura (String code) {
+
+        def literal
+
+        switch (code) {
+            case "1":
+                literal = "Est�ndar"
+                break
+            case "2":
+                literal = "Rechazo"
+                break
+            case "3":
+                literal = "Combinado"
+                break
+            case "4":
+                literal = "Exclusi�n"
+                break
+            case "5":
+                literal = "Informe Medico"
+                break
+            case "6":
+                literal = "Prueba Medica"
+                break
+            case "7":
+                literal = "Rechazo Cobertura"
+                break
+            case "8":
+                literal = "Posponer"
+                break
+            case "9":
+                literal = "Consultar tarificador"
+                break
+            case "10":
+                literal = "Acuerdo"
+                break
+            case "11":
+                literal = "Teleselecci�n"
+                break
+            case "12":
+                literal = "valor absoluto"
+                break
+            case "20":
+                literal = "No Tarificado"
+                break
+            case "30":
+                literal = "Sobreprima"
+                break
+            case "31":
+                literal = "Sobremortalidad"
+                break
+        }
+        return literal
     }
 }

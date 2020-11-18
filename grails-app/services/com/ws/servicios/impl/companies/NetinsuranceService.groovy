@@ -1,46 +1,37 @@
 package com.ws.servicios.impl.companies
 
-import com.scor.comprimirdocumentos.ParametrosEntrada
 import com.scor.global.ExceptionUtils
 import com.scor.global.WSException
 import com.scor.srpfileinbound.DATOS
 import com.scor.srpfileinbound.REGISTRODATOS
-import com.scortelemed.*
+import com.scortelemed.Company
+import com.scortelemed.Request
+import com.scortelemed.TipoCompany
 import com.scortelemed.schemas.netinsurance.*
 import com.scortelemed.schemas.netinsurance.NetinsuranteGetDossierResponse.ExpedienteConsulta
 import com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCasesResultsResponse.Expediente
-import com.scortelemed.servicios.Candidato
-import com.scortelemed.servicios.Frontal
-import com.scortelemed.servicios.FrontalServiceLocator
 import com.ws.servicios.ICompanyService
 import com.ws.servicios.IComprimidoService
 import com.ws.servicios.ServiceFactory
-import hwsol.webservices.CorreoUtil
+import grails.util.Holders
 import hwsol.webservices.TransformacionUtil
-import hwsol.webservices.ZipResponse
 import org.w3c.dom.Document
 import org.w3c.dom.Element
 import org.w3c.dom.Node
 import org.w3c.dom.NodeList
 import org.xml.sax.InputSource
-import servicios.RespuestaCRM
 
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 import java.text.SimpleDateFormat
 
-import static grails.async.Promises.task
-
 class NetinsuranceService implements ICompanyService{
 
 	TransformacionUtil util = new TransformacionUtil()
-	def logginService
-	def requestService
-	def expedienteService
-	def grailsApplication
 	IComprimidoService zipService = ServiceFactory.getComprimidoImpl(TipoCompany.NET_INSURANCE)
-
-
+	def logginService = Holders.grailsApplication.mainContext.getBean("logginService")
+	def requestService = Holders.grailsApplication.mainContext.getBean("requestService")
+	def tarificadorService = Holders.grailsApplication.mainContext.getBean("tarificadorService")
 
 	String marshall(def objeto) {
 		String nameSpace = "http://www.scortelemed.com/schemas/netinsurance"
@@ -70,7 +61,7 @@ class NetinsuranceService implements ICompanyService{
 
 			return dato
 		} catch (Exception e) {
-			logginService.putError(e.toString())
+			logginService.putError("buildDatos",e.toString())
 		}
 	}
 
@@ -387,13 +378,7 @@ class NetinsuranceService implements ICompanyService{
 							datosRegistro.telefono1 = "999999999"
 						}
 					}
-                    log.info("***         Netinsurance           ***")
-					log.info("** Los telefonos que quedaron fueron: ")
-					log.info("Telefono1 :  ${datosRegistro.telefono1}")
-					log.info("Telefono2 :  ${datosRegistro.telefono2}")
-					log.info("Telefono3 :  ${datosRegistro.telefono3}")
-					log.info("***      Fin de los telefonos       ***")
-                    log.info("***         Netinsurance           ***")
+
 					/**CODIGO CIA
 					 *
 					 */
@@ -479,27 +464,9 @@ class NetinsuranceService implements ICompanyService{
 					 */
 
 					if (eElement.getElementsByTagName("agency").item(0) != null && !eElement.getElementsByTagName("agency").item(0).getTextContent().isEmpty()) {
-
-						Agente instituto = Agente.findByValor(eElement.getElementsByTagName("agency").item(0).getTextContent().toString())
-
-						if (instituto != null && instituto.getAgente() != null && !instituto.getAgente().isEmpty()) {
-
-							if (instituto.getAgente().length() > 20) {
-								datosRegistro.codigoAgencia = instituto.getAgente().substring(0, 19)
-							} else {
-								datosRegistro.codigoAgencia = instituto.getAgente()
-							}
-
-							datosRegistro.nomApellAgente = instituto.getAgente()
-
-						} else {
-
-							datosRegistro.codigoAgencia = eElement.getElementsByTagName("agency").item(0).getTextContent().toString()
-							datosRegistro.nomApellAgente = eElement.getElementsByTagName("agency").item(0).getTextContent().toString()
-						}
-
+						datosRegistro.codigoAgencia = requestService.obtenerAgente(eElement.getElementsByTagName("agency").item(0).getTextContent().toString(), company, true)
+						datosRegistro.nomApellAgente = requestService.obtenerAgente(eElement.getElementsByTagName("agency").item(0).getTextContent().toString(), company, false)
 					} else {
-
 						datosRegistro.codigoAgencia = "."
 						datosRegistro.nomApellAgente = "."
 					}
@@ -723,54 +690,5 @@ class NetinsuranceService implements ICompanyService{
 			case "PENDIENTE_CIA": return "ATTENDE CO";
 			default: return null;
 		}
-	}
-
-	servicios.Expediente existeExpediente(String numPoliza, String nombreCia, String companyCodigoSt, String ou) {
-
-		logginService.putInfoMessage("Buscando si existe expediente con numero de poliza " + numPoliza + " para " + nombreCia)
-
-		CorreoUtil correoUtil = new CorreoUtil()
-		servicios.Filtro filtro = new servicios.Filtro()
-        servicios.Expediente expediente = null;
-		RespuestaCRM respuestaCrm
-
-		try {
-
-			filtro.setClave(servicios.ClaveFiltro.CLIENTE);
-			filtro.setValor(companyCodigoSt.toString());
-
-			servicios.Filtro filtroRelacionado1 = new servicios.Filtro()
-			filtroRelacionado1.setClave(servicios.ClaveFiltro.NUM_SOLICITUD)
-			filtroRelacionado1.setValor(numPoliza.toString())
-
-			filtro.setFiltroRelacionado(filtroRelacionado1)
-
-			respuestaCrm = expedienteService.consultaExpediente(ou, filtro)
-
-			if (respuestaCrm != null && respuestaCrm.getListaExpedientes() != null && respuestaCrm.getListaExpedientes().size() > 0) {
-
-				for (int i = 0; i < respuestaCrm.getListaExpedientes().size(); i++) {
-
-					servicios.Expediente exp = respuestaCrm.getListaExpedientes().get(i)
-
-					if (exp.getCandidato() != null && exp.getCandidato().getCompanya() != null && exp.getCandidato().getCompanya().getCodigoST().equals(companyCodigoSt.toString()) && exp.getNumSolicitud() != null && exp.getNumSolicitud().equals(numPoliza.toString())) {
-
-						logginService.putInfoMessage("Expediente con número de poliza " + numPoliza + " y expediente " + exp.getCodigoST() + " para " + nombreCia + " ya existe en el sistema")
-						expediente = respuestaCrm.getListaExpedientes().get(i)
-					}
-				}
-			} else {
-
-                logginService.putInfoMessage("Expediente con número de poliza " + numPoliza + " para " + nombreCia + " no se existe en el sistema")
-                expediente = null
-            }
-
-		} catch (Exception e) {
-
-			logginService.putInfoMessage("Buscando si existe expediente con numero de poliza " + numPoliza + " para " + nombreCia + " . Error: " + + e.getMessage())
-			correoUtil.envioEmailErrores("ERROR en búsqueda de duplicados para " + nombreCia,"Buscando si existe expediente con numero de poliza " + numPoliza + " para " + nombreCia, e)
-		}
-
-		return expediente
 	}
 }

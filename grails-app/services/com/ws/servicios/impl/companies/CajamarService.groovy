@@ -6,11 +6,10 @@ import com.scor.srpfileinbound.DATOS
 import com.scor.srpfileinbound.REGISTRODATOS
 import com.scortelemed.Company
 import com.scortelemed.Request
-import com.scortelemed.TipoOperacion
 import com.ws.cajamar.beans.CajamarUnderwrittingCaseManagementRequest
 import com.ws.cajamar.beans.ConsolidacionPolizaRequest
 import com.ws.servicios.ICompanyService
-import hwsol.webservices.CorreoUtil
+import grails.util.Holders
 import hwsol.webservices.TransformacionUtil
 import org.w3c.dom.Document
 import org.w3c.dom.Element
@@ -25,11 +24,8 @@ import java.text.SimpleDateFormat
 class CajamarService implements ICompanyService{
 
 	TransformacionUtil transformacion = new TransformacionUtil()
-	def requestService
-	def expedienteService
-	def tarificadorService
-	def grailsApplication
-	def logginService
+	def requestService = Holders.grailsApplication.mainContext.getBean("requestService")
+	def logginService = Holders.grailsApplication.mainContext.getBean("logginService")
 
 	/**
 	 * CAJAMAR  (Beans, sin namespace)
@@ -60,7 +56,7 @@ class CajamarService implements ICompanyService{
 			dato.coberturas = rellenaCoberturas(req)
 			return dato
 		} catch (Exception e) {
-			logginService.putError(e.toString())
+			logginService.putError("buildDatos",e.toString())
 		}
 	}
 

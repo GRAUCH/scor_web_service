@@ -14,16 +14,15 @@ import com.ws.lifesquare.beans.LifesquareUnderwrittingCaseManagementRequest
 import com.ws.lifesquare.beans.LifesquareUnderwrittingCasesResultsRequest
 import com.ws.servicios.ICompanyService
 import grails.util.Environment
+import grails.util.Holders
 import org.apache.axis.types.Token
 
 import java.text.SimpleDateFormat
 
 class FrancesasService implements ICompanyService{
 
-	def grailsApplication
-	def expedienteService
-	def requestService
-	def logginService
+	def logginService = Holders.grailsApplication.mainContext.getBean("logginService")
+	def requestService = Holders.grailsApplication.mainContext.getBean("requestService")
 
 	/**
 	 * AFI_ESCA, ALPTIS, ZEN_UP(Lifesquare) (Beans, sin namespace)
@@ -59,7 +58,7 @@ class FrancesasService implements ICompanyService{
 			dato.coberturas = rellenaCoberturas(req)
 			return dato
 		} catch (Exception e) {
-			logginService.putError(e.toString())
+			logginService.putError("Error en el metodo buildDatos: " + e)
 		}
 	}
 

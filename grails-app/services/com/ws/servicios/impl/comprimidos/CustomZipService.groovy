@@ -15,10 +15,7 @@ import java.text.SimpleDateFormat
 @Transactional
 class CustomZipService implements IComprimidoService{
 
-    //def grailsApplication
     LogginService logginService
-    //def requestService
-    //def correoUtil = new CorreoUtil()
     def zipUtils = new ZipUtils()
     TipoCompany company
 
@@ -31,7 +28,7 @@ class CustomZipService implements IComprimidoService{
         return null
     }
 
-    def obtenerZip(TipoCompany tipoCompany, Expediente expediente) {
+    def obtenerZip(Expediente expediente) {
         def resultado
         if (expediente.getCodigoEstado()== TipoEstadoExpediente.CERRADO) {
             logginService.putInfoMessage("Iniciado generacion de zip para expediente " + expediente.codigoST)
@@ -67,8 +64,4 @@ class CustomZipService implements IComprimidoService{
         return resultado
     }
 
-
-    def obtenerZip(Expediente expediente) {
-        return null
-    }
 }

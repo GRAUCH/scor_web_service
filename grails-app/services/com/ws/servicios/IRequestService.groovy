@@ -19,5 +19,6 @@ interface IRequestService {
     void insertarRecibido(String companyId, String identificador, String info, TipoOperacion operacion)
     void insertarError(String companyId, String identificador, String info, TipoOperacion operacion, String detalleError)
     void insertarEnvio (String companyId, String identificador, String info)
+    String obtenerAgente(String valor, Company company, boolean substring)
 
-}
+    }

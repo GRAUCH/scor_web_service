@@ -7,13 +7,14 @@ import com.scor.srpfileinbound.REGISTRODATOS
 import com.scortelemed.Company
 import com.scortelemed.Request
 import com.scortelemed.TipoCompany
-import com.scortelemed.TipoOperacion
 import com.scortelemed.schemas.caser.*
 import com.scortelemed.schemas.caser.ConsultaExpedienteResponse.ExpedienteConsulta
 import com.scortelemed.schemas.caser.ResultadoReconocimientoMedicoResponse.Expediente
+import com.ws.enumeration.UnidadOrganizativa
 import com.ws.servicios.ICompanyService
 import com.ws.servicios.IComprimidoService
 import com.ws.servicios.ServiceFactory
+import grails.util.Holders
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
 import org.w3c.dom.Document
@@ -27,16 +28,14 @@ import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 import java.text.SimpleDateFormat
 
-import static grails.async.Promises.task
-
 class CaserService implements ICompanyService{
 
     TransformacionUtil util = new TransformacionUtil()
-    def grailsApplication
-    def logginService
-    def requestService
-    def expedienteService
     IComprimidoService zipService = ServiceFactory.getComprimidoImpl(TipoCompany.CASER)
+    def logginService = Holders.getGrailsApplication().mainContext.getBean("logginService")
+    def requestService = Holders.getGrailsApplication().mainContext.getBean("requestService")
+    def expedienteService = Holders.getGrailsApplication().mainContext.getBean("expedienteService")
+    def tarificadorService = Holders.getGrailsApplication().mainContext.getBean("tarificadorService")
     CorreoUtil correoUtil = new CorreoUtil()
 
 
@@ -69,7 +68,7 @@ class CaserService implements ICompanyService{
             dato.servicio = rellenaServicios(req)
             return dato
         } catch (Exception e) {
-            logginService.putError(e.toString())
+            logginService.putError("buildDatos",e.toString())
         }
     }
 
@@ -78,7 +77,7 @@ class CaserService implements ICompanyService{
         return null
     }
 
-    def rellenaDatosSalida(expedientePoliza, requestDate, logginService) {
+    def rellenaDatosSalida(expedientePoliza, requestDate) {
 
         Expediente expediente = new Expediente()
 
@@ -828,25 +827,16 @@ class CaserService implements ICompanyService{
         }
     }
 
-    List<servicios.Expediente> existeExpediente(String numeroSolicitud, String nombreCia, String companyCodigoSt, String unidadOrganizativa) {
+    List<servicios.Expediente> existeExpediente(String numeroSolicitud, String nombreCia, String companyCodigoSt, UnidadOrganizativa unidadOrganizativa) {
 
         logginService.putInfoMessage("Buscando si existe expediente con numero de solicitud " + numeroSolicitud + " para " + nombreCia)
 
-        servicios.Filtro filtro = new servicios.Filtro()
         List<servicios.Expediente> expedientes = new ArrayList<servicios.Expediente>()
         RespuestaCRM respuestaCrm
 
         try {
 
-            filtro.setClave(servicios.ClaveFiltro.CLIENTE)
-            filtro.setValor(companyCodigoSt)
-
-            servicios.Filtro filtroRelacionado1 = new servicios.Filtro()
-            filtroRelacionado1.setClave(servicios.ClaveFiltro.NUM_SOLICITUD)
-            filtroRelacionado1.setValor(numeroSolicitud)
-            filtro.setFiltroRelacionado(filtroRelacionado1)
-
-            respuestaCrm = expedienteService.consultaExpediente(unidadOrganizativa, filtro)
+            respuestaCrm = expedienteService.consultaExpedienteNumSolicitud(numeroSolicitud, unidadOrganizativa, companyCodigoSt)
 
             if (respuestaCrm != null && respuestaCrm.getListaExpedientes() != null && respuestaCrm.getListaExpedientes().size() > 0) {
 
