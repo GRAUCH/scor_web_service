@@ -186,16 +186,18 @@ class RequestService implements IRequestService {
 
     String obtenerAgente(String valor, Company company, boolean substring) {
         String salida = ""
-        Agente instituto = Agente.findByValorAndCia(valor, company)
+        if(valor && company) {
+            Agente instituto = Agente.findByValorAndCia(valor, company)
 
-        if (instituto != null && instituto.getAgente() != null && !instituto.getAgente().isEmpty()) {
-            salida = instituto.getAgente()
-        } else if(valor != null) {
-            salida = valor
-        }
+            if (instituto?.getAgente() && !instituto.getAgente().isEmpty()) {
+                salida = instituto.getAgente()
+            } else if (valor != null) {
+                salida = valor
+            }
 
-        if(substring) {
-            salida = salida.substring(0,20)
+            if (salida.length() > 20 && substring) {
+                salida = salida.substring(0, 20)
+            }
         }
 
         return salida

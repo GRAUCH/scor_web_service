@@ -129,7 +129,7 @@ class MethislabCFService implements ICompanyService{
         return expediente
     }
 
-    def rellenaDatos(req, company) {
+    def rellenaDatos(Request req, Company company) {
 
         def mapDatos = [:]
         def listadoPreguntas = []
@@ -362,26 +362,13 @@ class MethislabCFService implements ICompanyService{
                      *
                      */
 
-                    if (eElement.getElementsByTagName("fiscalIdentificationNumber").item(0) != null) {
-                        datosRegistro.codigoAgencia = eElement.getElementsByTagName("fiscalIdentificationNumber").item(0).getTextContent()
+                    if (eElement.getElementsByTagName("agent").item(0) != null) {
+                        datosRegistro.codigoAgencia = requestService.obtenerAgente(eElement.getElementsByTagName("agent").item(0).getTextContent(), company, true)
+                        datosRegistro.nomApellAgente = requestService.obtenerAgente(eElement.getElementsByTagName("agent").item(0).getTextContent(), company, false)
+                    } else {
+                        datosRegistro.codigoAgencia = "."
+                        datosRegistro.nomApellAgente = "."
                     }
-
-                    /**NOMBRE DE AGENTE
-                     *
-                     */
-                    if (eElement.getElementsByTagName("name").item(0) != null) {
-                        nombreAgente = eElement.getElementsByTagName("name").item(0).getTextContent()
-                    }
-
-                    if (eElement.getElementsByTagName("surname1").item(0) != null) {
-                        nombreAgente = nombreAgente + " " + eElement.getElementsByTagName("surname1").item(0).getTextContent()
-                    }
-
-                    if (eElement.getElementsByTagName("surname2").item(0) != null) {
-                        nombreAgente = nombreAgente + " " + eElement.getElementsByTagName("surname2").item(0).getTextContent()
-                    }
-
-                    datosRegistro.nomApellAgente = nombreAgente
                 }
             }
 

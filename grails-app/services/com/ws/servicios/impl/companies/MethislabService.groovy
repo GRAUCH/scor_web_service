@@ -133,7 +133,7 @@ class MethislabService implements ICompanyService{
         return expediente
     }
 
-    def rellenaDatos(req, company) {
+    def rellenaDatos(Request req, Company company) {
 
         def mapDatos = [:]
         def listadoPreguntas = []
@@ -142,8 +142,6 @@ class MethislabService implements ICompanyService{
         def telefono1
         def telefono2
         def telefonoMovil
-        def productCia
-        def nombreAgente
 
         REGISTRODATOS datosRegistro = new REGISTRODATOS()
 
@@ -394,21 +392,12 @@ class MethislabService implements ICompanyService{
                      */
 
                     if (eElement.getElementsByTagName("agent").item(0) != null) {
-
-                        if (eElement.getElementsByTagName("agent").item(0).getTextContent().toString().length() > 20) {
-                            datosRegistro.codigoAgencia = eElement.getElementsByTagName("agent").item(0).getTextContent().substring(0, 19)
-                        } else {
-                            datosRegistro.codigoAgencia = eElement.getElementsByTagName("agent").item(0).getTextContent()
-                        }
-
-                        datosRegistro.nomApellAgente = eElement.getElementsByTagName("agent").item(0).getTextContent()
+                        datosRegistro.codigoAgencia = requestService.obtenerAgente(eElement.getElementsByTagName("agent").item(0).getTextContent(), company, true)
+                        datosRegistro.nomApellAgente = requestService.obtenerAgente(eElement.getElementsByTagName("agent").item(0).getTextContent(), company, false)
                     } else {
-
                         datosRegistro.codigoAgencia = "."
                         datosRegistro.nomApellAgente = "."
                     }
-
-                    datosRegistro.nomApellAgente = nombreAgente
                 }
             }
 
