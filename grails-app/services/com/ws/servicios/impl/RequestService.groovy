@@ -191,7 +191,7 @@ class RequestService implements IRequestService {
 
             if (instituto?.getAgente() && !instituto.getAgente().isEmpty()) {
                 salida = instituto.getAgente()
-            } else if (valor != null) {
+            } else if (!valor.isEmpty()) {
                 salida = valor
             }
 
