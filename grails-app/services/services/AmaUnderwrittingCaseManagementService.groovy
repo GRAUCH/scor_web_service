@@ -151,7 +151,7 @@ class AmaUnderwrittingCaseManagementService	 {
 		CorreoUtil correoUtil = new CorreoUtil()
 		def requestXML = ""
 		Request requestBBDD
-		List<ExpedienteInforme> expedientes = new ArrayList<ExpedienteInforme>()
+		List<Expediente> expedientes = new ArrayList<>()
 
 		Company company = Company.findByNombre(TipoCompany.AMA.getNombre())
 		TransformacionUtil util = new TransformacionUtil()
@@ -181,9 +181,9 @@ class AmaUnderwrittingCaseManagementService	 {
 					String fechaFin = sdfr.format(date)
 
 					if (Environment.current.name.equals("production_wildfly")) {
-						expedientes=expedienteService.obtenerInformeExpedientesSiniestros("1060",null,null,fechaIni,fechaFin,company.ou)
+						expedientes.addAll(expedienteService.obtenerInformeExpedientesSiniestros("1060",null,null,fechaIni,fechaFin,company.ou))
 					} else {
-						expedientes=expedienteService.obtenerInformeExpedientesSiniestros("1061",null,null,fechaIni,fechaFin,company.ou)
+						expedientes.addAll(expedienteService.obtenerInformeExpedientesSiniestros("1061",null,null,fechaIni,fechaFin,company.ou))
 					}
 
 					logginService.putInfoEndpoint("ResultadoSiniestro","Realizando peticion para " + company.nombre + " con fecha " + resultadoSiniestro.dateStart.toString().substring(0,10) +"-"+resultadoSiniestro.dateEnd.toString().substring(0,10))

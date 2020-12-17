@@ -6,6 +6,7 @@ import com.scortelemed.TipoCompany
 import com.ws.servicios.IComprimidoService
 import com.ws.servicios.LogginService
 import grails.transaction.Transactional
+import grails.util.Holders
 import hwsol.webservices.CorreoUtil
 import org.codehaus.groovy.grails.commons.GrailsApplication
 import servicios.Expediente
@@ -13,8 +14,8 @@ import servicios.Expediente
 @Transactional
 class CommonZipService implements IComprimidoService{
 
-    GrailsApplication grailsApplication
-    LogginService logginService
+    GrailsApplication grailsApplication = Holders.getGrailsApplication()
+    LogginService logginService = Holders.grailsApplication.mainContext.getBean("logginService")
     def correoUtil = new CorreoUtil()
 
     @Override

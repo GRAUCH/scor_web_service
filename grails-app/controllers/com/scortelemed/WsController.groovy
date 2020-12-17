@@ -48,6 +48,7 @@ class WsController {
     def requestService
     def expedienteService
     def tarificadorService
+    CommonZipService commonZipService
     CorreoUtil correoUtil = new CorreoUtil()
 
     def caseresult = {
@@ -929,12 +930,13 @@ class WsController {
         flash.message = ""
         String codigost = params.codigoST
         String company = params.companyName
-        UnidadOrganizativa unidad = expedienteService.obtenerUnidadOrganizativa(TipoCompany.fromNombre(company))
-        IComprimidoService zipService = ServiceFactory.getComprimidoImpl()
+        TipoCompany tipoCompany = TipoCompany.fromNombre(company)
+        UnidadOrganizativa unidad = expedienteService.obtenerUnidadOrganizativa(tipoCompany)
+        //IComprimidoService zipService = ServiceFactory.getComprimidoImpl(tipoCompany)
         RespuestaCRM respuestaCRM = expedienteService.consultaExpedienteCodigoST(codigost, unidad)
        if(respuestaCRM?.getListaExpedientes()?.size() > 0) {
            Expediente expediente = respuestaCRM?.getListaExpedientes()?.get(0)
-           def zip = zipService.obtenerZip(expediente)
+           def zip = commonZipService.obtenerZip(expediente)
 
            String contentDisposition = 'attachment'
            String mimeType2 = 'APPLICATION/OCTET-STREAM'

@@ -112,7 +112,7 @@ class ExpedienteService implements IExpedienteService {
             def bean = ctx.getBean("soapClientAlptis")
             bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("frontal.wsdl")?.value)
             def salida = grailsApplication.mainContext.soapClientAlptis.informeExpedientesSiniestros(obtenerUsuarioFrontal(pais), companya, producto, estado, fechaIni, fechaFin)
-            return salida.listaExpedientesInforme
+            return salida.listaExpedientes
         } catch (Exception e) {
             logginService.putError("obtenerInformeExpedientesSiniestros", "No se ha podido obtener el informe de expediente " + e)
             correoUtil.envioEmailErrores("obtenerInformeExpedientesSiniestros", "No se ha podido obtener el informe de expediente ->   Error msg: "  + e.getMessage()+"    Causa : " + e.getCause())
