@@ -3,6 +3,7 @@ package com.ws.servicios
 import com.scortelemed.Company
 import com.scortelemed.TipoCompany
 import com.ws.enumeration.UnidadOrganizativa
+import com.ws.servicios.impl.comprimidos.CommonZipService
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.FetchUtilLagunaro
 import hwsol.webservices.ScorExpedienteTarificado
@@ -17,6 +18,7 @@ class TarificadorService {
     /*
      Se conecta al CRM y devuelve los expedientes tarificados para una fecha
      */
+    CommonZipService commonZipService
     def grailsApplication
     def expedienteService
     def requestService
@@ -25,7 +27,6 @@ class TarificadorService {
     CorreoUtil correoUtil = new CorreoUtil()
 
     def tarificador(Date fecha) {
-        IComprimidoService zipService = ServiceFactory.getComprimidoImpl(TipoCompany.LAGUN_ARO)
         Company company = Company.findByNombre(TipoCompany.LAGUN_ARO.nombre) //Lagunaro
         def listaExpedientes = []
         try {
@@ -40,7 +41,6 @@ class TarificadorService {
                 xmlResultado = crmService.conexion(sqlXml)
                 expediente = fetchUtil.rellenaCoberturasExpediente(xmlResultado, expediente)
                 sqlXml = fetchUtil.dameExpedientePaquete((String) expediente.id)
-
                 xmlResultado = crmService.conexion(sqlXml)
                 expediente = fetchUtil.rellenaExpedientePaquete(xmlResultado, expediente)
 
@@ -57,7 +57,9 @@ class TarificadorService {
 
                 def nodo = obtenerNodoConsultaExpediente(expediente.scorName.toString(), UnidadOrganizativa.ES)
                 if (nodo) {
-                    expediente = zipService.obtenerZip(nodo)
+                    logginService.putInfo("tarificador", "Generando ZIP")
+                    expediente.zip = commonZipService.obtenerZip(nodo)
+                    logginService.putInfo("tarificador", "Zip generado correctamente")
                 }
             }
 
