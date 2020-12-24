@@ -18,8 +18,7 @@ class CommonZipService implements IComprimidoService{
     LogginService logginService = Holders.grailsApplication.mainContext.getBean("logginService")
     def correoUtil = new CorreoUtil()
 
-    @Override
-    def obtenerZip(String nodo) {
+    def obtenerZipFile(String nodo) {
         def response = new byte[0]
         try {
             def parametrosEntrada = new ParametrosEntrada()
@@ -31,13 +30,18 @@ class CommonZipService implements IComprimidoService{
             def bean = ctx.getBean("soapClientComprimidoAlptis")
             bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("orabpel.wsdl")?.value)
             def salida = grailsApplication.mainContext.soapClientComprimidoAlptis.process(parametrosEntrada)
-            return salida.datosRespuesta //.content
+            return salida.datosRespuesta
         } catch (Exception e) {
             logginService.putErrorMessage("No se ha podido obtener el zip del nodo : " + nodo + ". Error msg: "  + e.getMessage())
             logginService.putErrorMessage("Causa : " + e.getCause())
             correoUtil.envioEmailErrores("No se ha podido obtener el zip del nodo", "No se ha podido obtener el ZIP", e)
         }
         return response
+    }
+
+    @Override
+    def obtenerZip(String nodo) {
+        return obtenerZipFile(nodo).content
     }
 
     def obtenerZip(Expediente expediente) {

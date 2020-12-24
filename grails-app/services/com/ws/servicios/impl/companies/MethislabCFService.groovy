@@ -26,7 +26,7 @@ import java.text.SimpleDateFormat
 class MethislabCFService implements ICompanyService{
 
     TransformacionUtil util = new TransformacionUtil()
-    IComprimidoService zipService = ServiceFactory.getComprimidoImpl(TipoCompany.CF_LIFE)
+    def commonZipService
     def requestService = Holders.grailsApplication.mainContext.getBean("requestService")
     def logginService = Holders.grailsApplication.mainContext.getBean("logginService")
     def tarificadorService = Holders.grailsApplication.mainContext.getBean("tarificadorService")
@@ -88,7 +88,7 @@ class MethislabCFService implements ICompanyService{
             expediente.setPhoneNumber2("")
         }
 
-        byte[] compressedData = zipService.obtenerZip(expedientePoliza.getNodoAlfresco())
+        byte[] compressedData = commonZipService.obtenerZip(expedientePoliza.getNodoAlfresco())
 
         expediente.setZip(compressedData)
 

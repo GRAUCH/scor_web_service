@@ -33,7 +33,7 @@ import java.text.SimpleDateFormat
 class PsnService implements ICompanyService{
 
 	TransformacionUtil util = new TransformacionUtil()
-	IComprimidoService zipService = ServiceFactory.getComprimidoImpl(TipoCompany.PSN)
+	def commonZipService
 	def logginService = Holders.grailsApplication.mainContext.getBean("logginService")
 	def requestService = Holders.grailsApplication.mainContext.getBean("requestService")
 	def tarificadorService = Holders.grailsApplication.mainContext.getBean("tarificadorService")
@@ -297,7 +297,7 @@ class PsnService implements ICompanyService{
 			expediente.setPhoneNumber2("")
 		}
 
-		byte[] compressedData=zipService.obtenerZip(expedientePoliza.getNodoAlfresco())
+		byte[] compressedData=commonZipService.obtenerZip(expedientePoliza.getNodoAlfresco())
 
 		expediente.setZip(compressedData)
 

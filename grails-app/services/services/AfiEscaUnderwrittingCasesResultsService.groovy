@@ -37,6 +37,7 @@ class AfiEscaUnderwrittingCasesResultsService {
 	def expedienteService
 	def estadisticasService
 	def logginService
+	def commonZipService
 
 
 	@WebResult(name = "AfiEscaUnderwrittingCasesResultsResponse")
@@ -49,7 +50,6 @@ class AfiEscaUnderwrittingCasesResultsService {
 		def requestXML = ""
 		def expedientes
 		Request requestBBDD
-		IComprimidoService zipService = ServiceFactory.getComprimidoImpl(TipoCompany.AFI_ESCA)
 		def company = Company.findByNombre(TipoCompany.AFI_ESCA.getNombre())
 		
 		AfiEscaUnderwrittingCasesResultsResponse result=new AfiEscaUnderwrittingCasesResultsResponse()
@@ -83,7 +83,7 @@ class AfiEscaUnderwrittingCasesResultsService {
 						def tuwCases=new TuwCase() 
 						tuwCases.policy_number=item.numSolicitud
 						tuwCases.reference_number=item.numPoliza
-						tuwCases.zip=zipService.obtenerZip(item.nodoAlfresco)
+						tuwCases.zip=commonZipService.obtenerZip(item.nodoAlfresco)
 						listTuwCases.add(tuwCases)
 					}
 				

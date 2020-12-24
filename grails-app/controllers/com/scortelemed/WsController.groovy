@@ -60,7 +60,6 @@ class WsController {
         def opername = "caseresult"
         def cases = []
         List<Expediente> expedientes = new ArrayList<>()
-        IComprimidoService zipService = ServiceFactory.getComprimidoImpl(TipoCompany.ALPTIS)
 
         try {
             def company = Company.findByNombre('alptis')
@@ -95,7 +94,7 @@ class WsController {
                 expedientes.each { item ->
                     if (item && item.nodoAlfresco) {
                         logginService.putInfoMessage("Obteniendo comprimido para expediente: " + item?.getCodigoST() + " con numero de poliza: " + item.getNumPoliza())
-                        def comprimido = zipService.obtenerZip(item.nodoAlfresco)
+                        def comprimido = commonZipService.obtenerZip(item.nodoAlfresco)
 
                         if (comprimido) {
                             def xml = tarificadorService.obtenerXMLExpedientePorZip(comprimido)
@@ -537,7 +536,6 @@ class WsController {
         def cases = []
         def estadoCausa = []
         def coberturas = []
-        IComprimidoService zipService = ServiceFactory.getComprimidoImpl(TipoCompany.AMA)
 
         List<Expediente> expedientes = new ArrayList<Expediente>()
         List<Cita> citas = new ArrayList<Cita>()
@@ -817,7 +815,7 @@ class WsController {
                                     listaBenefitInformation.add(benefitInformation)
                                 }
                                 logginService.putInfoMessage("Agrego ZIP")
-                                byte[] compressedData = zipService.obtenerZip(expediente.getNodoAlfresco())
+                                byte[] compressedData = commonZipService.obtenerZip(expediente.getNodoAlfresco())
 
                                 File file = new File()
                                 file.setFileBase64(new String(compressedData))
@@ -932,11 +930,10 @@ class WsController {
         String company = params.companyName
         TipoCompany tipoCompany = TipoCompany.fromNombre(company)
         UnidadOrganizativa unidad = expedienteService.obtenerUnidadOrganizativa(tipoCompany)
-        //IComprimidoService zipService = ServiceFactory.getComprimidoImpl(tipoCompany)
         RespuestaCRM respuestaCRM = expedienteService.consultaExpedienteCodigoST(codigost, unidad)
        if(respuestaCRM?.getListaExpedientes()?.size() > 0) {
            Expediente expediente = respuestaCRM?.getListaExpedientes()?.get(0)
-           def zip = commonZipService.obtenerZip(expediente)
+           def zip = commonZipService.obtenerZipFile(expediente)
 
            String contentDisposition = 'attachment'
            String mimeType2 = 'APPLICATION/OCTET-STREAM'

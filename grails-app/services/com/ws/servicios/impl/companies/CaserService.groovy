@@ -31,7 +31,7 @@ import java.text.SimpleDateFormat
 class CaserService implements ICompanyService{
 
     TransformacionUtil util = new TransformacionUtil()
-    IComprimidoService zipService = ServiceFactory.getComprimidoImpl(TipoCompany.CASER)
+    def commonZipService
     def logginService = Holders.getGrailsApplication().mainContext.getBean("logginService")
     def requestService = Holders.getGrailsApplication().mainContext.getBean("requestService")
     def expedienteService = Holders.getGrailsApplication().mainContext.getBean("expedienteService")
@@ -109,7 +109,7 @@ class CaserService implements ICompanyService{
             expediente.setProvincia("")
         }
 
-        byte[] compressedData = zipService.obtenerZip(expedientePoliza.getNodoAlfresco())
+        byte[] compressedData = commonZipService.obtenerZip(expedientePoliza.getNodoAlfresco())
 
         expediente.setZip(compressedData)
 
@@ -181,7 +181,7 @@ class CaserService implements ICompanyService{
             expediente.setProvincia("")
         }
 
-        byte[] compressedData = zipService.obtenerZip(expedientePoliza.getNodoAlfresco())
+        byte[] compressedData = commonZipService.obtenerZip(expedientePoliza.getNodoAlfresco())
 
         expediente.setZip(compressedData)
 
