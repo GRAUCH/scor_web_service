@@ -6,8 +6,11 @@ import com.scor.srpfileinbound.DATOS
 import com.scor.srpfileinbound.REGISTRODATOS
 import com.scortelemed.Company
 import com.scortelemed.Request
+import com.scortelemed.TipoCompany
 import com.scortelemed.schemas.methislabCF.*
 import com.ws.servicios.ICompanyService
+import com.ws.servicios.IComprimidoService
+import com.ws.servicios.ServiceFactory
 import grails.util.Holders
 import hwsol.webservices.TransformacionUtil
 import hwsol.webservices.WsError
@@ -16,7 +19,6 @@ import org.w3c.dom.Element
 import org.w3c.dom.Node
 import org.w3c.dom.NodeList
 import org.xml.sax.InputSource
-
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 import java.text.SimpleDateFormat
@@ -24,10 +26,10 @@ import java.text.SimpleDateFormat
 class MethislabCFService implements ICompanyService{
 
     TransformacionUtil util = new TransformacionUtil()
+    def commonZipService
     def requestService = Holders.grailsApplication.mainContext.getBean("requestService")
     def logginService = Holders.grailsApplication.mainContext.getBean("logginService")
     def tarificadorService = Holders.grailsApplication.mainContext.getBean("tarificadorService")
-
 
     String marshall(def objeto) {
         String nameSpace = "http://www.scortelemed.com/schemas/methislabCF"
@@ -86,7 +88,7 @@ class MethislabCFService implements ICompanyService{
             expediente.setPhoneNumber2("")
         }
 
-        byte[] compressedData = tarificadorService.obtenerZip(expedientePoliza.getNodoAlfresco())
+        byte[] compressedData = commonZipService.obtenerZip(expedientePoliza.getNodoAlfresco())
 
         expediente.setZip(compressedData)
 
@@ -127,7 +129,7 @@ class MethislabCFService implements ICompanyService{
         return expediente
     }
 
-    def rellenaDatos(req, company) {
+    def rellenaDatos(Request req, Company company) {
 
         def mapDatos = [:]
         def listadoPreguntas = []
@@ -360,26 +362,13 @@ class MethislabCFService implements ICompanyService{
                      *
                      */
 
-                    if (eElement.getElementsByTagName("fiscalIdentificationNumber").item(0) != null) {
-                        datosRegistro.codigoAgencia = eElement.getElementsByTagName("fiscalIdentificationNumber").item(0).getTextContent()
+                    if (eElement.getElementsByTagName("agent").item(0) != null) {
+                        datosRegistro.codigoAgencia = requestService.obtenerAgente(eElement.getElementsByTagName("agent").item(0).getTextContent(), company, true)
+                        datosRegistro.nomApellAgente = requestService.obtenerAgente(eElement.getElementsByTagName("agent").item(0).getTextContent(), company, false)
+                    } else {
+                        datosRegistro.codigoAgencia = "."
+                        datosRegistro.nomApellAgente = "."
                     }
-
-                    /**NOMBRE DE AGENTE
-                     *
-                     */
-                    if (eElement.getElementsByTagName("name").item(0) != null) {
-                        nombreAgente = eElement.getElementsByTagName("name").item(0).getTextContent()
-                    }
-
-                    if (eElement.getElementsByTagName("surname1").item(0) != null) {
-                        nombreAgente = nombreAgente + " " + eElement.getElementsByTagName("surname1").item(0).getTextContent()
-                    }
-
-                    if (eElement.getElementsByTagName("surname2").item(0) != null) {
-                        nombreAgente = nombreAgente + " " + eElement.getElementsByTagName("surname2").item(0).getTextContent()
-                    }
-
-                    datosRegistro.nomApellAgente = nombreAgente
                 }
             }
 

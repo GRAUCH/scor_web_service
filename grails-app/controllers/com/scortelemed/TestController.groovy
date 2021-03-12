@@ -1,5 +1,8 @@
 package com.scortelemed
-import grails.util.Holders 
+
+import com.ws.servicios.IComprimidoService
+import com.ws.servicios.ServiceFactory
+import grails.util.Holders
 
 /**
  * Authority Controller.
@@ -129,8 +132,9 @@ class TestController {
 	}
 	
 	def ws4() {
-		def result = tarificadorService.obtenerZip(null, "workspace://SpacesStore/c05f472f-45c6-4ca4-b521-79eb52ba7caf")
-		String str = new String(result.datosRespuesta.content);
+		IComprimidoService zipService = ServiceFactory.getComprimidoImpl(TipoCompany.SCOR)
+		def result = zipService.obtenerZip("workspace://SpacesStore/c05f472f-45c6-4ca4-b521-79eb52ba7caf")
+		String str = new String(result.datosRespuesta.content)
 		
 		render str
 	}

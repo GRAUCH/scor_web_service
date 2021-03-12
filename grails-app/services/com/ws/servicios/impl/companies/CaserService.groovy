@@ -6,11 +6,14 @@ import com.scor.srpfileinbound.DATOS
 import com.scor.srpfileinbound.REGISTRODATOS
 import com.scortelemed.Company
 import com.scortelemed.Request
+import com.scortelemed.TipoCompany
 import com.scortelemed.schemas.caser.*
 import com.scortelemed.schemas.caser.ConsultaExpedienteResponse.ExpedienteConsulta
 import com.scortelemed.schemas.caser.ResultadoReconocimientoMedicoResponse.Expediente
 import com.ws.enumeration.UnidadOrganizativa
 import com.ws.servicios.ICompanyService
+import com.ws.servicios.IComprimidoService
+import com.ws.servicios.ServiceFactory
 import grails.util.Holders
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
@@ -28,6 +31,7 @@ import java.text.SimpleDateFormat
 class CaserService implements ICompanyService{
 
     TransformacionUtil util = new TransformacionUtil()
+    def commonZipService
     def logginService = Holders.getGrailsApplication().mainContext.getBean("logginService")
     def requestService = Holders.getGrailsApplication().mainContext.getBean("requestService")
     def expedienteService = Holders.getGrailsApplication().mainContext.getBean("expedienteService")
@@ -73,7 +77,7 @@ class CaserService implements ICompanyService{
         return null
     }
 
-    def rellenaDatosSalida(expedientePoliza, requestDate, logginService) {
+    def rellenaDatosSalida(expedientePoliza, requestDate) {
 
         Expediente expediente = new Expediente()
 
@@ -105,7 +109,7 @@ class CaserService implements ICompanyService{
             expediente.setProvincia("")
         }
 
-        byte[] compressedData = tarificadorService.obtenerZip(expedientePoliza.getNodoAlfresco())
+        byte[] compressedData = commonZipService.obtenerZip(expedientePoliza.getNodoAlfresco())
 
         expediente.setZip(compressedData)
 
@@ -177,7 +181,7 @@ class CaserService implements ICompanyService{
             expediente.setProvincia("")
         }
 
-        byte[] compressedData = tarificadorService.obtenerZip(expedientePoliza.getNodoAlfresco())
+        byte[] compressedData = commonZipService.obtenerZip(expedientePoliza.getNodoAlfresco())
 
         expediente.setZip(compressedData)
 

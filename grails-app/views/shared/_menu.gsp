@@ -19,6 +19,7 @@
 					<li><g:link controller="company">Compa&ntilde;ias</g:link></li>
 					<li><g:link controller="person">Usuarios</g:link></li>
 					<li><g:link controller="authority">Roles</g:link></li>
+					<li><g:link controller="agente">Institutos</g:link></li>
 				</ul>
 			</li>
 			

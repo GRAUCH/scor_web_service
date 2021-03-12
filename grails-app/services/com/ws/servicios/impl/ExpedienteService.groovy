@@ -9,7 +9,7 @@ import com.scortelemed.Request
 import com.scortelemed.TipoCompany
 import com.scortelemed.TipoOperacion
 import com.ws.enumeration.UnidadOrganizativa
-import com.ws.servicios.CompanyFactory
+import com.ws.servicios.ServiceFactory
 import com.ws.servicios.ICompanyService
 import com.ws.servicios.IExpedienteService
 import grails.transaction.Transactional
@@ -126,11 +126,18 @@ class ExpedienteService implements IExpedienteService {
             def bean = ctx.getBean("soapClientAlptis")
             bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY,Conf.findByName("frontal.wsdl")?.value)
             def salida=grailsApplication.mainContext.soapClientAlptis.informeExpedientesPorFiltro(obtenerUsuarioFrontal(pais),filtro)
-            return salida
+            return salida.listaExpedientesInforme
         } catch (Exception e) {
             logginService.putError("informeExpedientePorFiltro de ama","No se ha podido obtener el informe de expediente : " + e)
             return null
         }
+    }
+
+    List<Expediente> informeExpedienteCodigoST(String codigoST, UnidadOrganizativa pais) {
+        Filtro filtro = new Filtro()
+        filtro.setClave(ClaveFiltro.EXPEDIENTE)
+        filtro.setValor(codigoST)
+        return consultaExpediente(pais, filtro).listaExpedientes
     }
 
     def modificaExpediente(UnidadOrganizativa pais, Expediente expediente, def servicioScorList, def paqueteScorList) {
@@ -168,7 +175,7 @@ class ExpedienteService implements IExpedienteService {
     }
 
     private def crearExpedienteBPM(Request req, TipoCompany comp) {
-        companyService = CompanyFactory.getCompanyImpl(comp)
+        companyService = ServiceFactory.getCompanyImpl(comp)
         def listadoFinal = []
         RootElement payload = new RootElement()
         try {
@@ -206,9 +213,14 @@ class ExpedienteService implements IExpedienteService {
         return pie
     }
 
-    Usuario obtenerUsuarioFrontal(UnidadOrganizativa unidadOrganizativa) {
+    UnidadOrganizativa obtenerUnidadOrganizativa(TipoCompany tipo) {
+        Company company = Company.findByNombre(tipo.nombre)
+        return company?.ou
+    }
 
+    Usuario obtenerUsuarioFrontal(UnidadOrganizativa unidadOrganizativa) {
         def usuario = new Usuario()
+
         switch(unidadOrganizativa) {
             case UnidadOrganizativa.ES:
                 if (Environment.current.name.equals("production_wildfly")) {

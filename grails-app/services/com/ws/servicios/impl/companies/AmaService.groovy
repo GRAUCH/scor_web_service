@@ -119,7 +119,7 @@ class AmaService implements ICompanyService{
 		return codigoCia
 	}
 
-	def rellenaDatosSalidaConsultaExpediente(servicios.Expediente expedientePoliza, String requestDate, RespuestaCRM respuestaCRM) {
+	def rellenaDatosSalidaConsultaExpediente(def expedientePoliza, String requestDate, RespuestaCRM respuestaCRM) {
 
 		ConsultaExpedienteResponse.Expediente expediente = new ConsultaExpedienteResponse.Expediente()
 
@@ -255,7 +255,7 @@ class AmaService implements ICompanyService{
 		return expediente
 	}
 
-	def rellenaDatosSalidaSiniestro(expedientePoliza) {
+	def rellenaDatosSalidaSiniestro(def expedientePoliza) {
 
 		List<Interviniente> listaIntervinientes = new ArrayList<Interviniente>()
 		List<Pago> listaPagos = new ArrayList<Pago>()
@@ -433,7 +433,7 @@ class AmaService implements ICompanyService{
 						beneficiario.setNumeroDocumento(util.devolverDatos(pagoPoliza.getBeneficiario().getNumeroDocumento()))
 						beneficiario.setNombre(util.devolverDatos(pagoPoliza.getBeneficiario().getNombre()))
 						beneficiario.setApellidos(util.devolverDatos(pagoPoliza.getBeneficiario().getApellidos()))
-						beneficiario.setNumeroMutualista(util.devolverDatos(expedientePoliza.getBeneficiario().getInterviniente()))
+						beneficiario.setNumeroMutualista(util.devolverDatos(pagoPoliza.getBeneficiario().getInterviniente()))
 						beneficiario.setNumeroCuenta(util.devolverDatos(pagoPoliza.getBeneficiario().getNumCuenta()))
 						beneficiario.setIban(util.devolverDatos(pagoPoliza.getBeneficiario().getIban()))
 						beneficiario.setTipoTelefono1(util.obtenerValorTelefono(pagoPoliza.getBeneficiario().getTipoTelefono1()))
@@ -1018,17 +1018,9 @@ class AmaService implements ICompanyService{
 	 * @param expediente
 	 * @return
 	 */
-	boolean expedienteGestionado(servicios.Expediente expediente, CorreoUtil correoUtil, String opername){
+	boolean expedienteGestionado(def expediente, CorreoUtil correoUtil, String opername){
 
 		String codError = null
-
-		//		return expediente != null && expediente.getSituacionPoliza() != null && expediente.getNumSuplemento() != null &&
-		//				!expediente.getNumSuplemento().isEmpty() &&	expediente.getNumSolicitud() != null && !expediente.getNumSolicitud().isEmpty() && expediente.getSucursal() != null &&
-		//				expediente.getSucursal().getCodigoBancarioOficina() != null && !expediente.getSucursal().getCodigoBancarioOficina().isEmpty() && expediente.getListaSiniestros() != null &&
-		//				expediente.getListaSiniestros().get(0).getFechaOcurrencia() != null && !expediente.getListaSiniestros().get(0).getFechaOcurrencia().isEmpty() &&
-		//				expediente.getListaSiniestros().get(0).getFechaDeclaracion() != null && !expediente.getListaSiniestros().get(0).getFechaDeclaracion().isEmpty() &&
-		//				expediente.getListaSiniestros().get(0).getTipoCausaAccidente() != null
-
 
 		if (expediente == null) {
 			codError = "El expediente es nulo"
@@ -1093,7 +1085,7 @@ class AmaService implements ICompanyService{
 	 * @param expediente
 	 * @return
 	 */
-	boolean cumpleRequisitosVisualizacion(servicios.Expediente expediente, CorreoUtil correoUtil, String opername){
+	boolean cumpleRequisitosVisualizacion(def expediente, CorreoUtil correoUtil, String opername){
 
 		if (expediente != null && expediente.getListaSiniestros() != null && expediente.getListaSiniestros().size() > 0 && tienePago(expediente, correoUtil, opername)){
 			return !existePagoColaboradorSinTipoImpuesto(expediente.getListaSiniestros().get(0).getPagos(), correoUtil, opername, expediente) && !existePagoAseguradoSinNumeroCuenta(expediente.getListaSiniestros().get(0).getPagos(), expediente, correoUtil, opername)
@@ -1102,7 +1094,7 @@ class AmaService implements ICompanyService{
 		return true
 	}
 
-	boolean tienePago(servicios.Expediente expediente, CorreoUtil correoUtil, String opername){
+	boolean tienePago(def expediente, CorreoUtil correoUtil, String opername){
 
 		if (expediente.getListaSiniestros().get(0).getPagos() != null && expediente.getListaSiniestros().get(0).getPagos().size() > 0) {
 			logginService.putInfoMessage("Expediente: " + expediente.getCodigoST() + " no tiene pago. Esto esta impidiendo a AMA ver la gesti�n del siniestro.")
@@ -1114,7 +1106,7 @@ class AmaService implements ICompanyService{
 
 	}
 
-	boolean existePagoColaboradorSinTipoImpuesto(List<servicios.Pago> pagos, CorreoUtil correoUtil, String opername, servicios.Expediente expediente){
+	boolean existePagoColaboradorSinTipoImpuesto(List<servicios.Pago> pagos, CorreoUtil correoUtil, String opername, def expediente){
 
 		if (pagos != null && pagos.size() > 0){
 			for (int i = 0; i < pagos.size(); i++){
@@ -1130,7 +1122,7 @@ class AmaService implements ICompanyService{
 
 	}
 
-	boolean existePagoAseguradoSinNumeroCuenta(List<servicios.Pago> pagos, servicios.Expediente expediente, CorreoUtil correoUtil, String opername){
+	boolean existePagoAseguradoSinNumeroCuenta(List<servicios.Pago> pagos, def expediente, CorreoUtil correoUtil, String opername){
 
 
 		if (pagos != null && pagos.size() > 0){
@@ -1282,72 +1274,6 @@ class AmaService implements ICompanyService{
 
 		return false
 
-	}
-
-	String devolverLiteralCobertura (String code) {
-
-		def literal
-
-		switch (code) {
-			case "1":
-				literal = "Est�ndar"
-				break
-			case "2":
-				literal = "Rechazo"
-				break
-			case "3":
-				literal = "Combinado"
-				break
-			case "4":
-				literal = "Exclusi�n"
-				break
-			case "5":
-				literal = "Informe Medico"
-				break
-			case "6":
-				literal = "Prueba Medica"
-				break
-			case "7":
-				literal = "Rechazo Cobertura"
-				break
-			case "8":
-				literal = "Posponer"
-				break
-			case "9":
-				literal = "Consultar tarificador"
-				break
-			case "10":
-				literal = "Acuerdo"
-				break
-			case "11":
-				literal = "Teleselecci�n"
-				break
-			case "12":
-				literal = "valor absoluto"
-				break
-			case "20":
-				literal = "No Tarificado"
-				break
-			case "30":
-				literal = "Sobreprima"
-				break
-			case "31":
-				literal = "Sobremortalidad"
-				break
-		}
-		return literal
-	}
-	
-	 boolean seExcluyeEnvio(servicios.Expediente expediente){
-		
-		if (expediente != null && expediente.getServicios() != null && expediente.getServicios().size() > 0 && expediente.getServicios().size() == 1){
-		
-			return expediente.getServicios()?.get(0)?.getCompanyaServicio()?.getCodigoST().equals("002561")
-				
-		}
-		
-		return false
-		
 	}
 	
 }

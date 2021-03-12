@@ -26,7 +26,7 @@ environments {
     development {
         println "COMPILA PARA DEVELOPMENT JDNI : MySqlscorwsDS"
         dataSource {
-            dbCreate = ""
+            dbCreate = "update"
             username = "root"
             password = "root"
             url = "jdbc:mysql://localhost/scorws-prepro"
