@@ -133,7 +133,7 @@ class ExpedienteService implements IExpedienteService {
         }
     }
 
-    def informeExpedienteCodigoST(String codigoST, UnidadOrganizativa pais) {
+    List<Expediente> informeExpedienteCodigoST(String codigoST, UnidadOrganizativa pais) {
         Filtro filtro = new Filtro()
         filtro.setClave(ClaveFiltro.EXPEDIENTE)
         filtro.setValor(codigoST)
