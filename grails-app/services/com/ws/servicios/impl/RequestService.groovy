@@ -1,7 +1,7 @@
 package com.ws.servicios.impl
 
 import com.scortelemed.*
-import com.ws.servicios.CompanyFactory
+import com.ws.servicios.ServiceFactory
 import com.ws.servicios.ICompanyService
 import com.ws.servicios.IRequestService
 import grails.transaction.Transactional
@@ -49,7 +49,7 @@ class RequestService implements IRequestService {
 
     String marshall(def objetoRelleno, TipoCompany tipo) {
         String salida = null
-        ICompanyService service = CompanyFactory.getCompanyImpl(tipo)
+        ICompanyService service = ServiceFactory.getCompanyImpl(tipo)
         if(service) {
             salida = service.marshall(objetoRelleno)
         }
@@ -179,8 +179,28 @@ class RequestService implements IRequestService {
 
     String convertirAscii(String cadena) {
         String normalized = Normalizer.normalize(cadena, Normalizer.Form.NFD)
-        // Nos quedamos ÃƒÂºnicamente con los caracteres ASCII
+        // Nos quedamos unicamente con los caracteres ASCII
         Pattern pattern = Pattern.compile("\\P{ASCII}+")
         return pattern.matcher(normalized).replaceAll("").toUpperCase()
     }
+
+    String obtenerAgente(String valor, Company company, boolean substring) {
+        String salida = ""
+        if(valor && company) {
+            Agente instituto = Agente.findByValorAndCia(valor, company)
+
+            if (instituto?.getAgente() && !instituto.getAgente().isEmpty()) {
+                salida = instituto.getAgente()
+            } else if (!valor.isEmpty()) {
+                salida = valor
+            }
+
+            if (salida.length() > 20 && substring) {
+                salida = salida.substring(0, 20)
+            }
+        }
+
+        return salida
+    }
+
 }

@@ -4,13 +4,15 @@ import com.scor.global.ExceptionUtils
 import com.scor.global.WSException
 import com.scor.srpfileinbound.DATOS
 import com.scor.srpfileinbound.REGISTRODATOS
-import com.scortelemed.Agente
 import com.scortelemed.Company
 import com.scortelemed.Request
+import com.scortelemed.TipoCompany
 import com.scortelemed.schemas.netinsurance.*
 import com.scortelemed.schemas.netinsurance.NetinsuranteGetDossierResponse.ExpedienteConsulta
 import com.scortelemed.schemas.netinsurance.NetinsuranteUnderwrittingCasesResultsResponse.Expediente
 import com.ws.servicios.ICompanyService
+import com.ws.servicios.IComprimidoService
+import com.ws.servicios.ServiceFactory
 import grails.util.Holders
 import hwsol.webservices.TransformacionUtil
 import org.w3c.dom.Document
@@ -26,6 +28,7 @@ import java.text.SimpleDateFormat
 class NetinsuranceService implements ICompanyService{
 
 	TransformacionUtil util = new TransformacionUtil()
+    def commonZipService
 	def logginService = Holders.grailsApplication.mainContext.getBean("logginService")
 	def requestService = Holders.grailsApplication.mainContext.getBean("requestService")
 	def tarificadorService = Holders.grailsApplication.mainContext.getBean("tarificadorService")
@@ -91,7 +94,7 @@ class NetinsuranceService implements ICompanyService{
 			expediente.setPhoneNumber2("")
 		}
 
-		byte[] compressedData=tarificadorService.obtenerZip(expedientePoliza.getNodoAlfresco())
+		byte[] compressedData = commonZipService.obtenerZip(expedientePoliza.getNodoAlfresco())
 
 		expediente.setZip(compressedData)
 
@@ -461,28 +464,9 @@ class NetinsuranceService implements ICompanyService{
 					 */
 
 					if (eElement.getElementsByTagName("agency").item(0) != null && !eElement.getElementsByTagName("agency").item(0).getTextContent().isEmpty()) {
-
-						Agente instituto = Agente.findByValor(eElement.getElementsByTagName("agency").item(0).getTextContent().toString())
-
-						if (instituto != null && instituto.getAgente() != null && !instituto.getAgente().isEmpty()) {
-							if (instituto.getAgente().length() > 20) {
-								datosRegistro.codigoAgencia = instituto.getAgente().substring(0, 19)
-							} else {
-								datosRegistro.codigoAgencia = instituto.getAgente()
-							}
-							datosRegistro.nomApellAgente = instituto.getAgente()
-						} else {
-							String agente = eElement.getElementsByTagName("agency").item(0).getTextContent().toString()
-							if (agente.length() > 20) {
-								datosRegistro.codigoAgencia = agente.substring(0, 19)
-							} else {
-								datosRegistro.codigoAgencia = agente
-							}
-							datosRegistro.nomApellAgente = agente
-						}
-
+						datosRegistro.codigoAgencia = requestService.obtenerAgente(eElement.getElementsByTagName("agency").item(0).getTextContent().toString(), company, true)
+						datosRegistro.nomApellAgente = requestService.obtenerAgente(eElement.getElementsByTagName("agency").item(0).getTextContent().toString(), company, false)
 					} else {
-
 						datosRegistro.codigoAgencia = "."
 						datosRegistro.nomApellAgente = "."
 					}

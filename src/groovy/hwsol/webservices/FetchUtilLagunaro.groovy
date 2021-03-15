@@ -23,9 +23,9 @@ class FetchUtilLagunaro {
 		def horas1 =  1 * 60 * 60 * 1000
 		tiempoActual=tiempoActual-horas1
 	
-		Date fechaSig = new Date(tiempoActual - horas1*2)
+		Date fechaSig = new Date(tiempoActual - horas1*3)
 
-		//devuelvo las 2 �ltimas horas.		
+		//devuelvo las 3 ultimas horas.
 		def fechaInicio = formatoDelTexto.format(fechaSig)
 		def fechaFin= formatoDelTexto.format(tiempoActual)
 		

@@ -175,7 +175,7 @@ class CaserUnderwrittingCaseManagementService {
 
                         expedientes.each { expedientePoliza ->
 
-                            resultado.getExpediente().add(caserService.rellenaDatosSalida(expedientePoliza, resultadoReconocimientoMedico.dateStart, logginService))
+                            resultado.getExpediente().add(caserService.rellenaDatosSalida(expedientePoliza, resultadoReconocimientoMedico.dateStart))
                         }
 
                         notes = "Resultados devueltos"
@@ -349,7 +349,7 @@ class CaserUnderwrittingCaseManagementService {
         int codigo = 0
 
         Company company = Company.findByNombre(TipoCompany.CASER.getNombre())
-        RespuestaCRM expediente = new RespuestaCRM()
+        RespuestaCRM respuestaCRM = new RespuestaCRM()
         TransformacionUtil util = new TransformacionUtil()
         ConsolidacionPolizaResponse resultado = new ConsolidacionPolizaResponse()
 
@@ -368,15 +368,15 @@ class CaserUnderwrittingCaseManagementService {
 
                     requestService.insertarRecibido(company, consolidacionPoliza.requestNumber, requestXML.toString(), TipoOperacion.CONSOLIDACION)
 
-                    expediente = expedienteService.consultaExpedienteNumSolicitud(consolidacionPoliza.requestNumber, company.ou, codigoSt)
+                    respuestaCRM = expedienteService.consultaExpedienteNumSolicitud(consolidacionPoliza.requestNumber, company.ou, codigoSt)
 
-                    if (expediente != null && expediente.getErrorCRM() == null && expediente.getListaExpedientes() != null && expediente.getListaExpedientes().size() > 0) {
+                    if (respuestaCRM != null && respuestaCRM.getErrorCRM() == null && respuestaCRM.getListaExpedientes() != null && respuestaCRM.getListaExpedientes().size() > 0) {
 
-                        if (expediente.getListaExpedientes().size() == 1) {
+                        if (respuestaCRM.getListaExpedientes().size() == 1) {
 
                             logginService.putInfoEndpoint("ConsolidacionPoliza", "Se procede a la modificacion de " + company.nombre + " con numero de solicitud " + consolidacionPoliza.requestNumber)
 
-                            Expediente eModificado = expediente.getListaExpedientes().get(0)
+                            Expediente eModificado = respuestaCRM.getListaExpedientes().get(0)
                             eModificado.setNumPoliza(consolidacionPoliza.policyNumber.toString())
 
                             RespuestaCRM respuestaCrmExpediente = expedienteService.modificaExpediente(company.ou, eModificado, null, null)

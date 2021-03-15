@@ -3,7 +3,7 @@ package com.scortelemed
 class Agente {
 
     Date fecha
-    String cia
+    Company cia
     String valor
     String agente
     

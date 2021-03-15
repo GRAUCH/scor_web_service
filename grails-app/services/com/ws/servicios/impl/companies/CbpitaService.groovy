@@ -395,14 +395,14 @@ class CbpitaService implements ICompanyService{
                      */
 
                     if (eElement.getElementsByTagName("agent").item(0) != null) {
-                        datosRegistro.codigoAgencia = codificarAgente(eElement.getElementsByTagName("agent").item(0).getTextContent(), true)
+                        datosRegistro.codigoAgencia = requestService.obtenerAgente(eElement.getElementsByTagName("agent").item(0).getTextContent(),company, true)
                     }
 
                     /**NOMBRE DE AGENTE
 
                      *                    */
                     if (eElement.getElementsByTagName("agent").item(0) != null) {
-                        nombreAgente = codificarAgente(eElement.getElementsByTagName("agent").item(0).getTextContent(), false)
+                        nombreAgente = requestService.obtenerAgente(eElement.getElementsByTagName("agent").item(0).getTextContent(), company, false)
                     }
 
                     if (eElement.getElementsByTagName("surname1").item(0) != null) {
@@ -970,30 +970,6 @@ class CbpitaService implements ICompanyService{
         }
 
         return expedienteModificado
-    }
-
-
-    String codificarAgente(String agente, boolean substring) {
-        String salida = agente
-
-        switch (agente) {
-
-            case "300.CBPPIT": salida = "PITAGORA"; break
-            case "300.CBPSPE": salida ="SPEFIN"; break
-            case "300.CBPPRO": salida ="BANCA PROGETTO"; break
-            case "300.CBPWEF": salida ="WE FINANCE"; break
-            case "300.CBPRAC": salida ="RACES"; break
-            case "300.CBPSIR": salida ="SIRIOFIN"; break
-            case "300.CBPDYN": salida ="DYNAMICA RETAIL"; break
-            case "300.CBPCOF": salida ="COFIDIS"; break
-            case "300.CBPBPF": salida ="BANCA POPOLARE DEL FRUSINATE"; break
-
-        }
-        if(salida.length() > 20 && substring) {
-            return salida.substring(0,19)
-        } else {
-            return salida
-        }
     }
 
 }

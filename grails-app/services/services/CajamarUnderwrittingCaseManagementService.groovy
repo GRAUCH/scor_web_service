@@ -187,7 +187,7 @@ class CajamarUnderwrittingCaseManagementService {
 		Request requestBBDD
 
 		Company company = Company.findByNombre(TipoCompany.CAJAMAR.getNombre())
-		RespuestaCRM expediente = new RespuestaCRM()
+		RespuestaCRM respuestaCRM = new RespuestaCRM()
 		TransformacionUtil util = new TransformacionUtil()
 		ConsolidacionPolizaResponse resultado=new ConsolidacionPolizaResponse()
 
@@ -205,11 +205,11 @@ class CajamarUnderwrittingCaseManagementService {
 
 				if (consolidacionPoliza.requestNumber != null && !consolidacionPoliza.requestNumber.isEmpty() != null && consolidacionPoliza.ciaCode !=null && !consolidacionPoliza.ciaCode.isEmpty() && consolidacionPoliza.policyNumber != null && !consolidacionPoliza.policyNumber.isEmpty()){
 
-					expediente = expedienteService.consultaExpedienteNumSolicitud(consolidacionPoliza.requestNumber,company.ou, consolidacionPoliza.ciaCode)
+					respuestaCRM = expedienteService.consultaExpedienteNumSolicitud(consolidacionPoliza.requestNumber,company.ou, consolidacionPoliza.ciaCode)
 
-					if (expediente != null && expediente.getErrorCRM() == null && expediente.getListaExpedientes() != null && expediente.getListaExpedientes().size() > 0){
+					if (respuestaCRM != null && respuestaCRM.getErrorCRM() == null && respuestaCRM.getListaExpedientes() != null && respuestaCRM.getListaExpedientes().size() > 0){
 
-						Expediente eModificado = expediente.getListaExpedientes().get(0)
+						Expediente eModificado = respuestaCRM.getListaExpedientes().get(0)
 						eModificado.setNumPoliza(consolidacionPoliza.policyNumber.toString())
 
 						RespuestaCRM respuestaCrmExpediente = expedienteService.modificaExpediente(company.ou,eModificado,null,null)

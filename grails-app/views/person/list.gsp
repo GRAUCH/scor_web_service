@@ -32,7 +32,7 @@
 					<td><g:link class="linkBloque" action="show" id="${person.id}">${person.userRealName?.encodeAsHTML()}</g:link></td>
 					<td class="${person.enabled? 'silist' : 'nolist'}"><g:link class="linkBloque" action="show" id="${person.id}"><span style="visibility: hidden">${person.enabled?.encodeAsHTML()}</span></g:link></td>
 					<td><g:link class="linkBloque" action="show" id="${person.id}">${person.description?.encodeAsHTML()}</g:link></td>
-					<td><g:link class="linkBloque" action="show" id="${person.id}">${person.company?.encodeAsHTML()}</g:link></td>
+					<td><g:link class="linkBloque" action="show" id="${person.id}">${person.company?.nombre?.encodeAsHTML()}</g:link></td>
 				</tr>
 			</g:each>
 			</tbody>

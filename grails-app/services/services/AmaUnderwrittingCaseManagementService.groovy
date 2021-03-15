@@ -10,10 +10,7 @@ import org.grails.cxf.utils.EndpointType
 import org.grails.cxf.utils.GrailsCxfEndpoint
 import org.grails.cxf.utils.GrailsCxfEndpointProperty
 import org.springframework.web.context.request.RequestContextHolder
-import servicios.ClaveFiltro
-import servicios.Expediente
-import servicios.Filtro
-import servicios.RespuestaCRM
+import servicios.*
 
 import javax.jws.WebParam
 import javax.jws.WebResult
@@ -154,7 +151,8 @@ class AmaUnderwrittingCaseManagementService	 {
 		CorreoUtil correoUtil = new CorreoUtil()
 		def requestXML = ""
 		Request requestBBDD
-		List<Expediente> expedientes = new ArrayList<Expediente>()
+		List<Expediente> expedientes = new ArrayList<>()
+
 		Company company = Company.findByNombre(TipoCompany.AMA.getNombre())
 		TransformacionUtil util = new TransformacionUtil()
 
@@ -183,9 +181,9 @@ class AmaUnderwrittingCaseManagementService	 {
 					String fechaFin = sdfr.format(date)
 
 					if (Environment.current.name.equals("production_wildfly")) {
-						expedientes=expedienteService.obtenerInformeExpedientesSiniestros("1060",null,null,fechaIni,fechaFin,company.ou)
+						expedientes.addAll(expedienteService.obtenerInformeExpedientesSiniestros("1060",null,null,fechaIni,fechaFin,company.ou))
 					} else {
-						expedientes=expedienteService.obtenerInformeExpedientesSiniestros("1061",null,null,fechaIni,fechaFin,company.ou)
+						expedientes.addAll(expedienteService.obtenerInformeExpedientesSiniestros("1061",null,null,fechaIni,fechaFin,company.ou))
 					}
 
 					logginService.putInfoEndpoint("ResultadoSiniestro","Realizando peticion para " + company.nombre + " con fecha " + resultadoSiniestro.dateStart.toString().substring(0,10) +"-"+resultadoSiniestro.dateEnd.toString().substring(0,10))
@@ -281,7 +279,7 @@ class AmaUnderwrittingCaseManagementService	 {
 		int codigo = 0
 
 		Company company = Company.findByNombre(TipoCompany.AMA.getNombre())
-		RespuestaCRM expediente = new RespuestaCRM()
+		RespuestaCRM respuestaCRM = new RespuestaCRM()
 		TransformacionUtil util = new TransformacionUtil()
 		ConsolidacionPolizaResponse resultado=new ConsolidacionPolizaResponse()
 
@@ -307,15 +305,15 @@ class AmaUnderwrittingCaseManagementService	 {
 
 					requestService.insertarRecibido(company, consolidacionPoliza.requestNumber, requestXML.toString(), TipoOperacion.CONSOLIDACION)
 
-					expediente = expedienteService.consultaExpedienteNumSolicitud(consolidacionPoliza.requestNumber,company.ou,codigoSt )
+					respuestaCRM = expedienteService.consultaExpedienteNumSolicitud(consolidacionPoliza.requestNumber,company.ou,codigoSt )
 
-					if (expediente != null && expediente.getErrorCRM() == null && expediente.getListaExpedientes() != null && expediente.getListaExpedientes().size() > 0){
+					if (respuestaCRM != null && respuestaCRM.getErrorCRM() == null && respuestaCRM.getListaExpedientes() != null && respuestaCRM.getListaExpedientes().size() > 0){
 
-						if (expediente.getListaExpedientes().size() == 1) {
+						if (respuestaCRM.getListaExpedientes().size() == 1) {
 
 							logginService.putInfoEndpoint("ConsolidacionPoliza","Se procede a la modificacion de " + company.nombre + " con numero de solicitud " + consolidacionPoliza.requestNumber)
 
-							Expediente eModificado = expediente.getListaExpedientes().get(0)
+							Expediente eModificado = respuestaCRM.getListaExpedientes().get(0)
 							eModificado.setNumPoliza(consolidacionPoliza.policyNumber.toString())
 
 							RespuestaCRM respuestaCrmExpediente = expedienteService.modificaExpediente(company.ou,eModificado,null,null)

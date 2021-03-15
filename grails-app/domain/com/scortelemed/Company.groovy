@@ -17,8 +17,8 @@ class Company {
 	UnidadOrganizativa ou
 	
 	static hasMany = [destinatarios: Destinatario, usuarios: Person, ips: Ipcontrol, requests: Request]
-	
-    static constraints = {
+
+	static constraints = {
     	nombre(blank:false, unique:true)
     	codigoSt(blank:false, unique:true)
 		ou(blank: false, nullable:false)

@@ -7,11 +7,15 @@ import com.scor.srpfileinbound.DATOS
 import com.scor.srpfileinbound.REGISTRODATOS
 import com.scortelemed.Company
 import com.scortelemed.Request
+import com.scortelemed.TipoCompany
 import com.scortelemed.schemas.psn.*
 import com.scortelemed.schemas.psn.ConsultaDocumentoResponse.Documento
 import com.scortelemed.schemas.psn.ResultadoReconocimientoMedicoResponse.Expediente
 import com.scortelemed.servicios.TipoSexo
 import com.ws.servicios.ICompanyService
+import com.ws.servicios.IComprimidoService
+import com.ws.servicios.ServiceFactory
+import hwsol.webservices.CorreoUtil
 import grails.util.Holders
 import hwsol.webservices.TransformacionUtil
 import hwsol.webservices.WsError
@@ -29,6 +33,7 @@ import java.text.SimpleDateFormat
 class PsnService implements ICompanyService{
 
 	TransformacionUtil util = new TransformacionUtil()
+	def commonZipService
 	def logginService = Holders.grailsApplication.mainContext.getBean("logginService")
 	def requestService = Holders.grailsApplication.mainContext.getBean("requestService")
 	def tarificadorService = Holders.grailsApplication.mainContext.getBean("tarificadorService")
@@ -292,7 +297,7 @@ class PsnService implements ICompanyService{
 			expediente.setPhoneNumber2("")
 		}
 
-		byte[] compressedData=tarificadorService.obtenerZip(expedientePoliza.getNodoAlfresco())
+		byte[] compressedData=commonZipService.obtenerZip(expedientePoliza.getNodoAlfresco())
 
 		expediente.setZip(compressedData)
 

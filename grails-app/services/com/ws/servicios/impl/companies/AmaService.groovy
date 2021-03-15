@@ -1262,5 +1262,18 @@ class AmaService implements ICompanyService{
 
 		return documento
 	}
+
+	boolean excluirDelEnvio(BenefitInformation[] benefitInformation){
+
+		for (int i = 0; i < benefitInformation.length; i++) {
+
+			if (benefitInformation[i].getBenefitResultCode().equals("9") || benefitInformation[i].getBenefitResultCode().equals("5")){
+				return true
+			}
+		}
+
+		return false
+
+	}
 	
 }

@@ -6,9 +6,12 @@ import com.scor.srpfileinbound.DATOS
 import com.scor.srpfileinbound.REGISTRODATOS
 import com.scortelemed.Company
 import com.scortelemed.Request
+import com.scortelemed.TipoCompany
 import com.scortelemed.schemas.methislab.*
 import com.scortelemed.schemas.methislab.MethislabUnderwrittingCasesResultsResponse.Expediente
 import com.ws.servicios.ICompanyService
+import com.ws.servicios.IComprimidoService
+import com.ws.servicios.ServiceFactory
 import grails.util.Holders
 import hwsol.webservices.TransformacionUtil
 import hwsol.webservices.WsError
@@ -25,6 +28,7 @@ import java.text.SimpleDateFormat
 class MethislabService implements ICompanyService{
 
     TransformacionUtil util = new TransformacionUtil()
+    def commonZipService
     def requestService = Holders.grailsApplication.mainContext.getBean("requestService")
     def logginService = Holders.grailsApplication.mainContext.getBean("logginService")
     def tarificadorService = Holders.grailsApplication.mainContext.getBean("tarificadorService")
@@ -64,7 +68,7 @@ class MethislabService implements ICompanyService{
         return null
     }
 
-    def rellenaDatosSalidaConsulta(expedientePoliza, requestDate, logginService) {
+    def rellenaDatosSalidaConsulta(expedientePoliza, requestDate) {
 
         Expediente expediente = new Expediente()
 
@@ -88,7 +92,7 @@ class MethislabService implements ICompanyService{
             expediente.setPhoneNumber2("")
         }
 
-        byte[] compressedData = tarificadorService.obtenerZip(expedientePoliza.getNodoAlfresco())
+        byte[] compressedData = commonZipService.obtenerZip(expedientePoliza.getNodoAlfresco())
 
         expediente.setZip(compressedData)
 
@@ -129,7 +133,7 @@ class MethislabService implements ICompanyService{
         return expediente
     }
 
-    def rellenaDatos(req, company) {
+    def rellenaDatos(Request req, Company company) {
 
         def mapDatos = [:]
         def listadoPreguntas = []
@@ -138,8 +142,6 @@ class MethislabService implements ICompanyService{
         def telefono1
         def telefono2
         def telefonoMovil
-        def productCia
-        def nombreAgente
 
         REGISTRODATOS datosRegistro = new REGISTRODATOS()
 
@@ -390,21 +392,12 @@ class MethislabService implements ICompanyService{
                      */
 
                     if (eElement.getElementsByTagName("agent").item(0) != null) {
-
-                        if (eElement.getElementsByTagName("agent").item(0).getTextContent().toString().length() > 20) {
-                            datosRegistro.codigoAgencia = eElement.getElementsByTagName("agent").item(0).getTextContent().substring(0, 19)
-                        } else {
-                            datosRegistro.codigoAgencia = eElement.getElementsByTagName("agent").item(0).getTextContent()
-                        }
-
-                        datosRegistro.nomApellAgente = eElement.getElementsByTagName("agent").item(0).getTextContent()
+                        datosRegistro.codigoAgencia = requestService.obtenerAgente(eElement.getElementsByTagName("agent").item(0).getTextContent(), company, true)
+                        datosRegistro.nomApellAgente = requestService.obtenerAgente(eElement.getElementsByTagName("agent").item(0).getTextContent(), company, false)
                     } else {
-
                         datosRegistro.codigoAgencia = "."
                         datosRegistro.nomApellAgente = "."
                     }
-
-                    datosRegistro.nomApellAgente = nombreAgente
                 }
             }
 

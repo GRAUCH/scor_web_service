@@ -6,6 +6,7 @@ import com.scortelemed.TipoOperacion
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
 import hwsol.webservices.WsError
+import servicios.ExpedienteInforme
 
 import java.text.SimpleDateFormat
 import javax.jws.WebParam
@@ -357,7 +358,7 @@ class PsnUnderwrittingCaseManagementService	 {
 		StatusType status = null
 
 		Company company = Company.findByNombre(TipoCompany.PSN.getNombre())
-		RespuestaCRM expediente = new RespuestaCRM()
+		List<ExpedienteInforme> expediente = new ArrayList<>()
 		TransformacionUtil util = new TransformacionUtil()
 		ConsolidacionPolizaResponse resultado=new ConsolidacionPolizaResponse()
 		String identificador = ""
