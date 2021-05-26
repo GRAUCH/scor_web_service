@@ -76,7 +76,7 @@ class WsController {
                 sbInfo.append(" con fecha inicio ").append(fechaIni).append("-").append(" con fecha fin ").append(fechaFin)
                 expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt, null, 1, fechaIni, fechaFin, company.ou))
             }
-            if (Environment.current.name.equals("production_wildfly")) {
+            if (Environment.current.name?.equals("production_wildfly")) {
                 logginService.putInfoMessage("WS PRD")
                 soap = soapAlptisRecetteWSPRO
             } else {
@@ -88,7 +88,7 @@ class WsController {
             def contadorResultados = 0
             def x = 0
 
-            logginService.putInfoMessage(sbInfo.toString())
+            logginService.putInfoMessage(sbInfo?.toString())
 
             if (expedientes && expedientes.size() > 0) {
                 expedientes.each { item ->
@@ -100,7 +100,7 @@ class WsController {
                             def xml = tarificadorService.obtenerXMLExpedientePorZip(comprimido)
                             resulComprimidos[x] = comprimido + "###" + xml
                             x++
-                            cases.add(xml.toString())
+                            cases.add(xml?.toString())
                         }
 
                     }
@@ -108,13 +108,13 @@ class WsController {
 
                 cases.each { caso ->
                     String identificador = null
-                    String info = caso.toString().replace("\n", "").replace("\t", "").replace(" ", "").trim()
+                    String info = caso?.toString()?.replace("\n", "").replace("\t", "").replace(" ", "").trim()
                     Envio envio = new Envio()
                     envio.setFecha(new Date())
-                    envio.setCia(company.id.toString())
-                    if (info.toString().indexOf("dossierCode") > -1) {
-                        int inicio = info.toString().indexOf("dossierCode") + 12
-                        identificador = info.toString().substring(inicio, inicio + 8)
+                    envio.setCia(company.id?.toString())
+                    if (info?.toString()?.indexOf("dossierCode") > -1) {
+                        int inicio = info?.toString()?.indexOf("dossierCode") + 12
+                        identificador = info?.toString()?.substring(inicio, inicio + 8)
                         envio.setIdentificador(identificador)
                     }
                     envio.setInfo(info)
@@ -133,7 +133,7 @@ class WsController {
                                         def resultado = resulComprimidos[i].split("###")
                                         if (resultado.size() == 2) {
                                             if (resultado[1].contains('tuw')) {
-                                                mkp.yieldUnescaped(resultado[1].toString())
+                                                mkp.yieldUnescaped(resultado[1]?.toString())
                                                 zip(resultado[0])
                                                 contadorResultados++
                                             }
@@ -142,7 +142,7 @@ class WsController {
                                     i++
                                 }
                             }
-                            dateRequested(params.date.toString())
+                            dateRequested(params.date?.toString())
                             comments("ok")
                         }
                     }
@@ -152,14 +152,14 @@ class WsController {
                 alptisUnderwrittingCaseResultsRequest.tuw_cases = cases
                 alptisUnderwrittingCaseResultsRequest.dateRequested = fechaIni + " - " + fechaFin
                 alptisUnderwrittingCaseResultsRequest.comments = "ok"
-                alptisUnderwrittingCaseResultsRequest.respuesta_remota = responseRecette.getBody().toString()
+                alptisUnderwrittingCaseResultsRequest.respuesta_remota = responseRecette?.getBody()?.toString()
 
                 def requestXML = requestService.marshall(alptisUnderwrittingCaseResultsRequest, AlptisUnderwrittingCaseResultsRequest.class)
 
                 /**Remplazamos caracteres raros
                  *
                  */
-                requestXML = requestXML.toString().replace("<?xml version='1.0' encoding='UTF-8' standalone='yes'?>", "").replace("&lt;/", "</").replace("&lt;", "<").replace("/&gt;", "/>").replace("&gt;", ">")
+                requestXML = requestXML?.toString()?.replace("<?xml version='1.0' encoding='UTF-8' standalone='yes'?>", "").replace("&lt;/", "</").replace("&lt;", "<").replace("/&gt;", "/>").replace("&gt;", ">")
                 requestService.crear("AlptisUnderwrittingCasesResultsRequest", requestXML)
 
                 /**Enviamos correo informativo
@@ -175,13 +175,13 @@ class WsController {
             return redirect(controller: 'dashboard', action: 'index', params: [idCia: ''])
         } catch (Exception ex) {
             logginService.putError("Endpoint-" + opername, "Error en al obtener resultados para las fechas " + fechaIni + "-" + fechaFin + ":" + ex)
-            correoUtil.envioEmail("AlptisUnderwrittingCasesResultsRequest", cases.toString(), ex)
+            correoUtil.envioEmail("AlptisUnderwrittingCasesResultsRequest", cases?.toString(), ex)
             flash.message = "KO - Ver logs"
             return redirect(controller: 'dashboard', action: 'index', params: [idCia: ''])
 //            responseRecette = soap.send(connectTimeout: 300000, readTimeout: 300000) {
 //                body {
 //                    AlptisUnderwrittingCaseResultsRequest(xmlns: "http://www.scortelemed.com/schemas/alptis") {
-//                        dateRequested(params.date.toString())
+//                        dateRequested(params.date?.toString())
 //                        comments(ex)
 //                    }
 //                }
@@ -228,11 +228,11 @@ class WsController {
 
             def client = new SOAPClient('https://www.generali.es/evi_vidaEmissioServWeb/services/TeleSeleccionHandlerService?Company=M')
             client.authorization = new HTTPBasicAuthorization("vevisct", "21yb51gs")
-            Calendar cal = Calendar.getInstance()
+            Calendar cal = Calendar?.getInstance()
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd")
             Date fechaSalida = sdf.parse("2016/07/26")
 
-            logginService.putInfoMessage(sbInfo.toString())
+            logginService.putInfoMessage(sbInfo?.toString())
 
             resulExpedienteSoap.each { expediente ->
 
@@ -240,50 +240,50 @@ class WsController {
 
                 if (expediente instanceof ExpedienteInforme) {
 
-                    cal.setTime(sdf.parse(expediente.getFechaApertura()))
+                    cal.setTime(sdf.parse(expediente?.getFechaApertura()))
 
-                    if (cal.getTime().after(fechaSalida) || cal.getTime().equals(fechaSalida)) {
+                    if (cal?.getTime()?.after(fechaSalida) || cal?.getTime()?.equals(fechaSalida)) {
 
-                        def wpers = transformacion.transformarCodigoCliente(expediente.getObservaciones())
+                        def wpers = transformacion.transformarCodigoCliente(expediente?.getObservaciones())
                         def numeroSolicitud = expediente?.getNumSolicitud()
-                        def producto = expediente.getProducto().getCodigoProductoCompanya()
-                        def ramo = transformacion.transformarRamo(expediente.getProducto().getCodigoProductoCompanya())
-                        estadoCausa = transformacion.transformarTipoCausaTerminacion(expediente.getCodigoEstado(), expediente.getMotivoAnulacion())
+                        def producto = expediente?.getProducto()?.getCodigoProductoCompanya()
+                        def ramo = transformacion.transformarRamo(expediente?.getProducto()?.getCodigoProductoCompanya())
+                        estadoCausa = transformacion.transformarTipoCausaTerminacion(expediente?.getCodigoEstado(), expediente?.getMotivoAnulacion())
 
                         if (estadoCausa != null) {
 
                             //FECHA DE ULTIMOCAMBIOESTADO-ESTADO
-                            cal.setTime(sdf.parse(expediente.getFechaUltimoCambioEstado()))
-                            def anioEstado = cal.get(Calendar.YEAR).toString()
-                            int dia = cal.get(Calendar.DAY_OF_MONTH) - 1
-                            def diaEstado = dia++ < 10 ? "0" + dia : dia.toString()
-                            int mes = cal.get(Calendar.MONTH) + 1
-                            def mesEstado = mes < 10 ? "0" + mes : mes.toString()
+                            cal.setTime(sdf.parse(expediente?.getFechaUltimoCambioEstado()))
+                            def anioEstado = cal?.get(Calendar.YEAR)?.toString()
+                            int dia = cal?.get(Calendar.DAY_OF_MONTH) - 1
+                            def diaEstado = dia++ < 10 ? "0" + dia : dia?.toString()
+                            int mes = cal?.get(Calendar.MONTH) + 1
+                            def mesEstado = mes < 10 ? "0" + mes : mes?.toString()
 
                             //FECHA DE SOLICITUD-GENERACION
-                            cal.setTime(sdf.parse(expediente.getFechaSolicitud()))
-                            def anioSolicitud = cal.get(Calendar.YEAR).toString()
-                            dia = cal.get(Calendar.DAY_OF_MONTH) - 1
-                            def diaSolicitud = dia++ < 10 ? "0" + dia : dia.toString()
-                            mes = cal.get(Calendar.MONTH) + 1
-                            def mesSolicitud = mes < 10 ? "0" + mes : mes.toString()
+                            cal.setTime(sdf.parse(expediente?.getFechaSolicitud()))
+                            def anioSolicitud = cal?.get(Calendar.YEAR)?.toString()
+                            dia = cal?.get(Calendar.DAY_OF_MONTH) - 1
+                            def diaSolicitud = dia++ < 10 ? "0" + dia : dia?.toString()
+                            mes = cal?.get(Calendar.MONTH) + 1
+                            def mesSolicitud = mes < 10 ? "0" + mes : mes?.toString()
 
                             //SERVICIOS
                             def tlabr = "0"
                             def tlcom = "0"
 
-                            for (i in expediente.getServicios()) {
+                            for (i in expediente?.getServicios()) {
 
-                                if (Environment.current.name.equals("production_wildfly")) {
-                                    if (i.getCodigoStFacturacion().toString().equals("002245")) {
+                                if (Environment.current.name?.equals("production_wildfly")) {
+                                    if (i?.getCodigoStFacturacion()?.toString()?.equals("002245")) {
                                         tlabr = "1"
-                                    } else if (i.getCodigoStFacturacion().toString().equals("000991")) {
+                                    } else if (i?.getCodigoStFacturacion()?.toString()?.equals("000991")) {
                                         tlcom = "1"
                                     }
                                 } else {
-                                    if (i.getCodigoStFacturacion().toString().equals("002245")) {
+                                    if (i?.getCodigoStFacturacion()?.toString()?.equals("002245")) {
                                         tlabr = "1"
-                                    } else if (i.getCodigoStFacturacion().toString().equals("001761")) {
+                                    } else if (i?.getCodigoStFacturacion()?.toString()?.equals("001761")) {
                                         tlcom = "1"
                                     }
                                 }
@@ -294,13 +294,13 @@ class WsController {
                             def listaCoberturas = []
                             Cobertura cober = new Cobertura()
 
-                            if (estadoCausa != null && estadoCausa[0].equals("01")) {
+                            if (estadoCausa != null && estadoCausa[0]?.equals("01")) {
 
-                                def todasRechazadas = transformacion.obtenerEstadoCoberturas(expediente.getCoberturasExpediente())
+                                def todasRechazadas = transformacion.obtenerEstadoCoberturas(expediente?.getCoberturasExpediente())
 
-                                for (i in expediente.getCoberturasExpediente()) {
+                                for (i in expediente?.getCoberturasExpediente()) {
 
-                                    String codigoCobertura = transformacion.obtenerCodigoCajamar(i.getCodigoCobertura(), expediente.getProducto().getCodigoProductoCompanya())
+                                    String codigoCobertura = transformacion.obtenerCodigoCajamar(i?.getCodigoCobertura(), expediente?.getProducto()?.getCodigoProductoCompanya())
 
                                     if (codigoCobertura != "10001" && codigoCobertura != "10002") {
 
@@ -308,7 +308,7 @@ class WsController {
                                             cober = transformacion.devolverCoberturaCm(codigoCobertura, i, expediente?.getNumSolicitud())
                                         } catch (Exception ex) {
                                             excluirDelEnvio = true
-                                            logginService.putInfoMessage("Expediente " + expediente?.getCodigoST() + " no tiene tarificacion para la cobertura: " + i.getNombreCobertura() + ". Se excluye del envio")
+                                            logginService.putInfoMessage("Expediente " + expediente?.getCodigoST() + " no tiene tarificacion para la cobertura: " + i?.getNombreCobertura() + ". Se excluye del envio")
 
                                         }
 
@@ -336,7 +336,7 @@ class WsController {
                             String cadenaCoberturas = ""
                             listaCoberturas.each {
 
-                                cadenaCoberturas = cadenaCoberturas + "<cobert>" + "<cobern>" + it.getCobern() + "</cobern>" + "<sobmor>" + it.getSobmor() + "</sobmor>" + "<sobpri>" + it.getSobpri() + "</sobpri>" + "<vacobe>" + it.getVacobe() + "</vacobe>" + "</cobert>"
+                                cadenaCoberturas = cadenaCoberturas + "<cobert>" + "<cobern>" + it?.getCobern() + "</cobern>" + "<sobmor>" + it?.getSobmor() + "</sobmor>" + "<sobpri>" + it?.getSobpri() + "</sobpri>" + "<vacobe>" + it?.getVacobe() + "</vacobe>" + "</cobert>"
                             }
 
                             if (!excluirDelEnvio) {
@@ -384,9 +384,9 @@ class WsController {
                                 render "OK"
                                 Envio envio = new Envio()
                                 envio.setFecha(new Date())
-                                envio.setCia(company.id.toString())
+                                envio.setCia(company.id?.toString())
                                 envio.setIdentificador(expediente?.getNumSolicitud())
-                                envio.setInfo(response.getText().trim())
+                                envio.setInfo(response?.getText()?.trim())
                                 envio.save(flush: true)
                                 logginService.putInfoMessage("Informacion expediente " + expediente?.getCodigoST() + " enviado a " + company.nombre + " correctamente")
                             }
@@ -403,10 +403,10 @@ class WsController {
             sbInfo.append("\n")
             sbInfo.append(" se procesaron cantidad : ${resulExpedienteSoap.size()}")
             logginService.putInfoMessage(" * proceso envio de informacion para " + company.nombre + " terminado. *")
-            flash.message = sbInfo.toString()
-            return redirect(controller: 'dashboard', action: 'index', params: [idCia: ''])
+            flash.message = sbInfo?.toString()
+            return redirect(controller: 'dashboard', action: 'index',params: [idCia: ''])
         } catch (Exception ex) {
-            logginService.putErrorMessage("Error: " + opername + ". " + ex.getMessage().toString() + ". Detalles:" + ex.printStackTrace())
+            logginService.putErrorMessage("Error: " + opername + ". " + ex?.getMessage()?.toString() + ". Detalles:" + ex.printStackTrace())
             flash.message = "KO - Ver logs"
             return redirect(controller: 'dashboard', action: 'index', params: [idCia: ''])
         }
@@ -452,7 +452,7 @@ class WsController {
 
             XSDProcessExecutionServiceLocator locator = new XSDProcessExecutionServiceLocator()
 
-            if (Environment.current.name.equals("production_wildfly")) {
+            if (Environment.current.name?.equals("production_wildfly")) {
                 sbInfo.append("** Clave  de caser  entorno -> production_wildfly **")
                 username = "caser"
                 password = "a2aa10aPvQ8D5i6VDNwtXU5F7acSeKGre9PLL6iQEFLbbGfRgZdoHRzdygau"
@@ -465,27 +465,27 @@ class WsController {
             }
 
 
-            XSDProcessExecutionPort port = locator.getXSDProcessExecutionPort()
+            XSDProcessExecutionPort port = locator?.getXSDProcessExecutionPort()
             StringHolder salida = new StringHolder()
-            logginService.putInfoMessage(sbInfo.toString())
+            logginService.putInfoMessage(sbInfo?.toString())
             RegistrarEventoSCOR entradaDetalle = new RegistrarEventoSCOR()
             String stringRequest = null
             expedientes.each { expediente ->
                 entradaDetalle = transformacion.obtenerDetalle(expediente)
                 if (entradaDetalle != null) {
-                    stringRequest = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?><service_RegistrarEventoSCOR><inputMap type='map'><username type='String'><_value_>" + username + "</_value_></username><password type='String'><_value_>" + password + "</_value_></password><idExpediente type='Integer'><_value_>" + entradaDetalle.getIdExpediente() + "</_value_></idExpediente><codigoEvento type='String'><_value_>" + entradaDetalle.getCodigoEvento() + "</_value_></codigoEvento><detalle type='String'><_value_>" + entradaDetalle.getDetalle() + "</_value_></detalle><fecha type='Date'><_value_>" + entradaDetalle.getFechaCierre() + "</_value_></fecha></inputMap></service_RegistrarEventoSCOR>"
+                    stringRequest = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?><service_RegistrarEventoSCOR><inputMap type='map'><username type='String'><_value_>" + username + "</_value_></username><password type='String'><_value_>" + password + "</_value_></password><idExpediente type='Integer'><_value_>" + entradaDetalle?.getIdExpediente() + "</_value_></idExpediente><codigoEvento type='String'><_value_>" + entradaDetalle?.getCodigoEvento() + "</_value_></codigoEvento><detalle type='String'><_value_>" + entradaDetalle?.getDetalle() + "</_value_></detalle><fecha type='Date'><_value_>" + entradaDetalle?.getFechaCierre() + "</_value_></fecha></inputMap></service_RegistrarEventoSCOR>"
                     Thread.sleep(6000)
                     try {
                         port.doProcessExecution(stringRequest, salida)
                         Envio envio = new Envio()
                         envio.setFecha(new Date())
-                        envio.setCia(company.id.toString())
-                        envio.setIdentificador(entradaDetalle.getIdExpediente())
+                        envio.setCia(company.id?.toString())
+                        envio.setIdentificador(entradaDetalle?.getIdExpediente())
                         envio.setInfo(stringRequest)
                         envio.save(flush: true)
-                        logginService.putInfoMessage("Informacion de salida envio de cambios en expedientes " + entradaDetalle.getIdExpediente())
-                        logginService.putInfoMessage("Informacion recibida de cambios en expedientes " + entradaDetalle.getIdExpediente() + ":" + salida.value.trim())
-                        logginService.putInfoMessage("Informacion expedientes " + entradaDetalle.getIdExpediente() + " enviado a " + company.nombre + " correctamente")
+                        logginService.putInfoMessage("Informacion de salida envio de cambios en expedientes " + entradaDetalle?.getIdExpediente())
+                        logginService.putInfoMessage("Informacion recibida de cambios en expedientes " + entradaDetalle?.getIdExpediente() + ":" + salida.value.trim())
+                        logginService.putInfoMessage("Informacion expedientes " + entradaDetalle?.getIdExpediente() + " enviado a " + company.nombre + " correctamente")
 
                     } catch (Exception ex) {
                         /**Metemos en errores
@@ -493,13 +493,13 @@ class WsController {
                          */
                         Error error = new Error()
                         error.setFecha(new Date())
-                        error.setCia(company.id.toString())
-                        error.setIdentificador(entradaDetalle.getIdExpediente())
+                        error.setCia(company.id?.toString())
+                        error.setIdentificador(entradaDetalle?.getIdExpediente())
                         error.setInfo(stringRequest)
                         error.setOperacion("ENVIO ESTADO")
-                        error.setError("Peticion no realizada para solicitud: " + entradaDetalle.getIdExpediente() + ". Error: " + ex.getMessage())
+                        error.setError("Peticion no realizada para solicitud: " + entradaDetalle?.getIdExpediente() + ". Error: " + ex?.getMessage())
                         error.save(flush: true)
-                        logginService.putErrorMessage("Error: " + opername + ". No se ha podido mandar el caso a Caser. Detalles:" + ex.getMessage())
+                        logginService.putErrorMessage("Error: " + opername + ". No se ha podido mandar el caso a Caser. Detalles:" + ex?.getMessage())
                     }
 
                 }
@@ -509,17 +509,17 @@ class WsController {
             logginService.putInfoMessage("** Se enviaron :" + expedientes.size() + " **")
             sbInfo.append("\n")
             sbInfo.append("* se procesaron cantidad : ${expedientes.size()} *")
-            flash.message = sbInfo.toString()
-            return redirect(controller: 'dashboard', action: 'index', params: [idCia: ''])
+            flash.message = sbInfo?.toString()
+            return redirect(controller: 'dashboard', action: 'index',params: [idCia: ''])
         } catch (Exception ex) {
-            logginService.putErrorMessage("Error: " + opername + ". " + ex.getMessage() + ". Detalles:" + ex.getMessage())
+            logginService.putErrorMessage("Error: " + opername + ". " + ex?.getMessage() + ". Detalles:" + ex?.getMessage())
             Error error = new Error()
             error.setFecha(new Date())
-            error.setCia(company.id.toString())
+            error.setCia(company.id?.toString())
             error.setIdentificador(" ")
             error.setInfo("$controllerName")
             error.setOperacion(opername)
-            error.setError("Peticion no realizada para solicitud: " + ex.getMessage() + ". Error: " + ex.getMessage())
+            error.setError("Peticion no realizada para solicitud: " + ex?.getMessage() + ". Error: " + ex?.getMessage())
             error.save(flush: true)
             flash.message = "KO - Ver logs"
             return redirect(controller: 'dashboard', action: 'index', params: [idCia: ''])
@@ -569,8 +569,8 @@ class WsController {
                 expedientes.addAll(expedienteService.obtenerInformeExpedientes(companyVida.codigoSt, null, 2, fechaIni, fechaFin, company.ou))
             }
 
-            logginService.putInfoMessage(sbInfo.toString())
-            if (Environment.current.name.equals("production_wildfly")) {
+            logginService.putInfoMessage(sbInfo?.toString())
+            if (Environment.current.name?.equals("production_wildfly")) {
                 logginService.putInfoMessage(" ** end point de PRD**")
                 def usuario = "aplCORWS"
                 def password = "Wh1t3p&&\$"
@@ -583,7 +583,7 @@ class WsController {
             }
 
             long timeout = 3 * 60 * 1000; // Tres minuitos
-            stub._getServiceClient().getOptions().setTimeOutInMilliSeconds(timeout);
+            stub._getServiceClient()?.getOptions()?.setTimeOutInMilliSeconds(timeout);
 
             Dossier dossier = new Dossier()
             DossierDataStoreWSStub.SaveDossierResultsE resultsE = new DossierDataStoreWSStub.SaveDossierResultsE()
@@ -594,7 +594,7 @@ class WsController {
                 for (int i = 0; i < expedientes.size(); i++) {
                     try {
 
-                        expediente = expedientes.get(i)
+                        expediente = expedientes?.get(i)
                         logginService.putInfoMessage(" ** Comienzo el proceso para el dossier: ${expediente?.getNumSolicitud()} de AMA**")
                         if (!seExcluyeEnvio(expediente)) {
                             identificadorCaso = expediente?.getNumSolicitud()
@@ -608,11 +608,11 @@ class WsController {
                              *
                              */
                             Candidate candidate = new Candidate()
-                            candidate.setBirthDate(transformacion.fromStringToCalendar(expediente.getCandidato().getFechaNacimiento()))
-                            candidate.setFullName(expediente.getCandidato().getNombre() + " " + expediente.getCandidato().getApellidos())
+                            candidate.setBirthDate(transformacion.fromStringToCalendar(expediente?.getCandidato()?.getFechaNacimiento()))
+                            candidate.setFullName(expediente?.getCandidato()?.getNombre() + " " + expediente?.getCandidato()?.getApellidos())
 
-                            if (expediente.getCandidato().getSexo() != null) {
-                                candidate.setGender(expediente.getCandidato().getSexo() == TipoSexo.HOMBRE ? (short) 1 : (short) 2)
+                            if (expediente?.getCandidato()?.getSexo() != null) {
+                                candidate.setGender(expediente?.getCandidato()?.getSexo() == TipoSexo.HOMBRE ? (short) 1 : (short) 2)
                             } else {
                                 candidate.setGender((short) 1)
                             }
@@ -626,11 +626,11 @@ class WsController {
                             com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.Company cia = new com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.Company()
 
 
-                            if (expediente.getCandidato() != null && expediente.getCandidato().getCompanya() != null && expediente.getCandidato().getCompanya()?.getCodigoST().equals("1064")) {
+                            if (expediente?.getCandidato() != null && expediente?.getCandidato()?.getCompanya() != null && expediente?.getCandidato()?.getCompanya()?.getCodigoST()?.equals("1064")) {
                                 cia.setCompanyCode("C0803")
                                 cia.setCompanyDescription("A.M.A. Vida")
                             }
-                            if (expediente.getCandidato() != null && expediente.getCandidato().getCompanya() != null && expediente.getCandidato().getCompanya()?.getCodigoST().equals("1059")) {
+                            if (expediente?.getCandidato() != null && expediente?.getCandidato()?.getCompanya() != null && expediente?.getCandidato()?.getCompanya()?.getCodigoST()?.equals("1059")) {
                                 cia.setCompanyCode("M0328")
                                 cia.setCompanyDescription("A.M.A.")
                             }
@@ -641,16 +641,16 @@ class WsController {
                              */
                             Product producto = new Product()
 
-                            if (expediente.getProducto() != null) {
-                                if (expediente.getProducto().getCodigoProductoCompanya().toString().equals("P49")) {
+                            if (expediente?.getProducto() != null) {
+                                if (expediente?.getProducto()?.getCodigoProductoCompanya()?.toString()?.equals("P49")) {
                                     producto.setProductCode("0013")
                                     logginService.putInfoMessage(" ** Producto: 0013 **")
                                 } else {
-                                    producto.setProductCode(expediente.getProducto().getCodigoProductoCompanya())
-                                    logginService.putInfoMessage(" ** Producto: ${expediente.getProducto().getCodigoProductoCompanya()} **")
+                                    producto.setProductCode(expediente?.getProducto()?.getCodigoProductoCompanya())
+                                    logginService.putInfoMessage(" ** Producto: ${expediente?.getProducto()?.getCodigoProductoCompanya()} **")
                                 }
-                                producto.setProductDescription(expediente.getProducto().getNombre())
-                                logginService.putInfoMessage(" ** Producto: ${expediente.getProducto().getNombre()} **")
+                                producto.setProductDescription(expediente?.getProducto()?.getNombre())
+                                logginService.putInfoMessage(" ** Producto: ${expediente?.getProducto()?.getNombre()} **")
                             } else {
                                 producto.setProductCode("")
                                 producto.setProductDescription("")
@@ -659,74 +659,59 @@ class WsController {
 
                             dossier.setProduct(producto)
 
-                            if (expediente.getCoberturasExpediente() != null && expediente.getCoberturasExpediente().size() > 0) {
+                            if (expediente?.getCoberturasExpediente() != null && expediente?.getCoberturasExpediente()?.size() > 0) {
 
-                                expediente.getCoberturasExpediente().each { CoberturaExpediente coberturasPoliza ->
+                                expediente?.getCoberturasExpediente()?.each { CoberturaExpediente coberturasPoliza ->
 
 
                                     BenefitInformation benefitInformation = new BenefitInformation();
-                                    logginService.putInfoMessage(" ** Cobertura ${coberturasPoliza.getCodigoCobertura()} **")
-                                    benefitInformation.setBenefitName(coberturasPoliza.getNombreCobertura());
-                                    benefitInformation.setBenefitCode(coberturasPoliza.getCodigoCobertura());
+                                    logginService.putInfoMessage(" ** Cobertura ${coberturasPoliza?.getCodigoCobertura()} **")
+                                    benefitInformation.setBenefitName(coberturasPoliza?.getNombreCobertura());
+                                    benefitInformation.setBenefitCode(coberturasPoliza?.getCodigoCobertura());
 
                                     BenefitResultValue benefitResultValue = new BenefitResultValue();
 
                                     benefitResultValue.setDescLoadingCapital("");
                                     benefitResultValue.setDescLoadingPremium("");
-                                    benefitResultValue.setLoadingCapital(BigDecimal.valueOf(Long.valueOf("0")));
-                                    benefitResultValue.setLoadingPremium(BigDecimal.valueOf(Long.valueOf("0")));
+                                    benefitResultValue.setLoadingCapital(BigDecimal.valueOf(0));
+                                    benefitResultValue.setLoadingPremium(BigDecimal.valueOf(0));
 
 
-                                    if (coberturasPoliza.getCodResultadoCobertura() != null && coberturasPoliza.getCodResultadoCobertura().trim().startsWith("3")) {
+                                    if (coberturasPoliza?.getCodResultadoCobertura()?.trim()?.startsWith("3") && (notNullNotEmpty(coberturasPoliza?.getValoracionCapital()) || notNullNotEmpty(coberturasPoliza?.getValoracionPrima()))) {
+                                        if(notNullNotEmpty(coberturasPoliza?.getValoracionCapital()) && notNullNotEmpty(coberturasPoliza?.getValoracionPrima())) {
+                                            benefitInformation.setBenefitResultCode("3");
+                                            benefitInformation.setBenefitResultType("Combinado");
+                                            benefitResultValue.setDescLoadingCapital(coberturasPoliza?.getCodResultadoCobertura()?.toString())
+                                            benefitResultValue.setDescLoadingPremium(coberturasPoliza?.getCodResultadoCobertura()?.toString())
+                                            benefitResultValue.setLoadingCapital(new BigDecimal(coberturasPoliza?.getValoracionCapital()?.replace(",", ".")))
+                                            benefitResultValue.setLoadingPremium(new BigDecimal(coberturasPoliza?.getValoracionPrima()?.replace(",", ".")))
 
-                                        /**
-                                         * SOBREMORTALIDAD (EXTRAPRIMA para AMA)
-                                         */
-                                        if (coberturasPoliza.getValoracionCapital() != null && !coberturasPoliza.getValoracionCapital().trim().isEmpty() && (coberturasPoliza.getValoracionPrima() == null || coberturasPoliza.getValoracionPrima().trim().isEmpty())) {
-
+                                        } else if (notNullNotEmpty(coberturasPoliza?.getValoracionCapital())) {
                                             benefitInformation.setBenefitResultCode("31");
                                             benefitInformation.setBenefitResultType("Sobremortalidad");
-                                            benefitResultValue.setDescLoadingCapital(coberturasPoliza.getCodResultadoCobertura().toString());
+                                            benefitResultValue.setDescLoadingCapital(coberturasPoliza?.getCodResultadoCobertura()?.toString());
                                             benefitResultValue.setDescLoadingPremium("");
-                                            benefitResultValue.setLoadingCapital(new BigDecimal(coberturasPoliza.getValoracionCapital().replace(",", ".")));
+                                            benefitResultValue.setLoadingCapital(new BigDecimal(coberturasPoliza?.getValoracionCapital()?.replace(",", ".")));
                                             benefitResultValue.setLoadingPremium(new BigDecimal(0));
 
-                                            /**
-                                             * SOBREPRIMA
-                                             */
-                                        } else if (coberturasPoliza.getValoracionPrima() != null && !coberturasPoliza.getValoracionPrima().trim().isEmpty() && (coberturasPoliza.getValoracionCapital() == null || coberturasPoliza.getValoracionCapital().trim().isEmpty())) {
-
+                                        } else if (notNullNotEmpty(coberturasPoliza?.getValoracionPrima())) {
                                             benefitInformation.setBenefitResultCode("30");
                                             benefitInformation.setBenefitResultType("Sobreprima");
                                             benefitResultValue.setDescLoadingCapital("");
-                                            benefitResultValue.setDescLoadingPremium(coberturasPoliza.getCodResultadoCobertura().toString());
+                                            benefitResultValue.setDescLoadingPremium(coberturasPoliza?.getCodResultadoCobertura()?.toString());
                                             benefitResultValue.setLoadingCapital(new BigDecimal(0));
-                                            benefitResultValue.setLoadingPremium(new BigDecimal(coberturasPoliza.getValoracionPrima().replace(",", ".")));
+                                            benefitResultValue.setLoadingPremium(new BigDecimal(coberturasPoliza?.getValoracionPrima()?.replace(",", ".")));
 
-                                        } else {
-
-                                            if (coberturasPoliza.getCodResultadoCobertura() != null) {
-
-                                                benefitInformation.setBenefitResultCode("3");
-                                                benefitInformation.setBenefitResultType("Combinado");
-                                                benefitResultValue.setDescLoadingCapital(coberturasPoliza.getCodResultadoCobertura().toString())
-                                                benefitResultValue.setDescLoadingPremium(coberturasPoliza.getCodResultadoCobertura().toString())
-                                                benefitResultValue.setLoadingCapital(new BigDecimal(coberturasPoliza.getValoracionCapital().replace(",", ".")))
-                                                benefitResultValue.setLoadingPremium(new BigDecimal(coberturasPoliza.getValoracionPrima().replace(",", ".")))
-                                            }
                                         }
-                                    } else if (coberturasPoliza.getCodResultadoCobertura() != null) {
-
-
-                                        benefitInformation.setBenefitResultCode(coberturasPoliza.getCodResultadoCobertura());
-                                        benefitInformation.setBenefitResultType(devolverLiteralCobertura(coberturasPoliza.getCodResultadoCobertura()));
+                                    } else if (coberturasPoliza?.getCodResultadoCobertura() != null) {
+                                        benefitInformation.setBenefitResultCode(coberturasPoliza?.getCodResultadoCobertura());
+                                        benefitInformation.setBenefitResultType(devolverLiteralCobertura(coberturasPoliza?.getCodResultadoCobertura()));
                                         benefitResultValue.setDescLoadingCapital("");
                                         benefitResultValue.setDescLoadingPremium("");
                                         benefitResultValue.setLoadingCapital(new BigDecimal(0));
                                         benefitResultValue.setLoadingPremium(new BigDecimal(0));
 
                                     } else {
-
                                         benefitInformation.setBenefitResultCode("");
                                         benefitInformation.setBenefitResultType("");
                                         benefitResultValue.setDescLoadingCapital("");
@@ -738,9 +723,9 @@ class WsController {
 
                                     benefitInformation.setBenefitResultValue(benefitResultValue);
 
-                                    if (transformacion.hasElements(coberturasPoliza.getExclusiones())) {
+                                    if (transformacion.hasElements(coberturasPoliza?.getExclusiones())) {
 
-                                        StringTokenizer st = new StringTokenizer(coberturasPoliza.getExclusiones(), ";");
+                                        StringTokenizer st = new StringTokenizer(coberturasPoliza?.getExclusiones(), ";");
 
                                         while (st.hasMoreTokens()) {
 
@@ -755,9 +740,9 @@ class WsController {
                                         benefitInformation.setExclusionsList(null);
                                     }
 
-                                    if (transformacion.hasElements(coberturasPoliza.getInformesMedicos())) {
+                                    if (transformacion.hasElements(coberturasPoliza?.getInformesMedicos())) {
 
-                                        StringTokenizer st = new StringTokenizer(coberturasPoliza.getInformesMedicos(), ";");
+                                        StringTokenizer st = new StringTokenizer(coberturasPoliza?.getInformesMedicos(), ";");
 
                                         while (st.hasMoreTokens()) {
 
@@ -772,9 +757,9 @@ class WsController {
                                         benefitInformation.addMedicalReportsList(null);
                                     }
 
-                                    if (transformacion.hasElements(coberturasPoliza.getNotas())) {
+                                    if (transformacion.hasElements(coberturasPoliza?.getNotas())) {
 
-                                        StringTokenizer st = new StringTokenizer(coberturasPoliza.getNotas(), ";");
+                                        StringTokenizer st = new StringTokenizer(coberturasPoliza?.getNotas(), ";");
 
                                         while (st.hasMoreTokens()) {
 
@@ -789,9 +774,9 @@ class WsController {
                                         benefitInformation.addAdditionalNotesList(null);
                                     }
 
-                                    if (transformacion.hasElements(coberturasPoliza.getValoracionTemporal())) {
+                                    if (transformacion.hasElements(coberturasPoliza?.getValoracionTemporal())) {
 
-                                        StringTokenizer st = new StringTokenizer(coberturasPoliza.getValoracionTemporal(), ";");
+                                        StringTokenizer st = new StringTokenizer(coberturasPoliza?.getValoracionTemporal(), ";");
 
                                         while (st.hasMoreTokens()) {
 
@@ -806,8 +791,8 @@ class WsController {
                                         benefitInformation.addTemporalLoadingsList(null);
                                     }
 
-                                    if (coberturasPoliza.getCapitalCobertura() != null && !coberturasPoliza.getCapitalCobertura().isEmpty()) {
-                                        dossier.setCapitalInsured(new BigDecimal(coberturasPoliza.getCapitalCobertura()))
+                                    if (notNullNotEmpty(coberturasPoliza?.getCapitalCobertura())) {
+                                        dossier.setCapitalInsured(new BigDecimal(coberturasPoliza?.getCapitalCobertura()))
                                     } else {
                                         dossier.setCapitalInsured(new BigDecimal(0))
                                     }
@@ -827,46 +812,46 @@ class WsController {
                                 saveResultIN.setListFiles((File[]) files.toArray())
                                 saveResultIN.setBenefitsInformationsList((BenefitInformation[]) listaBenefitInformation.toArray());
                                 saveResultIN.setDossier(dossier)
-                                saveResultIN.getDossier().setResultsCode("OK");
-                                saveResultIN.getDossier().setState((short) 1);
+                                saveResultIN?.getDossier()?.setResultsCode("OK");
+                                saveResultIN?.getDossier()?.setState((short) 1);
                                 saveResult.setDossierResultsIN(saveResultIN)
                                 resultsE.setSaveDossierResults(saveResult)
                                 logginService.putInfoMessage("Listo para enviar a AMA")
                                 respuestaCRM = stub.saveDossierResults(resultsE);
                                 logginService.putInfoMessage("** El resultado fue : **")
-                                if (respuestaCRM != null && respuestaCRM.localSaveDossierResultsResponse != null && respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT() != null && respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localTypeResult.equals("OK")) {
+                                if (respuestaCRM != null && respuestaCRM?.localSaveDossierResultsResponse != null && respuestaCRM?.localSaveDossierResultsResponse?.getDossierResultsOUT() != null && respuestaCRM?.localSaveDossierResultsResponse?.getDossierResultsOUT()?.localTypeResult?.equals("OK")) {
 
-                                    com.scortelemed.Envio envio = new com.scortelemed.Envio()
+                                    Envio envio = new Envio()
                                     envio.setFecha(new Date())
-                                    envio.setCia(company.id.toString())
+                                    envio.setCia(company.id?.toString())
                                     envio.setIdentificador(expediente?.getNumSolicitud())
-                                    envio.setInfo("Estado: " + expediente.getCodigoEstado().toString() + "-Respuesta: " + respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localDescriptionResultList[0])
+                                    envio.setInfo("Estado: " + expediente?.getCodigoEstado()?.toString() + "-Respuesta: " + respuestaCRM?.localSaveDossierResultsResponse?.getDossierResultsOUT()?.localDescriptionResultList[0])
                                     envio.save(flush: true)
 
                                     logginService.putInfoMessage("Informacion de salida de expediente " + expediente?.getCodigoST() + ". Codigo AMA: " + expediente?.getNumSolicitud())
-                                    logginService.putInfoMessage("Respuesta desde AMA al envio de informacion para expediente " + expediente?.getCodigoST() + ". " + respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localDescriptionResultList[0])
+                                    logginService.putInfoMessage("Respuesta desde AMA al envio de informacion para expediente " + expediente?.getCodigoST() + ". " + respuestaCRM?.localSaveDossierResultsResponse?.getDossierResultsOUT()?.localDescriptionResultList[0])
                                     logginService.putInfoMessage("Informacion expediente " + expediente?.getCodigoST() + " enviado a " + company.nombre + " correctamente")
 
-                                } else if (respuestaCRM != null && respuestaCRM.localSaveDossierResultsResponse != null && respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT() != null && respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localTypeResult.equals("ERROR")) {
+                                } else if (respuestaCRM != null && respuestaCRM?.localSaveDossierResultsResponse != null && respuestaCRM?.localSaveDossierResultsResponse?.getDossierResultsOUT() != null && respuestaCRM?.localSaveDossierResultsResponse?.getDossierResultsOUT()?.localTypeResult?.equals("ERROR")) {
 
                                     Error error = new Error()
                                     error.setFecha(new Date())
-                                    error.setCia(company.id.toString())
+                                    error.setCia(company.id?.toString())
                                     error.setIdentificador(identificadorCaso)
                                     error.setInfo("Error en el envio")
                                     error.setOperacion("ENVIO")
-                                    error.setError("Peticion no realizada para solicitud: " + identificadorCaso + ". Error: " + respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localDescriptionResultList[0])
+                                    error.setError("Peticion no realizada para solicitud: " + identificadorCaso + ". Error: " + respuestaCRM?.localSaveDossierResultsResponse?.getDossierResultsOUT()?.localDescriptionResultList[0])
                                     error.save(flush: true)
 
                                     logginService.putInfoMessage("Informacion de salida de expediente " + expediente?.getCodigoST() + ". Codigo AMA: " + expediente?.getNumSolicitud())
-                                    logginService.putInfoMessage("Respuesta desde AMA al envio de informacion para expediente " + expediente?.getCodigoST() + ". ERROR:" + respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localDescriptionResultList[0])
+                                    logginService.putInfoMessage("Respuesta desde AMA al envio de informacion para expediente " + expediente?.getCodigoST() + ". ERROR:" + respuestaCRM?.localSaveDossierResultsResponse?.getDossierResultsOUT()?.localDescriptionResultList[0])
                                     logginService.putInfoMessage("Informacion expediente " + expediente?.getCodigoST() + " no enviado a " + company.nombre + " correctamente")
 
                                 } else {
 
                                     Error error = new Error()
                                     error.setFecha(new Date())
-                                    error.setCia(company.id.toString())
+                                    error.setCia(company.id?.toString())
                                     error.setIdentificador(identificadorCaso)
                                     error.setInfo("Error en el envio")
                                     error.setOperacion("ENVIO")
@@ -886,19 +871,19 @@ class WsController {
                     } catch (Exception ex) {
                         Error error = new Error()
                         error.setFecha(new Date())
-                        error.setCia(company.id.toString())
+                        error.setCia(company.id?.toString())
                         error.setIdentificador(identificadorCaso)
                         error.setInfo("Error en el envio")
                         error.setOperacion("ENVIO")
-                        if (respuestaCRM != null && respuestaCRM.localSaveDossierResultsResponse != null && respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT() != null && respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localTypeResult.equals("ERROR")) {
-                            error.setError("Peticion no realizada para solicitud: " + identificadorCaso + ". Error: " + respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localDescriptionResultList[0])
+                        if (respuestaCRM != null && respuestaCRM?.localSaveDossierResultsResponse != null && respuestaCRM?.localSaveDossierResultsResponse?.getDossierResultsOUT() != null && respuestaCRM?.localSaveDossierResultsResponse?.getDossierResultsOUT()?.localTypeResult?.equals("ERROR")) {
+                            error.setError("Peticion no realizada para solicitud: " + identificadorCaso + ". Error: " + respuestaCRM?.localSaveDossierResultsResponse?.getDossierResultsOUT()?.localDescriptionResultList[0])
                             logginService.putInfoMessage("Informacion de salida de expediente " + expediente?.getCodigoST() + ". Codigo AMA: " + expediente?.getNumSolicitud())
-                            logginService.putInfoMessage("Respuesta desde AMA al envio de informacion para expediente " + expediente?.getCodigoST() + ". ERROR: " + respuestaCRM.localSaveDossierResultsResponse.getDossierResultsOUT().localDescriptionResultList[0])
+                            logginService.putInfoMessage("Respuesta desde AMA al envio de informacion para expediente " + expediente?.getCodigoST() + ". ERROR: " + respuestaCRM?.localSaveDossierResultsResponse?.getDossierResultsOUT()?.localDescriptionResultList[0])
                             logginService.putInfoMessage("Informacion expediente " + expediente?.getCodigoST() + " no enviado a " + company.nombre)
                         } else {
-                            error.setError("Peticion no realizada para solicitud: " + identificadorCaso + ". Error: " + ex.getMessage())
+                            error.setError("Peticion no realizada para solicitud: " + identificadorCaso + ". Error: " + ex?.getMessage())
                             logginService.putInfoMessage("Informacion de salida de expediente " + expediente?.getCodigoST() + ". Codigo AMA: " + expediente?.getNumSolicitud())
-                            logginService.putInfoMessage("Respuesta desde AMA al envio de informacion para expediente " + expediente?.getCodigoST() + ". ERROR: " + ex.getMessage())
+                            logginService.putInfoMessage("Respuesta desde AMA al envio de informacion para expediente " + expediente?.getCodigoST() + ". ERROR: " + ex?.getMessage())
                             logginService.putInfoMessage("Informacion expediente " + expediente?.getCodigoST() + " no enviado a " + company.nombre)
                         }
                         error.save(flush: true)
@@ -910,14 +895,14 @@ class WsController {
                 logginService.putInfoMessage("** Se enviaron :" + expedientes.size() + " **")
                 sbInfo.append("\n")
                 sbInfo.append("*  se procesaron cantidad : ${expedientes.size()} *")
-                flash.message = sbInfo.toString()
+                flash.message = sbInfo?.toString()
             } else {
                 flash.message = "No hay expedientes disponibles bajo esos criterios de busqueda"
             }
             return redirect(controller: 'dashboard', action: 'index', params: [idCia: ''])
         } catch (Exception ex) {
 
-            logginService.putErrorMessage("Error: " + opername + ". No se ha podido mandar el caso a Ama. Detalles:" + ex.getMessage())
+            logginService.putErrorMessage("Error: " + opername + ". No se ha podido mandar el caso a Ama. Detalles:" + ex?.getMessage())
             flash.message = "KO - Ver logs"
             return redirect(controller: 'dashboard', action: 'index', params: [idCia: ''])
         }

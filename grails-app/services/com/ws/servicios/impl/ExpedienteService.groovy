@@ -137,7 +137,7 @@ class ExpedienteService implements IExpedienteService {
         Filtro filtro = new Filtro()
         filtro.setClave(ClaveFiltro.EXPEDIENTE)
         filtro.setValor(codigoST)
-        return consultaExpediente(pais, filtro).listaExpedientes
+        return consultaExpediente(pais, filtro)?.getListaExpedientes()
     }
 
     def modificaExpediente(UnidadOrganizativa pais, Expediente expediente, def servicioScorList, def paqueteScorList) {
