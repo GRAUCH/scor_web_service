@@ -15,7 +15,7 @@ grails.project.fork = [
         // configure settings for the test-app JVM, uses the daemon by default
         test: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, daemon:true],
         // configure settings for the run-app JVM
-        run: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, forkReserve:false],
+        run: [maxMemory: 4096, minMemory: 768, debug: false, maxPerm: 4096, forkReserve:false],
         // configure settings for the run-war JVM
         war: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, forkReserve:false],
         // configure settings for the Console UI JVM
@@ -37,14 +37,17 @@ grails.project.dependency.resolution = {
     repositories {
         inherits true // Whether to inherit repository definitions from plugins
 
-        grailsPlugins()
+        //grailsPlugins() -> mavenRepo "https://repo.grails.org/grails/plugins/"
+		grailsPlugins()		
+		mavenRepo "https://repo.grails.org/artifactory/core"
         grailsHome()
         mavenLocal()
-        grailsCentral()
-        mavenCentral()
-
+        //grailsCentral() -> mavenRepo "https://grails.org/plugins/"
+		grailsCentral()
+        //mavenCentral() -> mavenRepo "https://repo1.maven.org/maven2/"
+		mavenCentral()
+		
         mavenRepo "http://repo.spring.io/milestone/"
-        mavenRepo "https://repo.grails.org/grails/plugins"
         // uncomment these (or add new ones) to enable remote dependency resolution from public Maven repositories
 //		mavenRepo "http://snapshots.repository.codehaus.org"
 //        mavenRepo "http://repository.codehaus.org"

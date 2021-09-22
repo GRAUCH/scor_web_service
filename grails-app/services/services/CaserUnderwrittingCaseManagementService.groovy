@@ -72,6 +72,7 @@ class CaserUnderwrittingCaseManagementService {
 
                 if (company.generationAutomatic) {
 
+					//TODO: HAY QUE AVERIGUAR SI AÑADIENDO EL SUBPOLICYNUMBER SE PUEDE PROPAGAR AL BPEL
                     requestXML = caserService.marshall(gestionReconocimientoMedico)
                     requestBBDD = requestService.crear(opername, requestXML)
 

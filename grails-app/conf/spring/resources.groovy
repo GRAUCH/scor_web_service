@@ -2,7 +2,7 @@ import com.scortelemed.Conf
 import hwsol.webservices.MyUserDetailsContextMapper
 import hwsol.webservices.EventIntrceptorListener
 
-
+//TODO: caserInfantil: AQUÍ HAY CONFIGURACIÓN DE AUTENTICACIÓN
 beans = {
 
     ldapUserDetailsMapper(MyUserDetailsContextMapper){

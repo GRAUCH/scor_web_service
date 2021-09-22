@@ -4,7 +4,7 @@ import com.ws.enumeration.UnidadOrganizativa
 
 class Company {
 	
-	String id
+	//String id
 	String nombre
 	String codigoSt
 	String userCrm

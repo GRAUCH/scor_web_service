@@ -86,7 +86,9 @@ class CaserService implements ICompanyService{
         expediente.setRequestState(util.devolverStateType(expedientePoliza.getCodigoEstado()))
         expediente.setProductCode(util.devolverDatos(expedientePoliza.getProducto().getCodigoProductoCompanya()))
         expediente.setPolicyNumber(util.devolverDatos(expedientePoliza.getNumPoliza()))
-        expediente.setCertificateNumber(util.devolverDatos(expedientePoliza.getNumCertificado()))
+		
+		//TODO: caserInfantil: expediente.setSubPolicyNumber no existe, pero se usa el campo7 para almacenarlo
+		expediente.setCertificateNumber(util.devolverDatos(expedientePoliza.getNumCertificado()))
 
 
         if (expedientePoliza.getCandidato() != null) {
