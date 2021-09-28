@@ -181,7 +181,7 @@ class ExpedienteService implements IExpedienteService {
         try {
             String codigoSt = companyService.getCodigoStManual(req)
             listadoFinal.add(buildCabecera(req, codigoSt))
-            listadoFinal.add(companyService.buildDatos(req, codigoSt))
+            listadoFinal.addAll(companyService.buildDatos(req, codigoSt))
             listadoFinal.add(buildPie(null))
             payload.cabeceraOrDATOSOrPIE = listadoFinal
         } catch (Exception e) {

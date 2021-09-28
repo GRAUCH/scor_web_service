@@ -21,7 +21,6 @@ import javax.xml.namespace.QName;
 
 public final class CaserUnderwrittingCaseManagementService_CaserUnderwrittingCaseManagementServicePort_Client {
 
-	//TODO: caserInfantil: aquí parece que se hace la correlación de la URL del namespace con el paquete java
     private static final QName SERVICE_NAME = new QName("http://www.scortelemed.com/schemas/caser", "CaserUnderwrittingCaseManagementServiceService");
 
     private CaserUnderwrittingCaseManagementService_CaserUnderwrittingCaseManagementServicePort_Client() {
@@ -71,65 +70,57 @@ public final class CaserUnderwrittingCaseManagementService_CaserUnderwrittingCas
         {
         System.out.println("Invoking gestionReconocimientoMedico...");
         com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest = new com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest();
-        
-        com.scortelemed.schemas.caser.ReconocimientoMedico _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1 = new com.scortelemed.schemas.caser.ReconocimientoMedico();
-        
-        com.scortelemed.schemas.caser.ReconocimientoMedico.CandidateInformation _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_CandidateInformation = new com.scortelemed.schemas.caser.ReconocimientoMedico.CandidateInformation();
-        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_CandidateInformation.setFiscalIdentificationNumber("FiscalIdentificationNumber642087568");
-        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_CandidateInformation.setName("Name-1110344521");
-        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_CandidateInformation.setSurname("Surname1241550343");
-        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_CandidateInformation.setAddress("Address-1986894848");
-        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_CandidateInformation.setCity("City1415369730");
-        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_CandidateInformation.setProvince("Province-1126729997");
-        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_CandidateInformation.setCountry("Country-1349307773");
-        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_CandidateInformation.setPostalCode("PostalCode145299418");
-        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_CandidateInformation.setEmail("Email895483464");
-        com.scortelemed.schemas.caser.GenderType _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_CandidateInformationGender = com.scortelemed.schemas.caser.GenderType.H;
-        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_CandidateInformation.setGender(_gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_CandidateInformationGender);
-        com.scortelemed.schemas.caser.CivilStateType _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_CandidateInformationCivilState = com.scortelemed.schemas.caser.CivilStateType.V;
-        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_CandidateInformation.setCivilState(_gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_CandidateInformationCivilState);
-        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_CandidateInformation.setMobileNumber("MobileNumber-868249385");
-        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_CandidateInformation.setPhoneNumber1("PhoneNumber11678585805");
-        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_CandidateInformation.setPhoneNumber2("PhoneNumber2-1577186249");
-        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_CandidateInformation.setPassword("Password-308051011");
-        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_CandidateInformation.setIgp("Igp167156298");
-        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_CandidateInformation.setAgente("Agente1318863377");
-        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_CandidateInformation.setProductCode("ProductCode-1726956057");
-        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_CandidateInformation.setBirthDate(null);
-        com.scortelemed.schemas.caser.OperationType _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_CandidateInformationOperationType = com.scortelemed.schemas.caser.OperationType.N;
-        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_CandidateInformation.setOperationType(_gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_CandidateInformationOperationType);
-        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1.setCandidateInformation(_gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_CandidateInformation);
-        com.scortelemed.schemas.caser.ReconocimientoMedico.PolicyHolderInformation _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_PolicyHolderInformation = new com.scortelemed.schemas.caser.ReconocimientoMedico.PolicyHolderInformation();
-        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_PolicyHolderInformation.setFiscalIdentificationNumber("FiscalIdentificationNumber-81118464");
-        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_PolicyHolderInformation.setName("Name-429462941");
-        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_PolicyHolderInformation.setSurname1("Surname12142507830");
-        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_PolicyHolderInformation.setSurname2("Surname2211550634");
-        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_PolicyHolderInformation.setPolicyNumber("PolicyNumber-973084711");
-        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_PolicyHolderInformation.setCertificateNumber("CertificateNumber-1797965073");
-        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_PolicyHolderInformation.setRequestDate(javax.xml.datatype.DatatypeFactory.newInstance().newXMLGregorianCalendar("2018-09-10T18:22:38.606+02:00"));
-        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_PolicyHolderInformation.setRequestNumber("RequestNumber-105039969");
-        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_PolicyHolderInformation.setComments("Comments-446270116");
-        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1.setPolicyHolderInformation(_gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_PolicyHolderInformation);
-        java.util.List<com.scortelemed.schemas.caser.ReconocimientoMedico.ServiceInformation> _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_ServiceInformation = new java.util.ArrayList<com.scortelemed.schemas.caser.ReconocimientoMedico.ServiceInformation>();
-        com.scortelemed.schemas.caser.ReconocimientoMedico.ServiceInformation _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_ServiceInformationVal1 = new com.scortelemed.schemas.caser.ReconocimientoMedico.ServiceInformation();
-        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_ServiceInformationVal1.setServiceType("ServiceType-1181955175");
-        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_ServiceInformationVal1.setServiceCode("ServiceCode1268953083");
-        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_ServiceInformationVal1.setServiceDescription("ServiceDescription962979367");
-        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_ServiceInformation.add(_gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_ServiceInformationVal1);
-        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1.getServiceInformation().addAll(_gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_ServiceInformation);
-        java.util.List<com.scortelemed.schemas.caser.ReconocimientoMedico.BenefitsType> _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_BenefitsType = new java.util.ArrayList<com.scortelemed.schemas.caser.ReconocimientoMedico.BenefitsType>();
-        com.scortelemed.schemas.caser.ReconocimientoMedico.BenefitsType _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_BenefitsTypeVal1 = new com.scortelemed.schemas.caser.ReconocimientoMedico.BenefitsType();
-        com.scortelemed.schemas.caser.BenefictNameType _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_BenefitsTypeVal1BenefictName = com.scortelemed.schemas.caser.BenefictNameType.DISABILITY_30_90;
-        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_BenefitsTypeVal1.setBenefictName(_gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_BenefitsTypeVal1BenefictName);
-        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_BenefitsTypeVal1.setBenefictCode("BenefictCode1702377472");
-        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_BenefitsTypeVal1.setBenefictCapital("BenefictCapital487607661");
-        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_BenefitsType.add(_gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_BenefitsTypeVal1);
-        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1.getBenefitsType().addAll(_gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientoMedico1_BenefitsType);
-        
-        java.util.List<com.scortelemed.schemas.caser.ReconocimientoMedico> _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientosMedicos = new java.util.ArrayList<com.scortelemed.schemas.caser.ReconocimientoMedico>();
-        
-        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest.getReconocimientosMedicos().addAll(_gestionReconocimientoMedico_gestionReconocimientoMedicoRequest_reconocimientosMedicos);
-        
+        com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest.CandidateInformation _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestCandidateInformation = new com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest.CandidateInformation();
+        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestCandidateInformation.setFiscalIdentificationNumber("FiscalIdentificationNumber642087568");
+        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestCandidateInformation.setName("Name-1110344521");
+        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestCandidateInformation.setSurname("Surname1241550343");
+        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestCandidateInformation.setAddress("Address-1986894848");
+        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestCandidateInformation.setCity("City1415369730");
+        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestCandidateInformation.setProvince("Province-1126729997");
+        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestCandidateInformation.setCountry("Country-1349307773");
+        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestCandidateInformation.setPostalCode("PostalCode145299418");
+        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestCandidateInformation.setEmail("Email895483464");
+        com.scortelemed.schemas.caser.GenderType _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestCandidateInformationGender = com.scortelemed.schemas.caser.GenderType.H;
+        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestCandidateInformation.setGender(_gestionReconocimientoMedico_gestionReconocimientoMedicoRequestCandidateInformationGender);
+        MaritalStatusType _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestCandidateInformationCivilState = MaritalStatusType.V;
+        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestCandidateInformation.setCivilState(_gestionReconocimientoMedico_gestionReconocimientoMedicoRequestCandidateInformationCivilState);
+        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestCandidateInformation.setMobileNumber("MobileNumber-868249385");
+        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestCandidateInformation.setPhoneNumber1("PhoneNumber11678585805");
+        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestCandidateInformation.setPhoneNumber2("PhoneNumber2-1577186249");
+        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestCandidateInformation.setPassword("Password-308051011");
+        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestCandidateInformation.setIgp("Igp167156298");
+        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestCandidateInformation.setAgente("Agente1318863377");
+        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestCandidateInformation.setProductCode("ProductCode-1726956057");
+        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestCandidateInformation.setBirthDate(null);
+        com.scortelemed.schemas.caser.OperationType _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestCandidateInformationOperationType = com.scortelemed.schemas.caser.OperationType.N;
+        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestCandidateInformation.setOperationType(_gestionReconocimientoMedico_gestionReconocimientoMedicoRequestCandidateInformationOperationType);
+        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest.setCandidateInformation(_gestionReconocimientoMedico_gestionReconocimientoMedicoRequestCandidateInformation);
+        com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest.PolicyHolderInformation _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestPolicyHolderInformation = new com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest.PolicyHolderInformation();
+        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestPolicyHolderInformation.setFiscalIdentificationNumber("FiscalIdentificationNumber-81118464");
+        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestPolicyHolderInformation.setName("Name-429462941");
+        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestPolicyHolderInformation.setSurname1("Surname12142507830");
+        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestPolicyHolderInformation.setSurname2("Surname2211550634");
+        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestPolicyHolderInformation.setPolicyNumber("PolicyNumber-973084711");
+        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestPolicyHolderInformation.setCertificateNumber("CertificateNumber-1797965073");
+        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestPolicyHolderInformation.setRequestDate(javax.xml.datatype.DatatypeFactory.newInstance().newXMLGregorianCalendar("2018-09-10T18:22:38.606+02:00"));
+        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestPolicyHolderInformation.setRequestNumber("RequestNumber-105039969");
+        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestPolicyHolderInformation.setComments("Comments-446270116");
+        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest.setPolicyHolderInformation(_gestionReconocimientoMedico_gestionReconocimientoMedicoRequestPolicyHolderInformation);
+        java.util.List<com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest.ServiceInformation> _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestServiceInformation = new java.util.ArrayList<com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest.ServiceInformation>();
+        com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest.ServiceInformation _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestServiceInformationVal1 = new com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest.ServiceInformation();
+        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestServiceInformationVal1.setServiceType("ServiceType-1181955175");
+        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestServiceInformationVal1.setServiceCode("ServiceCode1268953083");
+        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestServiceInformationVal1.setServiceDescription("ServiceDescription962979367");
+        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestServiceInformation.add(_gestionReconocimientoMedico_gestionReconocimientoMedicoRequestServiceInformationVal1);
+        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest.getServiceInformation().addAll(_gestionReconocimientoMedico_gestionReconocimientoMedicoRequestServiceInformation);
+        java.util.List<com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest.BenefitsType> _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestBenefitsType = new java.util.ArrayList<com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest.BenefitsType>();
+        com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest.BenefitsType _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestBenefitsTypeVal1 = new com.scortelemed.schemas.caser.GestionReconocimientoMedicoRequest.BenefitsType();
+        com.scortelemed.schemas.caser.BenefictNameType _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestBenefitsTypeVal1BenefictName = com.scortelemed.schemas.caser.BenefictNameType.DISABILITY_30_90;
+        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestBenefitsTypeVal1.setBenefictName(_gestionReconocimientoMedico_gestionReconocimientoMedicoRequestBenefitsTypeVal1BenefictName);
+        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestBenefitsTypeVal1.setBenefictCode("BenefictCode1702377472");
+        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestBenefitsTypeVal1.setBenefictCapital("BenefictCapital487607661");
+        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequestBenefitsType.add(_gestionReconocimientoMedico_gestionReconocimientoMedicoRequestBenefitsTypeVal1);
+        _gestionReconocimientoMedico_gestionReconocimientoMedicoRequest.getBenefitsType().addAll(_gestionReconocimientoMedico_gestionReconocimientoMedicoRequestBenefitsType);
         com.scortelemed.schemas.caser.GestionReconocimientoMedicoResponse _gestionReconocimientoMedico__return = port.gestionReconocimientoMedico(_gestionReconocimientoMedico_gestionReconocimientoMedicoRequest);
         System.out.println("gestionReconocimientoMedico.result=" + _gestionReconocimientoMedico__return);
 
