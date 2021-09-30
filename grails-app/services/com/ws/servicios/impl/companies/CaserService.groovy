@@ -2,6 +2,7 @@ package com.ws.servicios.impl.companies
 
 import com.scor.global.ExceptionUtils
 import com.scor.global.RequestUtils
+import com.scor.global.ValorUtils
 import com.scor.global.WSException
 import com.scor.srpfileinbound.DATOS
 import com.scor.srpfileinbound.REGISTRODATOS
@@ -23,10 +24,12 @@ import org.w3c.dom.Element
 import org.w3c.dom.Node
 import org.w3c.dom.NodeList
 import org.xml.sax.InputSource
+import org.xml.sax.SAXException
 import servicios.RespuestaCRM
 
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
+import javax.xml.parsers.ParserConfigurationException
 import java.text.SimpleDateFormat
 
 class CaserService implements ICompanyService{
@@ -64,23 +67,25 @@ class CaserService implements ICompanyService{
     def buildDatos(Request req, String codigoSt) {
         try {
             List<DATOS> listaDatosCandidatos = new ArrayList<>()
-
             DATOS dato = new DATOS()
-                Company company = req.company
-                dato.coberturas = rellenaCoberturas(req)
+            Company company = req.company
 
-                // Rellenamos el bloque de Registro
-                if (esCaserInfantil(req)) {
-                    dato.registro = rellenaDatosInfantil(req, company, dato.coberturas)
-                    dato.pregunta = rellenaPreguntas(req, company.nombre)
-                    dato.servicio = rellenaServicios(req)
-                    listaDatosCandidatos.add(dato)
-                } else {
-                    dato.registro = rellenaDatos(req, company, dato.coberturas)
-                    dato.pregunta = rellenaPreguntas(req, company.nombre)
-                    dato.servicio = rellenaServicios(req)
-                    listaDatosCandidatos.add(dato)
+            // Rellenamos el bloque de Registro
+            if (esCaserInfantil(req)) {
+                for (int iteradorCandidatos; iteradorCandidatos < obtenerNumeroCandidatos(req); iteradorCandidatos++){
+                dato.coberturas = rellenaCoberturasInfantil(req)
+                dato.registro = rellenaDatosInfantil(req, company, dato.coberturas, iteradorCandidatos)
+                dato.pregunta = rellenaPreguntas(req, company.nombre)
+                dato.servicio = rellenaServicios(req)
+                listaDatosCandidatos.add(dato)
                 }
+            } else {
+                dato.coberturas = rellenaCoberturas(req)
+                dato.registro = rellenaDatos(req, company, dato.coberturas)
+                dato.pregunta = rellenaPreguntas(req, company.nombre)
+                dato.servicio = rellenaServicios(req)
+                listaDatosCandidatos.add(dato)
+            }
 
             return listaDatosCandidatos
         } catch (Exception e) {
@@ -89,6 +94,8 @@ class CaserService implements ICompanyService{
     }
 
     Boolean esCaserInfantil(Request req) {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
+        DocumentBuilder builder = factory.newDocumentBuilder()
         Boolean esCaserInfantil = false
         InputSource is = new InputSource(new StringReader(req.request))
         is.setEncoding("UTF-8")
@@ -104,6 +111,20 @@ class CaserService implements ICompanyService{
         return esCaserInfantil
     }
 
+    Integer obtenerNumeroCandidatos(Request req) throws ParserConfigurationException, IOException, SAXException {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Boolean esCaserInfantil = false;
+        InputSource is = new InputSource(new StringReader(req.getRequest()));
+        is.setEncoding("UTF-8");
+        Document doc = builder.parse(is);
+
+        doc.getDocumentElement().normalize();
+
+        NodeList nList = doc.getElementsByTagName("CandidateInformation");
+
+        return nList.getLength();
+    }
 
     def getCodigoStManual(Request req) {
         return null
@@ -118,8 +139,6 @@ class CaserService implements ICompanyService{
         expediente.setRequestState(util.devolverStateType(expedientePoliza.getCodigoEstado()))
         expediente.setProductCode(util.devolverDatos(expedientePoliza.getProducto().getCodigoProductoCompanya()))
         expediente.setPolicyNumber(util.devolverDatos(expedientePoliza.getNumPoliza()))
-		
-		//TODO: caserInfantil: expediente.setSubPolicyNumber no existe, pero se usa el campo7 para almacenarlo
 		expediente.setCertificateNumber(util.devolverDatos(expedientePoliza.getNumCertificado()))
 
 
@@ -681,6 +700,68 @@ class CaserService implements ICompanyService{
 
             doc.getDocumentElement().normalize()
 
+            NodeList policyInformationList = doc.getElementsByTagName("PolicyInformation")
+
+            for (int temp = 0; temp < policyInformationList.getLength(); temp++) {
+
+                Node policyInformationNode = policyInformationList.item(temp)
+
+                if (policyInformationNode.getNodeType() == Node.ELEMENT_NODE) {
+
+                    Element policyInformationElement = (Element) policyInformationNode
+
+                    /**POLIZA
+                     *
+                     */
+
+                    if (policyInformationElement.getElementsByTagName("policyNumber").item(0) != null) {
+                        datosRegistro.numPoliza = policyInformationElement.getElementsByTagName("policyNumber").item(0).getTextContent()
+                    }
+
+                    /**CERTIFICADO
+                     *
+                     */
+
+                    if (policyInformationElement.getElementsByTagName("certificateNumber").item(0) != null) {
+                        datosRegistro.numCertificado = policyInformationElement.getElementsByTagName("certificateNumber").item(0).getTextContent()
+                    }
+
+                    /**CÓDIGO DE PRODUCTO
+                     *
+                     */
+
+                    if (policyInformationElement.getElementsByTagName("productCode").item(0) != null) {
+                        datosRegistro.codigoProducto = policyInformationElement.getElementsByTagName("productCode").item(0).getTextContent()
+                    }
+
+                    /**NUMERO DE REFERENCIA
+                     *
+                     */
+
+                    if (policyInformationElement.getElementsByTagName("requestNumber").item(0) != null) {
+                        datosRegistro.numSolicitud = policyInformationElement.getElementsByTagName("requestNumber").item(0).getTextContent()
+                    }
+
+                    /**FECHA DE SOLICITUD
+                     *
+                     */
+
+                    if (policyInformationElement.getElementsByTagName("requestDate").item(0) != null) {
+                        datosRegistro.fechaEnvio = formato.format(util.fromStringToXmlCalendar(policyInformationElement.getElementsByTagName("requestDate").item(0).getTextContent()).toGregorianCalendar().getTime())
+                    }
+
+                    /**OBSERVACIONES
+                     *
+                     */
+
+                    if (policyInformationElement.getElementsByTagName("comments").item(0) != null) {
+                        datosRegistro.observaciones = policyInformationElement.getElementsByTagName("comments").item(0).getTextContent()
+                    }
+
+
+                }
+            }
+
             NodeList candidateNodeList = doc.getElementsByTagName("CandidateInformation")
 
             Node candidateNode = candidateNodeList.item(candidateIteratorIndex)
@@ -689,22 +770,46 @@ class CaserService implements ICompanyService{
 
                 Element candidateInformationElement = (Element) candidateNode
 
-                /**TUTOR
-                 *
-                 */
-                if (candidateInformationElement.getElementsByTagName("tutor").item(0) != null && candidateInformationElement.getElementsByTagName("tutor").item(0) == true) {
-                    datosRegistro.observaciones = "Tutor"
-                } else {
-                    datosRegistro.observaciones = "Tutelado"
-                }
-
-
                 /**DNI CANDIDATO
                  *
                  */
 
                 if (candidateInformationElement.getElementsByTagName("identificationCode").item(0) != null) {
                     datosRegistro.dni = candidateInformationElement.getElementsByTagName("identificationCode").item(0).getTextContent()
+                }
+
+                /**TUTOR
+                 *
+                 */
+
+                String tutorIdentificationCode
+
+                if (candidateInformationElement.getElementsByTagName("tutor").item(0) != null && candidateInformationElement.getElementsByTagName("tutor").item(0).getTextContent().equals("true")) {
+                    String observacionesTutor = "Tutor de "
+                    for (int i=0; i < candidateIdentificationCodes.size(); i++){
+                        if (!datosRegistro.dni.equals(candidateIdentificationCodes[i])){
+                            if (i != candidateIdentificationCodes.size() - 1) {
+                                observacionesTutor += candidateIdentificationCodes[i] + ", "
+                            } else {
+                                observacionesTutor += candidateIdentificationCodes[i] + "."
+                            }
+                        } else {
+                            tutorIdentificationCode = candidateIdentificationCodes[i]
+                        }
+                    }
+
+                    if (ValorUtils.isValid(datosRegistro.observaciones)){
+                        datosRegistro.observaciones += ". " + observacionesTutor
+                    } else {
+                        datosRegistro.observaciones += observacionesTutor
+                    }
+
+                } else {
+                    if (ValorUtils.isValid(datosRegistro.observaciones)){
+                        datosRegistro.observaciones += ". Tutelado por " + tutorIdentificationCode
+                    } else {
+                        datosRegistro.observaciones += "Tutelado por " + tutorIdentificationCode
+                    }
                 }
 
                 /**NOMBRE DE CANDIDATO
@@ -724,8 +829,6 @@ class CaserService implements ICompanyService{
                 }
 
                 datosRegistro.apellidosCliente = apellido
-
-
 
                 /**SEXO CANDIDATO
                  *
@@ -755,7 +858,9 @@ class CaserService implements ICompanyService{
                     datosRegistro.fechaNacimiento = formato.format(util.fromStringToXmlCalendar("2017-01-01T00:00:00").toGregorianCalendar().getTime())
                 }
 
-                /**DIRECCION CLIENTE**/
+                /**DIRECCION CLIENTE
+                 *
+                 */
 
                 if (candidateInformationElement.getElementsByTagName("address").item(0) != null) {
                     datosRegistro.direccionCliente = candidateInformationElement.getElementsByTagName("address").item(0).getTextContent()
@@ -828,6 +933,14 @@ class CaserService implements ICompanyService{
                 if (candidateInformationElement.getElementsByTagName("phoneNumber2").item(0) != null && candidateInformationElement.getElementsByTagName("phoneNumber2").item(0).getTextContent() != null && !candidateInformationElement.getElementsByTagName("phoneNumber2").item(0).getTextContent().isEmpty()) {
                     telefono2 = candidateInformationElement.getElementsByTagName("phoneNumber2").item(0).getTextContent()
                     datosRegistro.telefono3 = telefono2
+                }
+
+                /**CODIGO DE AGENTE
+                 *
+                 */
+
+                if (candidateInformationElement.getElementsByTagName("agent").item(0) != null) {
+                    datosRegistro.codigoAgencia = candidateInformationElement.getElementsByTagName("agent").item(0).getTextContent()
                 }
 
                 /**CODIGO CIA
@@ -932,11 +1045,41 @@ class CaserService implements ICompanyService{
 
             return datosRegistro
         } catch (Exception e) {
-            throw new WSException(this.getClass(), "rellenaDatos", ExceptionUtils.composeMessage(null, e))
+            throw new WSException(this.getClass(), "rellenaDatosInfantil", ExceptionUtils.composeMessage(null, e))
         }
     }
 
+    private Map<String,Boolean> obtenerIdentificationNumberCandidatos(Request request) {
 
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
+        DocumentBuilder builder = factory.newDocumentBuilder()
+
+        InputSource is = new InputSource(new StringReader(request.request))
+        is.setEncoding("UTF-8")
+        Document doc = builder.parse(is)
+
+        doc.getDocumentElement().normalize()
+
+        NodeList candidateNodeList = doc.getElementsByTagName("CandidateInformation")
+
+        Map<String,Boolean> candidatesIdentificationNumber = new HashMap<>()
+
+        for (int candidateIndex = 0; candidateIndex < candidateNodeList.getLength(); candidateIndex++) {
+
+            Node candidateNode = candidateNodeList.item(candidateIndex)
+
+            if (candidateNode.getNodeType() == Node.ELEMENT_NODE) {
+
+                Element candidateInformationElement = (Element) candidateNode
+
+                if (candidateInformationElement.getElementsByTagName("identificationCode").item(0) != null) {
+                    candidatesIdentificationNumber.put(candidateInformationElement.getElementsByTagName("identificationCode").item(0).getTextContent(), candidateInformationElement.getElementsByTagName("tutor").item(0).getTextContent().toBoolean())
+                }
+            }
+        }
+
+        return candidatesIdentificationNumber
+    }
 
 
     private void setCamposGenericosInfantil(REGISTRODATOS datos, String subPolicyNumber) {

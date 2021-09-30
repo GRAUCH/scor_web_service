@@ -1,4 +1,4 @@
-grails.servlet.version = "2.5" // Change depending on target container compliance (2.5 or 3.0)
+grails.servlet.version = "3.0" // Change depending on target container compliance (2.5 or 3.0)
 grails.project.class.dir = "target/classes"
 grails.project.test.class.dir = "target/test-classes"
 grails.project.test.reports.dir = "target/test-reports"
@@ -17,6 +17,9 @@ grails.project.fork = [
         // configure settings for the run-app JVM
         run: [maxMemory: 4096, minMemory: 768, debug: false, maxPerm: 4096, forkReserve:false],
         // configure settings for the run-war JVM
+        /*TODO: PARA DEPURAR DESCOMENTAR ESTE BLOQUE Y COMENTAR EL SUPERIOR
+        test: false,
+        run: false, */
         war: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, forkReserve:false],
         // configure settings for the Console UI JVM
         console: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256]
