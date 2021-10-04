@@ -187,7 +187,7 @@ class CaserUnderwrittingCaseManagementService {
             notes = "Error: " + e.getMessage()
             status = StatusType.ERROR
 
-            requestService.insertarError(company, gestionReconocimientoMedicoInfantil.policyInformation.requestNumber, requestXML.toString(), TipoOperacion.ALTA, "Peticion no realizada para solicitud: " + gestionReconocimientoMedicoInfantil.policyHolderInformation.requestNumber + ". Error: " + e.getMessage())
+            requestService.insertarError(company, gestionReconocimientoMedicoInfantil.policyInformation.requestNumber, requestXML.toString(), TipoOperacion.ALTA, "Peticion no realizada para solicitud: " + gestionReconocimientoMedicoInfantil.policyInformation.requestNumber + ". Error: " + e.getMessage())
 
             logginService.putErrorEndpoint("GestionReconocimientoMedicoInfantil", "Peticion no realizada de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedicoInfantil.policyInformation.requestNumber + ". Error: " + e.getMessage())
             correoUtil.envioEmailErrores("GestionReconocimientoMedicoInfantil", "Peticion de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedicoInfantil.policyInformation.requestNumber, e)

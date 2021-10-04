@@ -686,6 +686,7 @@ class CaserService implements ICompanyService{
         def telefono2
         def telefonoMovil
         def nombreAgente
+        Map<String, Boolean> candidateIdentificationCodes = obtenerIdentificationNumberCandidatos(req)
 
         REGISTRODATOS datosRegistro = new REGISTRODATOS()
 
@@ -784,31 +785,41 @@ class CaserService implements ICompanyService{
 
                 String tutorIdentificationCode
 
+                String observacionesTutor
+
                 if (candidateInformationElement.getElementsByTagName("tutor").item(0) != null && candidateInformationElement.getElementsByTagName("tutor").item(0).getTextContent().equals("true")) {
-                    String observacionesTutor = "Tutor de "
-                    for (int i=0; i < candidateIdentificationCodes.size(); i++){
-                        if (!datosRegistro.dni.equals(candidateIdentificationCodes[i])){
-                            if (i != candidateIdentificationCodes.size() - 1) {
-                                observacionesTutor += candidateIdentificationCodes[i] + ", "
-                            } else {
-                                observacionesTutor += candidateIdentificationCodes[i] + "."
-                            }
-                        } else {
-                            tutorIdentificationCode = candidateIdentificationCodes[i]
+                    observacionesTutor = "Tutor de "
+
+                    for (Map.Entry<String, Boolean> candidateIterator : candidateIdentificationCodes){
+                        if (!candidateIterator.getValue()){
+                                observacionesTutor += StringBuilder.newInstance().append(candidateIterator.getKey()).append(", ")
                         }
                     }
 
+                    // Quitamos la última coma y la sustituimos por un punto
+                    observacionesTutor = StringBuilder.newInstance().append(observacionesTutor.substring(0, observacionesTutor.size()-2)).append(".").toString()
+
                     if (ValorUtils.isValid(datosRegistro.observaciones)){
-                        datosRegistro.observaciones += ". " + observacionesTutor
+                        datosRegistro.observaciones += StringBuilder.newInstance().append(". ").append(observacionesTutor).toString()
                     } else {
                         datosRegistro.observaciones += observacionesTutor
                     }
 
                 } else {
                     if (ValorUtils.isValid(datosRegistro.observaciones)){
-                        datosRegistro.observaciones += ". Tutelado por " + tutorIdentificationCode
+                        observacionesTutor = "Tutelado por "
+                        for (Map.Entry<String, Boolean> candidateIterator : candidateIdentificationCodes){
+                            if (candidateIterator.getValue()){
+                                observacionesTutor += StringBuilder.newInstance().append(candidateIterator.getKey()).append(", ")
+                            }
+                        }
+
+                        // Quitamos la última coma y la sustituimos por un punto
+                        observacionesTutor = StringBuilder.newInstance().append(observacionesTutor.substring(0, observacionesTutor.size()-2)).append(".").toString()
+
+                        datosRegistro.observaciones += StringBuilder.newInstance().append(".").append(observacionesTutor).toString()
                     } else {
-                        datosRegistro.observaciones += "Tutelado por " + tutorIdentificationCode
+                        datosRegistro.observaciones += observacionesTutor
                     }
                 }
 
@@ -949,93 +960,6 @@ class CaserService implements ICompanyService{
 
                 datosRegistro.codigoCia = company.codigoSt
 
-            }
-
-
-            NodeList policyInformationList = doc.getElementsByTagName("PolicyInformation")
-
-            for (int temp = 0; temp < policyInformationList.getLength(); temp++) {
-
-                Node policyInformationNode = policyInformationList.item(temp)
-
-                if (policyInformationNode.getNodeType() == Node.ELEMENT_NODE) {
-
-                    Element policyInformationElement = (Element) policyInformationNode
-
-                    /**POLIZA
-                     *
-                     */
-
-                    if (policyInformationElement.getElementsByTagName("policyNumber").item(0) != null) {
-                        datosRegistro.numPoliza = policyInformationElement.getElementsByTagName("policyNumber").item(0).getTextContent()
-                    }
-
-                    /**CERTIFICADO
-                     *
-                     */
-
-                    if (policyInformationElement.getElementsByTagName("certificateNumber").item(0) != null) {
-                        datosRegistro.numCertificado = policyInformationElement.getElementsByTagName("certificateNumber").item(0).getTextContent()
-                    }
-
-                    /**CÓDIGO DE PRODUCTO
-                     *
-                     */
-
-                    if (policyInformationElement.getElementsByTagName("productCode").item(0) != null) {
-                        datosRegistro.codigoProducto = policyInformationElement.getElementsByTagName("productCode").item(0).getTextContent()
-                    }
-
-                    /**NUMERO DE REFERENCIA
-                     *
-                     */
-
-                    if (policyInformationElement.getElementsByTagName("requestNumber").item(0) != null) {
-                        datosRegistro.numSolicitud = policyInformationElement.getElementsByTagName("requestNumber").item(0).getTextContent()
-                    }
-
-                    /**FECHA DE SOLICITUD
-                     *
-                     */
-
-                    if (policyInformationElement.getElementsByTagName("requestDate").item(0) != null) {
-                        datosRegistro.fechaEnvio = formato.format(util.fromStringToXmlCalendar(policyInformationElement.getElementsByTagName("requestDate").item(0).getTextContent()).toGregorianCalendar().getTime())
-                    }
-
-                    /**OBSERVACIONES
-                     *
-                     */
-
-                    if (policyInformationElement.getElementsByTagName("comments").item(0) != null) {
-                        String observacionesPoliza = policyInformationElement.getElementsByTagName("comments").item(0).getTextContent()
-                        datosRegistro.observaciones =+ observacionesPoliza
-                    }
-
-                    /**CODIGO DE AGENTE
-                     *
-                     */
-
-                    if (policyInformationElement.getElementsByTagName("fiscalIdentificationNumber").item(0) != null) {
-                        datosRegistro.codigoAgencia = policyInformationElement.getElementsByTagName("fiscalIdentificationNumber").item(0).getTextContent()
-                    }
-
-                    /**NOMBRE DE AGENTE
-                     *
-                     */
-                    if (policyInformationElement.getElementsByTagName("name").item(0) != null) {
-                        nombreAgente = policyInformationElement.getElementsByTagName("name").item(0).getTextContent()
-                    }
-
-                    if (policyInformationElement.getElementsByTagName("surname1").item(0) != null) {
-                        nombreAgente = nombreAgente + " " + policyInformationElement.getElementsByTagName("surname1").item(0).getTextContent()
-                    }
-
-                    if (policyInformationElement.getElementsByTagName("surname2").item(0) != null) {
-                        nombreAgente = nombreAgente + " " + policyInformationElement.getElementsByTagName("surname2").item(0).getTextContent()
-                    }
-
-                    datosRegistro.nomApellAgente = nombreAgente
-                }
             }
 
             // AÑADIMOS EN EL CAMPO7 EL NÚMERO DE CANDIDATOS DE LA PÓLIZA PARA QUE APAREZCA EN EL CRM COMO subPolicyNumber (NÚMERO DE SUBPÓLIZA)
