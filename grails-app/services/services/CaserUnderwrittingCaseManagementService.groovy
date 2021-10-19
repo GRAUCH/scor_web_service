@@ -166,7 +166,7 @@ class CaserUnderwrittingCaseManagementService {
                         expedienteService.crearExpediente(requestBBDD, TipoCompany.CASER)
                         requestService.insertarRecibido(company, gestionReconocimientoMedicoInfantil.policyInformation.requestNumber, requestXML.toString(), TipoOperacion.ALTA)
                         /**Llamamos al metodo asincrono que busca en el crm el expediente recien creado*/
-                        expedienteService.busquedaCrm(requestBBDD, company, gestionReconocimientoMedicoInfantil.policyInformation.requestNumber, gestionReconocimientoMedicoInfantil.policyHolderInformation.certificateNumber, null)
+                        expedienteService.busquedaCrm(requestBBDD, company, gestionReconocimientoMedicoInfantil.policyInformation.requestNumber, gestionReconocimientoMedicoInfantil.policyInformation.certificateNumber, null)
 
                     } else {
                         logginService.putInfoMessage("Se procede al envio del email para notificar del cambio  Ref: ${gestionReconocimientoMedicoInfantil.policyInformation.requestNumber}")

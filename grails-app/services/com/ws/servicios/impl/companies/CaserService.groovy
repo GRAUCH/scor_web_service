@@ -66,30 +66,330 @@ class CaserService implements ICompanyService{
 
     def buildDatos(Request req, String codigoSt) {
         try {
-            List<DATOS> listaDatosCandidatos = new ArrayList<>()
             DATOS dato = new DATOS()
             Company company = req.company
 
-            // Rellenamos el bloque de Registro
-            if (esCaserInfantil(req)) {
-                for (int iteradorCandidatos; iteradorCandidatos < obtenerNumeroCandidatos(req); iteradorCandidatos++){
-                dato.coberturas = rellenaCoberturasInfantil(req)
-                dato.registro = rellenaDatosInfantil(req, company, dato.coberturas, iteradorCandidatos)
-                dato.pregunta = rellenaPreguntas(req, company.nombre)
-                dato.servicio = rellenaServicios(req)
-                listaDatosCandidatos.add(dato)
-                }
-            } else {
-                dato.coberturas = rellenaCoberturas(req)
-                dato.registro = rellenaDatos(req, company, dato.coberturas)
-                dato.pregunta = rellenaPreguntas(req, company.nombre)
-                dato.servicio = rellenaServicios(req)
-                listaDatosCandidatos.add(dato)
-            }
+            dato.coberturas = rellenaCoberturas(req)
+            dato.registro = rellenaDatos(req, company, dato.coberturas)
+            dato.pregunta = rellenaPreguntas(req, company.nombre)
+            dato.servicio = rellenaServicios(req)
 
-            return listaDatosCandidatos
+            return dato
         } catch (Exception e) {
             logginService.putError("buildDatos",e.toString())
+            //TODO: EXCEPTION: SE CAPTURA PERO NO SE PROPAGA
+        }
+    }
+
+    def buildDatosCaserInfantil(Request req, String codigoSt, int iteradorCandidatos) {
+        try {
+            DATOS dato = new DATOS()
+            Company company = req.company
+
+            dato.coberturas = rellenaCoberturasInfantil(req)
+            dato.registro = rellenaDatosInfantil(req, company, dato.coberturas, iteradorCandidatos)
+            dato.pregunta = rellenaPreguntas(req, company.nombre)
+            dato.servicio = rellenaServicios(req)
+
+            return dato
+        } catch (Exception e) {
+            logginService.putError("buildDatos",e.toString())
+            //TODO: EXCEPTION: SE CAPTURA PERO NO SE PROPAGA
+        }
+    }
+
+    def rellenaDatosInfantil(req, company, coberturas, candidateIteratorIndex) {
+
+        def formato = new SimpleDateFormat("yyyyMMdd")
+        def apellido
+        def telefono1
+        def telefono2
+        def telefonoMovil
+        def nombreAgente
+        Map<String, Boolean> candidateIdentificationCodes = obtenerIdentificationNumberCandidatos(req)
+
+        REGISTRODATOS datosRegistro = new REGISTRODATOS()
+
+        try {
+
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
+            DocumentBuilder builder = factory.newDocumentBuilder()
+
+            InputSource is = new InputSource(new StringReader(req.request))
+            is.setEncoding("UTF-8")
+            Document doc = builder.parse(is)
+
+            doc.getDocumentElement().normalize()
+
+            NodeList policyInformationList = doc.getElementsByTagName("PolicyInformation")
+
+            for (int temp = 0; temp < policyInformationList.getLength(); temp++) {
+
+                Node policyInformationNode = policyInformationList.item(temp)
+
+                if (policyInformationNode.getNodeType() == Node.ELEMENT_NODE) {
+
+                    Element policyInformationElement = (Element) policyInformationNode
+
+                    /**POLIZA
+                     *
+                     */
+
+                    if (policyInformationElement.getElementsByTagName("policyNumber").item(0) != null) {
+                        datosRegistro.numPoliza = policyInformationElement.getElementsByTagName("policyNumber").item(0).getTextContent()
+                    }
+
+                    /**CERTIFICADO
+                     *
+                     */
+
+                    if (policyInformationElement.getElementsByTagName("certificateNumber").item(0) != null) {
+                        datosRegistro.numCertificado = policyInformationElement.getElementsByTagName("certificateNumber").item(0).getTextContent()
+                    }
+
+                    /**CÓDIGO DE PRODUCTO
+                     *
+                     */
+
+                    if (policyInformationElement.getElementsByTagName("productCode").item(0) != null) {
+                        datosRegistro.codigoProducto = policyInformationElement.getElementsByTagName("productCode").item(0).getTextContent()
+                    }
+
+                    /**NUMERO DE REFERENCIA
+                     *
+                     */
+
+                    if (policyInformationElement.getElementsByTagName("requestNumber").item(0) != null) {
+                        datosRegistro.numSolicitud = policyInformationElement.getElementsByTagName("requestNumber").item(0).getTextContent()
+                    }
+
+                    /**FECHA DE SOLICITUD
+                     *
+                     */
+
+                    if (policyInformationElement.getElementsByTagName("requestDate").item(0) != null) {
+                        datosRegistro.fechaEnvio = formato.format(util.fromStringToXmlCalendar(policyInformationElement.getElementsByTagName("requestDate").item(0).getTextContent()).toGregorianCalendar().getTime())
+                    }
+
+                    /**OBSERVACIONES
+                     *
+                     */
+
+                    if (policyInformationElement.getElementsByTagName("comments").item(0) != null) {
+                        datosRegistro.observaciones = policyInformationElement.getElementsByTagName("comments").item(0).getTextContent()
+                    }
+
+
+                }
+            }
+
+            NodeList candidateNodeList = doc.getElementsByTagName("CandidateInformation")
+
+            Node candidateNode = candidateNodeList.item(candidateIteratorIndex)
+
+            if (candidateNode.getNodeType() == Node.ELEMENT_NODE) {
+
+                Element candidateInformationElement = (Element) candidateNode
+
+                /**DNI CANDIDATO
+                 *
+                 */
+
+                if (candidateInformationElement.getElementsByTagName("identificationCode").item(0) != null) {
+                    datosRegistro.dni = candidateInformationElement.getElementsByTagName("identificationCode").item(0).getTextContent()
+                }
+
+                /**TUTOR
+                 *
+                 */
+
+                String tutorIdentificationCode
+
+                String observacionesTutor
+
+                if (candidateInformationElement.getElementsByTagName("tutor").item(0) != null && candidateInformationElement.getElementsByTagName("tutor").item(0).getTextContent().equals("true")) {
+                    observacionesTutor = "Tutor de "
+
+                    for (Map.Entry<String, Boolean> candidateIterator : candidateIdentificationCodes){
+                        if (!candidateIterator.getValue()){
+                            observacionesTutor += StringBuilder.newInstance().append(candidateIterator.getKey()).append(", ")
+                        }
+                    }
+
+                    // Quitamos la última coma y la sustituimos por un punto
+                    observacionesTutor = StringBuilder.newInstance().append(observacionesTutor.substring(0, observacionesTutor.size()-2)).append(".").toString()
+
+                    if (ValorUtils.isValid(datosRegistro.observaciones)){
+                        datosRegistro.observaciones += StringBuilder.newInstance().append(". ").append(observacionesTutor).toString()
+                    } else {
+                        datosRegistro.observaciones += observacionesTutor
+                    }
+
+                } else {
+                    if (ValorUtils.isValid(datosRegistro.observaciones)){
+                        observacionesTutor = "Tutelado por "
+                        for (Map.Entry<String, Boolean> candidateIterator : candidateIdentificationCodes){
+                            if (candidateIterator.getValue()){
+                                observacionesTutor += StringBuilder.newInstance().append(candidateIterator.getKey()).append(", ")
+                            }
+                        }
+
+                        // Quitamos la última coma y la sustituimos por un punto
+                        observacionesTutor = StringBuilder.newInstance().append(observacionesTutor.substring(0, observacionesTutor.size()-2)).append(".").toString()
+
+                        datosRegistro.observaciones += StringBuilder.newInstance().append(".").append(observacionesTutor).toString()
+                    } else {
+                        datosRegistro.observaciones += observacionesTutor
+                    }
+                }
+
+                /**NOMBRE DE CANDIDATO
+                 *
+                 */
+
+                if (candidateInformationElement.getElementsByTagName("name").item(0) != null) {
+                    datosRegistro.nombreCliente = candidateInformationElement.getElementsByTagName("name").item(0).getTextContent()
+                }
+
+                /**APELLIDO CANDIDATO
+                 *
+                 */
+
+                if (candidateInformationElement.getElementsByTagName("surname").item(0) != null) {
+                    apellido = candidateInformationElement.getElementsByTagName("surname").item(0).getTextContent()
+                }
+
+                datosRegistro.apellidosCliente = apellido
+
+                /**SEXO CANDIDATO
+                 *
+                 */
+
+                if (candidateInformationElement.getElementsByTagName("gender").item(0) != null) {
+                    datosRegistro.sexo = candidateInformationElement.getElementsByTagName("gender").item(0).getTextContent() == "M" ? "M" : "V"
+                } else {
+                    datosRegistro.sexo = "M"
+                }
+
+                /**ESTADO CIVIL
+                 *
+                 */
+
+                if (candidateInformationElement.getElementsByTagName("maritalStatus").item(0) != null) {
+                    datosRegistro.estadoCivil = candidateInformationElement.getElementsByTagName("maritalStatus").item(0).getTextContent()
+                }
+
+                /**FECHA DE NACIMIENTO
+                 *
+                 */
+
+                if (candidateInformationElement.getElementsByTagName("birthDate").item(0) != null && !candidateInformationElement.getElementsByTagName("birthDate").item(0).getTextContent().isEmpty()) {
+                    datosRegistro.fechaNacimiento = formato.format(util.fromStringToXmlCalendar(candidateInformationElement.getElementsByTagName("birthDate").item(0).getTextContent()).toGregorianCalendar().getTime())
+                } else {
+                    datosRegistro.fechaNacimiento = formato.format(util.fromStringToXmlCalendar("2017-01-01T00:00:00").toGregorianCalendar().getTime())
+                }
+
+                /**DIRECCION CLIENTE
+                 *
+                 */
+
+                if (candidateInformationElement.getElementsByTagName("address").item(0) != null) {
+                    datosRegistro.direccionCliente = candidateInformationElement.getElementsByTagName("address").item(0).getTextContent()
+                } else {
+                    datosRegistro.direccionCliente = "."
+                }
+
+                /**POBLACION
+                 *
+                 */
+
+                if (candidateInformationElement.getElementsByTagName("city").item(0) != null) {
+                    datosRegistro.poblacion = candidateInformationElement.getElementsByTagName("city").item(0).getTextContent()
+                } else {
+                    datosRegistro.poblacion = "."
+                }
+
+                /**PROVINCIA
+                 *
+                 */
+
+                if (candidateInformationElement.getElementsByTagName("province").item(0) != null) {
+                    datosRegistro.provincia = candidateInformationElement.getElementsByTagName("province").item(0).getTextContent()
+                } else {
+                    datosRegistro.provincia = "."
+                }
+
+                /**PAÍS
+                 *
+                 */
+
+                if (candidateInformationElement.getElementsByTagName("country").item(0) != null) {
+                    datosRegistro.pais = candidateInformationElement.getElementsByTagName("country").item(0).getTextContent()
+                } else {
+                    datosRegistro.pais = "."
+                }
+
+                /**CODIGO POSTAL CLIENTE
+                 *
+                 */
+
+                if (candidateInformationElement.getElementsByTagName("postalCode").item(0) != null) {
+                    datosRegistro.codigoPostal = candidateInformationElement.getElementsByTagName("postalCode").item(0).getTextContent()
+                } else {
+                    datosRegistro.codigoPostal = "."
+                }
+
+                /**EMAIL
+                 *
+                 */
+
+                if (candidateInformationElement.getElementsByTagName("email").item(0) != null) {
+                    datosRegistro.email = candidateInformationElement.getElementsByTagName("email").item(0).getTextContent()
+                }
+
+                /**TELEFONOS
+                 *
+                 */
+
+                if (candidateInformationElement.getElementsByTagName("mobileNumber").item(0) != null && candidateInformationElement.getElementsByTagName("mobileNumber").item(0).getTextContent() != null && !candidateInformationElement.getElementsByTagName("mobileNumber").item(0).getTextContent().isEmpty()) {
+                    telefonoMovil = candidateInformationElement.getElementsByTagName("mobileNumber").item(0).getTextContent()
+                    datosRegistro.telefono1 = telefonoMovil
+                }
+
+                if (candidateInformationElement.getElementsByTagName("phoneNumber1").item(0) != null && candidateInformationElement.getElementsByTagName("phoneNumber1").item(0).getTextContent() != null && !candidateInformationElement.getElementsByTagName("phoneNumber1").item(0).getTextContent().isEmpty()) {
+                    telefono1 = candidateInformationElement.getElementsByTagName("phoneNumber1").item(0).getTextContent()
+                    datosRegistro.telefono2 = telefono1
+                }
+
+                if (candidateInformationElement.getElementsByTagName("phoneNumber2").item(0) != null && candidateInformationElement.getElementsByTagName("phoneNumber2").item(0).getTextContent() != null && !candidateInformationElement.getElementsByTagName("phoneNumber2").item(0).getTextContent().isEmpty()) {
+                    telefono2 = candidateInformationElement.getElementsByTagName("phoneNumber2").item(0).getTextContent()
+                    datosRegistro.telefono3 = telefono2
+                }
+
+                /**CODIGO DE AGENTE
+                 *
+                 */
+
+                if (candidateInformationElement.getElementsByTagName("agent").item(0) != null) {
+                    datosRegistro.codigoAgencia = candidateInformationElement.getElementsByTagName("agent").item(0).getTextContent()
+                }
+
+                /**CODIGO CIA
+                 *
+                 */
+
+                datosRegistro.codigoCia = company.codigoSt
+
+            }
+
+            // AÑADIMOS EN EL CAMPO7 EL NÚMERO DE CANDIDATOS DE LA PÓLIZA PARA QUE APAREZCA EN EL CRM COMO subPolicyNumber (NÚMERO DE SUBPÓLIZA)
+            Integer subPolicyNumber = candidateNodeList.getLength()
+
+            setCamposGenericosInfantil(datosRegistro, subPolicyNumber.toString())
+
+            return datosRegistro
+        } catch (Exception e) {
+            throw new WSException(this.getClass(), "rellenaDatosInfantil", ExceptionUtils.composeMessage(null, e))
         }
     }
 
@@ -676,301 +976,6 @@ class CaserService implements ICompanyService{
         datos.campo18 = ""
         datos.campo19 = ""
         datos.campo20 = ""
-    }
-
-    def rellenaDatosInfantil(req, company, coberturas, candidateIteratorIndex) {
-
-        def formato = new SimpleDateFormat("yyyyMMdd")
-        def apellido
-        def telefono1
-        def telefono2
-        def telefonoMovil
-        def nombreAgente
-        Map<String, Boolean> candidateIdentificationCodes = obtenerIdentificationNumberCandidatos(req)
-
-        REGISTRODATOS datosRegistro = new REGISTRODATOS()
-
-        try {
-
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
-            DocumentBuilder builder = factory.newDocumentBuilder()
-
-            InputSource is = new InputSource(new StringReader(req.request))
-            is.setEncoding("UTF-8")
-            Document doc = builder.parse(is)
-
-            doc.getDocumentElement().normalize()
-
-            NodeList policyInformationList = doc.getElementsByTagName("PolicyInformation")
-
-            for (int temp = 0; temp < policyInformationList.getLength(); temp++) {
-
-                Node policyInformationNode = policyInformationList.item(temp)
-
-                if (policyInformationNode.getNodeType() == Node.ELEMENT_NODE) {
-
-                    Element policyInformationElement = (Element) policyInformationNode
-
-                    /**POLIZA
-                     *
-                     */
-
-                    if (policyInformationElement.getElementsByTagName("policyNumber").item(0) != null) {
-                        datosRegistro.numPoliza = policyInformationElement.getElementsByTagName("policyNumber").item(0).getTextContent()
-                    }
-
-                    /**CERTIFICADO
-                     *
-                     */
-
-                    if (policyInformationElement.getElementsByTagName("certificateNumber").item(0) != null) {
-                        datosRegistro.numCertificado = policyInformationElement.getElementsByTagName("certificateNumber").item(0).getTextContent()
-                    }
-
-                    /**CÓDIGO DE PRODUCTO
-                     *
-                     */
-
-                    if (policyInformationElement.getElementsByTagName("productCode").item(0) != null) {
-                        datosRegistro.codigoProducto = policyInformationElement.getElementsByTagName("productCode").item(0).getTextContent()
-                    }
-
-                    /**NUMERO DE REFERENCIA
-                     *
-                     */
-
-                    if (policyInformationElement.getElementsByTagName("requestNumber").item(0) != null) {
-                        datosRegistro.numSolicitud = policyInformationElement.getElementsByTagName("requestNumber").item(0).getTextContent()
-                    }
-
-                    /**FECHA DE SOLICITUD
-                     *
-                     */
-
-                    if (policyInformationElement.getElementsByTagName("requestDate").item(0) != null) {
-                        datosRegistro.fechaEnvio = formato.format(util.fromStringToXmlCalendar(policyInformationElement.getElementsByTagName("requestDate").item(0).getTextContent()).toGregorianCalendar().getTime())
-                    }
-
-                    /**OBSERVACIONES
-                     *
-                     */
-
-                    if (policyInformationElement.getElementsByTagName("comments").item(0) != null) {
-                        datosRegistro.observaciones = policyInformationElement.getElementsByTagName("comments").item(0).getTextContent()
-                    }
-
-
-                }
-            }
-
-            NodeList candidateNodeList = doc.getElementsByTagName("CandidateInformation")
-
-            Node candidateNode = candidateNodeList.item(candidateIteratorIndex)
-
-            if (candidateNode.getNodeType() == Node.ELEMENT_NODE) {
-
-                Element candidateInformationElement = (Element) candidateNode
-
-                /**DNI CANDIDATO
-                 *
-                 */
-
-                if (candidateInformationElement.getElementsByTagName("identificationCode").item(0) != null) {
-                    datosRegistro.dni = candidateInformationElement.getElementsByTagName("identificationCode").item(0).getTextContent()
-                }
-
-                /**TUTOR
-                 *
-                 */
-
-                String tutorIdentificationCode
-
-                String observacionesTutor
-
-                if (candidateInformationElement.getElementsByTagName("tutor").item(0) != null && candidateInformationElement.getElementsByTagName("tutor").item(0).getTextContent().equals("true")) {
-                    observacionesTutor = "Tutor de "
-
-                    for (Map.Entry<String, Boolean> candidateIterator : candidateIdentificationCodes){
-                        if (!candidateIterator.getValue()){
-                                observacionesTutor += StringBuilder.newInstance().append(candidateIterator.getKey()).append(", ")
-                        }
-                    }
-
-                    // Quitamos la última coma y la sustituimos por un punto
-                    observacionesTutor = StringBuilder.newInstance().append(observacionesTutor.substring(0, observacionesTutor.size()-2)).append(".").toString()
-
-                    if (ValorUtils.isValid(datosRegistro.observaciones)){
-                        datosRegistro.observaciones += StringBuilder.newInstance().append(". ").append(observacionesTutor).toString()
-                    } else {
-                        datosRegistro.observaciones += observacionesTutor
-                    }
-
-                } else {
-                    if (ValorUtils.isValid(datosRegistro.observaciones)){
-                        observacionesTutor = "Tutelado por "
-                        for (Map.Entry<String, Boolean> candidateIterator : candidateIdentificationCodes){
-                            if (candidateIterator.getValue()){
-                                observacionesTutor += StringBuilder.newInstance().append(candidateIterator.getKey()).append(", ")
-                            }
-                        }
-
-                        // Quitamos la última coma y la sustituimos por un punto
-                        observacionesTutor = StringBuilder.newInstance().append(observacionesTutor.substring(0, observacionesTutor.size()-2)).append(".").toString()
-
-                        datosRegistro.observaciones += StringBuilder.newInstance().append(".").append(observacionesTutor).toString()
-                    } else {
-                        datosRegistro.observaciones += observacionesTutor
-                    }
-                }
-
-                /**NOMBRE DE CANDIDATO
-                 *
-                 */
-
-                if (candidateInformationElement.getElementsByTagName("name").item(0) != null) {
-                    datosRegistro.nombreCliente = candidateInformationElement.getElementsByTagName("name").item(0).getTextContent()
-                }
-
-                /**APELLIDO CANDIDATO
-                 *
-                 */
-
-                if (candidateInformationElement.getElementsByTagName("surname").item(0) != null) {
-                    apellido = candidateInformationElement.getElementsByTagName("surname").item(0).getTextContent()
-                }
-
-                datosRegistro.apellidosCliente = apellido
-
-                /**SEXO CANDIDATO
-                 *
-                 */
-
-                if (candidateInformationElement.getElementsByTagName("gender").item(0) != null) {
-                    datosRegistro.sexo = candidateInformationElement.getElementsByTagName("gender").item(0).getTextContent() == "M" ? "M" : "V"
-                } else {
-                    datosRegistro.sexo = "M"
-                }
-
-                /**ESTADO CIVIL
-                 *
-                 */
-
-                if (candidateInformationElement.getElementsByTagName("maritalStatus").item(0) != null) {
-                    datosRegistro.estadoCivil = candidateInformationElement.getElementsByTagName("maritalStatus").item(0).getTextContent()
-                }
-
-                /**FECHA DE NACIMIENTO
-                 *
-                 */
-
-                if (candidateInformationElement.getElementsByTagName("birthDate").item(0) != null && !candidateInformationElement.getElementsByTagName("birthDate").item(0).getTextContent().isEmpty()) {
-                    datosRegistro.fechaNacimiento = formato.format(util.fromStringToXmlCalendar(candidateInformationElement.getElementsByTagName("birthDate").item(0).getTextContent()).toGregorianCalendar().getTime())
-                } else {
-                    datosRegistro.fechaNacimiento = formato.format(util.fromStringToXmlCalendar("2017-01-01T00:00:00").toGregorianCalendar().getTime())
-                }
-
-                /**DIRECCION CLIENTE
-                 *
-                 */
-
-                if (candidateInformationElement.getElementsByTagName("address").item(0) != null) {
-                    datosRegistro.direccionCliente = candidateInformationElement.getElementsByTagName("address").item(0).getTextContent()
-                } else {
-                    datosRegistro.direccionCliente = "."
-                }
-
-                /**POBLACION
-                 *
-                 */
-
-                if (candidateInformationElement.getElementsByTagName("city").item(0) != null) {
-                    datosRegistro.poblacion = candidateInformationElement.getElementsByTagName("city").item(0).getTextContent()
-                } else {
-                    datosRegistro.poblacion = "."
-                }
-
-                /**PROVINCIA
-                 *
-                 */
-
-                if (candidateInformationElement.getElementsByTagName("province").item(0) != null) {
-                    datosRegistro.provincia = candidateInformationElement.getElementsByTagName("province").item(0).getTextContent()
-                } else {
-                    datosRegistro.provincia = "."
-                }
-
-                /**PAÍS
-                 *
-                 */
-
-                if (candidateInformationElement.getElementsByTagName("country").item(0) != null) {
-                    datosRegistro.pais = candidateInformationElement.getElementsByTagName("country").item(0).getTextContent()
-                } else {
-                    datosRegistro.pais = "."
-                }
-
-                /**CODIGO POSTAL CLIENTE
-                 *
-                 */
-
-                if (candidateInformationElement.getElementsByTagName("postalCode").item(0) != null) {
-                    datosRegistro.codigoPostal = candidateInformationElement.getElementsByTagName("postalCode").item(0).getTextContent()
-                } else {
-                    datosRegistro.codigoPostal = "."
-                }
-
-                /**EMAIL
-                 *
-                 */
-
-                if (candidateInformationElement.getElementsByTagName("email").item(0) != null) {
-                    datosRegistro.email = candidateInformationElement.getElementsByTagName("email").item(0).getTextContent()
-                }
-
-                /**TELEFONOS
-                 *
-                 */
-
-                if (candidateInformationElement.getElementsByTagName("mobileNumber").item(0) != null && candidateInformationElement.getElementsByTagName("mobileNumber").item(0).getTextContent() != null && !candidateInformationElement.getElementsByTagName("mobileNumber").item(0).getTextContent().isEmpty()) {
-                    telefonoMovil = candidateInformationElement.getElementsByTagName("mobileNumber").item(0).getTextContent()
-                    datosRegistro.telefono1 = telefonoMovil
-                }
-
-                if (candidateInformationElement.getElementsByTagName("phoneNumber1").item(0) != null && candidateInformationElement.getElementsByTagName("phoneNumber1").item(0).getTextContent() != null && !candidateInformationElement.getElementsByTagName("phoneNumber1").item(0).getTextContent().isEmpty()) {
-                    telefono1 = candidateInformationElement.getElementsByTagName("phoneNumber1").item(0).getTextContent()
-                    datosRegistro.telefono2 = telefono1
-                }
-
-                if (candidateInformationElement.getElementsByTagName("phoneNumber2").item(0) != null && candidateInformationElement.getElementsByTagName("phoneNumber2").item(0).getTextContent() != null && !candidateInformationElement.getElementsByTagName("phoneNumber2").item(0).getTextContent().isEmpty()) {
-                    telefono2 = candidateInformationElement.getElementsByTagName("phoneNumber2").item(0).getTextContent()
-                    datosRegistro.telefono3 = telefono2
-                }
-
-                /**CODIGO DE AGENTE
-                 *
-                 */
-
-                if (candidateInformationElement.getElementsByTagName("agent").item(0) != null) {
-                    datosRegistro.codigoAgencia = candidateInformationElement.getElementsByTagName("agent").item(0).getTextContent()
-                }
-
-                /**CODIGO CIA
-                 *
-                 */
-
-                datosRegistro.codigoCia = company.codigoSt
-
-            }
-
-            // AÑADIMOS EN EL CAMPO7 EL NÚMERO DE CANDIDATOS DE LA PÓLIZA PARA QUE APAREZCA EN EL CRM COMO subPolicyNumber (NÚMERO DE SUBPÓLIZA)
-            Integer subPolicyNumber = candidateNodeList.getLength()
-
-            setCamposGenericosInfantil(datosRegistro, subPolicyNumber.toString())
-
-            return datosRegistro
-        } catch (Exception e) {
-            throw new WSException(this.getClass(), "rellenaDatosInfantil", ExceptionUtils.composeMessage(null, e))
-        }
     }
 
     private Map<String,Boolean> obtenerIdentificationNumberCandidatos(Request request) {

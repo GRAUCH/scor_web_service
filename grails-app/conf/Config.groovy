@@ -86,7 +86,7 @@ environments {
                     wsdl = "http://172.17.0.33:8003/FrontalServiciosCRM/FrontalService?wsdl"
                     namespace = "servicios"
                     clientInterface = "servicios.Frontal"
-                    serviceEndpointAddress = "http://172.17.0.33:8003/FrontalServiciosCRM/FrontalService?wsdl"
+                    serviceEndpointAddress = "http://172.17.0.33:8003/FrontalServiciosCRM/FrontalService"
                     connectionTimeout = 99999
                     enableDefaultLoggingInterceptors = false
                 }
@@ -95,7 +95,7 @@ environments {
                     wsdl = "http://172.17.0.33:8888/orabpel/default/ComprimirDocumentos/ComprimirDocumentos?wsdl"
                     namespace = "com.scor.comprimirdocumentos"
                     clientInterface = "com.scor.comprimirdocumentos.ComprimirDocumentos"
-                    serviceEndpointAddress = "http://172.17.0.33:8888/orabpel/default/ComprimirDocumentos/ComprimirDocumentos?wsdl"
+                    serviceEndpointAddress = "http://172.17.0.33:8888/orabpel/default/ComprimirDocumentos/ComprimirDocumentos"
                     connectionTimeout = 240000
                     enableDefaultLoggingInterceptors = false
                 }
@@ -104,7 +104,7 @@ environments {
                     wsdl = "http://172.17.0.33:8888/orabpel/default/CreacionExpedienteAsyncSRP/CreacionExpedienteAsyncSRP?wsdl"
                     namespace = "com.scor.creacionexpedienteasyncsrp"
                     clientInterface = "com.scor.creacionexpedienteasyncsrp.CreacionExpedienteAsyncSRP"
-                    serviceEndpointAddress = "http://172.17.0.33:8888/orabpel/default/CreacionExpedienteAsyncSRP/CreacionExpedienteAsyncSRP?wsdl"
+                    serviceEndpointAddress = "http://172.17.0.33:8888/orabpel/default/CreacionExpedienteAsyncSRP/CreacionExpedienteAsyncSRP"
                     connectionTimeout = 99999
                     enableDefaultLoggingInterceptors = false
                 }
