@@ -106,6 +106,22 @@ public class CaserUnderwrittingCaseManagementServiceImpl implements CaserUnderwr
         }
     }
 
+    public GestionReconocimientoMedicoInfantilResponse gestionReconocimientoMedicoInfantil(GestionReconocimientoMedicoInfantilRequest gestionReconocimientoMedicoInfantilRequest) {
+        LOG.info("Executing operation gestionReconocimientoMedicoInfantil");
+        System.out.println(gestionReconocimientoMedicoInfantilRequest);
+        try {
+            com.scortelemed.schemas.caser.GestionReconocimientoMedicoInfantilResponse _return = new com.scortelemed.schemas.caser.GestionReconocimientoMedicoInfantilResponse();
+            com.scortelemed.schemas.caser.StatusType _returnStatus = com.scortelemed.schemas.caser.StatusType.ERROR;
+            _return.setStatus(_returnStatus);
+            _return.setDate(javax.xml.datatype.DatatypeFactory.newInstance().newXMLGregorianCalendar("2018-09-10T18:22:38.616+02:00"));
+            _return.setNotes("Notes-633581689");
+            return _return;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new RuntimeException(ex);
+        }
+    }
+
     /* (non-Javadoc)
      * @see com.scortelemed.schemas.caser.CaserUnderwrittingCaseManagementService#resultadoReconocimientoMedico(com.scortelemed.schemas.caser.ResultadoReconocimientoMedicoRequest  resultadoReconocimientoMedicoRequest )*
      */

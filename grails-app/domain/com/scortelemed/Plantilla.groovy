@@ -2,7 +2,6 @@ package com.scortelemed
 class Plantilla {
 	
 	String nombre
-
 	String subject
 	String body
 	Date fecha_alta
@@ -10,11 +9,14 @@ class Plantilla {
 	
 	static hasMany = [avisos: Aviso]
 
+	static mapping = {
+		body sqlType: 'longText'
+	}
 		
     static constraints = {
     	nombre(blank: false, unique: true)
     	subject(blank:false)
-    	body(blank:false, size:0..51200)
+		body(blank:false)
 		fecha_alta(nullable:true)
 		fecha_modificacion(nullable:true)
     }

@@ -12,6 +12,7 @@ import com.ws.enumeration.UnidadOrganizativa
 import com.ws.servicios.ServiceFactory
 import com.ws.servicios.ICompanyService
 import com.ws.servicios.IExpedienteService
+import com.ws.servicios.impl.companies.CaserService
 import grails.transaction.Transactional
 import grails.util.Environment
 import grails.util.Holders
@@ -22,6 +23,7 @@ import servicios.Filtro
 import servicios.RespuestaCRM
 import servicios.Usuario
 
+import javax.xml.ws.BindingProvider
 import java.text.SimpleDateFormat
 
 import static grails.async.Promises.task
@@ -163,15 +165,46 @@ class ExpedienteService implements IExpedienteService {
      */
     boolean crearExpediente(Request req, TipoCompany comp) {
         try {
-            //SOBREESCRIBIMOS LA URL A LA QUE TIENE QUE LLAMAR EL WSDL
-            def ctx = grailsApplication.mainContext
-            def bean = ctx.getBean("soapClientCrearOrabpel")
-            bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("orabpelCreacion.wsdl")?.value)
-            def salida = grailsApplication.mainContext.soapClientCrearOrabpel.initiate(crearExpedienteBPM(req, comp))
-            return true
+
+            CaserService companyService
+
+            if (comp == TipoCompany.CASER) {
+                companyService = new CaserService()
+            }
+
+            if (companyService?.esCaserInfantil(req)){
+
+                for (int i = 0; i<companyService.obtenerNumeroCandidatos(req); i++) {
+                    realizarPeticionSOAP(req, comp, crearExpedienteCaserInfantil(req, i))
+                }
+
+                return true
+
+            } else {
+                return realizarPeticionSOAP(req, comp, crearExpedienteBPM(req, comp))
+            }
+
         } catch (Exception e) {
             throw new WSException(this.getClass(), "crearExpediente", ExceptionUtils.composeMessage(null, e))
         }
+    }
+
+    /**
+     * METODO QUE REALIZA LA LLAMADA AL BPEL DE ORACLE PARA CREAR EXPEDIENTES
+     * @param req REQUEST EN XML
+     * @param comp ENUMERADO QUE IDENTIFICA LA COMPANY
+     * @param payload ESTRUCTURA DE DATOS QUE SE ENVIA AL BPEL COMO CUERPO DEL SERVICIO SOAP, SE CONSTRUYE CON METODOS crearExpediente(req, comp)
+     *                O crearExpedienteCaserInfantil(req, iteradorCandidatosIndex)
+     * @return true SE DEVUELVE SIEMPRE TRUE PORQUE EL SERVICIO SOAP NO DEVUELVE ESTADO DE LA LLAMADA REALIZADA
+     *              SE COMPRUEBA POSTERIORMENTE SI EL EXPEDIENTE EXISTE EN CRM PARA VALIDAR QUE SE HA PERSISTIDO CORRECTAMENTE
+     */
+    private boolean realizarPeticionSOAP(Request req, TipoCompany comp, RootElement payload) {
+        //SOBREESCRIBIMOS LA URL A LA QUE TIENE QUE LLAMAR EL WSDL
+        def ctx = grailsApplication.mainContext
+        def bean = ctx.getBean("soapClientCrearOrabpel")
+        bean.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("orabpelCreacion.wsdl")?.value)
+        def salida = grailsApplication.mainContext.soapClientCrearOrabpel.initiate(payload)
+        return true
     }
 
     private def crearExpedienteBPM(Request req, TipoCompany comp) {
@@ -186,6 +219,24 @@ class ExpedienteService implements IExpedienteService {
             payload.cabeceraOrDATOSOrPIE = listadoFinal
         } catch (Exception e) {
            logginService.putError("crearExpedienteBPM","Error en el metodo crearExpedienteBPM: " + e)
+            //TODO: EXCEPTION: SE CAPTURA PERO NO SE PROPAGA
+        }
+        return payload
+    }
+
+    private def crearExpedienteCaserInfantil(Request req, int iteradorCandidatosIndex) {
+        companyService = new CaserService()
+        def listadoFinal = []
+        RootElement payload = new RootElement()
+        try {
+            String codigoSt = companyService.getCodigoStManual(req)
+            listadoFinal.add(buildCabecera(req, codigoSt))
+            listadoFinal.add(companyService.buildDatosCaserInfantil(req, codigoSt, iteradorCandidatosIndex))
+            listadoFinal.add(buildPie(null))
+            payload.cabeceraOrDATOSOrPIE = listadoFinal
+        } catch (Exception e) {
+            logginService.putError("crearExpedienteCaserInfantil","Error en el metodo crearExpedienteCaserInfantil: " + e)
+            //TODO: EXCEPTION: SE CAPTURA PERO NO SE PROPAGA
         }
         return payload
     }
