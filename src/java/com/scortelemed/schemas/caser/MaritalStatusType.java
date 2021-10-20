@@ -11,7 +11,7 @@ import javax.xml.bind.annotation.XmlType;
  * <p>The following schema fragment specifies the expected content contained within this class.
  * <p>
  * <pre>
- * &lt;simpleType name="CivilStateType">
+ * &lt;simpleType name="MaritalStatusType">
  *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
  *     &lt;enumeration value="C"/>
  *     &lt;enumeration value="D"/>
@@ -25,9 +25,9 @@ import javax.xml.bind.annotation.XmlType;
  * </pre>
  * 
  */
-@XmlType(name = "CivilStateType")
+@XmlType(name = "MaritalStatusType")
 @XmlEnum
-public enum CivilStateType {
+public enum MaritalStatusType {
 
     C,
     D,
@@ -41,7 +41,7 @@ public enum CivilStateType {
         return name();
     }
 
-    public static CivilStateType fromValue(String v) {
+    public static MaritalStatusType fromValue(String v) {
         return valueOf(v);
     }
 

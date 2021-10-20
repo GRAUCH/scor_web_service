@@ -1,23 +1,14 @@
 package services
 
-import com.scortelemed.Company
-import com.scortelemed.Operacion
-import com.scortelemed.Request
-import com.scortelemed.TipoCompany
-import com.scortelemed.TipoOperacion
+import com.scor.srpfileinbound.DATOS
+import com.scortelemed.*
 import com.scortelemed.schemas.caser.*
-import com.ws.servicios.*
-import com.ws.servicios.impl.ExpedienteService
-import com.ws.servicios.impl.RequestService
-import com.ws.servicios.impl.companies.CaserService
-import grails.util.Environment
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
 import org.apache.cxf.annotations.SchemaValidation
 import org.grails.cxf.utils.EndpointType
 import org.grails.cxf.utils.GrailsCxfEndpoint
 import org.grails.cxf.utils.GrailsCxfEndpointProperty
-
 import org.springframework.web.context.request.RequestContextHolder
 import servicios.Expediente
 import servicios.RespuestaCRM
@@ -72,6 +63,7 @@ class CaserUnderwrittingCaseManagementService {
 
                 if (company.generationAutomatic) {
 
+                    //TODO: HAY QUE AVERIGUAR SI AÑADIENDO EL SUBPOLICYNUMBER SE PUEDE PROPAGAR AL BPEL -  se carga en el campo7
                     requestXML = caserService.marshall(gestionReconocimientoMedico)
                     requestBBDD = requestService.crear(opername, requestXML)
 
@@ -80,11 +72,11 @@ class CaserUnderwrittingCaseManagementService {
 
                     logginService.putInfoMessage("Se procede el alta automatica de " + company.nombre + " con numero de solicitud " + gestionReconocimientoMedico.policyHolderInformation.requestNumber)
 
-//Chequeo si existe el expediente.
+                    //Chequeo si existe el expediente.
 
                     expedientes = caserService.existeExpediente(gestionReconocimientoMedico.policyHolderInformation.requestNumber, company.nombre, company.codigoSt, company.ou)
-                    if(expedientes != null)
-                    logginService.putInfoMessage("Exisiten ${expedientes.size()}  con numero de solicitud " + gestionReconocimientoMedico.policyHolderInformation.requestNumber)
+                    if (expedientes != null)
+                        logginService.putInfoMessage("Exisiten ${expedientes.size()}  con numero de solicitud " + gestionReconocimientoMedico.policyHolderInformation.requestNumber)
                     if (expedientes != null && expedientes.size() == 0) {
                         expedienteService.crearExpediente(requestBBDD, TipoCompany.CASER)
                         requestService.insertarRecibido(company, gestionReconocimientoMedico.policyHolderInformation.requestNumber, requestXML.toString(), TipoOperacion.ALTA)
@@ -112,6 +104,93 @@ class CaserUnderwrittingCaseManagementService {
 
             logginService.putErrorEndpoint("GestionReconocimientoMedico", "Peticion no realizada de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.policyHolderInformation.requestNumber + ". Error: " + e.getMessage())
             correoUtil.envioEmailErrores("GestionReconocimientoMedico", "Peticion de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedico.policyHolderInformation.requestNumber, e)
+        } finally {
+
+            def sesion = RequestContextHolder.currentRequestAttributes().getSession()
+            sesion.removeAttribute("userEndPoint")
+            sesion.removeAttribute("companyST")
+        }
+
+        resultado.setNotes(notes)
+        resultado.setDate(util.fromDateToXmlCalendar(new Date()))
+        resultado.setStatus(status)
+
+        return resultado
+    }
+
+    @WebResult(name = "GestionReconocimientoMedicoInfantilResponse")
+    GestionReconocimientoMedicoInfantilResponse gestionReconocimientoMedicoInfantil(
+            @WebParam(partName = "GestionReconocimientoMedicoInfantilRequest", name = "GestionReconocimientoMedicoInfantilRequest")
+                    GestionReconocimientoMedicoInfantilRequest gestionReconocimientoMedicoInfantil) {
+
+
+        GestionReconocimientoMedicoInfantilResponse resultado = new GestionReconocimientoMedicoInfantilResponse()
+        TransformacionUtil util = new TransformacionUtil()
+        CorreoUtil correoUtil = new CorreoUtil()
+
+        String opername = "CaserResultadoReconocimientoMedicoInfantilRequest"
+        String requestXML = ""
+        Request requestBBDD
+        String notes = null
+        StatusType status = null
+
+        RespuestaCRM respuestaCRM = new RespuestaCRM()
+
+        def company = Company.findByNombre(TipoCompany.CASER.getNombre())
+        List<servicios.Expediente> expedientes = new ArrayList<servicios.Expediente>()
+        logginService.putInfoMessage("Realizando peticion de informacion de servicio GestionReconocimientoMedicoInfantil para la cia " + company.nombre)
+
+        try {
+
+            Operacion operacion = estadisticasService.obtenerObjetoOperacion(opername)
+
+            if (operacion && operacion.activo) {
+
+                if (company.generationAutomatic) {
+
+                    requestXML = caserService.marshall(gestionReconocimientoMedicoInfantil)
+                    requestBBDD = requestService.crear(opername, requestXML)
+
+                    notes = "El caso se ha procesado correctamente"
+                    status = StatusType.OK
+
+                    logginService.putInfoMessage("Se procede el alta automatica de " + company.nombre + " con numero de solicitud " + gestionReconocimientoMedicoInfantil.policyInformation.requestNumber)
+
+                    //Chequeo si existen expedientes asociados a ese número de póliza.
+
+                    expedientes = caserService.existeExpediente(gestionReconocimientoMedicoInfantil.policyInformation.requestNumber, company.nombre, company.codigoSt, company.ou)
+                    if (expedientes != null && expedientes.size())
+                        logginService.putInfoMessage("Exisiten ${expedientes.size()}  con numero de solicitud " + gestionReconocimientoMedicoInfantil.policyInformation.requestNumber)
+                    if (expedientes != null && expedientes.size() == 0) {
+
+                        expedienteService.crearExpediente(requestBBDD, TipoCompany.CASER)
+                        requestService.insertarRecibido(company, gestionReconocimientoMedicoInfantil.policyInformation.requestNumber, requestXML.toString(), TipoOperacion.ALTA)
+                        /**Llamamos al metodo asincrono que busca en el crm el expediente recien creado*/
+                        expedienteService.busquedaCrm(requestBBDD, company, gestionReconocimientoMedicoInfantil.policyInformation.requestNumber, gestionReconocimientoMedicoInfantil.policyInformation.certificateNumber, null)
+
+                    } else {
+                        logginService.putInfoMessage("Se procede al envio del email para notificar del cambio  Ref: ${gestionReconocimientoMedicoInfantil.policyInformation.requestNumber}")
+                        //el expediente existe, le envio un email a quien este configurado en la compania.
+                        //TODO: DEJAR SIN COMENTAR ESTA LÍNEA: caserService.envioEmail(requestBBDD)
+                    }
+                }
+
+            } else {
+
+                notes = "Esta operacion esta desactivada temporalmente"
+                status = StatusType.OK
+                logginService.putInfoEndpoint("GestionReconocimientoMedicoInfantil", "Esta operacion para " + company.nombre + " esta desactivada temporalmente")
+                correoUtil.envioEmail("GestionReconocimientoMedicoInfantil", "Peticion de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedicoInfantil.policyInformation.requestNumber + ". Esta operacion para " + company.nombre + " esta desactivada temporalmente", 0)
+            }
+        } catch (Exception e) {
+
+            notes = "Error: " + e.getMessage()
+            status = StatusType.ERROR
+
+            requestService.insertarError(company, gestionReconocimientoMedicoInfantil.policyInformation.requestNumber, requestXML.toString(), TipoOperacion.ALTA, "Peticion no realizada para solicitud: " + gestionReconocimientoMedicoInfantil.policyInformation.requestNumber + ". Error: " + e.getMessage())
+
+            logginService.putErrorEndpoint("GestionReconocimientoMedicoInfantil", "Peticion no realizada de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedicoInfantil.policyInformation.requestNumber + ". Error: " + e.getMessage())
+            correoUtil.envioEmailErrores("GestionReconocimientoMedicoInfantil", "Peticion de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedicoInfantil.policyInformation.requestNumber, e)
         } finally {
 
             def sesion = RequestContextHolder.currentRequestAttributes().getSession()

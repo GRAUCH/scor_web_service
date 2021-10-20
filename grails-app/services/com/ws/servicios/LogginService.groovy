@@ -6,7 +6,7 @@ import org.springframework.web.context.request.RequestContextHolder
 class LogginService {
 	def authenticateService
 	
-	def putInfoEndpoint = { operacion, mensaje->
+	def putInfoEndpoint = { String operacion, String mensaje->
 		def datosConexion=dameDatosSession()
 			
 		log.info ("["+operacion+"] ("+datosConexion.user+"-"+datosConexion.ip+"): "+mensaje)
@@ -17,18 +17,18 @@ class LogginService {
 		log.info ("["+operacion+"] ("+datosConexion.user+"-"+datosConexion.ip+"): "+mensaje)
 	}
 	
-	def putInfoMessage= { mensaje->	
+	def putInfoMessage= { String mensaje->
 		log.info (mensaje)
 	}
 	
-	def putErrorEndpoint = { operacion, mensaje->
+	def putErrorEndpoint = { String operacion, String mensaje->
 		def datosConexion=dameDatosSession()
 			
 		log.error ("["+operacion+"] ("+datosConexion.user+"-"+datosConexion.ip+"): "+mensaje)
 	}
 	
 	
-	def putError = { operacion, mensaje->
+	def putError = { String operacion, String mensaje->
 		def datosConexion=dameDatosSession()
 			
 		log.error ("["+operacion+"] : "+mensaje)

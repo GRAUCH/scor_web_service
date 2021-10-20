@@ -1,0 +1,119 @@
+2021-09-15 10:38:49,102 [main] INFO  webxml.WebxmlGrailsPlugin  - Loading default config file: class DefaultWebXmlConfig
+2021-09-15 10:38:49,120 [main] WARN  webxml.WebxmlGrailsPlugin  - Did not find application config file: WebXmlConfig
+2021-09-15 10:38:50,045 [main] INFO  webxml.WebxmlGrailsPlugin  - Loading default config file: class DefaultWebXmlConfig
+2021-09-15 10:38:50,048 [main] WARN  webxml.WebxmlGrailsPlugin  - Did not find application config file: WebXmlConfig
+2021-09-15 10:38:53,529 [localhost-startStop-1] INFO  [localhost].[/scorWebservices]  - Initializing Spring root WebApplicationContext
+2021-09-15 10:38:58,971 [localhost-startStop-1] INFO  hibernate4.HibernatePluginSupport  - Set db generation strategy to 'update' for datasource DEFAULT
+2021-09-15 10:38:59,508 [localhost-startStop-1] INFO  CxfClientGrailsPlugin  - wiring up cxf-client beans
+2021-09-15 10:38:59,516 [localhost-startStop-1] INFO  CxfClientGrailsPlugin  - wiring up client for soapClientAlptis [clientInterface=servicios.Frontal and serviceEndpointAddress=http://172.17.0.33:8003/FrontalServiciosCRM/FrontalService?wsdl]
+2021-09-15 10:38:59,528 [localhost-startStop-1] INFO  CxfClientGrailsPlugin  - wiring up client for soapClientComprimidoAlptis [clientInterface=com.scor.comprimirdocumentos.ComprimirDocumentos and serviceEndpointAddress=http://172.17.0.33:8888/orabpel/default/ComprimirDocumentos/ComprimirDocumentos?wsdl]
+2021-09-15 10:38:59,528 [localhost-startStop-1] INFO  CxfClientGrailsPlugin  - wiring up client for soapClientCrearOrabpel [clientInterface=com.scor.creacionexpedienteasyncsrp.CreacionExpedienteAsyncSRP and serviceEndpointAddress=http://172.17.0.33:8888/orabpel/default/CreacionExpedienteAsyncSRP/CreacionExpedienteAsyncSRP?wsdl]
+2021-09-15 10:38:59,529 [localhost-startStop-1] INFO  CxfClientGrailsPlugin  - completed mapping cxf-client beans
+2021-09-15 10:39:01,597 [localhost-startStop-1] INFO  cache.CacheBeanPostProcessor  - postProcessBeanDefinitionRegistry start
+2021-09-15 10:39:01,601 [localhost-startStop-1] INFO  cache.CacheBeanPostProcessor  - postProcessBeanFactory
+2021-09-15 10:39:02,537 [localhost-startStop-1] WARN  util.GrailsUtil  - [WARNING] Property [ou] of domain class com.scortelemed.Company has type [com.ws.enumeration.UnidadOrganizativa] and doesn't support constraint [blank]. This constraint will not be checked during validation.
+2021-09-15 10:39:02,542 [localhost-startStop-1] WARN  util.GrailsUtil  - [WARNING] Property [company] of domain class com.scortelemed.Ipcontrol has type [com.scortelemed.Company] and doesn't support constraint [blank]. This constraint will not be checked during validation.
+2021-09-15 10:39:02,608 [localhost-startStop-1] WARN  mapping.RootClass  - HHH000038: Composite-id class does not override equals(): com.scortelemed.WebserviceUsuarios
+2021-09-15 10:39:02,608 [localhost-startStop-1] WARN  mapping.RootClass  - HHH000039: Composite-id class does not override hashCode(): com.scortelemed.WebserviceUsuarios
+2021-09-15 10:39:02,677 [localhost-startStop-1] WARN  config.ConfigurationFactory  - No configuration found. Configuring ehcache from ehcache-failsafe.xml  found in the classpath: jar:file:/C:/Users/lmmiralles/.m2/repository/net/sf/ehcache/ehcache-core/2.4.8/ehcache-core-2.4.8.jar!/ehcache-failsafe.xml
+2021-09-15 10:39:02,756 [localhost-startStop-1] WARN  ehcache.AbstractEhcacheRegionFactory  - HHH020003: Could not find a specific ehcache configuration for cache named [org.hibernate.cache.spi.UpdateTimestampsCache]; using defaults.
+2021-09-15 10:39:02,782 [localhost-startStop-1] WARN  ehcache.AbstractEhcacheRegionFactory  - HHH020003: Could not find a specific ehcache configuration for cache named [org.hibernate.cache.internal.StandardQueryCache]; using defaults.
+2021-09-15 10:39:03,569 [localhost-startStop-1] WARN  ehcache.AbstractEhcacheRegionFactory  - HHH020003: Could not find a specific ehcache configuration for cache named [com.scortelemed.Authority]; using defaults.
+2021-09-15 10:39:03,625 [localhost-startStop-1] WARN  ehcache.AbstractEhcacheRegionFactory  - HHH020003: Could not find a specific ehcache configuration for cache named [com.scortelemed.SecAppRole]; using defaults.
+2021-09-15 10:39:04,016 [localhost-startStop-1] INFO  sql.DatabaseMetaData  - HHH000262: Table not found: plantilla
+2021-09-15 10:39:04,060 [localhost-startStop-1] INFO  sql.DatabaseMetaData  - HHH000262: Table not found: plantilla
+2021-09-15 10:39:04,061 [localhost-startStop-1] INFO  sql.DatabaseMetaData  - HHH000262: Table not found: plantilla
+2021-09-15 10:39:04,069 [localhost-startStop-1] ERROR hbm2ddl.SchemaUpdate  - HHH000388: Unsuccessful: create table plantilla (id bigint not null auto_increment, version bigint not null, body varchar(51200) not null, fecha_alta datetime, fecha_modificacion datetime, nombre varchar(255) not null, subject varchar(255) not null, primary key (id))
+2021-09-15 10:39:04,070 [localhost-startStop-1] ERROR hbm2ddl.SchemaUpdate  - Column length too big for column 'body' (max = 21845); use BLOB or TEXT instead
+2021-09-15 10:39:04,084 [localhost-startStop-1] ERROR hbm2ddl.SchemaUpdate  - HHH000388: Unsuccessful: alter table agente add constraint FK_76jn4y1f9kfgwfidsqefvx4e3 foreign key (cia_id) references company (id)
+2021-09-15 10:39:04,084 [localhost-startStop-1] ERROR hbm2ddl.SchemaUpdate  - Can't create table 'scorws-prepro.#sql-19a8c_41' (errno: 150)
+2021-09-15 10:39:04,093 [localhost-startStop-1] ERROR hbm2ddl.SchemaUpdate  - HHH000388: Unsuccessful: alter table aviso add constraint FK_fhmpx8x8dudf99d9qjp7tc2pw foreign key (plantilla_id) references plantilla (id)
+2021-09-15 10:39:04,093 [localhost-startStop-1] ERROR hbm2ddl.SchemaUpdate  - Can't create table 'scorws-prepro.#sql-19a8c_41' (errno: 150)
+2021-09-15 10:39:04,101 [localhost-startStop-1] ERROR hbm2ddl.SchemaUpdate  - HHH000388: Unsuccessful: alter table destinatario add constraint FK_p8144cifv5f4nh03pmu7von6l foreign key (company_id) references company (id)
+2021-09-15 10:39:04,102 [localhost-startStop-1] ERROR hbm2ddl.SchemaUpdate  - Can't create table 'scorws-prepro.#sql-19a8c_41' (errno: 150)
+2021-09-15 10:39:04,111 [localhost-startStop-1] ERROR hbm2ddl.SchemaUpdate  - HHH000388: Unsuccessful: alter table ipcontrol add constraint FK_s3cghqmbl8ny4bqwc94r45bx4 foreign key (company_id) references company (id)
+2021-09-15 10:39:04,111 [localhost-startStop-1] ERROR hbm2ddl.SchemaUpdate  - Can't create table 'scorws-prepro.#sql-19a8c_41' (errno: 150)
+2021-09-15 10:39:04,120 [localhost-startStop-1] ERROR hbm2ddl.SchemaUpdate  - HHH000388: Unsuccessful: alter table person add constraint FK_bmitwdbd0ff8brd63rr4j54sf foreign key (company_id) references company (id)
+2021-09-15 10:39:04,120 [localhost-startStop-1] ERROR hbm2ddl.SchemaUpdate  - Can't create table 'scorws-prepro.#sql-19a8c_41' (errno: 150)
+2021-09-15 10:39:04,130 [localhost-startStop-1] ERROR hbm2ddl.SchemaUpdate  - HHH000388: Unsuccessful: alter table request add constraint FK_byecajiufmxl56pvc3okvp04u foreign key (company_id) references company (id)
+2021-09-15 10:39:04,130 [localhost-startStop-1] ERROR hbm2ddl.SchemaUpdate  - Can't create table 'scorws-prepro.#sql-19a8c_41' (errno: 150)
+2021-09-15 10:39:05,130 [localhost-startStop-1] INFO  scaffolding.AbstractGrailsTemplateGenerator  - Scaffolding template generator set to use resource loader [org.codehaus.groovy.grails.commons.spring.GrailsWebApplicationContext@551c8d0: startup date [Wed Sep 15 10:39:00 CEST 2021]; parent: Root WebApplicationContext]
+2021-09-15 10:39:09,062 [localhost-startStop-1] INFO  webservices.EventIntrceptorListener  - Creando un interceptor personalizado
+2021-09-15 10:39:10,049 [localhost-startStop-1] WARN  intercept.AnnotationFilterInvocationDefinition  - replaced rule for '/generacionfichero/generarporcompania' with tokens [permitAll] with tokens [permitAll]
+2021-09-15 10:39:10,049 [localhost-startStop-1] WARN  intercept.AnnotationFilterInvocationDefinition  - replaced rule for '/generacionfichero/generarporcompania.*' with tokens [permitAll] with tokens [permitAll]
+2021-09-15 10:39:10,049 [localhost-startStop-1] WARN  intercept.AnnotationFilterInvocationDefinition  - replaced rule for '/generacionfichero/generarporcompania/**' with tokens [permitAll] with tokens [permitAll]
+2021-09-15 10:39:10,578 [localhost-startStop-1] INFO  databasemigration.MigrationRunner  - updateOnStart disabled for dataSource; not running migrations
+2021-09-15 10:39:10,670 [localhost-startStop-1] INFO  ScaffoldingGrailsPlugin  - configuring scaffolding...
+2021-09-15 10:39:10,671 [localhost-startStop-1] INFO  ScaffoldingGrailsPlugin  - done configuring scaffolding.
+2021-09-15 10:39:10,672 [localhost-startStop-1] WARN  util.GrailsUtil  - [WARNING] Property [ou] of domain class com.scortelemed.Company has type [com.ws.enumeration.UnidadOrganizativa] and doesn't support constraint [blank]. This constraint will not be checked during validation.
+2021-09-15 10:39:10,672 [localhost-startStop-1] WARN  util.GrailsUtil  - [WARNING] Property [company] of domain class com.scortelemed.Ipcontrol has type [com.scortelemed.Company] and doesn't support constraint [blank]. This constraint will not be checked during validation.
+2021-09-15 10:39:10,674 [localhost-startStop-1] INFO  context.GrailsConfigUtils  - [GrailsContextLoader] Grails application loaded.
+2021-09-15 10:39:10,946 [localhost-startStop-1] INFO  [localhost].[/scorWebservices]  - Initializing Spring FrameworkServlet 'grails'
+2021-09-15 10:39:11,113 [localhost-startStop-1] INFO  factory.ReflectionServiceFactoryBean  - Creating Service {http://www.scortelemed.com/schemas/lifesquare}LifesquareUnderwrittingCaseManagementServiceService from class services.LifesquareUnderwrittingCaseManagementService
+2021-09-15 10:39:12,081 [localhost-startStop-1] INFO  endpoint.ServerImpl  - Setting the server's publish address to be /lifesquare/LifesquareUnderwrittingCaseManagement
+2021-09-15 10:39:12,099 [localhost-startStop-1] INFO  factory.ReflectionServiceFactoryBean  - Creating Service {http://www.scortelemed.com/schemas/alptis}AlptisUnderwrittingCaseManagementServiceService from class services.AlptisUnderwrittingCaseManagementService
+2021-09-15 10:39:12,155 [localhost-startStop-1] INFO  endpoint.ServerImpl  - Setting the server's publish address to be /alptis/AlptisUnderwrittingCaseManagement
+2021-09-15 10:39:12,156 [localhost-startStop-1] INFO  factory.ReflectionServiceFactoryBean  - Creating Service {http://www.scortelemed.com/schemas/nn}NationaleNederlandenUnderwrittingCaseManagementServiceService from class services.NationaleNederlandenUnderwrittingCaseManagementService
+2021-09-15 10:39:12,277 [localhost-startStop-1] INFO  endpoint.ServerImpl  - Setting the server's publish address to be /nn/NnUnderwrittingCaseManagement
+2021-09-15 10:39:12,278 [localhost-startStop-1] INFO  factory.ReflectionServiceFactoryBean  - Creating Service {http://www.scortelemed.com/schemas/societeGenerale}SocieteGeneraleUnderwrittingCaseManagementServiceService from class services.SocieteGeneraleUnderwrittingCaseManagementService
+2021-09-15 10:39:12,398 [localhost-startStop-1] INFO  endpoint.ServerImpl  - Setting the server's publish address to be /societeGenerale/SocieteGeneraleUnderwrittingCaseManagement
+2021-09-15 10:39:12,398 [localhost-startStop-1] INFO  factory.ReflectionServiceFactoryBean  - Creating Service {http://www.scortelemed.com/schemas/cajamar}CajamarUnderwrittingCaseManagementServiceService from class services.CajamarUnderwrittingCaseManagementService
+2021-09-15 10:39:12,511 [localhost-startStop-1] INFO  endpoint.ServerImpl  - Setting the server's publish address to be /cajamar/CajamarUnderwrittingCaseManagement
+2021-09-15 10:39:12,511 [localhost-startStop-1] INFO  factory.ReflectionServiceFactoryBean  - Creating Service {http://www.scortelemed.com/schemas/afiEsca}AfiEscaUnderwrittingCaseManagementServiceService from class services.AfiEscaUnderwrittingCaseManagementService
+2021-09-15 10:39:12,555 [localhost-startStop-1] INFO  endpoint.ServerImpl  - Setting the server's publish address to be /afiesca/AfiEscaUnderwrittingCaseManagement
+2021-09-15 10:39:12,555 [localhost-startStop-1] INFO  factory.ReflectionServiceFactoryBean  - Creating Service {http://www.scortelemed.com/schemas/enginyers}EnginyersUnderwrittingCaseManagementServiceService from class services.EnginyersUnderwrittingCaseManagementService
+2021-09-15 10:39:12,744 [localhost-startStop-1] INFO  endpoint.ServerImpl  - Setting the server's publish address to be /enginyers/EnginyersUnderwrittingCaseManagement
+2021-09-15 10:39:12,744 [localhost-startStop-1] INFO  factory.ReflectionServiceFactoryBean  - Creating Service {http://www.scortelemed.com/schemas/lagunaro}GestionReconocimientosMedicosServiceService from class services.GestionReconocimientosMedicosService
+2021-09-15 10:39:12,845 [localhost-startStop-1] INFO  endpoint.ServerImpl  - Setting the server's publish address to be /lagunaro/GestionReconocimientosMedicos
+2021-09-15 10:39:12,846 [localhost-startStop-1] INFO  factory.ReflectionServiceFactoryBean  - Creating Service {http://www.scortelemed.com/schemas/simplefr}SimplefrUnderwrittingCaseManagementServiceService from class services.SimplefrUnderwrittingCaseManagementService
+2021-09-15 10:39:12,964 [localhost-startStop-1] INFO  endpoint.ServerImpl  - Setting the server's publish address to be /simplefr/SimplefrUnderwrittingCaseManagement
+2021-09-15 10:39:12,965 [localhost-startStop-1] INFO  factory.ReflectionServiceFactoryBean  - Creating Service {http://www.scortelemed.com/schemas/methislabCF}MethislabCFUnderwrittingCaseManagementServiceService from class services.MethislabCFUnderwrittingCaseManagementService
+2021-09-15 10:39:13,119 [localhost-startStop-1] INFO  endpoint.ServerImpl  - Setting the server's publish address to be /methislabCF/MethislabCFUnderwrittingCaseManagement
+2021-09-15 10:39:13,119 [localhost-startStop-1] INFO  factory.ReflectionServiceFactoryBean  - Creating Service {http://www.scortelemed.com/schemas/ama}AmaUnderwrittingCaseManagementServiceService from class services.AmaUnderwrittingCaseManagementService
+2021-09-15 10:39:14,052 [localhost-startStop-1] INFO  endpoint.ServerImpl  - Setting the server's publish address to be /ama/AmaUnderwrittingCaseManagement
+2021-09-15 10:39:14,054 [localhost-startStop-1] INFO  factory.ReflectionServiceFactoryBean  - Creating Service {http://www.scortelemed.com/schemas/lifesquare}LifesquareUnderwrittingCasesResultsServiceService from class services.LifesquareUnderwrittingCasesResultsService
+2021-09-15 10:39:14,071 [localhost-startStop-1] INFO  endpoint.ServerImpl  - Setting the server's publish address to be /lifesquare/LifesquareUnderwrittingCasesResults
+2021-09-15 10:39:14,071 [localhost-startStop-1] INFO  factory.ReflectionServiceFactoryBean  - Creating Service {http://www.scortelemed.com/schemas/cbpita}CbpitaUnderwrittingCaseManagementServiceService from class services.CbpitaUnderwrittingCaseManagementService
+2021-09-15 10:39:14,195 [localhost-startStop-1] INFO  endpoint.ServerImpl  - Setting the server's publish address to be /cbpita/CbpitaUnderwrittingCaseManagement
+2021-09-15 10:39:14,195 [localhost-startStop-1] INFO  factory.ReflectionServiceFactoryBean  - Creating Service {http://www.scortelemed.com/schemas/afiEsca}AfiEscaUnderwrittingCasesResultsServiceService from class services.AfiEscaUnderwrittingCasesResultsService
+2021-09-15 10:39:14,205 [localhost-startStop-1] INFO  endpoint.ServerImpl  - Setting the server's publish address to be /afiesca/AfiEscaUnderwrittingCasesResults
+2021-09-15 10:39:14,206 [localhost-startStop-1] INFO  factory.ReflectionServiceFactoryBean  - Creating Service {http://www.scortelemed.com/schemas/caser}CaserUnderwrittingCaseManagementServiceService from class services.CaserUnderwrittingCaseManagementService
+2021-09-15 10:39:14,361 [localhost-startStop-1] INFO  endpoint.ServerImpl  - Setting the server's publish address to be /caser/CaserUnderwrittingCaseManagement
+2021-09-15 10:39:14,362 [localhost-startStop-1] INFO  factory.ReflectionServiceFactoryBean  - Creating Service {http://www.scortelemed.com/schemas/psn}PsnUnderwrittingCaseManagementServiceService from class services.PsnUnderwrittingCaseManagementService
+2021-09-15 10:39:14,615 [localhost-startStop-1] INFO  endpoint.ServerImpl  - Setting the server's publish address to be /psn/PsnUnderwrittingCaseManagement
+2021-09-15 10:39:14,616 [localhost-startStop-1] INFO  factory.ReflectionServiceFactoryBean  - Creating Service {http://www.scortelemed.com/schemas/netinsurance}NetinsuranceUnderwrittingCaseManagementServiceService from class services.NetinsuranceUnderwrittingCaseManagementService
+2021-09-15 10:39:14,744 [localhost-startStop-1] INFO  endpoint.ServerImpl  - Setting the server's publish address to be /netinsurance/NetinsuranceUnderwrittingCaseManagement
+2021-09-15 10:39:14,746 [localhost-startStop-1] INFO  factory.ReflectionServiceFactoryBean  - Creating Service {http://www.scortelemed.com/schemas/methislab}MethislabUnderwrittingCaseManagementServiceService from class services.MethislabUnderwrittingCaseManagementService
+2021-09-15 10:39:14,867 [localhost-startStop-1] INFO  endpoint.ServerImpl  - Setting the server's publish address to be /methislab/MethislabUnderwrittingCaseManagement
+2021-09-15 10:39:14,878 [main] INFO  http11.Http11Protocol  - Starting ProtocolHandler ["http-bio-8080"]
+2021-09-16 12:25:34,141 [Thread-13] INFO  compiler.GrailsProjectWatcher  - File [C:\Workspace_Grails\scorWebservices\src\java\com\scortelemed\schemas\caser\GestionReconocimientoMedicoRequest.java] changed. Applying changes to application.
+2021-09-16 12:25:34,171 [Thread-8] INFO  compiler.GrailsProjectWatcher  - File [C:\Workspace_Grails\scorWebservices\src\java\com\scortelemed\schemas\caser\GestionReconocimientoMedicoRequest.java] changed. Applying changes to application.
+2021-09-16 12:25:40,198 [FileSystemWatcher: files=#1030 cl=groovy.lang.GroovyClassLoader@56f0cc85] ERROR agent.Watcher  - FileWatcher caught serious error, see cause
+java.lang.LinkageError: loader (instance of  org/springsource/loaded/ChildClassLoader): attempted  duplicate class definition for name: "com/scortelemed/schemas/caser/GestionReconocimientoMedicoRequest$BenefitsType$$DSjAVtRK"
+	at java.lang.ClassLoader.defineClass(ClassLoader.java:756)
+	at java.lang.ClassLoader.defineClass(ClassLoader.java:635)
+	at java.lang.Thread.run(Thread.java:748)
+2021-09-16 12:25:40,206 [FileSystemWatcher: files=#1030 cl=groovy.lang.GroovyClassLoader@56f0cc85] ERROR agent.Watcher  - FileWatcher caught serious error, see cause
+java.lang.LinkageError: loader (instance of  org/springsource/loaded/ChildClassLoader): attempted  duplicate class definition for name: "com/scortelemed/schemas/caser/GestionReconocimientoMedicoRequest$CandidateInformation$$DSjAVtRO"
+	at java.lang.ClassLoader.defineClass(ClassLoader.java:756)
+	at java.lang.ClassLoader.defineClass(ClassLoader.java:635)
+	at java.lang.Thread.run(Thread.java:748)
+2021-09-16 12:25:40,210 [FileSystemWatcher: files=#1030 cl=groovy.lang.GroovyClassLoader@56f0cc85] ERROR agent.Watcher  - FileWatcher caught serious error, see cause
+java.lang.LinkageError: loader (instance of  org/springsource/loaded/ChildClassLoader): attempted  duplicate class definition for name: "com/scortelemed/schemas/caser/GestionReconocimientoMedicoRequest$PolicyHolderInformation$$DSjAVtRR"
+	at java.lang.ClassLoader.defineClass(ClassLoader.java:756)
+	at java.lang.ClassLoader.defineClass(ClassLoader.java:635)
+	at java.lang.Thread.run(Thread.java:748)
+2021-09-16 12:25:40,212 [FileSystemWatcher: files=#1030 cl=groovy.lang.GroovyClassLoader@56f0cc85] ERROR agent.Watcher  - FileWatcher caught serious error, see cause
+java.lang.LinkageError: loader (instance of  org/springsource/loaded/ChildClassLoader): attempted  duplicate class definition for name: "com/scortelemed/schemas/caser/GestionReconocimientoMedicoRequest$ServiceInformation$$DSjAVtRT"
+	at java.lang.ClassLoader.defineClass(ClassLoader.java:756)
+	at java.lang.ClassLoader.defineClass(ClassLoader.java:635)
+	at java.lang.Thread.run(Thread.java:748)
+2021-09-16 12:25:40,215 [FileSystemWatcher: files=#1030 cl=groovy.lang.GroovyClassLoader@56f0cc85] ERROR agent.Watcher  - FileWatcher caught serious error, see cause
+java.lang.LinkageError: loader (instance of  org/springsource/loaded/ChildClassLoader): attempted  duplicate class definition for name: "com/scortelemed/schemas/caser/GestionReconocimientoMedicoRequest$$DSjAVtRZ"
+	at java.lang.ClassLoader.defineClass(ClassLoader.java:756)
+	at java.lang.ClassLoader.defineClass(ClassLoader.java:635)
+	at java.lang.Thread.run(Thread.java:748)
+2021-09-16 12:26:27,323 [Thread-13] INFO  compiler.GrailsProjectWatcher  - File [C:\Workspace_Grails\scorWebservices\src\java\com\scortelemed\schemas\caser\GestionReconocimientoMedicoRequest.java] changed. Applying changes to application.
+2021-09-16 12:26:27,323 [Thread-8] INFO  compiler.GrailsProjectWatcher  - File [C:\Workspace_Grails\scorWebservices\src\java\com\scortelemed\schemas\caser\GestionReconocimientoMedicoRequest.java] changed. Applying changes to application.
+2021-09-16 12:26:28,307 [Thread-13] INFO  compiler.GrailsProjectWatcher  - File [C:\Workspace_Grails\scorWebservices\src\java\com\scortelemed\schemas\caser\GestionReconocimientoMedicoRequest.java] changed. Applying changes to application.
+2021-09-16 12:26:29,368 [Thread-8] INFO  compiler.GrailsProjectWatcher  - File [C:\Workspace_Grails\scorWebservices\src\java\com\scortelemed\schemas\caser\GestionReconocimientoMedicoRequest.java] changed. Applying changes to application.

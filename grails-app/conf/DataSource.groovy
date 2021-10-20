@@ -16,7 +16,7 @@ hibernate {
 environments {
     test {
         dataSource {
-            dbCreate = "" // one of 'create', 'create-drop','update'
+            dbCreate = "update" // one of 'create', 'create-drop','update'
             username = "root"
             password = "root"
             url = "jdbc:mysql://localhost/scorws-prepro"
