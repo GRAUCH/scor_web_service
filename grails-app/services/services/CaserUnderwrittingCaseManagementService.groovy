@@ -171,7 +171,7 @@ class CaserUnderwrittingCaseManagementService {
                     } else {
                         logginService.putInfoMessage("Se procede al envio del email para notificar del cambio  Ref: ${gestionReconocimientoMedicoInfantil.policyInformation.requestNumber}")
                         //el expediente existe, le envio un email a quien este configurado en la compania.
-                        //TODO: DEJAR SIN COMENTAR ESTA LÍNEA: caserService.envioEmail(requestBBDD)
+                        caserService.envioEmail(requestBBDD)
                     }
                 }
 

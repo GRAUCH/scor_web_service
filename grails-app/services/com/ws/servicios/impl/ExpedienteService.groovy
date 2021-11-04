@@ -174,8 +174,11 @@ class ExpedienteService implements IExpedienteService {
 
             if (companyService?.esCaserInfantil(req)){
 
+                // NECESITAMOS RELENTIZAR EL ENVÍO DE PETICIONES SOAP AL FRONTAL, YA QUE SI LLEGAN DEMASIADO RÁPIDO SE REPITEN LOS CÓDIGOS ST,
+                // POR LO QUE USAREMOS UN DELAY DE 30 SEGUNDOS (TIEMPO QUE TARDA BPEL EN CREAR UN EXPEDIENTE EN CRM ES DE 25 SEGUNDOS)
                 for (int i = 0; i<companyService.obtenerNumeroCandidatos(req); i++) {
                     realizarPeticionSOAP(req, comp, crearExpedienteCaserInfantil(req, i))
+                    Thread.currentThread().sleep(25000)
                 }
 
                 return true
@@ -236,7 +239,7 @@ class ExpedienteService implements IExpedienteService {
             payload.cabeceraOrDATOSOrPIE = listadoFinal
         } catch (Exception e) {
             logginService.putError("crearExpedienteCaserInfantil","Error en el metodo crearExpedienteCaserInfantil: " + e)
-            //TODO: EXCEPTION: SE CAPTURA PERO NO SE PROPAGA
+            throw new Exception(e)
         }
         return payload
     }
