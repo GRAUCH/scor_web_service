@@ -78,7 +78,7 @@ grails.hibernate.osiv.readonly = false
 environments {
     test {
         grails.logging.jul.usebridge = true
-        println "entra a test"
+        println "Carga configuración entorno 'test'"
 
         cxf {
             client {
@@ -113,7 +113,7 @@ environments {
     }
 
     development {
-        println "entra a DEVELOPMENT"
+        println "Carga configuración entorno 'development'"
 
         grails.logging.jul.usebridge = true
 
@@ -152,7 +152,7 @@ environments {
     }
 
     preproduction_wildfly {
-        println "entra a prepro wildfly"
+        println "Carga configuración entorno 'preproduction_wildfly'"
         grails.logging.jul.usebridge = true
 
         cxf {
@@ -190,7 +190,7 @@ environments {
     }
 
     production_wildfly{
-        println "entra a produccion wildfly CONEXIONES WSDL"
+        println "Carga configuración entorno 'production_wildfly'"
         grails.logging.jul.usebridge = false
         cxf {
             client {
@@ -279,7 +279,7 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
 log4j = {
     environments {
         test {
-            println "ENTORNO TEST"
+            println "Carga configuración log4j 'test'"
             appenders {
                 layout:
                 pattern(conversionPattern: '%c{2} %m%n')
@@ -302,7 +302,7 @@ log4j = {
         }
 
         development {
-            println "ENTORNO DEVELOPMENT"
+            println "Carga configuración log4j 'development'"
             appenders {
                 layout:
                 pattern(conversionPattern: '%c{2} %m%n')
@@ -327,7 +327,7 @@ log4j = {
 
 
         preproduction_wildfly {
-            println "ENTORNO PREPRODUCCION WILDFLY"
+            println "Carga configuración log4j 'preproduction_wildfly'"
             appenders {
                 layout:
                 pattern(conversionPattern: '%c{2} %m%n')
@@ -350,7 +350,7 @@ log4j = {
         }
 
         production_wildfly {
-            println "ENTORNO PRODUCCION WILDFLY LOGS"
+            println "Carga configuración log4j 'production_wildfly'"
             appenders {
                 layout:
                 pattern(conversionPattern: '%c{2} %m%n')
