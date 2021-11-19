@@ -11,3 +11,4 @@ scorWebservices.iml
 .slcache/
 
 target/
+logs/
