@@ -8,6 +8,7 @@ import com.scortelemed.Conf
 import com.scortelemed.Request
 import com.scortelemed.TipoCompany
 import com.scortelemed.TipoOperacion
+import com.scortelemed.schemas.caser.ExpedienteCRMDynamics
 import com.ws.enumeration.UnidadOrganizativa
 import com.ws.servicios.ServiceFactory
 import com.ws.servicios.ICompanyService
@@ -17,6 +18,7 @@ import grails.transaction.Transactional
 import grails.util.Environment
 import grails.util.Holders
 import hwsol.webservices.CorreoUtil
+import org.hibernate.transform.Transformers
 import servicios.ClaveFiltro
 import servicios.Expediente
 import servicios.Filtro
@@ -38,6 +40,7 @@ class ExpedienteService implements IExpedienteService {
     CorreoUtil correoUtil = new CorreoUtil()
     ICompanyService companyService
 
+    def sessionFactory_CRMDynamics
 
     def consultaExpediente(UnidadOrganizativa pais, Filtro filtro) {
         try {
@@ -174,7 +177,7 @@ class ExpedienteService implements IExpedienteService {
 
             if (companyService?.esCaserInfantil(req)){
 
-                if (validarCoberturas(req, comp)) {
+
 
                     // NECESITAMOS RELENTIZAR EL ENVÍO DE PETICIONES SOAP AL FRONTAL, YA QUE SI LLEGAN DEMASIADO RÁPIDO SE REPITEN LOS CÓDIGOS ST,
                     // POR LO QUE USAREMOS UN DELAY DE 30 SEGUNDOS (TIEMPO QUE TARDA BPEL EN CREAR UN EXPEDIENTE EN CRM ES DE 25 SEGUNDOS),
@@ -190,26 +193,13 @@ class ExpedienteService implements IExpedienteService {
                     }
 
                     return true
-                }
+
             } else {
                 return realizarPeticionSOAP(req, comp, crearExpedienteBPM(req, comp))
             }
 
         } catch (Exception e) {
             throw new WSException(this.getClass(), "crearExpediente", ExceptionUtils.composeMessage(null, e))
-        }
-    }
-
-    private boolean validarCoberturas(Request req, TipoCompany comp) {
-
-
-
-        if ( 1 == 1) {
-
-        }
-        else {
-                logginService.putErrorEndpoint("CrearExpediente", "Error en la validación de las coberturas");
-                throw new Exception("Error en la validación de las coberturas")
         }
     }
 
@@ -340,6 +330,51 @@ class ExpedienteService implements IExpedienteService {
                 break
         }
         return usuario
+    }
+
+    List<ExpedienteCRMDynamics> existeExpedienteCRMDynamics(String companyNombre, String companyCodigoPais, String companyCodigoSt, String numeroSolicitud, String productoIdName) {
+
+        logginService.putInfoMessage("Buscando si existe expediente con numero de solicitud " + numeroSolicitud + " para " + companyNombre)
+
+        final List<ExpedienteCRMDynamics> expedientes
+
+        try {
+            // Cogemos la sesión de Hibernate para el datasource del CRMDynamics
+            final sessionCRMDynamics = sessionFactory_CRMDynamics.currentSession
+
+            // Creamos la queryString con el parámetro :numSolicitud
+            // IMPORTANTE: HAY QUE REALIZAR EL CAST( XXX AS VARCHAR) PORQUE EN SQLSERVER SE PRODUCE UN ERROR DE DIALECT AL INTENTAR CREAR LA LISTA DE RESULTADOS
+            final String query = 'SELECT  cast(A.Scor_name as varchar) as codigoExpedienteST, cast(E.scor_codigoST as varchar) as codigoCompanyiaST, cast(A.scor_nsolicitud_compania as varchar) as numSolicitud FROM Scor_expediente AS A, Contact AS C, Scor_codBusinessUnit AS D, Scor_clienteExtensionBase as E WHERE (C.contactId = A.scor_candidatoid) and (A.owningbusinessunit = D.scor_unidaddenegocioid) and (C.scor_candidatosid = e.Scor_clienteID) and d.scor_codigopais=:companyCodigoPais and E.scor_codigoST=:companyCodigoSt and A.scor_nsolicitud_compania=:numSolicitud and A.scor_productoidName=:productoIdName order by a.Scor_name'
+
+            // Creamos la query nativa SQL
+            final sqlQuery = sessionCRMDynamics.createSQLQuery(query)
+
+            // Usamos el método with() de GORM para invocar métodos sobre el objeto sqlQuery
+            expedientes = sqlQuery.with {
+                // Definimos un Transformer para que convierta los campos alias a la clase POJO destino, en este caso ExpedienteCRMDynamics
+                setResultTransformer(Transformers.aliasToBean(ExpedienteCRMDynamics.class))
+
+                // seteamos el parámetro 'companyCodigoPais' de la query con el parámetro de entrada del método 'companyCodigoPais'
+                setString("companyCodigoPais", companyCodigoPais)
+
+                // seteamos el parámetro 'companyCodigoSt' de la query con el parámetro de entrada del método 'companyCodigoSt'
+                setString("companyCodigoSt", companyCodigoSt)
+
+                // seteamos el parámetro 'numSolicitud' de la query con el parámetro de entrada del método 'numSolicitud'
+                setString("numSolicitud", numeroSolicitud)
+
+                // seteamos el parámetro 'productoIdName' de la query con el parámetro de entrada del método 'productoIdName'
+                setString("productoIdName", productoIdName)
+
+                // Ejecutamos la query y obtenemos los resultados
+                list()
+            }
+
+        } catch (Exception e) {
+            logginService.putInfoMessage("Buscando si existe expediente con numero de poliza " + numeroSolicitud + " para " + companyNombre + " . Error: " + e.getMessage())
+            correoUtil.envioEmailErrores("ERROR en búsqueda de duplicados para " + companyNombre, "Buscando si existe expediente con numero de poliza " + numeroSolicitud + " para " + companyNombre, e)
+        }
+        return expedientes
     }
 
     def busquedaCrm(Request requestBBDD, Company company, String requestNumber, String certificateNumber, String policyNumber) {

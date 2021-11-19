@@ -44,8 +44,6 @@ class CaserService implements ICompanyService{
     def tarificadorService = Holders.getGrailsApplication().mainContext.getBean("tarificadorService")
     CorreoUtil correoUtil = new CorreoUtil()
 
-    def sessionFactory_CRMDynamics
-
 
     String marshall(def objeto) {
         String nameSpace = "http://www.scortelemed.com/schemas/caser"
@@ -206,8 +204,6 @@ class CaserService implements ICompanyService{
                 /**TUTOR
                  *
                  */
-
-                String tutorIdentificationCode
 
                 String observacionesTutor
 
@@ -408,10 +404,17 @@ class CaserService implements ICompanyService{
         doc.getDocumentElement().normalize()
 
         NodeList nList = doc.getElementsByTagName("CandidateInformation")
-        String productCode = doc.getElementById("productCode")
+        NodeList policyInformationNList = doc.getElementsByTagName("PolicyInformation")
 
-        if (nList.getLength() > 1 && productCode == "Infantil")
-            esCaserInfantil = true
+        Node policyInformationNode = policyInformationNList.item(0)
+
+        if (policyInformationNode == Node.ELEMENT_NODE) {
+
+            Element policyInformationElement = (Element) policyInformationNode
+
+            if (nList.getLength() > 1 && policyInformationElement.getElementsByTagName("productCode").item(0).getTextContent() == "Infantil")
+                esCaserInfantil = true
+        }
 
         return esCaserInfantil
     }
@@ -1384,39 +1387,4 @@ class CaserService implements ICompanyService{
         return expedientes
     }
 
-    def existeExpediente(String numeroSolicitud, String nombreCia) {
-
-        logginService.putInfoMessage("Buscando si existe expediente con numero de solicitud " + numeroSolicitud + " para " + nombreCia)
-
-        final List<ExpedienteCRMDynamics> expedientes
-
-        try {
-            // Cogemos la sesión de Hibernate para el datasource del CRMDynamics
-            final sessionCRMDynamics = sessionFactory_CRMDynamics.currentSession
-
-            // Creamos la queryString con el parámetro :numSolicitud
-            // IMPORTANTE: HAY QUE REALIZAR EL CAST( XXX AS VARCHAR) PORQUE EN SQLSERVER SE PRODUCE UN ERROR DE DIALECT AL INTENTAR CREAR LA LISTA DE RESULTADOS
-            final String query = 'SELECT  cast(A.Scor_name as varchar) as codigoExpedienteST, cast(E.scor_codigoST as varchar) as codigoCompanyiaST, cast(A.scor_nsolicitud_compania as varchar) as numSolicitud FROM Scor_expediente AS A, Contact AS C, Scor_codBusinessUnit AS D, Scor_clienteExtensionBase as E WHERE (C.contactId = A.scor_candidatoid) and (A.owningbusinessunit = D.scor_unidaddenegocioid) and (C.scor_candidatosid = e.Scor_clienteID) and d.scor_codigopais=\'ES\' and E.scor_codigoST=\'1062\' and A.scor_nsolicitud_compania=:numSolicitud and A.scor_productoidName=\'Infantil\' order by a.Scor_name'
-
-            // Creamos la query nativa SQL
-            final sqlQuery = sessionCRMDynamics.createSQLQuery(query)
-
-            // Usamos el método with() de GORM para invocar métodos sobre el objeto sqlQuery
-            expedientes = sqlQuery.with {
-                // Definimos un Transformer para que convierta los campos alias a la clase POJO destino, en este caso ExpedienteCRMDynamics
-                setResultTransformer(Transformers.aliasToBean(ExpedienteCRMDynamics.class))
-
-                // seteamos el parámetro 'numSolicitud' de la query con el parámetro de entrada del método 'numSolicitud'
-                setString("numSolicitud", numeroSolicitud)
-
-                // Ejecutamos la query y obtenemos los resultados
-                list()
-            }
-
-        } catch (Exception e) {
-            logginService.putInfoMessage("Buscando si existe expediente con numero de poliza " + numeroSolicitud + " para " + nombreCia + " . Error: " + e.getMessage())
-            correoUtil.envioEmailErrores("ERROR en búsqueda de duplicados para " + nombreCia, "Buscando si existe expediente con numero de poliza " + numeroSolicitud + " para " + nombreCia, e)
-    }
-    return expedientes
-    }
 }

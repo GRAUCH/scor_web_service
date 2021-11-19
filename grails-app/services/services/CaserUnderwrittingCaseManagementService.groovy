@@ -63,7 +63,6 @@ class CaserUnderwrittingCaseManagementService {
 
                 if (company.generationAutomatic) {
 
-                    //TODO: HAY QUE AVERIGUAR SI AÑADIENDO EL SUBPOLICYNUMBER SE PUEDE PROPAGAR AL BPEL -  se carga en el campo7
                     requestXML = caserService.marshall(gestionReconocimientoMedico)
                     requestBBDD = requestService.crear(opername, requestXML)
 
@@ -134,10 +133,9 @@ class CaserUnderwrittingCaseManagementService {
         String notes = null
         StatusType status = null
 
-        RespuestaCRM respuestaCRM = new RespuestaCRM()
-
         def company = Company.findByNombre(TipoCompany.CASER.getNombre())
-        List<ExpedienteCRMDynamics> expedientes = new ArrayList<servicios.Expediente>()
+        List<ExpedienteCRMDynamics> expedientes = new ArrayList<>()
+        List<ExpedienteCRMDynamics> expedientesCreados = new ArrayList<>()
         logginService.putInfoMessage("Realizando peticion de informacion de servicio GestionReconocimientoMedicoInfantil para la cia " + company.nombre)
 
         try {
@@ -157,16 +155,29 @@ class CaserUnderwrittingCaseManagementService {
                     logginService.putInfoMessage("Se procede el alta automatica de " + company.nombre + " con numero de solicitud " + gestionReconocimientoMedicoInfantil.policyInformation.requestNumber)
 
                     //Chequeo si existen expedientes asociados a ese número de póliza.
-
-                    expedientes = caserService.existeExpediente(gestionReconocimientoMedicoInfantil.policyInformation.requestNumber, company.nombre)
+                    expedientes = expedienteService.existeExpedienteCRMDynamics(company.nombre, company.ou.getKey(), company.codigoSt, gestionReconocimientoMedicoInfantil.policyInformation.requestNumber, gestionReconocimientoMedicoInfantil.policyInformation.productCode)
                     if (expedientes != null && expedientes.size())
                         logginService.putInfoMessage("Exisiten ${expedientes.size()}  con numero de solicitud " + gestionReconocimientoMedicoInfantil.policyInformation.requestNumber)
                     if (expedientes != null && expedientes.size() == 0) {
 
                         expedienteService.crearExpediente(requestBBDD, TipoCompany.CASER)
                         requestService.insertarRecibido(company, gestionReconocimientoMedicoInfantil.policyInformation.requestNumber, requestXML.toString(), TipoOperacion.ALTA)
-                        /**Llamamos al metodo asincrono que busca en el crm el expediente recien creado*/
-                        expedienteService.busquedaCrm(requestBBDD, company, gestionReconocimientoMedicoInfantil.policyInformation.requestNumber, gestionReconocimientoMedicoInfantil.policyInformation.certificateNumber, null)
+
+                        try {
+                            // realizamos la consulta al CRMDynamics para evitar llamadas de consulta al frontal, ya que no funcionan los filtros para obtener expedientes por número de solicitud
+                            expedientesCreados = expedienteService.existeExpedienteCRMDynamics(company.nombre, company.ou.getKey(), company.codigoSt, gestionReconocimientoMedicoInfantil.policyInformation.requestNumber, gestionReconocimientoMedicoInfantil.policyInformation.productCode)
+
+                            if (expedientesCreados.size() == caserService.obtenerNumeroCandidatos(gestionReconocimientoMedicoInfantil)) {
+
+                            } else {
+                                logginService.putInfoMessage(opername+" - Nueva alta de "+logExpediente+" se ha procesado pero no se ha dado de alta en CRM")
+                                correoUtil.envioEmailErrores(opername,"Nueva alta de "+logExpediente+" se ha procesado pero no se ha dado de alta en CRM",null)
+                                requestService.insertarError(company.id, requestNumber, requestBBDD.request, TipoOperacion.ALTA, "Peticion procesada para solicitud: "+logExpediente+". Error: No encontrada en CRM")
+                            }
+                        } catch (Exception e) {
+                            logginService.putInfoMessage(opername+" - Nueva alta de "+logExpediente+". Error: " + e.getMessage())
+                            correoUtil.envioEmailErrores(opername,"Nueva alta de "+logExpediente,e)
+                        }
 
                     } else {
                         logginService.putInfoMessage("Se procede al envio del email para notificar del cambio  Ref: ${gestionReconocimientoMedicoInfantil.policyInformation.requestNumber}")
