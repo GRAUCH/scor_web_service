@@ -52,7 +52,7 @@ class CaserUnderwrittingCaseManagementService {
         RespuestaCRM respuestaCRM = new RespuestaCRM()
 
         def company = Company.findByNombre(TipoCompany.CASER.getNombre())
-        List<servicios.Expediente> expedientes = new ArrayList<servicios.Expediente>()
+        List<Expediente> expedientes = new ArrayList<servicios.Expediente>()
         logginService.putInfoMessage("Realizando peticion de informacion de servicio GestionReconocimientoMedico para la cia " + company.nombre)
 
         try {
@@ -137,7 +137,7 @@ class CaserUnderwrittingCaseManagementService {
         RespuestaCRM respuestaCRM = new RespuestaCRM()
 
         def company = Company.findByNombre(TipoCompany.CASER.getNombre())
-        List<servicios.Expediente> expedientes = new ArrayList<servicios.Expediente>()
+        List<ExpedienteCRMDynamics> expedientes = new ArrayList<servicios.Expediente>()
         logginService.putInfoMessage("Realizando peticion de informacion de servicio GestionReconocimientoMedicoInfantil para la cia " + company.nombre)
 
         try {
@@ -158,7 +158,7 @@ class CaserUnderwrittingCaseManagementService {
 
                     //Chequeo si existen expedientes asociados a ese número de póliza.
 
-                    expedientes = caserService.existeExpediente(gestionReconocimientoMedicoInfantil.policyInformation.requestNumber, company.nombre, company.codigoSt, company.ou)
+                    expedientes = caserService.existeExpediente(gestionReconocimientoMedicoInfantil.policyInformation.requestNumber, company.nombre)
                     if (expedientes != null && expedientes.size())
                         logginService.putInfoMessage("Exisiten ${expedientes.size()}  con numero de solicitud " + gestionReconocimientoMedicoInfantil.policyInformation.requestNumber)
                     if (expedientes != null && expedientes.size() == 0) {
@@ -171,7 +171,7 @@ class CaserUnderwrittingCaseManagementService {
                     } else {
                         logginService.putInfoMessage("Se procede al envio del email para notificar del cambio  Ref: ${gestionReconocimientoMedicoInfantil.policyInformation.requestNumber}")
                         //el expediente existe, le envio un email a quien este configurado en la compania.
-                        //TODO: DEJAR SIN COMENTAR ESTA LÍNEA: caserService.envioEmail(requestBBDD)
+                        caserService.envioEmail(requestBBDD)
                     }
                 }
 

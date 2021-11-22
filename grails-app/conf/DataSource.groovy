@@ -11,7 +11,8 @@ dataSource {
 dataSource_CRMDynamics {
     pooled = true
     driverClassName = "com.microsoft.sqlserver.jdbc.SQLServerDriver"
-    dialect = "org.hibernate.dialect.SQLServer2008Dialect"
+    dialect = org.hibernate.dialect.SQLServer2008Dialect
+    //dialect = "org.hibernate.dialect.SQLServerDialect"
     readOnly = true
     properties {
         removeAbandonedTimeout = "60"
@@ -31,7 +32,7 @@ hibernate {
 // environment specific settings
 environments {
     test {
-        println "COMPILA PARA LOCAL: MySql"
+        println "Carga configuración datasource 'test' MySQL"
         dataSource {
             dbCreate = "update" // one of 'create', 'create-drop','update'
             username = "root"
@@ -39,7 +40,7 @@ environments {
             url = "jdbc:mysql://localhost/scorws-prepro"
         }
 
-        println "COMPILA PARA LOCAL: SQL Server"
+        println "Carga configuración datasource 'test' SQL Server"
         dataSource_CRMDynamics {
             username = "sa"
             password = "xY;;#MID!c!572"
@@ -49,7 +50,7 @@ environments {
     }
 
     development {
-        println "COMPILA PARA DEVELOPMENT JDNI : MySqlscorwsDS"
+        println "Carga configuración datasource 'development'"
         dataSource {
             dbCreate = "update"
             username = "root"
@@ -59,14 +60,14 @@ environments {
     }
 
     preproduction_wildfly {
-        println "COMPILA PARA PREPRODUCCION con el JNDI : MySqlscorwsDS"
+        println "Carga configuración datasource 'preproduction_wildfly'"
         dataSource {
             jndiName = "java:jboss/datasources/MySqlscorwsDS"
         }
     }
 
     production_wildfly {
-        println "COMPILA PARA PRODUCCION WILDFLY DATA SOURCE"
+        println "Carga configuración datasource 'production_wildfly'"
         dataSource {
             jndiName = "java:jboss/datasources/MySqlscorwsDS"
         }

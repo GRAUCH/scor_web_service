@@ -174,18 +174,42 @@ class ExpedienteService implements IExpedienteService {
 
             if (companyService?.esCaserInfantil(req)){
 
-                for (int i = 0; i<companyService.obtenerNumeroCandidatos(req); i++) {
-                    realizarPeticionSOAP(req, comp, crearExpedienteCaserInfantil(req, i))
+                if (validarCoberturas(req, comp)) {
+
+                    // NECESITAMOS RELENTIZAR EL ENVÍO DE PETICIONES SOAP AL FRONTAL, YA QUE SI LLEGAN DEMASIADO RÁPIDO SE REPITEN LOS CÓDIGOS ST,
+                    // POR LO QUE USAREMOS UN DELAY DE 30 SEGUNDOS (TIEMPO QUE TARDA BPEL EN CREAR UN EXPEDIENTE EN CRM ES DE 25 SEGUNDOS),
+                    // EN EL CASO DEL ÚLTIMO EXPEDIENTE, SÓLO ESPERAMOS 5 SEGUNDOS
+
+                    for (int i = 0; i < companyService.obtenerNumeroCandidatos(req); i++) {
+                        realizarPeticionSOAP(req, comp, crearExpedienteCaserInfantil(req, i))
+                        if (i == companyService.obtenerNumeroCandidatos(req) - 1) {
+                            Thread.currentThread().sleep(5000)
+                        } else {
+                            Thread.currentThread().sleep(25000)
+                        }
+                    }
+
+                    return true
                 }
-
-                return true
-
             } else {
                 return realizarPeticionSOAP(req, comp, crearExpedienteBPM(req, comp))
             }
 
         } catch (Exception e) {
             throw new WSException(this.getClass(), "crearExpediente", ExceptionUtils.composeMessage(null, e))
+        }
+    }
+
+    private boolean validarCoberturas(Request req, TipoCompany comp) {
+
+
+
+        if ( 1 == 1) {
+
+        }
+        else {
+                logginService.putErrorEndpoint("CrearExpediente", "Error en la validación de las coberturas");
+                throw new Exception("Error en la validación de las coberturas")
         }
     }
 
@@ -236,7 +260,7 @@ class ExpedienteService implements IExpedienteService {
             payload.cabeceraOrDATOSOrPIE = listadoFinal
         } catch (Exception e) {
             logginService.putError("crearExpedienteCaserInfantil","Error en el metodo crearExpedienteCaserInfantil: " + e)
-            //TODO: EXCEPTION: SE CAPTURA PERO NO SE PROPAGA
+            throw new Exception(e)
         }
         return payload
     }
