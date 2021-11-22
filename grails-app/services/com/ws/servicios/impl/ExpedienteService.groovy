@@ -177,14 +177,14 @@ class ExpedienteService implements IExpedienteService {
 
             if (companyService?.esCaserInfantil(req)){
 
-
-
                     // NECESITAMOS RELENTIZAR EL ENVÍO DE PETICIONES SOAP AL FRONTAL, YA QUE SI LLEGAN DEMASIADO RÁPIDO SE REPITEN LOS CÓDIGOS ST,
                     // POR LO QUE USAREMOS UN DELAY DE 30 SEGUNDOS (TIEMPO QUE TARDA BPEL EN CREAR UN EXPEDIENTE EN CRM ES DE 25 SEGUNDOS),
                     // EN EL CASO DEL ÚLTIMO EXPEDIENTE, SÓLO ESPERAMOS 5 SEGUNDOS
 
                     for (int i = 0; i < companyService.obtenerNumeroCandidatos(req); i++) {
+                        logginService.putInfoMessage("Creando expediente " + (i+1) + " de " + companyService.obtenerNumeroCandidatos(req))
                         realizarPeticionSOAP(req, comp, crearExpedienteCaserInfantil(req, i))
+
                         if (i == companyService.obtenerNumeroCandidatos(req) - 1) {
                             Thread.currentThread().sleep(5000)
                         } else {
@@ -344,7 +344,7 @@ class ExpedienteService implements IExpedienteService {
 
             // Creamos la queryString con el parámetro :numSolicitud
             // IMPORTANTE: HAY QUE REALIZAR EL CAST( XXX AS VARCHAR) PORQUE EN SQLSERVER SE PRODUCE UN ERROR DE DIALECT AL INTENTAR CREAR LA LISTA DE RESULTADOS
-            final String query = 'SELECT  cast(A.Scor_name as varchar) as codigoExpedienteST, cast(E.scor_codigoST as varchar) as codigoCompanyiaST, cast(A.scor_nsolicitud_compania as varchar) as numSolicitud FROM Scor_expediente AS A, Contact AS C, Scor_codBusinessUnit AS D, Scor_clienteExtensionBase as E WHERE (C.contactId = A.scor_candidatoid) and (A.owningbusinessunit = D.scor_unidaddenegocioid) and (C.scor_candidatosid = e.Scor_clienteID) and d.scor_codigopais=:companyCodigoPais and E.scor_codigoST=:companyCodigoSt and A.scor_nsolicitud_compania=:numSolicitud and A.scor_productoidName=:productoIdName order by a.Scor_name'
+            final String query = 'SELECT cast(A.Scor_name as varchar) as codigoExpedienteST, cast(E.scor_codigoST as varchar) as codigoCompanyiaST, cast(A.scor_nsolicitud_compania as varchar) as numSolicitud FROM Scor_expediente AS A, Contact AS C, Scor_codBusinessUnit AS D, Scor_clienteExtensionBase as E WHERE A.DeletionStateCode = \'0\' and (C.contactId = A.scor_candidatoid) and (A.owningbusinessunit = D.scor_unidaddenegocioid) and (C.scor_candidatosid = e.Scor_clienteID) and d.scor_codigopais=:companyCodigoPais and E.scor_codigoST=:companyCodigoSt and A.scor_nsolicitud_compania=:numSolicitud and A.scor_productoidName=:productoIdName order by a.Scor_name'
 
             // Creamos la query nativa SQL
             final sqlQuery = sessionCRMDynamics.createSQLQuery(query)

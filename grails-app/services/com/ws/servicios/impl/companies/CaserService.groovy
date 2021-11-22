@@ -404,11 +404,12 @@ class CaserService implements ICompanyService{
         doc.getDocumentElement().normalize()
 
         NodeList nList = doc.getElementsByTagName("CandidateInformation")
-        NodeList policyInformationNList = doc.getElementsByTagName("PolicyInformation")
 
-        Node policyInformationNode = policyInformationNList.item(0)
+        NodeList policyInformationNodeList = doc.getElementsByTagName("PolicyInformation")
 
-        if (policyInformationNode == Node.ELEMENT_NODE) {
+        Node policyInformationNode = policyInformationNodeList.item(0)
+
+        if (policyInformationNode.getNodeType() == Node.ELEMENT_NODE) {
 
             Element policyInformationElement = (Element) policyInformationNode
 
@@ -420,18 +421,17 @@ class CaserService implements ICompanyService{
     }
 
     Integer obtenerNumeroCandidatos(Request req) throws ParserConfigurationException, IOException, SAXException {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        Boolean esCaserInfantil = false;
-        InputSource is = new InputSource(new StringReader(req.getRequest()));
-        is.setEncoding("UTF-8");
-        Document doc = builder.parse(is);
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
+        DocumentBuilder builder = factory.newDocumentBuilder()
+        InputSource is = new InputSource(new StringReader(req.getRequest()))
+        is.setEncoding("UTF-8")
+        Document doc = builder.parse(is)
 
-        doc.getDocumentElement().normalize();
+        doc.getDocumentElement().normalize()
 
-        NodeList nList = doc.getElementsByTagName("CandidateInformation");
+        NodeList nList = doc.getElementsByTagName("CandidateInformation")
 
-        return nList.getLength();
+        return nList.getLength()
     }
 
     def getCodigoStManual(Request req) {
@@ -586,7 +586,14 @@ class CaserService implements ICompanyService{
 
     def envioEmail(req) {
 
-        def datosEmail = rellenoDatosEmail(req)
+        def datosEmail
+
+        if (esCaserInfantil(req)) {
+            datosEmail = rellenoDatosEmailInfantil(req)
+        } else {
+            datosEmail = rellenoDatosEmail()
+        }
+
         def textEmail = compongoText(datosEmail)
 
         logginService.putInfo('Envio email modificacion Caser', textEmail)
@@ -652,6 +659,53 @@ class CaserService implements ICompanyService{
 
         return datosEmail
 
+    }
+
+    def rellenoDatosEmailInfantil(req) {
+
+        def datosEmail = [:]
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
+        DocumentBuilder builder = factory.newDocumentBuilder()
+
+        InputSource is = new InputSource(new StringReader(req.request))
+        is.setEncoding("UTF-8")
+        Document doc = builder.parse(is)
+
+        doc.getDocumentElement().normalize()
+
+        NodeList nList = doc.getElementsByTagName("PolicyInformation")
+        def requestNumber, policyNumber, certificateNumber, comments
+        Node nNode = nList.item(0)
+        if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+            Element eElement = (Element) nNode
+            requestNumber = eElement.getElementsByTagName("requestNumber").item(0).getTextContent()
+            policyNumber = eElement.getElementsByTagName("policyNumber").item(0).getTextContent()
+            certificateNumber = eElement.getElementsByTagName("certificateNumber").item(0).getTextContent()
+            comments = eElement.getElementsByTagName("comments").item(0).getTextContent()
+        }
+
+        datosEmail.put('requestNumber', requestNumber)
+        datosEmail.put('policyNumber', policyNumber)
+        datosEmail.put('certificateNumber', certificateNumber)
+        datosEmail.put('comments', comments)
+
+        nList = doc.getElementsByTagName("CandidateInformation")
+        def nombre, apellido, dni
+        for (int numCandidato = 0; numCandidato < nList.getLength(); numCandidato++) {
+            nNode = nList.item(numCandidato)
+            if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+                Element eElement = (Element) nNode
+                nombre = eElement.getElementsByTagName("name").item(0).getTextContent()
+                apellido = eElement.getElementsByTagName("surname").item(0).getTextContent()
+                dni = eElement.getElementsByTagName("identificationCode").item(0).getTextContent()
+
+                datosEmail.put('Candidato ' + numCandidato + ': nombre = ' , nombre)
+                datosEmail.put('Candidato ' + numCandidato + ': apellido = ' , apellido)
+                datosEmail.put('Candidato ' + numCandidato + ': dni = ', dni)
+            }
+        }
+
+        return datosEmail
     }
 
     def rellenaDatos(req, company, coberturas) {
