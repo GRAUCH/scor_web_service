@@ -44,8 +44,6 @@ class CaserService implements ICompanyService{
     def tarificadorService = Holders.getGrailsApplication().mainContext.getBean("tarificadorService")
     CorreoUtil correoUtil = new CorreoUtil()
 
-    def sessionFactory_CRMDynamics
-
 
     String marshall(def objeto) {
         String nameSpace = "http://www.scortelemed.com/schemas/caser"
@@ -206,8 +204,6 @@ class CaserService implements ICompanyService{
                 /**TUTOR
                  *
                  */
-
-                String tutorIdentificationCode
 
                 String observacionesTutor
 
@@ -408,27 +404,34 @@ class CaserService implements ICompanyService{
         doc.getDocumentElement().normalize()
 
         NodeList nList = doc.getElementsByTagName("CandidateInformation")
-        String productCode = doc.getElementById("productCode")
 
-        if (nList.getLength() > 1 && productCode == "Infantil")
-            esCaserInfantil = true
+        NodeList policyInformationNodeList = doc.getElementsByTagName("PolicyInformation")
+
+        Node policyInformationNode = policyInformationNodeList.item(0)
+
+        if (policyInformationNode.getNodeType() == Node.ELEMENT_NODE) {
+
+            Element policyInformationElement = (Element) policyInformationNode
+
+            if (nList.getLength() > 1 && policyInformationElement.getElementsByTagName("productCode").item(0).getTextContent() == "Infantil")
+                esCaserInfantil = true
+        }
 
         return esCaserInfantil
     }
 
     Integer obtenerNumeroCandidatos(Request req) throws ParserConfigurationException, IOException, SAXException {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        Boolean esCaserInfantil = false;
-        InputSource is = new InputSource(new StringReader(req.getRequest()));
-        is.setEncoding("UTF-8");
-        Document doc = builder.parse(is);
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
+        DocumentBuilder builder = factory.newDocumentBuilder()
+        InputSource is = new InputSource(new StringReader(req.getRequest()))
+        is.setEncoding("UTF-8")
+        Document doc = builder.parse(is)
 
-        doc.getDocumentElement().normalize();
+        doc.getDocumentElement().normalize()
 
-        NodeList nList = doc.getElementsByTagName("CandidateInformation");
+        NodeList nList = doc.getElementsByTagName("CandidateInformation")
 
-        return nList.getLength();
+        return nList.getLength()
     }
 
     def getCodigoStManual(Request req) {
@@ -583,7 +586,14 @@ class CaserService implements ICompanyService{
 
     def envioEmail(req) {
 
-        def datosEmail = rellenoDatosEmail(req)
+        def datosEmail
+
+        if (esCaserInfantil(req)) {
+            datosEmail = rellenoDatosEmailInfantil(req)
+        } else {
+            datosEmail = rellenoDatosEmail()
+        }
+
         def textEmail = compongoText(datosEmail)
 
         logginService.putInfo('Envio email modificacion Caser', textEmail)
@@ -649,6 +659,53 @@ class CaserService implements ICompanyService{
 
         return datosEmail
 
+    }
+
+    def rellenoDatosEmailInfantil(req) {
+
+        def datosEmail = [:]
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
+        DocumentBuilder builder = factory.newDocumentBuilder()
+
+        InputSource is = new InputSource(new StringReader(req.request))
+        is.setEncoding("UTF-8")
+        Document doc = builder.parse(is)
+
+        doc.getDocumentElement().normalize()
+
+        NodeList nList = doc.getElementsByTagName("PolicyInformation")
+        def requestNumber, policyNumber, certificateNumber, comments
+        Node nNode = nList.item(0)
+        if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+            Element eElement = (Element) nNode
+            requestNumber = eElement.getElementsByTagName("requestNumber").item(0).getTextContent()
+            policyNumber = eElement.getElementsByTagName("policyNumber").item(0).getTextContent()
+            certificateNumber = eElement.getElementsByTagName("certificateNumber").item(0).getTextContent()
+            comments = eElement.getElementsByTagName("comments").item(0).getTextContent()
+        }
+
+        datosEmail.put('requestNumber', requestNumber)
+        datosEmail.put('policyNumber', policyNumber)
+        datosEmail.put('certificateNumber', certificateNumber)
+        datosEmail.put('comments', comments)
+
+        nList = doc.getElementsByTagName("CandidateInformation")
+        def nombre, apellido, dni
+        for (int numCandidato = 0; numCandidato < nList.getLength(); numCandidato++) {
+            nNode = nList.item(numCandidato)
+            if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+                Element eElement = (Element) nNode
+                nombre = eElement.getElementsByTagName("name").item(0).getTextContent()
+                apellido = eElement.getElementsByTagName("surname").item(0).getTextContent()
+                dni = eElement.getElementsByTagName("identificationCode").item(0).getTextContent()
+
+                datosEmail.put('Candidato ' + numCandidato + ': nombre = ' , nombre)
+                datosEmail.put('Candidato ' + numCandidato + ': apellido = ' , apellido)
+                datosEmail.put('Candidato ' + numCandidato + ': dni = ', dni)
+            }
+        }
+
+        return datosEmail
     }
 
     def rellenaDatos(req, company, coberturas) {
@@ -1384,39 +1441,4 @@ class CaserService implements ICompanyService{
         return expedientes
     }
 
-    def existeExpediente(String numeroSolicitud, String nombreCia) {
-
-        logginService.putInfoMessage("Buscando si existe expediente con numero de solicitud " + numeroSolicitud + " para " + nombreCia)
-
-        final List<ExpedienteCRMDynamics> expedientes
-
-        try {
-            // Cogemos la sesión de Hibernate para el datasource del CRMDynamics
-            final sessionCRMDynamics = sessionFactory_CRMDynamics.currentSession
-
-            // Creamos la queryString con el parámetro :numSolicitud
-            // IMPORTANTE: HAY QUE REALIZAR EL CAST( XXX AS VARCHAR) PORQUE EN SQLSERVER SE PRODUCE UN ERROR DE DIALECT AL INTENTAR CREAR LA LISTA DE RESULTADOS
-            final String query = 'SELECT  cast(A.Scor_name as varchar) as codigoExpedienteST, cast(E.scor_codigoST as varchar) as codigoCompanyiaST, cast(A.scor_nsolicitud_compania as varchar) as numSolicitud FROM Scor_expediente AS A, Contact AS C, Scor_codBusinessUnit AS D, Scor_clienteExtensionBase as E WHERE (C.contactId = A.scor_candidatoid) and (A.owningbusinessunit = D.scor_unidaddenegocioid) and (C.scor_candidatosid = e.Scor_clienteID) and d.scor_codigopais=\'ES\' and E.scor_codigoST=\'1062\' and A.scor_nsolicitud_compania=:numSolicitud and A.scor_productoidName=\'Infantil\' order by a.Scor_name'
-
-            // Creamos la query nativa SQL
-            final sqlQuery = sessionCRMDynamics.createSQLQuery(query)
-
-            // Usamos el método with() de GORM para invocar métodos sobre el objeto sqlQuery
-            expedientes = sqlQuery.with {
-                // Definimos un Transformer para que convierta los campos alias a la clase POJO destino, en este caso ExpedienteCRMDynamics
-                setResultTransformer(Transformers.aliasToBean(ExpedienteCRMDynamics.class))
-
-                // seteamos el parámetro 'numSolicitud' de la query con el parámetro de entrada del método 'numSolicitud'
-                setString("numSolicitud", numeroSolicitud)
-
-                // Ejecutamos la query y obtenemos los resultados
-                list()
-            }
-
-        } catch (Exception e) {
-            logginService.putInfoMessage("Buscando si existe expediente con numero de poliza " + numeroSolicitud + " para " + nombreCia + " . Error: " + e.getMessage())
-            correoUtil.envioEmailErrores("ERROR en búsqueda de duplicados para " + nombreCia, "Buscando si existe expediente con numero de poliza " + numeroSolicitud + " para " + nombreCia, e)
-    }
-    return expedientes
-    }
 }

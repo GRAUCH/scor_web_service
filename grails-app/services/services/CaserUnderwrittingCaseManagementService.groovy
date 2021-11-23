@@ -63,7 +63,6 @@ class CaserUnderwrittingCaseManagementService {
 
                 if (company.generationAutomatic) {
 
-                    //TODO: HAY QUE AVERIGUAR SI AÑADIENDO EL SUBPOLICYNUMBER SE PUEDE PROPAGAR AL BPEL -  se carga en el campo7
                     requestXML = caserService.marshall(gestionReconocimientoMedico)
                     requestBBDD = requestService.crear(opername, requestXML)
 
@@ -134,11 +133,13 @@ class CaserUnderwrittingCaseManagementService {
         String notes = null
         StatusType status = null
 
-        RespuestaCRM respuestaCRM = new RespuestaCRM()
-
         def company = Company.findByNombre(TipoCompany.CASER.getNombre())
-        List<ExpedienteCRMDynamics> expedientes = new ArrayList<servicios.Expediente>()
-        logginService.putInfoMessage("Realizando peticion de informacion de servicio GestionReconocimientoMedicoInfantil para la cia " + company.nombre)
+        List<ExpedienteCRMDynamics> expedientes = new ArrayList<>()
+        List<ExpedienteCRMDynamics> expedientesCreados = new ArrayList<>()
+        logginService.putInfoMessage("Realizando peticion de informacion de servicio GestionReconocimientoMedicoInfantil para la cia ${company.nombre}")
+
+        String numeroSolicitud = gestionReconocimientoMedicoInfantil.policyInformation.requestNumber
+        String productCode = gestionReconocimientoMedicoInfantil.policyInformation.productCode
 
         try {
 
@@ -154,22 +155,38 @@ class CaserUnderwrittingCaseManagementService {
                     notes = "El caso se ha procesado correctamente"
                     status = StatusType.OK
 
-                    logginService.putInfoMessage("Se procede el alta automatica de " + company.nombre + " con numero de solicitud " + gestionReconocimientoMedicoInfantil.policyInformation.requestNumber)
+
+
+                    logginService.putInfoMessage("Se procede el alta automatica de ${company.nombre} con numero de solicitud ${numeroSolicitud}")
 
                     //Chequeo si existen expedientes asociados a ese número de póliza.
 
-                    expedientes = caserService.existeExpediente(gestionReconocimientoMedicoInfantil.policyInformation.requestNumber, company.nombre)
+                    expedientes = expedienteService.existeExpedienteCRMDynamics(company.nombre, company.ou.getKey(), company.codigoSt, numeroSolicitud, productCode)
                     if (expedientes != null && expedientes.size())
-                        logginService.putInfoMessage("Exisiten ${expedientes.size()}  con numero de solicitud " + gestionReconocimientoMedicoInfantil.policyInformation.requestNumber)
+                        logginService.putInfoMessage("Ya existen ${expedientes.size()} expedientes con numero de solicitud ${numeroSolicitud}")
                     if (expedientes != null && expedientes.size() == 0) {
 
                         expedienteService.crearExpediente(requestBBDD, TipoCompany.CASER)
-                        requestService.insertarRecibido(company, gestionReconocimientoMedicoInfantil.policyInformation.requestNumber, requestXML.toString(), TipoOperacion.ALTA)
-                        /**Llamamos al metodo asincrono que busca en el crm el expediente recien creado*/
-                        expedienteService.busquedaCrm(requestBBDD, company, gestionReconocimientoMedicoInfantil.policyInformation.requestNumber, gestionReconocimientoMedicoInfantil.policyInformation.certificateNumber, null)
+                        requestService.insertarRecibido(company, numeroSolicitud, requestXML.toString(), TipoOperacion.ALTA)
+
+                        try {
+                            // realizamos la consulta al CRMDynamics para evitar llamadas de consulta al frontal, ya que no funcionan los filtros para obtener expedientes por número de solicitud
+                            expedientesCreados = expedienteService.existeExpedienteCRMDynamics(company.nombre, company.ou.getKey(), company.codigoSt, numeroSolicitud, productCode)
+
+                            if (expedientesCreados.size() == caserService.obtenerNumeroCandidatos(requestBBDD)) {
+                                logginService.putInfoMessage("${opername} - Nueva alta de ${numeroSolicitud} se ha procesado pero no se ha dado de alta en CRM")
+                            } else {
+                                logginService.putInfoMessage("${opername} - Nueva alta de ${numeroSolicitud} se ha procesado pero no se ha dado de alta en CRM")
+                                correoUtil.envioEmailErrores(opername,"Nueva alta de " + numeroSolicitud + " se ha procesado pero no se ha dado de alta en CRM",null)
+                                requestService.insertarError(company.id, requestNumber, requestBBDD.request, TipoOperacion.ALTA, "Peticion procesada para solicitud: ${numeroSolicitud}. Error: No encontrada en CRM")
+                            }
+                        } catch (Exception e) {
+                            logginService.putInfoMessage("${opername} - Nueva alta de ${numeroSolicitud} . Error: " + e.getMessage())
+                            correoUtil.envioEmailErrores(opername,"Nueva alta de " + numeroSolicitud, e)
+                        }
 
                     } else {
-                        logginService.putInfoMessage("Se procede al envio del email para notificar del cambio  Ref: ${gestionReconocimientoMedicoInfantil.policyInformation.requestNumber}")
+                        logginService.putInfoMessage("Se procede al envio del email para notificar del cambio  Ref: ${numeroSolicitud}")
                         //el expediente existe, le envio un email a quien este configurado en la compania.
                         caserService.envioEmail(requestBBDD)
                     }
@@ -179,18 +196,18 @@ class CaserUnderwrittingCaseManagementService {
 
                 notes = "Esta operacion esta desactivada temporalmente"
                 status = StatusType.OK
-                logginService.putInfoEndpoint("GestionReconocimientoMedicoInfantil", "Esta operacion para " + company.nombre + " esta desactivada temporalmente")
-                correoUtil.envioEmail("GestionReconocimientoMedicoInfantil", "Peticion de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedicoInfantil.policyInformation.requestNumber + ". Esta operacion para " + company.nombre + " esta desactivada temporalmente", 0)
+                logginService.putInfoEndpoint("GestionReconocimientoMedicoInfantil", "Esta operacion para ${company.nombre} esta desactivada temporalmente")
+                correoUtil.envioEmail("GestionReconocimientoMedicoInfantil", "Peticion de " + company.nombre + " con numero de solicitud: " + numeroSolicitud + ". Esta operacion para " + company.nombre + " esta desactivada temporalmente", 0)
             }
         } catch (Exception e) {
 
             notes = "Error: " + e.getMessage()
             status = StatusType.ERROR
 
-            requestService.insertarError(company, gestionReconocimientoMedicoInfantil.policyInformation.requestNumber, requestXML.toString(), TipoOperacion.ALTA, "Peticion no realizada para solicitud: " + gestionReconocimientoMedicoInfantil.policyInformation.requestNumber + ". Error: " + e.getMessage())
+            requestService.insertarError(company, numeroSolicitud, requestXML.toString(), TipoOperacion.ALTA, "Peticion no realizada para solicitud: " + numeroSolicitud + ". Error: " + e.getMessage())
 
-            logginService.putErrorEndpoint("GestionReconocimientoMedicoInfantil", "Peticion no realizada de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedicoInfantil.policyInformation.requestNumber + ". Error: " + e.getMessage())
-            correoUtil.envioEmailErrores("GestionReconocimientoMedicoInfantil", "Peticion de " + company.nombre + " con numero de solicitud: " + gestionReconocimientoMedicoInfantil.policyInformation.requestNumber, e)
+            logginService.putErrorEndpoint("GestionReconocimientoMedicoInfantil", "Peticion no realizada de " + company.nombre + " con numero de solicitud: " + numeroSolicitud + ". Error: " + e.getMessage())
+            correoUtil.envioEmailErrores("GestionReconocimientoMedicoInfantil", "Peticion de " + company.nombre + " con numero de solicitud: " + numeroSolicitud, e)
         } finally {
 
             def sesion = RequestContextHolder.currentRequestAttributes().getSession()
