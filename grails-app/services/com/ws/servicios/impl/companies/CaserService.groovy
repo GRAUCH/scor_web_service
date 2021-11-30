@@ -1,26 +1,23 @@
 package com.ws.servicios.impl.companies
 
 import com.scor.global.ExceptionUtils
-import com.scor.global.RequestUtils
 import com.scor.global.ValorUtils
 import com.scor.global.WSException
 import com.scor.srpfileinbound.DATOS
 import com.scor.srpfileinbound.REGISTRODATOS
 import com.scortelemed.Company
 import com.scortelemed.Request
-import com.scortelemed.TipoCompany
 import com.scortelemed.schemas.caser.*
 import com.scortelemed.schemas.caser.ConsultaExpedienteResponse.ExpedienteConsulta
 import com.scortelemed.schemas.caser.ResultadoReconocimientoMedicoResponse.Expediente
-import com.scortelemed.schemas.caser.ExpedienteCRMDynamics
+import com.velogica.model.dto.CandidatoCRMDynamicsDTO
+import com.velogica.model.dto.CoberturasCRMDynamicsDTO
+import com.velogica.model.dto.ExpedienteCRMDynamicsDTO
 import com.ws.enumeration.UnidadOrganizativa
 import com.ws.servicios.ICompanyService
-import com.ws.servicios.IComprimidoService
-import com.ws.servicios.ServiceFactory
 import grails.util.Holders
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
-import org.hibernate.transform.Transformers
 import org.w3c.dom.Document
 import org.w3c.dom.Element
 import org.w3c.dom.Node
@@ -29,6 +26,7 @@ import org.xml.sax.InputSource
 import org.xml.sax.SAXException
 import servicios.RespuestaCRM
 
+import javax.xml.datatype.XMLGregorianCalendar
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.parsers.ParserConfigurationException
@@ -438,27 +436,31 @@ class CaserService implements ICompanyService{
         return null
     }
 
-    def rellenaDatosSalida(expedientePoliza, requestDate) {
+    def rellenaDatosSalida(String codigoExpedienteST, XMLGregorianCalendar requestDate) {
 
         Expediente expediente = new Expediente()
 
+        // obtenemos los datos del expediente
+        ExpedienteCRMDynamicsDTO datosExpediente = expedienteService.obtenerDatosExpedienteCRMDynamics(codigoExpedienteST)
+
         expediente.setRequestDate(requestDate)
-        expediente.setRequestNumber(util.devolverDatos(expedientePoliza.getNumSolicitud()))
-        expediente.setRequestState(util.devolverStateType(expedientePoliza.getCodigoEstado()))
-        expediente.setProductCode(util.devolverDatos(expedientePoliza.getProducto().getCodigoProductoCompanya()))
-        expediente.setPolicyNumber(util.devolverDatos(expedientePoliza.getNumPoliza()))
-		expediente.setCertificateNumber(util.devolverDatos(expedientePoliza.getNumCertificado()))
+        expediente.setRequestNumber(util.devolverDatos(datosExpediente.getNumSolicitud()))
+        expediente.setRequestState(util.devolverTipoEstadoCRM(datosExpediente.getCodigoEstadoExpediente()))
+        expediente.setProductCode(util.devolverDatos(datosExpediente.getCodigoProductoCompanya()))
+        expediente.setPolicyNumber(util.devolverDatos(datosExpediente.getNumPoliza()))
+		expediente.setCertificateNumber(util.devolverDatos(datosExpediente.getNumCertificado()))
 
+        // obtenemos los datos del candidato del expediente
+        CandidatoCRMDynamicsDTO datosCandidatoExpediente = expedienteService.obtenerDatosCandidatoExpedienteCRMDynamics(codigoExpedienteST)
 
-        if (expedientePoliza.getCandidato() != null) {
-            expediente.setFiscalIdentificationNumber(expedientePoliza.getCandidato().getNumeroDocumento())
-            expediente.setMobilePhone(util.devolverTelefonoMovil(expedientePoliza.getCandidato()))
-            expediente.setPhoneNumber1(util.devolverTelefono1(expedientePoliza.getCandidato()))
-            expediente.setPhoneNumber2(util.devolverTelefono2(expedientePoliza.getCandidato()))
-            expediente.setDomicilio(expedientePoliza?.getCandidato()?.getDireccion())
-            expediente.setCodPostal(expedientePoliza?.getCandidato()?.getCodigoPostal())
-            expediente.setLocalidad(expedientePoliza?.getCandidato()?.getLocalidad())
-            expediente.setProvincia(expedientePoliza?.getCandidato()?.getProvincia())
+        if (datosCandidatoExpediente != null) {
+            expediente.setFiscalIdentificationNumber(datosCandidatoExpediente.getNumeroDocumento())
+            // Asignamos los teléfonos por orden de prioridad y tipo
+            util.asignarTelefonos(expediente, datosCandidatoExpediente)
+            expediente.setDomicilio(datosCandidatoExpediente.getDireccion())
+            expediente.setCodPostal(datosCandidatoExpediente.getCodPostal())
+            expediente.setLocalidad(datosCandidatoExpediente.getLocalidad())
+            expediente.setProvincia(datosCandidatoExpediente.getProvincia())
         } else {
             expediente.setFiscalIdentificationNumber("")
             expediente.setMobilePhone("")
@@ -470,15 +472,20 @@ class CaserService implements ICompanyService{
             expediente.setProvincia("")
         }
 
-        byte[] compressedData = commonZipService.obtenerZip(expedientePoliza.getNodoAlfresco())
+        byte[] compressedData = commonZipService.obtenerZip(datosExpediente.getNodoAlfresco())
 
         expediente.setZip(compressedData)
 
-        expediente.setNotes(util.devolverDatos(expedientePoliza.getTarificacion().getObservaciones()))
+        // obtenemos las observaciones de la tarificación de un expediente
 
-        if (expedientePoliza.getCoberturasExpediente() != null && expedientePoliza.getCoberturasExpediente().size() > 0) {
+        expediente.setNotes(util.devolverDatos(datosExpediente.getObservacionesTarificacion()))
 
-            expedientePoliza.getCoberturasExpediente().each { coberturasPoliza ->
+        // obtenemos las coberturas del expediente
+        List<CoberturasCRMDynamicsDTO> datosCoberturasExpediente = expedienteService.obtenerCoberturasExpedienteCRMDynamics(codigoExpedienteST)
+
+        if (datosCoberturasExpediente != null && datosCoberturasExpediente.size() > 0) {
+
+            datosCoberturasExpediente.each { coberturasPoliza ->
 
                 BenefitsType benefitsType = new BenefitsType()
 
@@ -489,7 +496,7 @@ class CaserService implements ICompanyService{
                 BenefictResultType benefictResultType = new BenefictResultType()
 
                 benefictResultType.setDescResult(util.devolverDatos(coberturasPoliza.getResultadoCobertura()))
-                benefictResultType.setResultCode(util.devolverDatos(coberturasPoliza.getCodResultadoCobertura()))
+                benefictResultType.setResultCode(util.devolverDatos(coberturasPoliza.getCodigoResultadoCobertura()))
 
                 benefictResultType.setPremiumLoading(util.devolverDatos(coberturasPoliza.getValoracionPrima()))
                 benefictResultType.setCapitalLoading(util.devolverDatos(coberturasPoliza.getValoracionCapital()))
@@ -497,10 +504,6 @@ class CaserService implements ICompanyService{
                 benefictResultType.setDescCapitalLoading("")
 
                 benefictResultType.exclusions = util.fromStringLoList(coberturasPoliza.getExclusiones())
-                benefictResultType.temporalLoading = util.fromStringLoList(coberturasPoliza.getValoracionTemporal())
-                benefictResultType.medicalReports = util.fromStringLoList(coberturasPoliza.getInformesMedicos())
-                //benefictResultType.medicalTest = util.fromStringLoList(coberturasPoliza.getInformes)
-                benefictResultType.notes = util.fromStringLoList(coberturasPoliza.getNotas())
 
                 benefitsType.setBenefictResult(benefictResultType)
 

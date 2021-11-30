@@ -8,7 +8,9 @@ import com.scortelemed.Conf
 import com.scortelemed.Request
 import com.scortelemed.TipoCompany
 import com.scortelemed.TipoOperacion
-import com.scortelemed.schemas.caser.ExpedienteCRMDynamics
+import com.velogica.model.dto.CandidatoCRMDynamicsDTO
+import com.velogica.model.dto.CoberturasCRMDynamicsDTO
+import com.velogica.model.dto.ExpedienteCRMDynamicsDTO
 import com.ws.enumeration.UnidadOrganizativa
 import com.ws.servicios.ServiceFactory
 import com.ws.servicios.ICompanyService
@@ -71,6 +73,13 @@ class ExpedienteService implements IExpedienteService {
         filtroRelacionado.setClave(ClaveFiltro.NUM_SOLICITUD)
         filtroRelacionado.setValor(requestNumber)
         filtro.setFiltroRelacionado(filtroRelacionado)
+        return consultaExpediente(pais, filtro)
+    }
+
+    def consultaExpedienteNumPoliza(String requestNumber, UnidadOrganizativa pais) {
+        Filtro filtro = new Filtro()
+        filtro.setClave(ClaveFiltro.NUM_POLIZA)
+        filtro.setValor(requestNumber)
         return consultaExpediente(pais, filtro)
     }
 
@@ -332,27 +341,43 @@ class ExpedienteService implements IExpedienteService {
         return usuario
     }
 
-    List<ExpedienteCRMDynamics> existeExpedienteCRMDynamics(String companyNombre, String companyCodigoPais, String companyCodigoSt, String numeroSolicitud, String productoIdName) {
+    /**
+     * Búsqueda directa a la BD del CRM Dynamics para obtener los expedientes con el mismo número de solicitud y producto de una compañía
+     *
+     *     codigoExpedienteST: códigoST del expediente
+     *
+     *     codigoCompanyiaST: códigoST de la compañia cliente
+     *
+     *     numSolicitud: número de solicitud del expediente
+     *
+     * @param companyNombre
+     * @param companyCodigoPais
+     * @param companyCodigoSt
+     * @param numeroSolicitud
+     * @param productoIdName
+     * @return
+     */
+    List<ExpedienteCRMDynamicsDTO> obtenerExpedientesCRMDynamics(String companyNombre, String companyCodigoPais, String companyCodigoSt, String numSolicitud, String productoIdName) {
 
-        logginService.putInfoMessage("Buscando si existe expediente con numero de solicitud " + numeroSolicitud + " para " + companyNombre)
+        logginService.putInfoMessage("Buscando si existen expedientes con número de solicitud " + numSolicitud + " y producto " + productoIdName + " para " + companyNombre)
 
-        final List<ExpedienteCRMDynamics> expedientes
+        final List<ExpedienteCRMDynamicsDTO> expedientes
 
         try {
             // Cogemos la sesión de Hibernate para el datasource del CRMDynamics
             final sessionCRMDynamics = sessionFactory_CRMDynamics.currentSession
 
-            // Creamos la queryString con el parámetro :numSolicitud
+            // Creamos la queryString con el parámetro :companyCodigoPais, :companyCodigoSt, :numSolicitud y :productoIdName
             // IMPORTANTE: HAY QUE REALIZAR EL CAST( XXX AS VARCHAR) PORQUE EN SQLSERVER SE PRODUCE UN ERROR DE DIALECT AL INTENTAR CREAR LA LISTA DE RESULTADOS
-            final String query = 'SELECT cast(A.Scor_name as varchar) as codigoExpedienteST, cast(E.scor_codigoST as varchar) as codigoCompanyiaST, cast(A.scor_nsolicitud_compania as varchar) as numSolicitud FROM Scor_expediente AS A, Contact AS C, Scor_codBusinessUnit AS D, Scor_clienteExtensionBase as E WHERE A.DeletionStateCode = \'0\' and (C.contactId = A.scor_candidatoid) and (A.owningbusinessunit = D.scor_unidaddenegocioid) and (C.scor_candidatosid = e.Scor_clienteID) and d.scor_codigopais=:companyCodigoPais and E.scor_codigoST=:companyCodigoSt and A.scor_nsolicitud_compania=:numSolicitud and A.scor_productoidName=:productoIdName order by a.Scor_name'
+            final String query = 'SELECT CAST(A.Scor_name as varchar) as codigoExpedienteST, CAST(E.scor_codigoST as varchar) as codigoCompanyiaST, CAST(A.scor_nsolicitud_compania as varchar) as numSolicitud FROM Scor_expediente AS A, Contact AS C, Scor_codBusinessUnit AS D, Scor_clienteExtensionBase as E WHERE A.DeletionStateCode = \'0\' and (C.contactId = A.scor_candidatoid) and (A.owningbusinessunit = D.scor_unidaddenegocioid) and (C.scor_candidatosid = e.Scor_clienteID) and d.scor_codigopais=:companyCodigoPais and E.scor_codigoST=:companyCodigoSt and A.scor_nsolicitud_compania=:numSolicitud and A.scor_productoidName=:productoIdName order by a.Scor_name'
 
             // Creamos la query nativa SQL
             final sqlQuery = sessionCRMDynamics.createSQLQuery(query)
 
             // Usamos el método with() de GORM para invocar métodos sobre el objeto sqlQuery
             expedientes = sqlQuery.with {
-                // Definimos un Transformer para que convierta los campos alias a la clase POJO destino, en este caso ExpedienteCRMDynamics
-                setResultTransformer(Transformers.aliasToBean(ExpedienteCRMDynamics.class))
+                // Definimos un Transformer para que convierta los campos alias a la clase POJO destino, en este caso ExpedienteCRMDynamicsDTO
+                setResultTransformer(Transformers.aliasToBean(ExpedienteCRMDynamicsDTO.class))
 
                 // seteamos el parámetro 'companyCodigoPais' de la query con el parámetro de entrada del método 'companyCodigoPais'
                 setString("companyCodigoPais", companyCodigoPais)
@@ -361,7 +386,7 @@ class ExpedienteService implements IExpedienteService {
                 setString("companyCodigoSt", companyCodigoSt)
 
                 // seteamos el parámetro 'numSolicitud' de la query con el parámetro de entrada del método 'numSolicitud'
-                setString("numSolicitud", numeroSolicitud)
+                setString("numSolicitud", numSolicitud)
 
                 // seteamos el parámetro 'productoIdName' de la query con el parámetro de entrada del método 'productoIdName'
                 setString("productoIdName", productoIdName)
@@ -371,8 +396,322 @@ class ExpedienteService implements IExpedienteService {
             }
 
         } catch (Exception e) {
-            logginService.putInfoMessage("Buscando si existe expediente con numero de poliza " + numeroSolicitud + " para " + companyNombre + " . Error: " + e.getMessage())
-            correoUtil.envioEmailErrores("ERROR en búsqueda de duplicados para " + companyNombre, "Buscando si existe expediente con numero de poliza " + numeroSolicitud + " para " + companyNombre, e)
+            logginService.putError(this.class.getName() + ".obtenerExpedientesCRMDynamics", "Error en búsqueda directa a la BD del CRM Dynamics para obtener los expedientes con el mismo número de solicitud " + numSolicitud + " y producto " + productoIdName + " para " + companyNombre + ": " + ExceptionUtils.composeMessage(null, e))
+            correoUtil.envioEmailErrores(this.class.getName() + ".obtenerExpedientesCRMDynamics", "Error en búsqueda directa a la BD del CRM Dynamics para obtener los expedientes con el mismo número de solicitud " + numSolicitud + " y producto " + productoIdName + " para " + companyNombre + ": ", e)
+            throw new WSException(this.getClass(), this.class.getName() + ".obtenerExpedientesCRMDynamics", e.getMessage())
+        }
+        return expedientes
+    }
+
+    /**
+     * Búsqueda directa a la BBDD del CRM Dynamics para obtener los expedientes en estado 10 (CERRADOS) y 11 (ANULADOS) de la compañía CASER de España
+     *
+     *     codigoExpedienteST: códigoST del expediente
+     *
+     *     codigoCompanyiaST: códigoST de la compañia cliente
+     *
+     *     numSolicitud: número de solicitud del expediente
+     *
+     *     numSubPoliza: número de subpóliza (en este caso indica cuántos expedientes hay en esa póliza)
+     *
+     *     codigoEstadoExpediente: código de estado del expediente, en nuestro caso verificaremos que está CERRADO
+     *
+     * @param companyNombre
+     * @param companyCodigoSt
+     * @param fechaIni
+     * @param fechaFin
+     * @param companyCodigoPais
+     * @return
+     */
+    List<ExpedienteCRMDynamicsDTO> obtenerExpedientesCerradosAnuladosCRMDynamics(String companyNombre, String companyCodigoSt, String fechaIni, String fechaFin, String companyCodigoPais) {
+
+        logginService.putInfoMessage("Buscando expedientes cerrados y anulados entre " + fechaIni + " y " + fechaFin + " para " + companyNombre + "de " + companyCodigoPais)
+
+        final List<ExpedienteCRMDynamicsDTO> expedientes
+
+        try {
+            // Cogemos la sesión de Hibernate para el datasource del CRMDynamics
+            final sessionCRMDynamics = sessionFactory_CRMDynamics.currentSession
+
+            // Creamos la queryString con el parámetro :companyCodigoSt, :fechaIni, :fechaFin y :companyCodigoPais
+            // IMPORTANTE: HAY QUE REALIZAR EL CAST( XXX AS VARCHAR) PORQUE EN SQLSERVER SE PRODUCE UN ERROR DE DIALECT AL INTENTAR CREAR LA LISTA DE RESULTADOS
+            final String query = 'SELECT CAST(A.Scor_name AS VARCHAR) as codigoExpedienteST, CAST(E.scor_codigoST AS VARCHAR) as codigoCompanyiaST, CAST(A.scor_nsolicitud_compania AS VARCHAR) as numSolicitud, CAST(a.Scor_nsubpoliza AS VARCHAR) as numSubPoliza, CAST(a.scor_estado AS VARCHAR) as codigoEstadoExpediente FROM Scor_expediente AS A, Contact AS C, Scor_codBusinessUnit AS D, Scor_clienteExtensionBase as E WHERE A.DeletionStateCode = \'0\' and (C.contactId = A.scor_candidatoid) and (A.owningbusinessunit = D.scor_unidaddenegocioid) and (C.scor_candidatosid = e.Scor_clienteID) and d.scor_codigopais=:companyCodigoPais and E.scor_codigoST=:companyCodigoSt and A.scor_estado in(\'10\',\'11\') and a.scor_fechadeestado >:fechaIni and a.scor_fechadeestado<=:fechaFin order by a.Scor_name'
+
+            // Creamos la query nativa SQL
+            final sqlQuery = sessionCRMDynamics.createSQLQuery(query)
+
+            // Usamos el método with() de GORM para invocar métodos sobre el objeto sqlQuery
+            expedientes = sqlQuery.with {
+                // Definimos un Transformer para que convierta los campos alias a la clase POJO destino, en este caso ExpedienteCRMDynamicsDTO
+                setResultTransformer(Transformers.aliasToBean(ExpedienteCRMDynamicsDTO.class))
+
+                // seteamos el parámetro 'companyCodigoSt' de la query con el parámetro de entrada del método 'companyCodigoSt'
+                setString("companyCodigoSt", companyCodigoSt)
+
+                // seteamos el parámetro 'fechaIni' de la query con el parámetro de entrada del método 'fechaIni'
+                setString("fechaIni", fechaIni)
+
+                // seteamos el parámetro 'fechaFin' de la query con el parámetro de entrada del método 'fechaFin'
+                setString("fechaFin", fechaFin)
+
+                // seteamos el parámetro 'companyCodigoPais' de la query con el parámetro de entrada del método 'companyCodigoPais'
+                setString("companyCodigoPais", companyCodigoPais)
+
+                // Ejecutamos la query y obtenemos los resultados
+                list()
+            }
+
+        } catch (Exception e) {
+            logginService.putError(this.class.getName() + ".obtenerExpedientesCerradosAnuladosCRMDynamics", "Error en búsqueda directa a la BBDD del CRM Dynamics para obtener los expedientes en estado 10 (CERRADOS) y 11 (ANULADOS) de la compañía " + companyNombre + " de " + companyCodigoPais + ": " + ExceptionUtils.composeMessage(null, e))
+            correoUtil.envioEmailErrores(this.class.getName() + ".obtenerExpedientesCerradosAnuladosCRMDynamics", "Error en búsqueda directa a la BBDD del CRM Dynamics para obtener los expedientes en estado 10 (CERRADOS) y 11 (ANULADOS) de la compañía " + companyNombre + " de " + companyCodigoPais + ": ", e)
+            throw new WSException(this.getClass(), this.class.getName() + ".obtenerExpedientesCerradosAnuladosCRMDynamics", e.getMessage())
+        }
+        return expedientes
+    }
+
+    /**
+     * Búsqueda directa a la BD del CRM Dynamics para obtener los expedientes con el mismo número de solicitud para una compañía
+     *
+     *     codigoExpedienteST: códigoST del expediente
+     *
+     *     codigoCompanyiaST: códigoST de la compañia cliente
+     *
+     *     numSolicitud: número de solicitud del expediente
+     *
+     *     numSubPoliza: número de subpóliza (en este caso indica cuántos expedientes hay en esa póliza)
+     *
+     *     codigoProductoCompanya: código del producto para la compañía CASER
+     *
+     *     codigoEstadoExpediente: código de estado del expediente, en nuestro caso verificaremos que está CERRADO
+     *
+     * @param companyNombre
+     * @param companyCodigoPais
+     * @param companyCodigoSt
+     * @param numeroSolicitud
+     * @return
+     */
+    List<ExpedienteCRMDynamicsDTO> obtenerExpedientesPorNumeroSolicitudYCompanyaCRMDynamics(String companyNombre, String companyCodigoPais, String companyCodigoSt, String numSolicitud) {
+
+        logginService.putInfoMessage("Buscando si existen expedientes con número de solicitud " + numSolicitud + " para " + companyNombre)
+
+        final List<ExpedienteCRMDynamicsDTO> expedientes
+
+        try {
+            // Cogemos la sesión de Hibernate para el datasource del CRMDynamics
+            final sessionCRMDynamics = sessionFactory_CRMDynamics.currentSession
+
+            // Creamos la queryString con el parámetro :companyCodigoSt, :numSolicitud y :companyCodigoPais
+            // IMPORTANTE: HAY QUE REALIZAR EL CAST( XXX AS VARCHAR) PORQUE EN SQLSERVER SE PRODUCE UN ERROR DE DIALECT AL INTENTAR CREAR LA LISTA DE RESULTADOS
+            final String query = 'SELECT CAST(A.Scor_name AS VARCHAR) as codigoExpedienteST, CAST(E.scor_codigoST AS VARCHAR) as codigoCompanyiaST, CAST(A.scor_nsolicitud_compania AS VARCHAR) as numSolicitud, CAST(a.Scor_nsubpoliza AS VARCHAR) as numSubPoliza, CAST(A.scor_productoidName AS VARCHAR) as codigoProductoCompanya, CAST(a.scor_estado AS VARCHAR) as codigoEstadoExpediente FROM Scor_expediente AS A, Contact AS C, Scor_codBusinessUnit AS D, Scor_clienteExtensionBase as E WHERE A.DeletionStateCode = \'0\' and (C.contactId = A.scor_candidatoid) and (A.owningbusinessunit = D.scor_unidaddenegocioid) and (C.scor_candidatosid = e.Scor_clienteID) and d.scor_codigopais=:companyCodigoPais and E.scor_codigoST=:companyCodigoSt and A.scor_nsolicitud_compania = :numSolicitud order by a.Scor_name'
+
+            // Creamos la query nativa SQL
+            final sqlQuery = sessionCRMDynamics.createSQLQuery(query)
+
+            // Usamos el método with() de GORM para invocar métodos sobre el objeto sqlQuery
+            expedientes = sqlQuery.with {
+                // Definimos un Transformer para que convierta los campos alias a la clase POJO destino, en este caso ExpedienteCRMDynamicsDTO
+                setResultTransformer(Transformers.aliasToBean(ExpedienteCRMDynamicsDTO.class))
+
+                // seteamos el parámetro 'companyCodigoSt' de la query con el parámetro de entrada del método 'companyCodigoSt'
+                setString("companyCodigoSt", companyCodigoSt)
+
+                // seteamos el parámetro 'numSolicitud' de la query con el parámetro de entrada del método 'numSolicitud'
+                setString("numSolicitud", numSolicitud)
+
+                // seteamos el parámetro 'companyCodigoPais' de la query con el parámetro de entrada del método 'companyCodigoPais'
+                setString("companyCodigoPais", companyCodigoPais)
+
+                // Ejecutamos la query y obtenemos los resultados
+                list()
+            }
+
+        } catch (Exception e) {
+            logginService.putError(this.class.getName() + ".obtenerExpedientesPorNumeroSolicitudYCompanyaCRMDynamics", "Error en búsqueda directa a la BD del CRM Dynamics para obtener los expedientes con el mismo número de solicitud " + numSolicitud + " para la compañía " + companyNombre + " de " + companyCodigoPais + ": " + ExceptionUtils.composeMessage(null, e))
+            correoUtil.envioEmailErrores(this.class.getName() + ".obtenerExpedientesPorNumeroSolicitudYCompanyaCRMDynamics", "Error en búsqueda directa a la BD del CRM Dynamics para obtener los expedientes con el mismo número de solicitud " + numSolicitud + " para la compañía " + companyNombre + " de " + companyCodigoPais + ": ", e)
+            throw new WSException(this.getClass(), this.class.getName() + ".obtenerExpedientesPorNumeroSolicitudYCompanyaCRMDynamics", e.getMessage())
+        }
+        return expedientes
+    }
+
+    /**
+     * Búsqueda directa a la BBDD del CRM Dynamics para obtener los siguientes datos de un expediente:
+     *
+     *     codigoExpedienteST: códigoST del expediente
+     *
+     *     numSolicitud: número de solicitud del expediente
+     *
+     *     codigoEstadoExpediente: código de estado del expediente
+     *
+     *     codigoProductoCompanya: código del producto para la compañía CASER de ese expediente
+     *
+     *     numPoliza: número de póliza del expediente
+     *
+     *     numCertificado: número de certificado del expediente
+     *
+     *     observacionesTarificacion: las observaciones de la tarificación del expediente
+     *
+     *     nodoAlfresco: la ubicación en el gestor documental de los documentos asociados al expediente
+     *
+     * @param codigoExpedienteST
+     * @return
+     */
+    ExpedienteCRMDynamicsDTO obtenerDatosExpedienteCRMDynamics(String codigoExpedienteST) {
+
+        logginService.putInfoMessage("Recuperando información del expediente " + codigoExpedienteST)
+
+        final List<ExpedienteCRMDynamicsDTO> expedientes
+
+        try {
+            // Cogemos la sesión de Hibernate para el datasource del CRMDynamics
+            final sessionCRMDynamics = sessionFactory_CRMDynamics.currentSession
+
+            // Creamos la queryString con el parámetro :codigoExpedienteST
+            // IMPORTANTE: HAY QUE REALIZAR EL CAST( XXX AS VARCHAR) PORQUE EN SQLSERVER SE PRODUCE UN ERROR DE DIALECT AL INTENTAR CREAR LA LISTA DE RESULTADOS
+            final String query = 'SELECT  CAST(A.Scor_name as VARCHAR) as codigoExpedienteST, CAST(A.scor_nsolicitud_compania as VARCHAR) as numSolicitud, CAST(A.scor_estado as VARCHAR) as codigoEstadoExpediente, CAST(A.scor_productoidName as VARCHAR) as codigoProductoCompanya, CAST(A.Scor_npoliza as VARCHAR) as numPoliza, CAST(A.Scor_ncertificado as VARCHAR) as numCertificado, CAST(A.Scor_observacionestarificacion as VARCHAR) as observacionesTarificacion, CAST(A.Scor_idgestordocumental as VARCHAR) as nodoAlfresco FROM Scor_expediente AS A, Contact AS C, Scor_codBusinessUnit AS D, Scor_clienteExtensionBase as E WHERE A.DeletionStateCode = \'0\' and (C.contactId = A.scor_candidatoid) and (A.owningbusinessunit = D.scor_unidaddenegocioid) and (C.scor_candidatosid = E.Scor_clienteID) and A.Scor_name=:codigoExpedienteST order by a.Scor_name'
+
+            // Creamos la query nativa SQL
+            final sqlQuery = sessionCRMDynamics.createSQLQuery(query)
+
+            // Usamos el método with() de GORM para invocar métodos sobre el objeto sqlQuery
+            expedientes = sqlQuery.with {
+                // Definimos un Transformer para que convierta los campos alias a la clase POJO destino, en este caso ExpedienteCRMDynamicsDTO
+                setResultTransformer(Transformers.aliasToBean(ExpedienteCRMDynamicsDTO.class))
+
+                // seteamos el parámetro 'codigoExpedienteST' de la query con el parámetro de entrada del método 'codigoExpedienteST'
+                setString("codigoExpedienteST", codigoExpedienteST)
+
+                // Ejecutamos la query y obtenemos los resultados
+                list()
+            }
+
+        } catch (Exception e) {
+            logginService.putError(this.class.getName() + ".obtenerDatosExpedienteCRMDynamics", "Error en búsqueda directa a la BD del CRM Dynamics para obtener los siguientes datos del expediente " + codigoExpedienteST + ": " + ExceptionUtils.composeMessage(null, e))
+            correoUtil.envioEmailErrores(this.class.getName() + ".obtenerDatosExpedienteCRMDynamics", "Error en búsqueda directa a la BD del CRM Dynamics para obtener los siguientes datos del expediente " + codigoExpedienteST + ": ", e)
+            throw new WSException(this.getClass(), this.class.getName() + ".obtenerDatosExpedienteCRMDynamics", e.getMessage())
+        }
+        return expedientes
+    }
+
+    /**
+     * Búsqueda directa a la BD del CRM Dynamics para obtener los siguientes datos del candidato del expediente
+     *
+     *     numeroDocumento: el DNI del candidato.
+     *
+     *     telefono1: número de teléfono 1 del candidato
+     *
+     *     tipoTelefono1: tipo de número de teléfono 1 del candidato (1 es MÓVIL, 2 es FIJO)
+     *
+     *     telefono2: número de teléfono 2 del candidato
+     *
+     *     tipoTelefono2: tipo de número de teléfono 2 del candidato (1 es MÓVIL, 2 es FIJO)
+     *
+     *     telefono3: número de teléfono 3 del candidato
+     *
+     *     tipoTelefono3: tipo de número de teléfono 3 del candidato (1 es MÓVIL, 2 es FIJO)
+     *
+     *     dirección: dirección de vivienda del candidato
+     *
+     *     codPostal: codigo postal de la vivienda del candidato
+     *
+     *     localidad: localidad de la vivienda del candidato
+     *
+     *     provincia: provincia de la vivienda del candidato
+     *
+     * @param codigoExpedienteST
+     * @return
+     */
+    CandidatoCRMDynamicsDTO obtenerDatosCandidatoExpedienteCRMDynamics(String codigoExpedienteST) {
+
+        logginService.putInfoMessage("Recuperando información del candidato del expediente " + codigoExpedienteST)
+
+        final List<ExpedienteCRMDynamicsDTO> expedientes
+
+        try {
+            // Cogemos la sesión de Hibernate para el datasource del CRMDynamics
+            final sessionCRMDynamics = sessionFactory_CRMDynamics.currentSession
+
+            // Creamos la queryString con el parámetro :codigoExpedienteST
+            // IMPORTANTE: HAY QUE REALIZAR EL CAST( XXX AS VARCHAR) PORQUE EN SQLSERVER SE PRODUCE UN ERROR DE DIALECT AL INTENTAR CREAR LA LISTA DE RESULTADOS
+            final String query = 'SELECT CAST(scor_dnipasaporte AS VARCHAR) as numeroDocumento, CAST(telephone1 AS VARCHAR) as telefonol, Scor_Tipodetelefono as tipoTelefonol, CAST(telephone2 AS VARCHAR) as telefono2, Scor_tipodetelefono2 as tipoTelefono2, CAST(telephone3 AS VARCHAR) as telefono3, Scor_Tipodetelefono3 as tipoTelefono3, CAST(address1_line1 AS VARCHAR) as direccion, CAST(address1_postalcode AS VARCHAR) as codPostal, CAST(address1_city AS VARCHAR) as localidad, CAST(address1_stateorprovince AS VARCHAR) as provincia FROM Scor_expediente AS A, Contact AS C, Scor_codBusinessUnit AS D, Scor_clienteExtensionBase as E WHERE A.DeletionStateCode = \'0\' and (C.contactId = A.scor_candidatoid) and (A.owningbusinessunit = D.scor_unidaddenegocioid) and (C.scor_candidatosid = e.Scor_clienteID) and A.Scor_name=:codigoExpedienteST order by a.Scor_name'
+
+            // Creamos la query nativa SQL
+            final sqlQuery = sessionCRMDynamics.createSQLQuery(query)
+
+            // Usamos el método with() de GORM para invocar métodos sobre el objeto sqlQuery
+            expedientes = sqlQuery.with {
+                // Definimos un Transformer para que convierta los campos alias a la clase POJO destino, en este caso CandidatoCRMDynamicsDTO
+                setResultTransformer(Transformers.aliasToBean(CandidatoCRMDynamicsDTO.class))
+
+                // seteamos el parámetro 'codigoExpedienteST' de la query con el parámetro de entrada del método 'codigoExpedienteST'
+                setString("codigoExpedienteST", codigoExpedienteST)
+
+                // Ejecutamos la query y obtenemos los resultados
+                list()
+            }
+
+        } catch (Exception e) {
+            logginService.putError(this.class.getName() + ".obtenerDatosCandidatoExpedienteCRMDynamics", "Error en búsqueda directa a la BD del CRM Dynamics para obtener los siguientes datos del candidato del expediente " + codigoExpedienteST + ": " + ExceptionUtils.composeMessage(null, e))
+            correoUtil.envioEmailErrores(this.class.getName() + ".obtenerDatosCandidatoExpedienteCRMDynamics", "Error en búsqueda directa a la BD del CRM Dynamics para obtener los siguientes datos del candidato del expediente " + codigoExpedienteST + ": ", e)
+            throw new WSException(this.getClass(), this.class.getName() + ".obtenerDatosCandidatoExpedienteCRMDynamics", e.getMessage())
+        }
+        return expedientes
+    }
+
+    /**
+     * Búsqueda directa a la BBDD del CRM Dynamics para obtener las coberturas de un expediente
+     *
+     *      nombreCobertura: nombre de la cobertura
+     *
+     *      codigoCobertura: código de la cobertura
+     *
+     *      capitalCobertura: capital de la cobertura.
+     *
+     *      resultadoCobertura: resultado de la cobertura
+     *
+     *      codigoResultadoCobertura: codigo del resultado de la cobertura
+     *
+     *      valoracionPrima: valoración de la prima de la cobertura
+     *
+     *      valoracionCapital: valoración del capital de la cobertura
+     *
+     *      exclusiones: exclusiones de la cobertura
+     *
+     * @param codigoExpedienteST
+     * @return
+     */
+    List<CoberturasCRMDynamicsDTO> obtenerCoberturasExpedienteCRMDynamics(String codigoExpedienteST) {
+
+        logginService.putInfoMessage("Recuperando información de las coberturas del expediente " + codigoExpedienteST)
+
+        final List<ExpedienteCRMDynamicsDTO> expedientes
+
+        try {
+            // Cogemos la sesión de Hibernate para el datasource del CRMDynamics
+            final sessionCRMDynamics = sessionFactory_CRMDynamics.currentSession
+
+            // Creamos la queryString con el parámetro :codigoExpedienteST
+            // IMPORTANTE: HAY QUE REALIZAR EL CAST( XXX AS VARCHAR) PORQUE EN SQLSERVER SE PRODUCE UN ERROR DE DIALECT AL INTENTAR CREAR LA LISTA DE RESULTADOS
+            final String query = 'SELECT CAST(C.scor_name as VARCHAR) as nombreCobertura, CAST(C.Scor_Codigo as VARCHAR) as codigoCobertura, CAST(a.Scor_capital as VARCHAR) as capitalCobertura, CAST(D.Scor_name as VARCHAR) AS resultadoCobertura, CAST(D.Scor_referencia as VARCHAR) AS codigoResultadoCobertura, CAST(a.Scor_valoracionprima as VARCHAR) as valoracionPrima, CAST(a.Scor_valoracioncapital as VARCHAR) as valoracionCapital, CAST(a.Scor_exclusiones as VARCHAR) as exclusiones FROM Scor_coberturadelexpedienteExtensionBase AS a INNER JOIN Scor_expediente AS b ON a.Scor_expedienteId = b.Scor_expedienteId INNER JOIN Scor_coberturaExtensionBase AS C ON a.Scor_coberturaId = C.Scor_coberturaId LEFT OUTER JOIN Scor_resultadocoberturaExtensionBase AS D ON a.Scor_resultadocoberturaid = D.Scor_resultadocoberturaId WHERE b.DeletionStateCode = \'0\' and b.Scor_name=:codigoExpedienteST'
+
+            // Creamos la query nativa SQL
+            final sqlQuery = sessionCRMDynamics.createSQLQuery(query)
+
+            // Usamos el método with() de GORM para invocar métodos sobre el objeto sqlQuery
+            expedientes = sqlQuery.with {
+                // Definimos un Transformer para que convierta los campos alias a la clase POJO destino, en este caso CoberturasCRMDynamicsDTO
+                setResultTransformer(Transformers.aliasToBean(CoberturasCRMDynamicsDTO.class))
+
+                // seteamos el parámetro 'codigoExpedienteST' de la query con el parámetro de entrada del método 'codigoExpedienteST'
+                setString("codigoExpedienteST", codigoExpedienteST)
+
+                // Ejecutamos la query y obtenemos los resultados
+                list()
+            }
+
+        } catch (Exception e) {
+            logginService.putError(this.class.getName() + ".obtenerCoberturasExpedienteCRMDynamics", "Error en búsqueda directa a la BBDD del CRM Dynamics para obtener las coberturas del expediente " + codigoExpedienteST + ": " + ExceptionUtils.composeMessage(null, e))
+            correoUtil.envioEmailErrores(this.class.getName() + ".obtenerCoberturasExpedienteCRMDynamics", "Error en búsqueda directa a la BBDD del CRM Dynamics para obtener las coberturas del expediente " + codigoExpedienteST + ": ", e)
+            throw new WSException(this.getClass(), this.class.getName() + ".obtenerCoberturasExpedienteCRMDynamics", e.getMessage())
         }
         return expedientes
     }

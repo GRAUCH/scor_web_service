@@ -6,6 +6,7 @@ import com.scortelemed.Envio
 import com.scortelemed.Recibido
 import com.scortelemed.schemas.caser.BenefictNameType
 import com.scortelemed.schemas.caser.RequestStateType
+import com.velogica.model.dto.CandidatoCRMDynamicsDTO
 import com.ws.cajamar.beans.Cobertura
 import com.ws.cajamar.beans.ElementoEntrada
 import com.ws.cajamar.beans.ElementoSalida
@@ -13,6 +14,7 @@ import hwsol.entities.EnvioCaser
 import hwsol.entities.parser.RegistrarEventoSCOR
 import servicios.Candidato
 import servicios.TipoTelefono
+import com.scortelemed.schemas.caser.ResultadoReconocimientoMedicoResponse.Expediente
 
 import javax.xml.datatype.DatatypeFactory
 import javax.xml.datatype.XMLGregorianCalendar
@@ -915,13 +917,106 @@ class TransformacionUtil {
         }
     }
 
+    /**
+     * Asigna los teléfonos del candidato por orden de prioridad 1, 2 y 3, en los slots de telefonoMobil y telefonoFijo1 y telefonoFijo2 respectivamente
+     * @param expediente
+     * @param datosCandidatoExpediente
+     */
+    void asignarTelefonos(Expediente expediente, CandidatoCRMDynamicsDTO datosCandidatoExpediente) {
+
+        String telefonoMovil
+        String telefonoFijo1
+        String telefonoFijo2
+
+        if (datosCandidatoExpediente.getTelefonol()!=null && datosCandidatoExpediente.getTipoTelefonol()!=null && obtenerTipoTelefono(datosCandidatoExpediente.getTipoTelefonol()) == TipoTelefono.MOVIL.value()) {
+            telefonoMovil = datosCandidatoExpediente.getTelefonol()
+            if (datosCandidatoExpediente.getTelefono2()!=null) {
+                telefonoFijo1 = datosCandidatoExpediente.getTelefono2()
+                if (datosCandidatoExpediente.getTelefono3()!=null) {
+                    telefonoFijo2 = datosCandidatoExpediente.getTelefono3()
+                } else {
+                    telefonoFijo2 = ""
+                }
+            } else if (datosCandidatoExpediente.getTelefono3()!=null) {
+                telefonoFijo1 = datosCandidatoExpediente.getTelefono3()
+                telefonoFijo2 = ""
+            } else {
+                telefonoFijo1 = ""
+                telefonoFijo2 = ""
+            }
+        } else if (datosCandidatoExpediente.getTelefono2()!=null && datosCandidatoExpediente.getTipoTelefono2()!=null && obtenerTipoTelefono(datosCandidatoExpediente.getTipoTelefono2()) == TipoTelefono.MOVIL.value()) {
+            telefonoMovil = datosCandidatoExpediente.getTelefono2()
+            if (datosCandidatoExpediente.getTelefono1()!=null) {
+                telefonoFijo1 = datosCandidatoExpediente.getTelefono1()
+                if (datosCandidatoExpediente.getTelefono3()!=null) {
+                    telefonoFijo2 = datosCandidatoExpediente.getTelefono3()
+                } else {
+                    telefonoFijo2 = ""
+                }
+            } else if (datosCandidatoExpediente.getTelefono3()!=null) {
+                telefonoFijo1 = datosCandidatoExpediente.getTipoTelefono1()
+                telefonoFijo2 = ""
+            } else {
+                telefonoFijo1 = ""
+                telefonoFijo2 = ""
+            }
+        } else if (datosCandidatoExpediente.getTelefono3()!=null && datosCandidatoExpediente.getTipoTelefono3() != null && obtenerTipoTelefono(datosCandidatoExpediente.getTipoTelefono3()) == TipoTelefono.MOVIL.value()) {
+            telefonoMovil = datosCandidatoExpediente.getTelefono3()
+            if (datosCandidatoExpediente.getTelefono1() != null) {
+                telefonoFijo1 = datosCandidatoExpediente.getTelefono1()
+                if (datosCandidatoExpediente.getTelefono2() != null) {
+                    telefonoFijo2 = datosCandidatoExpediente.getTelefono2()
+                } else {
+                    telefonoFijo2 = ""
+                }
+            } else if (datosCandidatoExpediente.getTelefono2() != null) {
+                telefonoFijo1 = datosCandidatoExpediente.getTelefono2()
+                telefonoFijo2 = ""
+            } else {
+                telefonoFijo1 = ""
+                telefonoFijo2 = ""
+            }
+        } else {
+
+            telefonoMovil = ""
+
+            if (datosCandidatoExpediente.getTelefonol()!=null && datosCandidatoExpediente.getTipoTelefonol() != null && obtenerTipoTelefono(datosCandidatoExpediente.getTipoTelefonol()) == TipoTelefono.FIJO.value()) {
+                telefonoFijo1 = datosCandidatoExpediente.getTelefonol()
+                if (datosCandidatoExpediente.getTelefono2()!=null && datosCandidatoExpediente.getTipoTelefono2() != null && obtenerTipoTelefono(datosCandidatoExpediente.getTipoTelefono2()) == TipoTelefono.FIJO.value()) {
+                    telefonoFijo2 = datosCandidatoExpediente.getTelefono2()
+                } else if (datosCandidatoExpediente.getTelefono3()!=null && datosCandidatoExpediente.getTipoTelefono3() != null && obtenerTipoTelefono(datosCandidatoExpediente.getTipoTelefono3()) == TipoTelefono.FIJO.value()) {
+                    telefonoFijo2 = datosCandidatoExpediente.getTelefono3()
+                } else {
+                    telefonoFijo2 = ""
+                }
+            } else if (datosCandidatoExpediente.getTelefono2()!=null && datosCandidatoExpediente.getTipoTelefono2() != null && obtenerTipoTelefono(datosCandidatoExpediente.getTipoTelefono2()) == TipoTelefono.FIJO.value()) {
+                telefonoFijo1 = datosCandidatoExpediente.getTelefono2()
+                if (datosCandidatoExpediente.getTelefono3()!=null && datosCandidatoExpediente.getTipoTelefono3() != null && obtenerTipoTelefono(datosCandidatoExpediente.getTipoTelefono3()) == TipoTelefono.FIJO.value()) {
+                    telefonoFijo2 = datosCandidatoExpediente.getTelefono3()
+                } else {
+                    telefonoFijo2 = ""
+                }
+            } else if (datosCandidatoExpediente.getTelefono3()!=null && datosCandidatoExpediente.getTipoTelefono3() != null && obtenerTipoTelefono(datosCandidatoExpediente.getTipoTelefono3()) == TipoTelefono.FIJO.value()) {
+                telefonoFijo1 = datosCandidatoExpediente.getTelefono3()
+                telefonoFijo2 = ""
+            } else {
+                telefonoFijo1 = ""
+                telefonoFijo2 = ""
+            }
+        }
+
+        expediente.setMobilePhone(telefonoMovil)
+        expediente.setPhoneNumber1(telefonoFijo1)
+        expediente.setPhoneNumber2(telefonoFijo2)
+    }
+
     def devolverTelefonoMovil(Candidato candidato) {
 
-        if (candidato.getTipoTelefono1() != null && candidato.getTipoTelefono1() == TipoTelefono.MOVIL) {
+        if (candidato.getTipoTelefono1() != null && candidato.getTipoTelefono1() == TipoTelefono.MOVIL.value()) {
             return candidato.telefono1
-        } else if (candidato.getTipoTelefono2() != null && candidato.getTipoTelefono2() == TipoTelefono.MOVIL) {
+        } else if (candidato.getTipoTelefono2() != null && candidato.getTipoTelefono2() == TipoTelefono.MOVIL.value()) {
             return candidato.telefono2
-        } else if (candidato.getTipoTelefono3() != null && candidato.getTipoTelefono3() == TipoTelefono.MOVIL) {
+        } else if (candidato.getTipoTelefono3() != null && candidato.getTipoTelefono3() == TipoTelefono.MOVIL.value()) {
             return candidato.telefono3
         } else {
             return ""
@@ -961,6 +1056,16 @@ class TransformacionUtil {
             case "CERRADO": return RequestStateType.CLOSED;
             case "ANULADO": return RequestStateType.CANCELLED;
             case "RECHAZADO": return RequestStateType.REJECTED;
+            default: return null;
+        }
+
+    }
+
+    def devolverTipoEstadoCRM(estado) {
+
+        switch (estado) {
+            case "10": return RequestStateType.CLOSED;
+            case "11": return RequestStateType.CANCELLED;
             default: return null;
         }
 
@@ -1235,6 +1340,16 @@ class TransformacionUtil {
         }
     }
 
+    def obtenerTipoTelefono(valorTipoTelefono) {
+
+        switch (valorTipoTelefono) {
+            case "1": return "MOVIL"
+            case "2": return "FIJO"
+            case "3": return "FAX"
+            default: return "null"
+        }
+    }
+
     def obtenerValorTipoProvision(tipoProvision) {
 
         switch (tipoProvision) {
@@ -1413,6 +1528,8 @@ class TransformacionUtil {
             return BenefictNameType.ACCIDENTAL_DEAD
         } else if (codigo.equals("COB1")) {
             return BenefictNameType.DEPENDENCY
+        } else if (codigo.equals("COB3")) {
+            return BenefictNameType.CRITICAL_ILLNESS
         } else {
             return null
         }
