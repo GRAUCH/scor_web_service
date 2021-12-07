@@ -1,6 +1,7 @@
 package services
 
-
+import com.scor.global.ExceptionUtils
+import com.scor.global.WSException
 import com.scortelemed.*
 import com.scortelemed.schemas.caser.*
 import com.velogica.model.dto.ExpedienteCRMDynamicsDTO
@@ -32,6 +33,7 @@ class CaserUnderwrittingCaseManagementService {
     def estadisticasService
     def requestService
     def logginService
+    def validationService
 
     @WebResult(name = "GestionReconocimientoMedicoResponse")
     GestionReconocimientoMedicoResponse gestionReconocimientoMedico(
@@ -154,15 +156,20 @@ class CaserUnderwrittingCaseManagementService {
                     notes = "El caso se ha procesado correctamente"
                     status = StatusType.OK
 
+                    Collection<Validation> validationCollection = validationService.obtenerValidaciones(company.getCodigoSt(), company.getOu().toString(), gestionReconocimientoMedicoInfantil.getPolicyInformation().getProductCode())
 
+                    caserService.validarCoberturas(gestionReconocimientoMedicoInfantil, company)
 
                     logginService.putInfoMessage("Se procede el alta automatica de ${company.getNombre()} con numero de solicitud ${numeroSolicitud}")
 
                     //Chequeo si existen expedientes asociados a ese número de solicitud.
                     expedientes = expedienteService.obtenerExpedientesCRMDynamics(company.getNombre(), company.getOu().getKey(), company.getCodigoSt(), numeroSolicitud, productCode)
 
-                    if (expedientes != null && expedientes.size())
+                    if (expedientes != null && expedientes.size()) {
                         logginService.putInfoMessage("Ya existen ${expedientes.size()} expedientes con numero de solicitud ${numeroSolicitud}")
+                        throw new Exception("Ya existen ${expedientes.size()} expedientes con numero de solicitud ${numeroSolicitud}")
+                    }
+
                     if (expedientes != null && expedientes.size() == 0) {
 
                         expedienteService.crearExpediente(requestBBDD, TipoCompany.CASER)
@@ -200,12 +207,17 @@ class CaserUnderwrittingCaseManagementService {
             }
         } catch (Exception e) {
 
-            notes = "Error: " + e.getMessage()
+            if (e.getMessage() == null) {
+                notes = e.getCause().getMessage()
+            } else {
+                notes = "Error: " + e.getMessage()
+            }
+
             status = StatusType.ERROR
 
-            requestService.insertarError(company, numeroSolicitud, requestXML.toString(), TipoOperacion.ALTA, "Peticion no realizada para solicitud: " + numeroSolicitud + ". Error: " + e.getMessage())
+            requestService.insertarError(company, numeroSolicitud, requestXML.toString(), TipoOperacion.ALTA, "Peticion no realizada para solicitud: " + numeroSolicitud + ". Error: " + notes)
 
-            logginService.putErrorEndpoint("GestionReconocimientoMedicoInfantil", "Peticion no realizada de " + company.getNombre() + " con numero de solicitud: " + numeroSolicitud + ". Error: " + e.getMessage())
+            logginService.putErrorEndpoint("GestionReconocimientoMedicoInfantil", "Peticion no realizada de " + company.getNombre() + " con numero de solicitud: " + numeroSolicitud + ". Error: " + notes)
             correoUtil.envioEmailErrores("GestionReconocimientoMedicoInfantil", "Peticion de " + company.getNombre() + " con numero de solicitud: " + numeroSolicitud, e)
         } finally {
 
@@ -220,6 +232,8 @@ class CaserUnderwrittingCaseManagementService {
 
         return resultado
     }
+
+
 
     @WebResult(name = "ResultadoReconocimientoMedicoResponse")
     ResultadoReconocimientoMedicoResponse resultadoReconocimientoMedico(

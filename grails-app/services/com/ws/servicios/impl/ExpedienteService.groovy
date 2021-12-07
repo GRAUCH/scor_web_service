@@ -480,7 +480,7 @@ class ExpedienteService implements IExpedienteService {
      *
      *     numSubPoliza: número de subpóliza (en este caso indica cuántos expedientes hay en esa póliza)
      *
-     *     codigoProductoCompanya: código del producto para la compañía CASER
+     *     codigoProductoCompanyia: código del producto para la compañía CASER
      *
      *     codigoEstadoExpediente: código de estado del expediente, en nuestro caso verificaremos que está CERRADO
      *
@@ -502,7 +502,7 @@ class ExpedienteService implements IExpedienteService {
 
             // Creamos la queryString con el parámetro :companyCodigoSt, :numSolicitud y :companyCodigoPais
             // IMPORTANTE: HAY QUE REALIZAR EL CAST( XXX AS VARCHAR(5000)) PORQUE EN SQLSERVER SE PRODUCE UN ERROR DE DIALECT AL INTENTAR CREAR LA LISTA DE RESULTADOS
-            final String query = 'SELECT CAST(A.Scor_name AS VARCHAR(5000)) as codigoExpedienteST, CAST(E.scor_codigoST AS VARCHAR(5000)) as codigoCompanyiaST, CAST(A.scor_nsolicitud_compania AS VARCHAR(5000)) as numSolicitud, CAST(a.Scor_nsubpoliza AS VARCHAR(5000)) as numSubPoliza, CAST(A.scor_productoidName AS VARCHAR(5000)) as codigoProductoCompanya, CAST(a.scor_estado AS VARCHAR(5000)) as codigoEstadoExpediente FROM Scor_expediente AS A, Contact AS C, Scor_codBusinessUnit AS D, Scor_clienteExtensionBase as E WHERE A.DeletionStateCode = \'0\' and (C.contactId = A.scor_candidatoid) and (A.owningbusinessunit = D.scor_unidaddenegocioid) and (C.scor_candidatosid = e.Scor_clienteID) and d.scor_codigopais=:companyCodigoPais and E.scor_codigoST=:companyCodigoSt and A.scor_nsolicitud_compania = :numSolicitud order by a.Scor_name'
+            final String query = 'SELECT CAST(A.Scor_name AS VARCHAR(5000)) as codigoExpedienteST, CAST(E.scor_codigoST AS VARCHAR(5000)) as codigoCompanyiaST, CAST(A.scor_nsolicitud_compania AS VARCHAR(5000)) as numSolicitud, CAST(a.Scor_nsubpoliza AS VARCHAR(5000)) as numSubPoliza, CAST(A.scor_productoidName AS VARCHAR(5000)) as codigoProductoCompanyia, CAST(a.scor_estado AS VARCHAR(5000)) as codigoEstadoExpediente FROM Scor_expediente AS A, Contact AS C, Scor_codBusinessUnit AS D, Scor_clienteExtensionBase as E WHERE A.DeletionStateCode = \'0\' and (C.contactId = A.scor_candidatoid) and (A.owningbusinessunit = D.scor_unidaddenegocioid) and (C.scor_candidatosid = e.Scor_clienteID) and d.scor_codigopais=:companyCodigoPais and E.scor_codigoST=:companyCodigoSt and A.scor_nsolicitud_compania = :numSolicitud order by a.Scor_name'
 
             // Creamos la query nativa SQL
             final sqlQuery = sessionCRMDynamics.createSQLQuery(query)
@@ -542,7 +542,7 @@ class ExpedienteService implements IExpedienteService {
      *
      *     codigoEstadoExpediente: código de estado del expediente
      *
-     *     codigoProductoCompanya: código del producto para la compañía CASER de ese expediente
+     *     codigoProductoCompanyia: código del producto para la compañía CASER de ese expediente
      *
      *     numPoliza: número de póliza del expediente
      *
@@ -567,7 +567,7 @@ class ExpedienteService implements IExpedienteService {
 
             // Creamos la queryString con el parámetro :codigoExpedienteST
             // IMPORTANTE: HAY QUE REALIZAR EL CAST( XXX AS VARCHAR(5000)) PORQUE EN SQLSERVER SE PRODUCE UN ERROR DE DIALECT AL INTENTAR CREAR LA LISTA DE RESULTADOS
-            final String query = 'SELECT  CAST(A.Scor_name as VARCHAR(5000)) as codigoExpedienteST, CAST(A.scor_nsolicitud_compania as VARCHAR(5000)) as numSolicitud, CAST(A.scor_estado as VARCHAR(5000)) as codigoEstadoExpediente, CAST(A.scor_productoidName as VARCHAR(5000)) as codigoProductoCompanya, CAST(A.Scor_npoliza as VARCHAR(5000)) as numPoliza, CAST(A.Scor_ncertificado as VARCHAR(5000)) as numCertificado, CAST(A.Scor_observacionestarificacion as VARCHAR(5000)) as observacionesTarificacion, CAST(A.Scor_idgestordocumental as VARCHAR(5000)) as nodoAlfresco FROM Scor_expediente AS A, Contact AS C, Scor_codBusinessUnit AS D, Scor_clienteExtensionBase as E WHERE A.DeletionStateCode = \'0\' and (C.contactId = A.scor_candidatoid) and (A.owningbusinessunit = D.scor_unidaddenegocioid) and (C.scor_candidatosid = E.Scor_clienteID) and A.Scor_name=:codigoExpedienteST order by a.Scor_name'
+            final String query = 'SELECT  CAST(A.Scor_name as VARCHAR(5000)) as codigoExpedienteST, CAST(A.scor_nsolicitud_compania as VARCHAR(5000)) as numSolicitud, CAST(A.scor_estado as VARCHAR(5000)) as codigoEstadoExpediente, CAST(A.scor_productoidName as VARCHAR(5000)) as codigoProductoCompanyia, CAST(A.Scor_npoliza as VARCHAR(5000)) as numPoliza, CAST(A.Scor_ncertificado as VARCHAR(5000)) as numCertificado, CAST(A.Scor_observacionestarificacion as VARCHAR(5000)) as observacionesTarificacion, CAST(A.Scor_idgestordocumental as VARCHAR(5000)) as nodoAlfresco FROM Scor_expediente AS A, Contact AS C, Scor_codBusinessUnit AS D, Scor_clienteExtensionBase as E WHERE A.DeletionStateCode = \'0\' and (C.contactId = A.scor_candidatoid) and (A.owningbusinessunit = D.scor_unidaddenegocioid) and (C.scor_candidatosid = E.Scor_clienteID) and A.Scor_name=:codigoExpedienteST order by a.Scor_name'
 
             // Creamos la query nativa SQL
             final sqlQuery = sessionCRMDynamics.createSQLQuery(query)

@@ -1,6 +1,7 @@
 dataSource {
     pooled = true
     driverClassName = "com.mysql.jdbc.Driver"
+    dialect = org.hibernate.dialect.MySQL5InnoDBDialect
     properties {
         removeAbandonedTimeout = "60"
         testWhileIdle = true
@@ -12,7 +13,6 @@ dataSource_CRMDynamics {
     pooled = true
     driverClassName = "com.microsoft.sqlserver.jdbc.SQLServerDriver"
     dialect = org.hibernate.dialect.SQLServer2008Dialect
-    //dialect = "org.hibernate.dialect.SQLServerDialect"
     readOnly = true
     properties {
         removeAbandonedTimeout = "60"

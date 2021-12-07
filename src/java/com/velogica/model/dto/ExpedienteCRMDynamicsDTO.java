@@ -30,7 +30,7 @@ public class ExpedienteCRMDynamicsDTO {
     /**
      * código del producto para la compañía
      */
-    String codigoProductoCompanya;
+    String codigoProductoCompanyia;
 
     /**
      * código de estado del expediente
@@ -56,24 +56,24 @@ public class ExpedienteCRMDynamicsDTO {
 
     }
 
-    public ExpedienteCRMDynamicsDTO(String codigoExpedienteST, String numSolicitud, String codigoEstadoExpediente, String codigoProductoCompanya, String numPoliza, String numCertificado, String observacionesTarificacion, String nodoAlfresco) {
+    public ExpedienteCRMDynamicsDTO(String codigoExpedienteST, String numSolicitud, String codigoEstadoExpediente, String codigoProductoCompanyia, String numPoliza, String numCertificado, String observacionesTarificacion, String nodoAlfresco) {
         this.codigoExpedienteST = codigoExpedienteST;
         this.numSolicitud = numSolicitud;
         this.numPoliza = numPoliza;
-        this.codigoProductoCompanya = codigoProductoCompanya;
+        this.codigoProductoCompanyia = codigoProductoCompanyia;
         this.codigoEstadoExpediente = codigoEstadoExpediente;
         this.numCertificado = numCertificado;
         this.observacionesTarificacion = observacionesTarificacion;
         this.nodoAlfresco = nodoAlfresco;
     }
 
-    public ExpedienteCRMDynamicsDTO(String codigoExpedienteST, String codigoCompanyiaST, String numSolicitud, String numPoliza, String numSubPoliza, String codigoProductoCompanya, String codigoEstadoExpediente, String numCertificado, String observacionesTarificacion, String nodoAlfresco) {
+    public ExpedienteCRMDynamicsDTO(String codigoExpedienteST, String codigoCompanyiaST, String numSolicitud, String numPoliza, String numSubPoliza, String codigoProductoCompanyia, String codigoEstadoExpediente, String numCertificado, String observacionesTarificacion, String nodoAlfresco) {
         this.codigoExpedienteST = codigoExpedienteST;
         this.codigoCompanyiaST = codigoCompanyiaST;
         this.numSolicitud = numSolicitud;
         this.numPoliza = numPoliza;
         this.numSubPoliza = numSubPoliza;
-        this.codigoProductoCompanya = codigoProductoCompanya;
+        this.codigoProductoCompanyia = codigoProductoCompanyia;
         this.codigoEstadoExpediente = codigoEstadoExpediente;
         this.numCertificado = numCertificado;
         this.observacionesTarificacion = observacionesTarificacion;
@@ -86,7 +86,7 @@ public class ExpedienteCRMDynamicsDTO {
         this.numSolicitud = expedienteCRMDynamicsDTO.getNumSolicitud();
         this.numPoliza = expedienteCRMDynamicsDTO.getNumPoliza();
         this.numSubPoliza = expedienteCRMDynamicsDTO.getNumSubPoliza();
-        this.codigoProductoCompanya = expedienteCRMDynamicsDTO.getCodigoProductoCompanya();
+        this.codigoProductoCompanyia = expedienteCRMDynamicsDTO.getCodigoProductoCompanyia();
         this.codigoEstadoExpediente = expedienteCRMDynamicsDTO.getCodigoEstadoExpediente();
         this.numCertificado = expedienteCRMDynamicsDTO.getNumCertificado();
         this.observacionesTarificacion = expedienteCRMDynamicsDTO.getObservacionesTarificacion();
@@ -133,12 +133,12 @@ public class ExpedienteCRMDynamicsDTO {
         this.numSubPoliza = numSubPoliza;
     }
 
-    public String getCodigoProductoCompanya() {
-        return codigoProductoCompanya;
+    public String getCodigoProductoCompanyia() {
+        return codigoProductoCompanyia;
     }
 
-    public void setCodigoProductoCompanya(String codigoProductoCompanya) {
-        this.codigoProductoCompanya = codigoProductoCompanya;
+    public void setCodigoProductoCompanyia(String codigoProductoCompanyia) {
+        this.codigoProductoCompanyia = codigoProductoCompanyia;
     }
 
     public String getCodigoEstadoExpediente() {
