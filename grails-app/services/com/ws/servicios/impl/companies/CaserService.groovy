@@ -7,6 +7,7 @@ import com.scor.srpfileinbound.DATOS
 import com.scor.srpfileinbound.REGISTRODATOS
 import com.scortelemed.Company
 import com.scortelemed.Request
+import com.scortelemed.Validation
 import com.scortelemed.schemas.caser.*
 import com.scortelemed.schemas.caser.ConsultaExpedienteResponse.ExpedienteConsulta
 import com.scortelemed.schemas.caser.ResultadoReconocimientoMedicoResponse.Expediente
@@ -15,6 +16,7 @@ import com.velogica.model.dto.CoberturasCRMDynamicsDTO
 import com.velogica.model.dto.ExpedienteCRMDynamicsDTO
 import com.ws.enumeration.UnidadOrganizativa
 import com.ws.servicios.ICompanyService
+import com.ws.servicios.impl.ValidationService
 import grails.util.Holders
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
@@ -30,6 +32,7 @@ import javax.xml.datatype.XMLGregorianCalendar
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.parsers.ParserConfigurationException
+import java.lang.reflect.UndeclaredThrowableException
 import java.text.SimpleDateFormat
 
 class CaserService implements ICompanyService{
@@ -40,6 +43,7 @@ class CaserService implements ICompanyService{
     def requestService = Holders.getGrailsApplication().mainContext.getBean("requestService")
     def expedienteService = Holders.getGrailsApplication().mainContext.getBean("expedienteService")
     def tarificadorService = Holders.getGrailsApplication().mainContext.getBean("tarificadorService")
+    def validationService = Holders.getGrailsApplication().mainContext.getBean("validationService")
     CorreoUtil correoUtil = new CorreoUtil()
 
 
@@ -446,7 +450,7 @@ class CaserService implements ICompanyService{
         expediente.setRequestDate(requestDate)
         expediente.setRequestNumber(util.devolverDatos(datosExpediente.getNumSolicitud()))
         expediente.setRequestState(util.devolverTipoEstadoCRM(datosExpediente.getCodigoEstadoExpediente()))
-        expediente.setProductCode(util.devolverDatos(datosExpediente.getCodigoProductoCompanya()))
+        expediente.setProductCode(util.devolverDatos(datosExpediente.getCodigoProductoCompanyia()))
         expediente.setPolicyNumber(util.devolverDatos(datosExpediente.getNumPoliza()))
 		expediente.setCertificateNumber(util.devolverDatos(datosExpediente.getNumCertificado()))
 
@@ -521,7 +525,7 @@ class CaserService implements ICompanyService{
         expediente.setRequestDate(requestDate)
         expediente.setRequestNumber(util.devolverDatos(expedientePoliza.getNumSolicitud()))
         expediente.setRequestState(expedientePoliza.getCodigoEstado().toString())
-        expediente.setProductCode(util.devolverDatos(expedientePoliza.getProducto().getCodigoProductoCompanya()))
+        expediente.setProductCode(util.devolverDatos(expedientePoliza.getProducto().getCodigoProductoCompanyia()))
         expediente.setPolicyNumber(util.devolverDatos(expedientePoliza.getNumPoliza()))
         expediente.setCertificateNumber(util.devolverDatos(expedientePoliza.getNumCertificado()))
 
@@ -1408,6 +1412,44 @@ class CaserService implements ICompanyService{
             throw new WSException(this.getClass(), "rellenaCoberturasInfantil", ExceptionUtils.composeMessage(null, e))
         }
     }
+
+    def validarCoberturas(GestionReconocimientoMedicoInfantilRequest gestionReconocimientoMedicoInfantil, Company company){
+
+        String codigoCompanyiaST
+        String unidadOrganizativaCompanyia
+        String codigoProductoCompanyia
+
+        try {
+            codigoCompanyiaST = company.getCodigoSt()
+            unidadOrganizativaCompanyia = company.getOu().toString()
+            codigoProductoCompanyia = gestionReconocimientoMedicoInfantil.getPolicyInformation().getProductCode()
+
+            List<GestionReconocimientoMedicoInfantilRequest.BenefitsType> benefitsTypeList = gestionReconocimientoMedicoInfantil.getBenefitsType()
+
+            Collection<Validation> validationCollection = validationService.obtenerValidaciones(codigoCompanyiaST, unidadOrganizativaCompanyia, codigoProductoCompanyia)
+
+            Set<String> benefitsValidationCodes = validationService.obtenerBenefitCodes(validationCollection)
+
+            if (ValorUtils.isValid(benefitsValidationCodes)) {
+
+                for (GestionReconocimientoMedicoInfantilRequest.BenefitsType benefitTypeIterator : benefitsTypeList) {
+                    // Si no está definido el código de la cobertura, lanzamos una excepción
+                    if (!benefitsValidationCodes.contains(benefitTypeIterator.getBenefictCode().toUpperCase())) {
+                        throw new Exception(this.getClass().getName() + ": Las coberturas de la petición no se corresponden con las definidas para el dominio de la compañia " + company.getNombre() + " para el producto " + codigoProductoCompanyia + ": " + benefitsValidationCodes.toString() + ". Revise la base de datos o corrija la petición.")
+                    }
+                }
+
+            } else {
+                throw new Exception(this.getClass().getName() + ": No hay coberturas definidas para este dominio. Revise la base de datos.")
+            }
+        }
+        catch (Exception e) {
+            logginService.putError(this.class.getName() + ".validarCoberturas", "Error en la validacion de coberturas para la compañia " + company.getNombre() + " y producto " + codigoProductoCompanyia + ": " + ExceptionUtils.composeMessage(null, e))
+            correoUtil.envioEmailErrores(this.class.getName() + ".validarCoberturas", "Error en la validacion de coberturas para la compañia " + company.getNombre() + " y producto " + codigoProductoCompanyia + ": ", e)
+            throw new Exception(this.class.getName() + ".validarCoberturas: " +  e.getMessage(), e)
+        }
+    }
+
 
     List<servicios.Expediente> existeExpediente(String numeroSolicitud, String nombreCia, String companyCodigoSt, UnidadOrganizativa unidadOrganizativa) {
 
