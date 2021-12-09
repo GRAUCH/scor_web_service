@@ -208,7 +208,7 @@ class CaserUnderwrittingCaseManagementService {
         } catch (Exception e) {
 
             if (e.getMessage() == null) {
-                notes = e.getCause().getMessage()
+                notes = "Error: " + e.getCause().getMessage()
             } else {
                 notes = "Error: " + e.getMessage()
             }

@@ -1435,18 +1435,18 @@ class CaserService implements ICompanyService{
                 for (GestionReconocimientoMedicoInfantilRequest.BenefitsType benefitTypeIterator : benefitsTypeList) {
                     // Si no está definido el código de la cobertura, lanzamos una excepción
                     if (!benefitsValidationCodes.contains(benefitTypeIterator.getBenefictCode().toUpperCase())) {
-                        throw new Exception(this.getClass().getName() + ": Las coberturas de la petición no se corresponden con las definidas para el dominio de la compañia " + company.getNombre() + " para el producto " + codigoProductoCompanyia + ": " + benefitsValidationCodes.toString() + ". Revise la base de datos o corrija la petición.")
+                        throw new Exception("Las coberturas de la petición no se corresponden con las definidas para el dominio de la compañia " + company.getNombre() + " para el producto " + codigoProductoCompanyia + ": " + benefitsValidationCodes.toString() + ". Revise la base de datos o corrija la petición.")
                     }
                 }
 
             } else {
-                throw new Exception(this.getClass().getName() + ": No hay coberturas definidas para este dominio. Revise la base de datos.")
+                throw new Exception("No hay coberturas definidas para este dominio. Revise la base de datos.")
             }
         }
         catch (Exception e) {
             logginService.putError(this.class.getName() + ".validarCoberturas", "Error en la validacion de coberturas para la compañia " + company.getNombre() + " y producto " + codigoProductoCompanyia + ": " + ExceptionUtils.composeMessage(null, e))
             correoUtil.envioEmailErrores(this.class.getName() + ".validarCoberturas", "Error en la validacion de coberturas para la compañia " + company.getNombre() + " y producto " + codigoProductoCompanyia + ": ", e)
-            throw new Exception(this.class.getName() + ".validarCoberturas: " +  e.getMessage(), e)
+            throw new Exception(e.getMessage(), e)
         }
     }
 
