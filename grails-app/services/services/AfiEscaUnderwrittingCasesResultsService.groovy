@@ -74,7 +74,7 @@ class AfiEscaUnderwrittingCasesResultsService {
 				fecha.add(Calendar.MINUTE , -120)
 				def fechaIni = fecha.getTime().format ('yyyyMMdd HH:mm')
 				fechaIni= fechaIni.toString()+":00"
-				expedientes=expedienteService.obtenerInformeExpedientes(company.codigoSt,null,1,fechaIni,fechaFin,company.ou.toString())
+				expedientes=expedienteService.obtenerInformeExpedientes(company.codigoSt,null,1,fechaIni,fechaFin,company.ou)
 				requestService.insertarEnvio(company, afiEscaUnderwrittingCasesResultsRequest.date.toString(), requestXML.toString())
 
 				if(expedientes){

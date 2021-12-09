@@ -328,7 +328,6 @@ class CbpitaUnderwrittingCaseManagementService {
 
         } catch (Exception e) {
 
-
             message = "Error: " + e.getMessage()
             status = StatusType.ERROR
             code = 2
