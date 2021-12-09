@@ -1,6 +1,7 @@
 package services
 
 import com.scortelemed.Company
+import com.scortelemed.Conf
 import com.scortelemed.Operacion
 import com.scortelemed.Request
 import com.scortelemed.TipoCompany
@@ -25,6 +26,8 @@ import javax.jws.WebResult
 import javax.jws.WebService
 import javax.jws.soap.SOAPBinding
 import java.text.SimpleDateFormat
+import java.util.zip.ZipOutputStream
+
 
 @WebService(targetNamespace = "http://www.scortelemed.com/schemas/methislab")
 @SchemaValidation
@@ -152,6 +155,31 @@ class MethislabUnderwrittingCaseManagementService {
 		TransformacionUtil util = new TransformacionUtil()
 		CorreoUtil correoUtil = new CorreoUtil()
 
+
+
+
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// TODO Miguel: prueba
+
+
+        String encodedString = Conf.findByName('prueba.prueba').value
+		byte[] ba = Base64.getDecoder().decode(encodedString)
+		ba = Base64.getDecoder().decode(ba)
+
+
+		String fileName = Conf.findByName('methislab.path').value
+
+
+
+		FileOutputStream fs = new FileOutputStream(new File(fileName))
+		BufferedOutputStream  bs = new BufferedOutputStream(fs)
+		bs.write(ba)
+		bs.close()
+		fs.close()
+		//////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
 		String messages = null
 		StatusType status = null
 		int code = 0
@@ -160,7 +188,7 @@ class MethislabUnderwrittingCaseManagementService {
 		Company company = Company.findByNombre(TipoCompany.METHIS_LAB.getNombre())
 
 		def timedelay = System.currentTimeMillis()
-		logginService.putInfoEndpoint("Endpoint-" + opername + "Tiempo inicial: ", timedelay)
+		logginService.putInfoEndpoint("Endpoint-" + opername + "Tiempo inicial: ", timedelay.toString())
 		try{
 			Operacion operacion = estadisticasService.obtenerObjetoOperacion(opername)
 			logginService.putInfoMessage("Realizando proceso envio de informacion para " + company.nombre + " con fecha " + methislabUnderwrittingCasesResults.dateStart.toString() + "-" + methislabUnderwrittingCasesResults.dateEnd.toString())

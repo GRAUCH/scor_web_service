@@ -37,7 +37,11 @@ class LogginService {
 	def putErrorMessage= { mensaje->
 		log.error (mensaje)
 	}
-	
+
+	def putDebugMessage= { mensaje->
+		log.debug(mensaje)
+	}
+
 	def dameDatosSession (){
 		
 		def request = WebUtils.retrieveGrailsWebRequest().getCurrentRequest()
