@@ -21,11 +21,16 @@ import grails.util.Environment
 import grails.util.Holders
 import hwsol.webservices.CorreoUtil
 import org.hibernate.transform.Transformers
+import org.apache.cxf.binding.soap.SoapFault
+import org.springframework.ws.soap.SoapFaultException
 import servicios.ClaveFiltro
 import servicios.Expediente
 import servicios.Filtro
 import servicios.RespuestaCRM
 import servicios.Usuario
+
+import javax.xml.namespace.QName
+import javax.xml.ws.soap.SOAPFaultException
 
 import javax.xml.ws.BindingProvider
 import java.text.SimpleDateFormat

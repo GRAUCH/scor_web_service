@@ -175,7 +175,7 @@ class WsController {
             return redirect(controller: 'dashboard', action: 'index', params: [idCia: ''])
         } catch (Exception ex) {
             logginService.putError("Endpoint-" + opername, "Error en al obtener resultados para las fechas " + fechaIni + "-" + fechaFin + ":" + ex)
-            correoUtil.envioEmail("AlptisUnderwrittingCasesResultsRequest", cases?.toString(), ex)
+            correoUtil.envioEmail("AlptisUnderwrittingCasesResultsRequest", cases?.toString() + ex, 0)
             flash.message = "KO - Ver logs"
             return redirect(controller: 'dashboard', action: 'index', params: [idCia: ''])
 //            responseRecette = soap.send(connectTimeout: 300000, readTimeout: 300000) {
