@@ -22,7 +22,7 @@ grails.project.fork = [
         // /* TODO: PARA DEPURAR DESCOMENTAR ESTE BLOQUE Y COMENTAR EL SUPERIOR
         test: false,
         run: false,
-        // */
+        //*/
         war: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, forkReserve:false],
         // configure settings for the Console UI JVM
         console: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256]
