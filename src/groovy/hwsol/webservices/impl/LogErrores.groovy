@@ -148,7 +148,7 @@ class LogErrores implements LogService{
         try {
             Error.executeQuery(hqlQueryBuilder.toString(), namedParams, sortParams)
         } catch (Exception e) {
-            logginService.putErrorMessage(this.class.getName() + "Error:" + e.getCause().getMessage())
+            logginService.putErrorMessage(this.class.getName() + ".findErrores: Error:" + e.getCause().getMessage())
             throw new Exception(e.getMessage(), e)
         }
     }

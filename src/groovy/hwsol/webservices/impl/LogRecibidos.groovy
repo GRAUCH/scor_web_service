@@ -109,7 +109,7 @@ class LogRecibidos implements LogService{
         try {
             Recibido.executeQuery(hqlQueryBuilder.toString(), namedParams, sortParams)
         } catch (Exception e) {
-            logginService.putErrorMessage(this.class.getName() + "Error:" + e.getCause().getMessage())
+            logginService.putErrorMessage(this.class.getName() + + ".findRecibidos: Error:" + e.getCause().getMessage())
             throw new Exception(e.getMessage(), e)
         }
     }

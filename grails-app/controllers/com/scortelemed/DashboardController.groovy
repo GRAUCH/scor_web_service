@@ -37,17 +37,29 @@ class DashboardController {
 
             Company company = null
             Calendar calHasta = Calendar.getInstance()
-            calHasta.set(Calendar.HOUR_OF_DAY, 23)
-            calHasta.set(Calendar.MINUTE, 59)
-            calHasta.set(Calendar.SECOND, 59)
-            calHasta.set(Calendar.MILLISECOND, 0)
+            if (params.hasta != null) {
+                calHasta.set(Calendar.YEAR, new Integer(params.hasta.split('/')[2]))
+                calHasta.set(Calendar.MONTH, new Integer(params.hasta.split('/')[1])-1)
+                calHasta.set(Calendar.DAY_OF_MONTH, new Integer(params.hasta.split('/')[0]))
+            }
+                calHasta.set(Calendar.HOUR_OF_DAY, 23)
+                calHasta.set(Calendar.MINUTE, 59)
+                calHasta.set(Calendar.SECOND, 59)
+                calHasta.set(Calendar.MILLISECOND, 0)
+
             Date hasta = calHasta.getTime()
 
             Calendar calDesde = Calendar.getInstance()
-            calDesde.set(Calendar.HOUR_OF_DAY, 0)
-            calDesde.set(Calendar.MINUTE, 0)
-            calDesde.set(Calendar.SECOND, 0)
-            calDesde.set(Calendar.MILLISECOND, 0)
+            if (params.desde != null) {
+                calDesde.set(Calendar.YEAR, new Integer(params.desde.split('/')[2]))
+                calDesde.set(Calendar.MONTH, new Integer(params.desde.split('/')[1])-1)
+                calDesde.set(Calendar.DAY_OF_MONTH, new Integer(params.desde.split('/')[0]))
+            }
+                calDesde.set(Calendar.HOUR_OF_DAY, 0)
+                calDesde.set(Calendar.MINUTE, 0)
+                calDesde.set(Calendar.SECOND, 0)
+                calDesde.set(Calendar.MILLISECOND, 0)
+
             Date desde = calDesde.getTime()
 
             SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy")
@@ -66,15 +78,15 @@ class DashboardController {
                 [ciasLog: ciasLog, company: ' ', elementos: elementos, ou: ou, desde: formatter.format(desde), hasta: formatter.format(hasta), max: params.max, lista: null, idCia: ' ']
             } else if (params.logs == 'recibido') {
                 LogService recibidos = LogFactory.newLogService(Recibido.class)
-                elementos = recibidos.obtener(company, formatter.parse(params.desde), formatter.parse(params.hasta), params.max)
+                elementos = recibidos.obtener(company, formatter.parse(desde), formatter.parse(hasta), params.max)
                 [ciasLog: ciasLog, company: company.nombre, elementos: elementos, ou: ou, desde: params.desde, hasta: params.hasta, max: params.max, lista: "listaRecibidos" + company.nombre + ".gsp", idCia: company.id]
             } else if (params.logs == 'error') {
                 LogService errores = LogFactory.newLogService(Error.class)
-                elementos = errores.obtener(company, formatter.parse(params.desde), formatter.parse(params.hasta), params.max)
+                elementos = errores.obtener(company, formatter.parse(desde), formatter.parse(hasta), params.max)
                 [ciasLog: ciasLog, company: company.nombre, elementos: elementos, ou: ou, desde: params.desde, hasta: params.hasta, max: params.max, lista: "listaErrores.gsp", idCia: company.id]
             } else {
                 LogService enviados = LogFactory.newLogService(Envio.class)
-                elementos = enviados.obtener(company, formatter.parse(params.desde), formatter.parse(params.hasta), params.max)
+                elementos = enviados.obtener(company, desde, hasta, params.max)
                 [ciasLog: ciasLog, company: company.nombre, elementos: elementos, ou: ou, desde: params.desde, hasta: params.hasta, max: params.max, lista: "listaEnviados.gsp", idCia: company.id]
             }
         }
