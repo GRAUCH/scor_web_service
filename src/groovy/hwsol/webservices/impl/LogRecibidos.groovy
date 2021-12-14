@@ -25,6 +25,8 @@ class LogRecibidos implements LogService{
 
     LogRecibidos(){}
 
+    def logginService
+
     List elementos
     Parser parser = new Parser()
 
@@ -103,6 +105,12 @@ class LogRecibidos implements LogService{
         namedParams["iniDate"] = desde
         hqlQueryBuilder << "ORDER BY fecha DESC"
         System.out.println("idCia ID  -->>" + company.id)
-        Recibido.executeQuery(hqlQueryBuilder.toString(), namedParams, sortParams)
+
+        try {
+            Recibido.executeQuery(hqlQueryBuilder.toString(), namedParams, sortParams)
+        } catch (Exception e) {
+            logginService.putErrorMessage(this.class.getName() + "Error:" + e.getCause().getMessage())
+            throw new Exception(e.getMessage(), e)
+        }
     }
 }

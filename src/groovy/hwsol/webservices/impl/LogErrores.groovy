@@ -2,6 +2,7 @@ package hwsol.webservices.impl
 
 import com.scortelemed.Company
 import com.scortelemed.Error
+import com.scortelemed.Recibido
 import com.scortelemed.TipoCompany
 import com.scortelemed.schemas.cbpita.CbpitaUnderwrittingCasesResultsRequest
 import com.scortelemed.schemas.enginyers.AddExp
@@ -20,6 +21,8 @@ import hwsol.webservices.LogService
 class LogErrores implements LogService{
 
     LogErrores(){}
+
+    def logginService
 
     List elementos
     Parser parser = new Parser()
@@ -142,7 +145,11 @@ class LogErrores implements LogService{
 
         System.out.println("idCia ID  -->>" + company.id)
 
-
-        Error.executeQuery(hqlQueryBuilder.toString(), namedParams, sortParams)
+        try {
+            Error.executeQuery(hqlQueryBuilder.toString(), namedParams, sortParams)
+        } catch (Exception e) {
+            logginService.putErrorMessage(this.class.getName() + "Error:" + e.getCause().getMessage())
+            throw new Exception(e.getMessage(), e)
+        }
     }
 }

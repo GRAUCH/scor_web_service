@@ -44,6 +44,8 @@ class LogEnviados implements LogService{
 
     LogEnviados(){}
 
+    def logginService
+
     List elementos
     Parser parser = new Parser()
 
@@ -122,7 +124,7 @@ class LogEnviados implements LogService{
         StringBuilder hqlQueryBuilder = new StringBuilder(' ')
 
         hqlQueryBuilder << 'FROM Envio AS envio  '
-        Map namedParams = [idCia: company.id]
+        Map namedParams = [idCia: company.id.toString()]
         hqlQueryBuilder << 'WHERE cia = :idCia '
         hqlQueryBuilder << 'AND '
         hqlQueryBuilder << "fecha BETWEEN  :iniDate "
@@ -131,10 +133,14 @@ class LogEnviados implements LogService{
         namedParams["endDate"] = hasta
         namedParams["iniDate"] = desde
 
-
         hqlQueryBuilder << "ORDER BY fecha DESC"
 
-        Recibido.executeQuery(hqlQueryBuilder.toString(), namedParams, sortParams)
+        try {
+            Recibido.executeQuery(hqlQueryBuilder.toString(), namedParams, sortParams)
+        } catch (Exception e) {
+            logginService.putErrorMessage(this.class.getName() + "Error:" + e.getCause().getMessage())
+            throw new Exception(e.getMessage(), e)
+        }
     }
 
     /**
