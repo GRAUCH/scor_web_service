@@ -95,7 +95,7 @@ class LogRecibidos implements LogService{
     private List<Recibido> findRecibidos(desde, hasta, Company company, Map sortParams) {
         StringBuilder hqlQueryBuilder = new StringBuilder(' ')
         hqlQueryBuilder << 'FROM Recibido AS recibido  '
-        Map namedParams = [idCia: company.id]
+        Map namedParams = [idCia: company.id.toString()]
         hqlQueryBuilder << 'WHERE cia = :idCia '
         hqlQueryBuilder << 'AND '
         hqlQueryBuilder << "fecha BETWEEN  :iniDate "

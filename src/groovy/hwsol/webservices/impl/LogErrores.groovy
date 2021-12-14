@@ -131,7 +131,7 @@ class LogErrores implements LogService{
         StringBuilder hqlQueryBuilder = new StringBuilder(' ')
 
         hqlQueryBuilder << 'FROM Error AS error  '
-        Map namedParams = [idCia: company.id]
+        Map namedParams = [idCia: company.id.toString()]
         hqlQueryBuilder << 'WHERE cia = :idCia '
         hqlQueryBuilder << 'AND '
         hqlQueryBuilder << "fecha BETWEEN  :iniDate "
