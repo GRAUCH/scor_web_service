@@ -138,11 +138,9 @@ environments {
                 }
 
                 soapClientCrearOrabpel {
-//					wsdl="wsdl/crear.wsdl"
                     wsdl = "http://172.17.0.33:8888/orabpel/default/CreacionExpedienteAsyncSRP/4.0?wsdl"
                     namespace = "com.scor.creacionexpedienteasyncsrp"
                     clientInterface = "com.scor.creacionexpedienteasyncsrp.CreacionExpedienteAsyncSRP"
-                    //serviceEndpointAddress="wsdl/crear.wsdl"
                     serviceEndpointAddress = "http://172.17.0.33:8888/orabpel/default/CreacionExpedienteAsyncSRP/4.0?wsdl"
                     connectionTimeout = 99999
                     enableDefaultLoggingInterceptors = false
@@ -176,11 +174,9 @@ environments {
                 }
 
                 soapClientCrearOrabpel {
-//					wsdl="wsdl/crear.wsdl"
                     wsdl = "http://172.17.0.33:8888/orabpel/default/CreacionExpedienteAsyncSRP/4.0?wsdl"
                     namespace = "com.scor.creacionexpedienteasyncsrp"
                     clientInterface = "com.scor.creacionexpedienteasyncsrp.CreacionExpedienteAsyncSRP"
-                    //serviceEndpointAddress="wsdl/crear.wsdl"
                     serviceEndpointAddress = "http://172.17.0.33:8888/orabpel/default/CreacionExpedienteAsyncSRP/4.0?wsdl"
                     connectionTimeout = 99999
                     enableDefaultLoggingInterceptors = false
@@ -310,21 +306,19 @@ log4j = {
                         name: 'infoAppender',
                         datePattern: "'.'yyyy-MM-dd",
                         threshold: org.apache.log4j.Level.INFO,
-                        fileName: 'C:\\temp\\scorWebserviceInfo.log',  //storage path of log file
+                        fileName: '/var/log/wildfly/appLogs/webservicessoap/scorWebserviceInfo.log',  //storage path of log file
                         layout: pattern(conversionPattern: '%d [%t] %-5p %c{2} %x - %m%n')
                 )
                 appender new DailyRollingFileAppender(
                         name: 'errorAppender',
                         datePattern: "'.'yyyy-MM-dd",
                         threshold: org.apache.log4j.Level.ERROR,
-                        fileName: 'C:\\temp\\scorWebserviceError.log',  //storage path of log file
+                        fileName: '/var/log/wildfly/appLogs/webservicessoap/scorWebserviceError.log',  //storage path of log file
                         layout: pattern(conversionPattern: '%d [%t] %-5p %c{2} %x - %m%n')
                 )
             }
 
         }
-
-
 
         preproduction_wildfly {
             println "Carga configuración log4j 'preproduction_wildfly'"
@@ -335,14 +329,14 @@ log4j = {
                         name: 'infoAppender',
                         datePattern: "'.'yyyy-MM-dd",
                         threshold: org.apache.log4j.Level.INFO,
-                        fileName: '/datos/apps/logs/webservicessoap/scorWebserviceInfo.log',  //storage path of log file
+                        fileName: '/var/log/wildfly/appLogs/webservicessoap/scorWebserviceInfo.log',  //storage path of log file
                         layout: pattern(conversionPattern: '%d [%t] %-5p %c{2} %x - %m%n')
                 )
                 appender new DailyRollingFileAppender(
                         name: 'errorAppender',
                         datePattern: "'.'yyyy-MM-dd",
                         threshold: org.apache.log4j.Level.ERROR,
-                        fileName: '/datos/apps/logs/webservicessoap/scorWebserviceError.log',  //storage path of log file
+                        fileName: '/var/log/wildfly/appLogs/webservicessoap/scorWebserviceError.log',  //storage path of log file
                         layout: pattern(conversionPattern: '%d [%t] %-5p %c{2} %x - %m%n')
                 )
             }
