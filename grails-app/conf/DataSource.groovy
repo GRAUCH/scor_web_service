@@ -64,6 +64,14 @@ environments {
         dataSource {
             jndiName = "java:jboss/datasources/MySqlscorwsDS"
         }
+
+        println "Carga configuración datasource 'test' SQL Server"
+        dataSource_CRMDynamics {
+            username = "sa"
+            password = "xY;;#MID!c!572"
+            url = "jdbc:sqlserver://172.17.0.36:1433;databaseName=ScorTelemed_MSCRM"
+            logSql = true
+        }
     }
 
     production_wildfly {
