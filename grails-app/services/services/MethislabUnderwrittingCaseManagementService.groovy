@@ -162,7 +162,7 @@ class MethislabUnderwrittingCaseManagementService {
 		// TODO Miguel: prueba
 
 
-        String encodedString = Conf.findByName('prueba.prueba').value
+        /*String encodedString = Conf.findByName('prueba.prueba').value
 		byte[] ba = Base64.getDecoder().decode(encodedString)
 		ba = Base64.getDecoder().decode(ba)
 
@@ -175,7 +175,7 @@ class MethislabUnderwrittingCaseManagementService {
 		BufferedOutputStream  bs = new BufferedOutputStream(fs)
 		bs.write(ba)
 		bs.close()
-		fs.close()
+		fs.close()*/
 		//////////////////////////////////////////////////////////////////////////////////////////////////
 
 
