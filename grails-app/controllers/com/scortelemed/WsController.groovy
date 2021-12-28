@@ -1001,4 +1001,8 @@ class WsController {
         }
         return literal
     }
+
+    boolean notNullNotEmpty(String entrada) {
+        return (entrada && !entrada.trim().isEmpty())
+    }
 }

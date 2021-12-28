@@ -169,7 +169,7 @@ class MethislabUnderwrittingCaseManagementService {
 				if (methislabUnderwrittingCasesResults && methislabUnderwrittingCasesResults.dateStart && methislabUnderwrittingCasesResults.dateEnd){
 
 					requestXML=methislabService.marshall(methislabUnderwrittingCasesResults)
-					requestBBDD = requestService.crear(opername,requestXML)
+					requestBBDD = requestService.crear(opername,requestXML) //TODO revisar
 
 					Date date = methislabUnderwrittingCasesResults.dateStart.toGregorianCalendar().getTime()
 					SimpleDateFormat sdfr = new SimpleDateFormat("yyyyMMdd HH:mm:ss")

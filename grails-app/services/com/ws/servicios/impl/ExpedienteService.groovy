@@ -45,8 +45,15 @@ class ExpedienteService implements IExpedienteService {
             def salida=grailsApplication.mainContext.soapClientAlptis.consultaExpediente(obtenerUsuarioFrontal(pais),filtro)
             return salida
         } catch (Exception e) {
-            logginService.putError("consultaExpediente","No se ha podido consultar el expediente " + e)
-            correoUtil.envioEmailErrores("consultaExpediente", "No se ha podido consultar el expediente ", e)
+            String error = "No se ha podido consultar el expediente"
+            Filtro actual = filtro
+            while (actual != null) {
+                error += " con "+actual.getClave()+" = "+actual.getValor()
+                actual = actual.getFiltroRelacionado()
+            }
+            correoUtil.envioEmailErrores("consultaExpediente", error, e)
+            error += ": Causa " + e
+            logginService.putError("consultaExpediente",error)
             return null
         }
     }
