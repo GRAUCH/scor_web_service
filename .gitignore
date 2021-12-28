@@ -10,3 +10,4 @@ scorWebservices.iml
 
 target/
 logs/
+.settings
