@@ -71,7 +71,7 @@ class MethislabCFService implements ICompanyService{
         expediente.setRequestDate(requestDate)
         expediente.setRequestNumber(util.devolverDatos(expedientePoliza.getNumSolicitud()))
         expediente.setRequestState(devolverStateType(expedientePoliza.getCodigoEstado()))
-        expediente.setProductCode(util.devolverDatos(expedientePoliza.getProducto().getCodigoProductoCompanyia()))
+        expediente.setProductCode(util.devolverDatos(expedientePoliza.getProducto().getCodigoProductoCompanya()))
         expediente.setPolicyNumber(util.devolverDatos(expedientePoliza.getNumPoliza()))
         expediente.setCertificateNumber(util.devolverDatos(expedientePoliza.getNumCertificado()))
 

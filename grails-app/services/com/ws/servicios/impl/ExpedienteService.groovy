@@ -369,8 +369,15 @@ class ExpedienteService implements IExpedienteService {
         final List<ExpedienteCRMDynamicsDTO> expedientes
 
         try {
+			
+			// Cogemos la sesión de Hibernate para el datasource del CRMDynamics
+			def ctx = grailsApplication.mainContext
+			System.out.println(ctx.toString())
+			def sessionFactory = ctx.sessionFactory_CRMDynamics
+			def sessionCRMDynamics = sessionFactory.currentSession
+			
             // Cogemos la sesión de Hibernate para el datasource del CRMDynamics
-            final sessionCRMDynamics = sessionFactory_CRMDynamics.currentSession
+            //final sessionCRMDynamics = sessionFactory_CRMDynamics.currentSession
 
             // Creamos la queryString con el parámetro :companyCodigoPais, :companyCodigoSt, :numSolicitud y :productoIdName
             // IMPORTANTE: HAY QUE REALIZAR EL CAST( XXX AS VARCHAR(5000)) PORQUE EN SQLSERVER SE PRODUCE UN ERROR DE DIALECT AL INTENTAR CREAR LA LISTA DE RESULTADOS
@@ -436,7 +443,12 @@ class ExpedienteService implements IExpedienteService {
 
         try {
             // Cogemos la sesión de Hibernate para el datasource del CRMDynamics
-            final sessionCRMDynamics = sessionFactory_CRMDynamics.currentSession
+            def ctx = grailsApplication.mainContext
+            System.out.println(ctx.toString())
+            def sessionFactory = ctx.sessionFactory_CRMDynamics
+            def sessionCRMDynamics = sessionFactory.currentSession
+
+            //final sessionCRMDynamics = sessionFactory_CRMDynamics.currentSession
 
             // Creamos la queryString con el parámetro :companyCodigoSt, :fechaIni, :fechaFin y :companyCodigoPais
             // IMPORTANTE: HAY QUE REALIZAR EL CAST( XXX AS VARCHAR(5000)) PORQUE EN SQLSERVER SE PRODUCE UN ERROR DE DIALECT AL INTENTAR CREAR LA LISTA DE RESULTADOS
@@ -503,7 +515,13 @@ class ExpedienteService implements IExpedienteService {
 
         try {
             // Cogemos la sesión de Hibernate para el datasource del CRMDynamics
-            final sessionCRMDynamics = sessionFactory_CRMDynamics.currentSession
+			def ctx = grailsApplication.mainContext
+			System.out.println(ctx.toString())
+			def sessionFactory = ctx.sessionFactory_CRMDynamics
+			def sessionCRMDynamics = sessionFactory.currentSession
+			
+            // Cogemos la sesión de Hibernate para el datasource del CRMDynamics
+            //final sessionCRMDynamics = sessionFactory_CRMDynamics.currentSession
 
             // Creamos la queryString con el parámetro :companyCodigoSt, :numSolicitud y :companyCodigoPais
             // IMPORTANTE: HAY QUE REALIZAR EL CAST( XXX AS VARCHAR(5000)) PORQUE EN SQLSERVER SE PRODUCE UN ERROR DE DIALECT AL INTENTAR CREAR LA LISTA DE RESULTADOS
@@ -568,7 +586,13 @@ class ExpedienteService implements IExpedienteService {
 
         try {
             // Cogemos la sesión de Hibernate para el datasource del CRMDynamics
-            final sessionCRMDynamics = sessionFactory_CRMDynamics.currentSession
+			def ctx = grailsApplication.mainContext
+			System.out.println(ctx.toString())
+			def sessionFactory = ctx.sessionFactory_CRMDynamics
+			def sessionCRMDynamics = sessionFactory.currentSession
+			
+            // Cogemos la sesión de Hibernate para el datasource del CRMDynamics
+            //final sessionCRMDynamics = sessionFactory_CRMDynamics.currentSession
 
             // Creamos la queryString con el parámetro :codigoExpedienteST
             // IMPORTANTE: HAY QUE REALIZAR EL CAST( XXX AS VARCHAR(5000)) PORQUE EN SQLSERVER SE PRODUCE UN ERROR DE DIALECT AL INTENTAR CREAR LA LISTA DE RESULTADOS
@@ -632,8 +656,14 @@ class ExpedienteService implements IExpedienteService {
         final List<ExpedienteCRMDynamicsDTO> expedientes
 
         try {
+			// Cogemos la sesión de Hibernate para el datasource del CRMDynamics
+			def ctx = grailsApplication.mainContext
+			System.out.println(ctx.toString())
+			def sessionFactory = ctx.sessionFactory_CRMDynamics
+			def sessionCRMDynamics = sessionFactory.currentSession
+			
             // Cogemos la sesión de Hibernate para el datasource del CRMDynamics
-            final sessionCRMDynamics = sessionFactory_CRMDynamics.currentSession
+            //final sessionCRMDynamics = sessionFactory_CRMDynamics.currentSession		
 
             // Creamos la queryString con el parámetro :codigoExpedienteST
             // IMPORTANTE: HAY QUE REALIZAR EL CAST( XXX AS VARCHAR(5000)) PORQUE EN SQLSERVER SE PRODUCE UN ERROR DE DIALECT AL INTENTAR CREAR LA LISTA DE RESULTADOS
@@ -692,7 +722,13 @@ class ExpedienteService implements IExpedienteService {
 
         try {
             // Cogemos la sesión de Hibernate para el datasource del CRMDynamics
-            final sessionCRMDynamics = sessionFactory_CRMDynamics.currentSession
+			def ctx = grailsApplication.mainContext
+			System.out.println(ctx.toString())
+			def sessionFactory = ctx.sessionFactory_CRMDynamics
+			def sessionCRMDynamics = sessionFactory.currentSession
+			
+            // Cogemos la sesión de Hibernate para el datasource del CRMDynamics
+            //final sessionCRMDynamics = sessionFactory_CRMDynamics.currentSession
 
             // Creamos la queryString con el parámetro :codigoExpedienteST
             // IMPORTANTE: HAY QUE REALIZAR EL CAST( XXX AS VARCHAR(5000)) PORQUE EN SQLSERVER SE PRODUCE UN ERROR DE DIALECT AL INTENTAR CREAR LA LISTA DE RESULTADOS

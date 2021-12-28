@@ -78,11 +78,11 @@ class DashboardController {
                 [ciasLog: ciasLog, company: ' ', elementos: elementos, ou: ou, desde: formatter.format(desde), hasta: formatter.format(hasta), max: params.max, lista: null, idCia: ' ']
             } else if (params.logs == 'recibido') {
                 LogService recibidos = LogFactory.newLogService(Recibido.class)
-                elementos = recibidos.obtener(company, formatter.parse(desde), formatter.parse(hasta), params.max)
+                elementos = recibidos.obtener(company, desde, hasta, params.max)
                 [ciasLog: ciasLog, company: company.nombre, elementos: elementos, ou: ou, desde: params.desde, hasta: params.hasta, max: params.max, lista: "listaRecibidos" + company.nombre + ".gsp", idCia: company.id]
             } else if (params.logs == 'error') {
                 LogService errores = LogFactory.newLogService(Error.class)
-                elementos = errores.obtener(company, formatter.parse(desde), formatter.parse(hasta), params.max)
+                elementos = errores.obtener(company, desde, hasta, params.max)
                 [ciasLog: ciasLog, company: company.nombre, elementos: elementos, ou: ou, desde: params.desde, hasta: params.hasta, max: params.max, lista: "listaErrores.gsp", idCia: company.id]
             } else {
                 LogService enviados = LogFactory.newLogService(Envio.class)

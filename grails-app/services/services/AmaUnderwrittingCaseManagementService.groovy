@@ -188,11 +188,9 @@ class AmaUnderwrittingCaseManagementService	 {
 
 					logginService.putInfoEndpoint("ResultadoSiniestro","Realizando peticion para " + company.nombre + " con fecha " + resultadoSiniestro.dateStart.toString().substring(0,10) +"-"+resultadoSiniestro.dateEnd.toString().substring(0,10))
 
-					requestService.insertarEnvio (company, resultadoSiniestro.dateStart.toString().substring(0,10) +"-"+resultadoSiniestro.dateEnd.toString().substring(0,10), requestXML.toString())
-
-
+					String idIdentificador = new Date().format( 'dd-mm-yyyy HH:mm:ss' )
 					if(expedientes){
-
+						requestService.insertarEnvio(company, "SOLICITUD: " + idIdentificador,requestXML.toString())
 						for(Expediente expedientePoliza: expedientes) {
 
 							/**
@@ -201,7 +199,7 @@ class AmaUnderwrittingCaseManagementService	 {
 							 */
 
 							if (amaService.expedienteGestionado(expedientePoliza, correoUtil, opername) && amaService.cumpleRequisitosVisualizacion(expedientePoliza, correoUtil, opername)){
-
+								requestService.insertarEnvio(company, "EXPEDIENTE: " + idIdentificador, "ST:" + expedientePoliza.getCodigoST() + "#CIA:" + expedientePoliza.getNumSolicitud())
 								resultado.getExpediente().add(amaService.rellenaDatosSalidaSiniestro(expedientePoliza))
 							}
 						}
@@ -216,13 +214,13 @@ class AmaUnderwrittingCaseManagementService	 {
 
 							notes = "No hay resultados para las fechas indicadas"
 							status = StatusType.OK
-
+							requestService.insertarEnvio(company, "SOLICITUD: " + idIdentificador , "No hay resultados para " + company.nombre)
 							logginService.putInfoEndpoint("ResultadoSiniestro","No hay resultados para " + company.nombre)
 					} else {
 
 						notes = "No hay resultados para las fechas indicadas"
 						status = StatusType.OK
-
+						requestService.insertarEnvio(company, "SOLICITUD: " + idIdentificador , "No hay resultados para " + company.nombre)
 						logginService.putInfoEndpoint("ResultadoSiniestro","No hay resultados para " + company.nombre)
 					}
 				} else {
@@ -483,11 +481,12 @@ class AmaUnderwrittingCaseManagementService	 {
 						logginService.putInfoMessage("Datos obligatorios incompletos. Es necesario indicar numExpediente o numSolicitud o numSolicitud+numSuplemento." + company.nombre)
 						return resultado
 					}
-					requestService.insertarEnvio(company, identificador, requestXML.toString())
 
+					String idIdentificador = new Date().format( 'dd-mm-yyyy HH:mm:ss' )
 					respuestaCRM = expedienteService.informeExpedientePorFiltro(filtro,company.ou)
 
 					if(respuestaCRM != null && respuestaCRM.getListaExpedientesInforme() != null && respuestaCRM.getListaExpedientesInforme().size() > 0){
+						requestService.insertarEnvio(company, "SOLICITUD: " + idIdentificador , requestXML.toString())
 
 						for (int i = 0; i < respuestaCRM.getListaExpedientesInforme().size(); i++){
 
@@ -498,7 +497,7 @@ class AmaUnderwrittingCaseManagementService	 {
 							 */
 
 							if (expediente.getCandidato().getCompanya().getCodigoST().equals(company.getCodigoSt())) {
-
+								requestService.insertarEnvio(company, "EXPEDIENTE: " + idIdentificador, "ST:" + expediente.getCodigoST() + "#CIA:" + expedientePoliza.getNumSolicitud())
 								resultado.getExpediente().add(amaService.rellenaDatosSalidaConsultaExpediente(expediente, new SimpleDateFormat("yyyyMMdd").format(new Date()), respuestaCRM))
 							}
 							if (resultado.getExpediente() != null) {
@@ -514,6 +513,7 @@ class AmaUnderwrittingCaseManagementService	 {
 						resultado.setNotes("No hay resultados para el expediente indicado")
 						resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 						resultado.setStatus(StatusType.OK)
+						requestService.insertarEnvio(company, "SOLICITUD: " + idIdentificador , "No hay resultados para " + company.nombre)
 						logginService.putInfoMessage("No hay resultados para " + company.nombre)
 					}
 
@@ -583,20 +583,20 @@ class AmaUnderwrittingCaseManagementService	 {
 
 					respuestaCRM = expedienteService.informeExpedientePorFiltro(filtro,company.ou)
 
-					if (consultaDocumento.nodoAlfresco != null && !consultaDocumento.nodoAlfresco.isEmpty()) {
+					String idIdentificador = new Date().format( 'dd-mm-yyyy HH:mm:ss' )
 
+					if (consultaDocumento.nodoAlfresco != null && !consultaDocumento.nodoAlfresco.isEmpty()) {
+						requestService.insertarEnvio(company, "SOLICITUD: " + idIdentificador, requestXML.toString())
 						if (amaService.existeDocumentoNodo(respuestaCRM,consultaDocumento.nodoAlfresco)) {
 
 							requestXML=amaService.marshall(consultaDocumento)
 							requestBBDD=requestService.crear(opername,requestXML)
-							requestService.insertarEnvio(company, consultaDocumento.nodoAlfresco.substring(consultaDocumento.nodoAlfresco.lastIndexOf("/")+1,consultaDocumento.nodoAlfresco.length()), requestXML.toString())
-
 							resultado.setDocumento(amaService.rellenaDatosSalidaDocumentoNodo(consultaDocumento.nodoAlfresco, util.fromDateToXmlCalendar(new Date()), logginService, consultaDocumento.codigoSt))
 
 
 
 							if (resultado.getDocumento() != null) {
-
+								requestService.insertarEnvio(company, "NODO: " + idIdentificador, consultaDocumento.nodoAlfresco.substring(consultaDocumento.nodoAlfresco.lastIndexOf("/")+1,consultaDocumento.nodoAlfresco.length()))
 								resultado.setMessage("Resultados devueltos")
 								resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 								resultado.setStatus(StatusType.OK)
@@ -606,6 +606,7 @@ class AmaUnderwrittingCaseManagementService	 {
 								resultado.setMessage("No hay resultados para el nodo indicado")
 								resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 								resultado.setStatus(StatusType.OK)
+								requestService.insertarEnvio(company, "NODO: " + idIdentificador, "No hay resultados para " + company.nombre)
 								logginService.putInfoMessage("No hay resultados para " + company.nombre)
 							}
 
@@ -616,20 +617,21 @@ class AmaUnderwrittingCaseManagementService	 {
 							resultado.setMessage("Este nodo no pertenece a este expediente")
 							resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 							resultado.setStatus(StatusType.OK)
+							requestService.insertarEnvio(company, "NODO: " + idIdentificador, "Este nodo no pertenece a este expediente." + company.nombre)
 							logginService.putInfoMessage("Este nodo no pertenece a este expediente." + company.nombre)
 						}
 					} else if (consultaDocumento.documentacionId != null && !consultaDocumento.documentacionId.isEmpty()) {
-
+						requestService.insertarEnvio(company, "SOLICITUD: " + idIdentificador, requestXML.toString())
 						if (amaService.existeDocumentoId(respuestaCRM,consultaDocumento.documentacionId)) {
 
 							requestXML=amaService.marshall(consultaDocumento)
 							requestBBDD=requestService.crear(opername,requestXML)
-							requestService.insertarEnvio(company, consultaDocumento.documentacionId, requestXML.toString())
+
 
 							resultado.setDocumento(amaService.rellenaDatosSalidaDocumentoId(consultaDocumento.documentacionId, util.fromDateToXmlCalendar(new Date()), logginService, consultaDocumento.codigoSt))
 
 							if (resultado.getDocumento() != null) {
-
+								requestService.insertarEnvio(company, "NODO: " + idIdentificador, consultaDocumento.nodoAlfresco.substring(consultaDocumento.nodoAlfresco.lastIndexOf("/")+1,consultaDocumento.nodoAlfresco.length()))
 								resultado.setMessage("Resultados devueltos")
 								resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 								resultado.setStatus(StatusType.OK)
@@ -639,6 +641,7 @@ class AmaUnderwrittingCaseManagementService	 {
 								resultado.setMessage("No hay resultados para el documentoId indicado")
 								resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 								resultado.setStatus(StatusType.OK)
+								requestService.insertarEnvio(company, "NODO: " + idIdentificador, "No hay resultados para " + company.nombre )
 								logginService.putInfoMessage("No hay resultados para " + company.nombre)
 							}
 
@@ -649,6 +652,7 @@ class AmaUnderwrittingCaseManagementService	 {
 							resultado.setMessage("Este documentoId no pertenece a este expediente")
 							resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 							resultado.setStatus(StatusType.OK)
+							requestService.insertarEnvio(company, "NODO: " + idIdentificador, "Este documentoId no pertenece a este expediente." + company.nombre )
 							logginService.putInfoMessage("Este documentoId no pertenece a este expediente." + company.nombre)
 						}
 					} else {
