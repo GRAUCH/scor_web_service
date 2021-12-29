@@ -918,7 +918,7 @@ class WsController {
         RespuestaCRM respuestaCRM = expedienteService.consultaExpedienteCodigoST(codigost, unidad)
        if(respuestaCRM?.getListaExpedientes()?.size() > 0) {
            Expediente expediente = respuestaCRM?.getListaExpedientes()?.get(0)
-           def zip = commonZipService.obtenerZipFile(expediente)
+           def zip = commonZipService.obtenerZipFile(expediente.nodoAlfresco)
 
            String contentDisposition = 'attachment'
            String mimeType2 = 'APPLICATION/OCTET-STREAM'
