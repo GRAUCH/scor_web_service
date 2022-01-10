@@ -97,13 +97,8 @@ class MethislabService implements ICompanyService{
 
         byte[] compressedData = commonZipService.obtenerZip(expedientePoliza.getNodoAlfresco())
 
-
-
         expediente.setZip(compressedData)
 
-
-
-        //TODO Miguel: guardar fichero
         //As data received was encoded in base64 twice, should be decode twice times
         byte[] ba = Base64.getDecoder().decode(compressedData)
         ba = Base64.getDecoder().decode(ba)
@@ -118,6 +113,9 @@ class MethislabService implements ICompanyService{
         bs.write(ba)
         bs.close()
         fs.close()
+
+        logginService.putInfoMessage("Los ficheros del expedinte ${expedientePoliza.getNumSolicitud()} " +
+                "se guardo en la ruta ${fileName}")
 
         expediente.setNotes(util.devolverDatos(expedientePoliza.getTarificacion().getObservaciones()))
 
