@@ -15,6 +15,8 @@ import org.apache.log4j.DailyRollingFileAppender
 
 grails.project.groupId = appName // change this to alter the default package name and Maven publishing destination
 
+grails.app.context = '/webservicessoap'
+
 // The ACCEPT header will not be used for content negotiation for user agents containing the following strings (defaults to the 4 major rendering engines)
 grails.mime.disable.accept.header.userAgents = ['Gecko', 'WebKit', 'Presto', 'Trident']
 grails.mime.types = [ // the first one is the default format
@@ -297,6 +299,14 @@ log4j = {
                         fileName: './logs/scorWebserviceError.log',  //storage path of log file
                         layout: pattern(conversionPattern: '%d [%t] %-5p %c{2} %x - %m%n')
                 )
+                appender new DailyRollingFileAppender(
+                        name: 'debugAppender',
+                        datePattern: "'.'yyyy-MM-dd",
+                        threshold: org.apache.log4j.Level.DEBUG,
+                        fileName: './logs/scorWebserviceDebug.log',  //storage path of log file
+                        layout: pattern(conversionPattern: '%d [%t] %-5p %c{2} %x - %m%n')
+
+                )
             }
 
         }
@@ -374,7 +384,8 @@ log4j = {
 
     }
 
-    error 'org.codehaus.groovy.grails.web.servlet',  //  controllers
+    error additivity: false,
+            errorAppender: ['org.codehaus.groovy.grails.web.servlet',  //  controllers
             'org.codehaus.groovy.grails.web.pages', //  GSP
             'org.codehaus.groovy.grails.web.sitemesh', //  layouts
             'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
@@ -384,18 +395,23 @@ log4j = {
             'org.codehaus.groovy.grails.orm.hibernate', // hibernate integration
             'org.springframework',
             'org.hibernate',
-            'net.sf.ehcache.hibernate'
+            'net.sf.ehcache.hibernate']
 
-    warn 'org.springframework',
+    warn additivity: false,
+            infoAppender: ['org.springframework',
             'org.hibernate',
             'grails.plugins.springsecurity',
-            'groovyx.net.http'
+            'groovyx.net.http']
+
+    debug additivity: false,
+            debugAppender: ["grails.app"]
 
     root {
         error 'errorAppender'
         info 'infoAppender'
-        additivity = false
     }
+
+
 
 
 }
