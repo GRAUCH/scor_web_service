@@ -155,31 +155,6 @@ class MethislabUnderwrittingCaseManagementService {
 		TransformacionUtil util = new TransformacionUtil()
 		CorreoUtil correoUtil = new CorreoUtil()
 
-
-
-
-		/////////////////////////////////////////////////////////////////////////////////////////////////////////
-		// TODO Miguel: prueba
-
-
-        /*String encodedString = Conf.findByName('prueba.prueba').value
-		byte[] ba = Base64.getDecoder().decode(encodedString)
-		ba = Base64.getDecoder().decode(ba)
-
-
-		String fileName = Conf.findByName('methislab.path').value
-
-
-
-		FileOutputStream fs = new FileOutputStream(new File(fileName))
-		BufferedOutputStream  bs = new BufferedOutputStream(fs)
-		bs.write(ba)
-		bs.close()
-		fs.close()*/
-		//////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
 		String messages = null
 		StatusType status = null
 		int code = 0
