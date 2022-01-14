@@ -62,13 +62,9 @@ environments {
     }
 
     development {
-        println "Carga configuración datasource 'development'"
-        dataSource {
-            dbCreate = "update"
-            username = "root"
-            password = "root"
-            url = "jdbc:mysql://localhost/scorws-prepro"
-        }
+        // the necessary properties are already defined previously on the begin of this file.
+        println "Carga configuración datasource 'integration'"
+        println "Carga configuración dataSource_CRMDynamics 'integration'"
     }
 
     integration {
