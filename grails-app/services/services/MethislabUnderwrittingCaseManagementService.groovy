@@ -1,6 +1,7 @@
 package services
 
 import com.scortelemed.Company
+import com.scortelemed.Conf
 import com.scortelemed.Operacion
 import com.scortelemed.Request
 import com.scortelemed.TipoCompany
@@ -25,6 +26,8 @@ import javax.jws.WebResult
 import javax.jws.WebService
 import javax.jws.soap.SOAPBinding
 import java.text.SimpleDateFormat
+import java.util.zip.ZipOutputStream
+
 
 @WebService(targetNamespace = "http://www.scortelemed.com/schemas/methislab")
 @SchemaValidation

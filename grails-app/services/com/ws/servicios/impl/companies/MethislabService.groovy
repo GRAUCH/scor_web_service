@@ -5,6 +5,7 @@ import com.scor.global.WSException
 import com.scor.srpfileinbound.DATOS
 import com.scor.srpfileinbound.REGISTRODATOS
 import com.scortelemed.Company
+import com.scortelemed.Conf
 import com.scortelemed.Request
 import com.scortelemed.TipoCompany
 import com.scortelemed.schemas.methislab.*
@@ -24,6 +25,8 @@ import org.xml.sax.InputSource
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 class MethislabService implements ICompanyService{
 
@@ -96,6 +99,24 @@ class MethislabService implements ICompanyService{
         byte[] compressedData = commonZipService.obtenerZip(expedientePoliza.getNodoAlfresco())
 
         expediente.setZip(compressedData)
+
+        //As data received was encoded in base64 twice, should be decode twice times
+        byte[] ba = Base64.getDecoder().decode(compressedData)
+        ba = Base64.getDecoder().decode(ba)
+
+        LocalDate localDate = LocalDate.now();//For reference
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        String dateString = localDate.format(formatter);
+        String fileName = "${Conf.findByName('methislab.path').value}/${expedientePoliza.getNumSolicitud}_${expedientePoliza.getNumSolicitud}_${dateString}.zip"
+
+        FileOutputStream fs = new FileOutputStream(new File(fileName))
+        BufferedOutputStream  bs = new BufferedOutputStream(fs)
+        bs.write(ba)
+        bs.close()
+        fs.close()
+
+        logginService.putInfoMessage("Los ficheros del expedinte ${expedientePoliza.getNumSolicitud()} " +
+                "se guardo en la ruta ${fileName}")
 
         expediente.setNotes(util.devolverDatos(expedientePoliza.getTarificacion().getObservaciones()))
 
