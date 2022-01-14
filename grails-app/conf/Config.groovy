@@ -78,7 +78,7 @@ grails.hibernate.pass.readonly = false
 grails.hibernate.osiv.readonly = false
 
 environments {
-    test {
+    local {
         grails.logging.jul.usebridge = true
         println "Carga configuración entorno 'test'"
 
@@ -155,8 +155,9 @@ environments {
         }
     }
 
-    preproduction_wildfly {
-        println "Carga configuración entorno 'preproduction_wildfly'"
+    integration {
+        println "Carga configuración entorno 'integration'"
+
         grails.logging.jul.usebridge = true
 
         zipPath = "/datos/scorWebservices/MethisLab"
@@ -193,8 +194,46 @@ environments {
         }
     }
 
-    production_wildfly{
-        println "Carga configuración entorno 'production_wildfly'"
+    preproduction {
+        println "Carga configuración entorno 'preproduction'"
+        grails.logging.jul.usebridge = true
+
+        zipPath = "/datos/scorWebservices/MethisLab"
+
+        cxf {
+            client {
+                soapClientAlptis {
+                    wsdl = "http://172.17.0.33:8003/FrontalServiciosCRM/FrontalService?wsdl"
+                    namespace = "servicios"
+                    clientInterface = "servicios.Frontal"
+                    serviceEndpointAddress = "http://172.17.0.33:8003/FrontalServiciosCRM/FrontalService?wsdl"
+                    connectionTimeout = 99999
+                    enableDefaultLoggingInterceptors = false
+                }
+
+                soapClientComprimidoAlptis {
+                    wsdl = "http://172.17.0.33:8888/orabpel/default/ComprimirDocumentos/ComprimirDocumentos?wsdl"
+                    namespace = "com.scor.comprimirdocumentos"
+                    clientInterface = "com.scor.comprimirdocumentos.ComprimirDocumentos"
+                    serviceEndpointAddress = "http://172.17.0.33:8888/orabpel/default/ComprimirDocumentos/1.0"
+                    connectionTimeout = 99999
+                    enableDefaultLoggingInterceptors = false
+                }
+
+                soapClientCrearOrabpel {
+                    wsdl = "http://172.17.0.33:8888/orabpel/default/CreacionExpedienteAsyncSRP/4.0?wsdl"
+                    namespace = "com.scor.creacionexpedienteasyncsrp"
+                    clientInterface = "com.scor.creacionexpedienteasyncsrp.CreacionExpedienteAsyncSRP"
+                    serviceEndpointAddress = "http://172.17.0.33:8888/orabpel/default/CreacionExpedienteAsyncSRP/4.0?wsdl"
+                    connectionTimeout = 99999
+                    enableDefaultLoggingInterceptors = false
+                }
+            }
+        }
+    }
+
+    production{
+        println "Carga configuración entorno 'production'"
         grails.logging.jul.usebridge = false
 
         zipPath = "/datos/scorWebservices/MethisLab"

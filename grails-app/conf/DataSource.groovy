@@ -27,7 +27,8 @@ hibernate {
 
 // environment specific settings
 environments {
-    test {
+
+    local {
         println "Carga configuración datasource 'test' MySQL"
         dataSource {
 			jndiName = "" // we set to empty to avoid the default value defined previously.
@@ -70,14 +71,21 @@ environments {
         }
     }
 
-    preproduction_wildfly {
-		// the necessary properties are already defined previously on the begin of this file.
-        println "Carga configuración datasource 'preproduction_wildfly'"
-        println "Carga configuración dataSource_CRMDynamics 'preproduction_wildfly'"
+    integration {
+        // the necessary properties are already defined previously on the begin of this file.
+        println "Carga configuración datasource 'integration'"
+        println "Carga configuración dataSource_CRMDynamics 'integration'"
     }
 
-    production_wildfly {
+    preproduction {
 		// the necessary properties are already defined previously on the begin of this file.
-        println "Carga configuración datasource 'production_wildfly'"
+        println "Carga configuración datasource 'preproduction'"
+        println "Carga configuración dataSource_CRMDynamics 'preproduction'"
+    }
+
+    production {
+		// the necessary properties are already defined previously on the begin of this file.
+        println "Carga configuración datasource 'production'"
+        println "Carga configuración dataSource_CRMDynamics 'production'"
     }
 }
