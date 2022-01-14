@@ -35,7 +35,7 @@ class MethislabService implements ICompanyService{
     def requestService = Holders.grailsApplication.mainContext.getBean("requestService")
     def logginService = Holders.grailsApplication.mainContext.getBean("logginService")
     def tarificadorService = Holders.grailsApplication.mainContext.getBean("tarificadorService")
-
+    def grailsApplication = Holders.getGrailsApplication()
 
     String marshall(def objeto) {
         String nameSpace = "http://www.scortelemed.com/schemas/methislab"
@@ -107,7 +107,7 @@ class MethislabService implements ICompanyService{
         LocalDate localDate = LocalDate.now();//For reference
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         String dateString = localDate.format(formatter);
-        String fileName = "${Conf.findByName('methislab.path').value}/${expedientePoliza.getNumSolicitud}_${expedientePoliza.getNumSolicitud}_${dateString}.zip"
+        String fileName = grailsApplication.config.zipPath + "/${expedientePoliza.getNumSolicitud}_${expedientePoliza.getNumSolicitud}_${dateString}.zip"
 
         FileOutputStream fs = new FileOutputStream(new File(fileName))
         BufferedOutputStream  bs = new BufferedOutputStream(fs)

@@ -82,6 +82,8 @@ environments {
         grails.logging.jul.usebridge = true
         println "Carga configuración entorno 'test'"
 
+        zipPath = "/datos/scorWebservices/MethisLab"
+
         cxf {
             client {
                 soapClientAlptis {
@@ -119,6 +121,8 @@ environments {
 
         grails.logging.jul.usebridge = true
 
+        zipPath = "/datos/scorWebservices/MethisLab"
+
         cxf {
             client {
                 soapClientAlptis {
@@ -155,6 +159,8 @@ environments {
         println "Carga configuración entorno 'preproduction_wildfly'"
         grails.logging.jul.usebridge = true
 
+        zipPath = "/datos/scorWebservices/MethisLab"
+
         cxf {
             client {
                 soapClientAlptis {
@@ -190,6 +196,9 @@ environments {
     production_wildfly{
         println "Carga configuración entorno 'production_wildfly'"
         grails.logging.jul.usebridge = false
+
+        zipPath = "/datos/scorWebservices/MethisLab"
+
         cxf {
             client {
                 soapClientAlptis {
