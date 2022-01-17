@@ -24,6 +24,9 @@ import org.xml.sax.InputSource
 
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
+import java.nio.file.Path
+import java.nio.file.Paths
+import java.nio.file.Files
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -100,14 +103,19 @@ class MethislabService implements ICompanyService{
 
         expediente.setZip(compressedData)
 
-        //As data received was encoded in base64 twice, should be decode twice times
         byte[] ba = Base64.getDecoder().decode(compressedData)
-        ba = Base64.getDecoder().decode(ba)
-
+        
         LocalDate localDate = LocalDate.now();//For reference
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         String dateString = localDate.format(formatter);
-        String fileName = grailsApplication.config.zipPath + "/${expedientePoliza.getNumSolicitud}_${expedientePoliza.getNumSolicitud}_${dateString}.zip"
+
+        String pathString = grailsApplication.config.zipPath
+        String fileName = pathString + "/${expedientePoliza.getNumSolicitud()}_${expedientePoliza.getCodigoST()}_${dateString}.zip"
+
+        Path path = Paths.get(pathString)
+        if (!Files.exists(path)){
+            Files.createDirectories(path);
+        }
 
         FileOutputStream fs = new FileOutputStream(new File(fileName))
         BufferedOutputStream  bs = new BufferedOutputStream(fs)
