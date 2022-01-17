@@ -324,7 +324,7 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
 
 log4j = {
     environments {
-        test {
+        local {
             println "Carga configuración log4j 'test'"
             appenders {
                 layout:
@@ -333,21 +333,21 @@ log4j = {
                         name: 'infoAppender',
                         datePattern: "'.'yyyy-MM-dd",
                         threshold: org.apache.log4j.Level.INFO,
-                        fileName: './logs/scorWebserviceInfo.log',  //storage path of log file
+                        fileName: '/var/log/wildfly/appLogs/webservicessoap/scorWebserviceInfo.log',  //storage path of log file
                         layout: pattern(conversionPattern: '%d [%t] %-5p %c{2} %x - %m%n')
                 )
                 appender new DailyRollingFileAppender(
                         name: 'errorAppender',
                         datePattern: "'.'yyyy-MM-dd",
                         threshold: org.apache.log4j.Level.ERROR,
-                        fileName: './logs/scorWebserviceError.log',  //storage path of log file
+                        fileName: '/var/log/wildfly/appLogs/webservicessoap/scorWebserviceError.log',  //storage path of log file
                         layout: pattern(conversionPattern: '%d [%t] %-5p %c{2} %x - %m%n')
                 )
                 appender new DailyRollingFileAppender(
                         name: 'debugAppender',
                         datePattern: "'.'yyyy-MM-dd",
                         threshold: org.apache.log4j.Level.DEBUG,
-                        fileName: './logs/scorWebserviceDebug.log',  //storage path of log file
+                        fileName: '/var/log/wildfly/appLogs/webservicessoap/scorWebserviceDebug.log',  //storage path of log file
                         layout: pattern(conversionPattern: '%d [%t] %-5p %c{2} %x - %m%n')
 
                 )
