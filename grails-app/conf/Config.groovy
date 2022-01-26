@@ -80,7 +80,7 @@ grails.hibernate.osiv.readonly = false
 environments {
     local {
         grails.logging.jul.usebridge = true
-        println "Carga configuración entorno 'test'"
+        println "Carga configuración entorno 'local'"
 
         zipPath = "/datos/scorWebservices/MethisLab"
 
@@ -325,7 +325,7 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
 log4j = {
     environments {
         local {
-            println "Carga configuración log4j 'test'"
+            println "Carga configuración log4j 'local'"
             appenders {
                 layout:
                 pattern(conversionPattern: '%c{2} %m%n')

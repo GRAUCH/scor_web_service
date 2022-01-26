@@ -29,7 +29,7 @@ hibernate {
 environments {
 
     local {
-        println "Carga configuración datasource 'test' MySQL"
+        println "Carga configuración datasource 'local' MySQL"
         dataSource {
 			jndiName = "" // we set to empty to avoid the default value defined previously.
             dbCreate = "update" // one of 'create', 'create-drop','update'
@@ -43,7 +43,7 @@ environments {
             }
         }
 
-        println "Carga configuración datasource 'test' SQL Server"
+        println "Carga configuración datasource 'local' SQL Server"
         dataSource_CRMDynamics {
 			jndiName = "" // we set to empty to avoid the default value defined previously.
             username = "sa"
@@ -63,8 +63,8 @@ environments {
 
     development {
         // the necessary properties are already defined previously on the begin of this file.
-        println "Carga configuración datasource 'integration'"
-        println "Carga configuración dataSource_CRMDynamics 'integration'"
+        println "Carga configuración datasource 'development'"
+        println "Carga configuración dataSource_CRMDynamics 'development'"
     }
 
     integration {

@@ -90,10 +90,10 @@ class CaserService implements ICompanyService{
             DATOS dato = new DATOS()
             Company company = req.company
 
-            dato.coberturas = rellenaCoberturasInfantil(req)
+            dato.coberturas = rellenaCoberturasInfantil(req, iteradorCandidatos)
             dato.registro = rellenaDatosInfantil(req, company, dato.coberturas, iteradorCandidatos)
             dato.pregunta = rellenaPreguntas(req, company.nombre)
-            dato.servicio = rellenaServicios(req)
+            dato.servicio = rellenaServiciosInfantil(req, iteradorCandidatos)
 
             return dato
         } catch (Exception e) {
@@ -102,14 +102,13 @@ class CaserService implements ICompanyService{
         }
     }
 
-    def rellenaDatosInfantil(req, company, coberturas, candidateIteratorIndex) {
+    def rellenaDatosInfantil(Request req, Company company, List<DATOS.Coberturas> coberturas, int candidateIteratorIndex) {
 
         def formato = new SimpleDateFormat("yyyyMMdd")
         def apellido
         def telefono1
         def telefono2
         def telefonoMovil
-        def nombreAgente
         Map<String, Boolean> candidateIdentificationCodes = obtenerIdentificationNumberCandidatos(req)
 
         REGISTRODATOS datosRegistro = new REGISTRODATOS()
@@ -1311,7 +1310,7 @@ class CaserService implements ICompanyService{
         }
     }
 
-    private def rellenaCoberturasInfantil(req) {
+    private def rellenaCoberturasInfantil(Request req, int candidateIteratorIndex) {
 
         def listadoCoberturas = []
         def capital
@@ -1355,56 +1354,64 @@ class CaserService implements ICompanyService{
                 }
             }
 
-            /**Calculamos las coberturas en base al producto
+            /**Calculamos las coberturas en base al producto y candidato
              *
              */
 
-            NodeList nList = doc.getElementsByTagName("BenefitsType")
+            NodeList candidateNodeList = doc.getElementsByTagName("CandidateInformation")
 
-            for (int temp = 0; temp < nList.getLength(); temp++) {
+            Node candidateNode = candidateNodeList.item(candidateIteratorIndex)
 
-                Node nNode = nList.item(temp)
+            if (candidateNode.getNodeType() == Node.ELEMENT_NODE) {
 
-                if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+                Element candidateElement = (Element) candidateNode
 
-                    Element eElement = (Element) nNode
+                NodeList nList = candidateElement.getElementsByTagName("BenefitsType")
 
-                    DATOS.Coberturas cobertura = new DATOS.Coberturas()
+                for (int temp = 0; temp < nList.getLength(); temp++) {
 
-                    /**COBERTURAS QUE NOS LLEGA SIEMPRE ES COB5
-                     *
-                     */
-                    cobertura.filler = ""
-                    cobertura.codigoCobertura = eElement.getElementsByTagName("benefictCode").item(0).getTextContent().toUpperCase()
-                    cobertura.capital = Float.parseFloat(eElement.getElementsByTagName("benefictCapital").item(0).getTextContent())
+                    Node nNode = nList.item(temp)
 
-                    listadoCoberturas.add(cobertura)
+                    if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
-                    capital = Float.parseFloat(eElement.getElementsByTagName("benefictCapital").item(0).getTextContent())
+                        Element eElement = (Element) nNode
+
+                        DATOS.Coberturas cobertura = new DATOS.Coberturas()
+
+                        /**COBERTURAS QUE NOS LLEGAN
+                         *
+                         */
+                        cobertura.filler = ""
+                        cobertura.codigoCobertura = eElement.getElementsByTagName("benefictCode").item(0).getTextContent().toUpperCase()
+                        cobertura.capital = Float.parseFloat(eElement.getElementsByTagName("benefictCapital").item(0).getTextContent())
+
+                        listadoCoberturas.add(cobertura)
+
+                        capital = Float.parseFloat(eElement.getElementsByTagName("benefictCapital").item(0).getTextContent())
+                    }
+                }
+
+                if (codigoProducto.equals("SRP")) {
+
+                    DATOS.Coberturas cobertura_1 = new DATOS.Coberturas()
+
+                    cobertura_1.filler = ""
+                    cobertura_1.codigoCobertura = "COB2"
+                    cobertura_1.nombreCobertura = "ACCIDENTE"
+                    cobertura_1.capital = capital
+
+                    listadoCoberturas.add(cobertura_1)
+
+                    DATOS.Coberturas cobertura_2 = new DATOS.Coberturas()
+
+                    cobertura_2.filler = ""
+                    cobertura_2.codigoCobertura = "COB4"
+                    cobertura_2.nombreCobertura = "INVALIDEZ"
+                    cobertura_2.capital = capital
+
+                    listadoCoberturas.add(cobertura_2)
                 }
             }
-
-            if (codigoProducto.equals("SRP")) {
-
-                DATOS.Coberturas cobertura_1 = new DATOS.Coberturas()
-
-                cobertura_1.filler = ""
-                cobertura_1.codigoCobertura = "COB2"
-                cobertura_1.nombreCobertura = "ACCIDENTE"
-                cobertura_1.capital = capital
-
-                listadoCoberturas.add(cobertura_1)
-
-                DATOS.Coberturas cobertura_2 = new DATOS.Coberturas()
-
-                cobertura_2.filler = ""
-                cobertura_2.codigoCobertura = "COB4"
-                cobertura_2.nombreCobertura = "INVALIDEZ"
-                cobertura_2.capital = capital
-
-                listadoCoberturas.add(cobertura_2)
-            }
-
 
             return listadoCoberturas
 
@@ -1424,29 +1431,95 @@ class CaserService implements ICompanyService{
             unidadOrganizativaCompanyia = company.getOu().toString()
             codigoProductoCompanyia = gestionReconocimientoMedicoInfantil.getPolicyInformation().getProductCode()
 
-            List<GestionReconocimientoMedicoInfantilRequest.BenefitsType> benefitsTypeList = gestionReconocimientoMedicoInfantil.getBenefitsType()
+            boolean errorValidacion = false
+            List<String> listaErroresValidacion = new ArrayList<>()
 
-            Collection<Validation> validationCollection = validationService.obtenerValidaciones(codigoCompanyiaST, unidadOrganizativaCompanyia, codigoProductoCompanyia)
+            for (GestionReconocimientoMedicoInfantilRequest.CandidateInformation candidate : gestionReconocimientoMedicoInfantil.getCandidateInformation())
+                {
+                    List<GestionReconocimientoMedicoInfantilRequest.BenefitsType> benefitsTypeList = candidate.getBenefitsType()
 
-            Set<String> benefitsValidationCodes = validationService.obtenerBenefitCodes(validationCollection)
+                    Collection<Validation> validationCollection = validationService.obtenerValidaciones(codigoCompanyiaST, unidadOrganizativaCompanyia, codigoProductoCompanyia)
 
-            if (ValorUtils.isValid(benefitsValidationCodes)) {
+                    Set<String> benefitsValidationCodes = validationService.obtenerBenefitCodes(validationCollection)
 
-                for (GestionReconocimientoMedicoInfantilRequest.BenefitsType benefitTypeIterator : benefitsTypeList) {
-                    // Si no está definido el código de la cobertura, lanzamos una excepción
-                    if (!benefitsValidationCodes.contains(benefitTypeIterator.getBenefictCode().toUpperCase())) {
-                        throw new Exception("Las coberturas de la petición no se corresponden con las definidas para el dominio de la compañia " + company.getNombre() + " para el producto " + codigoProductoCompanyia + ": " + benefitsValidationCodes.toString() + ". Revise la base de datos o corrija la petición.")
+                    if (ValorUtils.isValid(benefitsValidationCodes)) {
+
+                        for (GestionReconocimientoMedicoInfantilRequest.BenefitsType benefitTypeIterator : benefitsTypeList) {
+                            // Si no está definido el código de la cobertura, lanzamos una excepción
+                            if (!benefitsValidationCodes.contains(benefitTypeIterator.getBenefictCode().toUpperCase())) {
+                                listaErroresValidacion.add("Las coberturas de la petición no se corresponden con las definidas para el dominio de la compañia " + company.getNombre() + " para el producto " + codigoProductoCompanyia + ": " + benefitsValidationCodes.toString() + "para el candidato " + candidate.identificationCode + ". Revise la base de datos o corrija la petición.")
+                                errorValidacion = true
+                            }
+                        }
+
+                    } else {
+                        listaErroresValidacion.add("No hay coberturas definidas para este dominio. Revise la base de datos.")
+                        errorValidacion = true
                     }
                 }
 
-            } else {
-                throw new Exception("No hay coberturas definidas para este dominio. Revise la base de datos.")
+            if (errorValidacion) {
+                throw new Exception(listaErroresValidacion.toString())
             }
         }
         catch (Exception e) {
             logginService.putError(this.class.getName() + ".validarCoberturas", "Error en la validacion de coberturas para la compañia " + company.getNombre() + " y producto " + codigoProductoCompanyia + ": " + ExceptionUtils.composeMessage(null, e))
             correoUtil.envioEmailErrores(this.class.getName() + ".validarCoberturas", "Error en la validacion de coberturas para la compañia " + company.getNombre() + " y producto " + codigoProductoCompanyia + ": ", e)
             throw new Exception(e.getMessage(), e)
+        }
+    }
+
+    private def rellenaServiciosInfantil( req, int candidateIteratorIndex) {
+
+        def listadoServicios = []
+
+        try {
+
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
+            DocumentBuilder builder = factory.newDocumentBuilder()
+
+            InputSource is = new InputSource(new StringReader(req.request))
+            is.setEncoding("UTF-8")
+            Document doc = builder.parse(is)
+            doc.getDocumentElement().normalize()
+
+            NodeList candidateNodeList = doc.getElementsByTagName("CandidateInformation")
+
+            Node candidateNode = candidateNodeList.item(candidateIteratorIndex)
+
+            if (candidateNode.getNodeType() == Node.ELEMENT_NODE) {
+
+                Element candidateElement = (Element) candidateNode
+
+                NodeList nList = candidateElement.getElementsByTagName("ServiceInformation")
+
+                for (int temp = 0; temp < nList.getLength(); temp++) {
+
+                    Node nNode = nList.item(temp)
+
+                    if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+
+                        Element eElement = (Element) nNode
+
+                        if (eElement.getElementsByTagName("serviceCode").item(0) != null) {
+
+                            DATOS.Servicio servicio = new DATOS.Servicio()
+
+                            servicio.codigoServicio = eElement.getElementsByTagName("serviceCode").item(0).getTextContent()
+                            servicio.tipoServicios = eElement.getElementsByTagName("serviceType").item(0).getTextContent()
+                            if (eElement.getElementsByTagName("serviceDescription").item(0) != null) {
+                                servicio.descripcionServicio = eElement.getElementsByTagName("serviceDescription").item(0).getTextContent()
+                            }
+
+                            servicio.filler = ""
+                            listadoServicios.add(servicio)
+                        }
+                    }
+                }
+            }
+            return listadoServicios
+        } catch (Exception e) {
+            throw new WSException(this.getClass(), "rellenaDatosInfantil", ExceptionUtils.composeMessage(null, e))
         }
     }
 
