@@ -103,28 +103,9 @@ class MethislabService implements ICompanyService{
 
         expediente.setZip(compressedData)
 
-        byte[] ba = Base64.getDecoder().decode(compressedData)
-        
-        LocalDate localDate = LocalDate.now();//For reference
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-        String dateString = localDate.format(formatter);
+        //TODO Completar: ver que hacemos si el zip viene vacio, no la usamos hasta que sepamos que hacer
+        boolean haveData = saveZipFile(expedientePoliza, compressedData)
 
-        String pathString = grailsApplication.config.zipPath
-        String fileName = pathString + "/${expedientePoliza.getNumSolicitud()}_${expedientePoliza.getCodigoST()}_${dateString}.zip"
-
-        Path path = Paths.get(pathString)
-        if (!Files.exists(path)){
-            Files.createDirectories(path);
-        }
-
-        FileOutputStream fs = new FileOutputStream(new File(fileName))
-        BufferedOutputStream  bs = new BufferedOutputStream(fs)
-        bs.write(ba)
-        bs.close()
-        fs.close()
-
-        logginService.putInfoMessage("Los ficheros del expedinte ${expedientePoliza.getNumSolicitud()} " +
-                "se guardo en la ruta ${fileName}")
 
         expediente.setNotes(util.devolverDatos(expedientePoliza.getTarificacion().getObservaciones()))
 
@@ -163,6 +144,42 @@ class MethislabService implements ICompanyService{
         return expediente
     }
 
+    def saveZipFile(expedientePoliza, compressedData){
+        boolean haveData = true;
+        if (compressedData.size()>0){
+            try {
+                byte[] ba = Base64.getDecoder().decode(compressedData)
+                LocalDate localDate = LocalDate.now();//For reference
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+                String dateString = localDate.format(formatter);
+
+                String pathString = grailsApplication.config.zipPath
+                String fileName = pathString + "/${expedientePoliza.getNumSolicitud()}_${expedientePoliza.getCodigoST()}_${dateString}.zip"
+
+                Path path = Paths.get(pathString)
+                if (!Files.exists(path)) {
+                    Files.createDirectories(path);
+                }
+
+                FileOutputStream fs = new FileOutputStream(new File(fileName))
+                BufferedOutputStream bs = new BufferedOutputStream(fs)
+                bs.write(ba)
+                bs.close()
+                fs.close()
+
+                logginService.putInfoMessage("Los ficheros del expedinte ${expedientePoliza.getNumSolicitud()} " +
+                        "se guardo en la ruta ${fileName}")
+            }catch(Exception e){
+                logginService.putError("Los ficheros del expedinte ${expedientePoliza.getNumSolicitud()} " + "no se han grabado",e)
+            }
+        }else{
+
+            logginService.putInfo("Los ficheros del expedinte ${expedientePoliza.getNumSolicitud()} " + "vienen vacios")
+            haveData = false
+        }
+
+        return haveData
+    }
     def rellenaDatos(Request req, Company company) {
 
         def mapDatos = [:]
