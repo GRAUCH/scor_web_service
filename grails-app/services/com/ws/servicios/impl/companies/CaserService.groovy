@@ -1447,7 +1447,7 @@ class CaserService implements ICompanyService{
                         for (GestionReconocimientoMedicoInfantilRequest.BenefitsType benefitTypeIterator : benefitsTypeList) {
                             // Si no está definido el código de la cobertura, lanzamos una excepción
                             if (!benefitsValidationCodes.contains(benefitTypeIterator.getBenefictCode().toUpperCase())) {
-                                listaErroresValidacion.add("Las coberturas de la petición no se corresponden con las definidas para el dominio de la compañia " + company.getNombre() + " para el producto " + codigoProductoCompanyia + ": " + benefitsValidationCodes.toString() + "para el candidato " + candidate.identificationCode + ". Revise la base de datos o corrija la petición.")
+                                listaErroresValidacion.add("Las coberturas de la petición no se corresponden con las definidas para el dominio de la compañia " + company.getNombre() + " para el producto " + codigoProductoCompanyia + ": " + benefitsValidationCodes.toString() + " para el candidato " + candidate.identificationCode + ". Revise la base de datos o corrija la petición.")
                                 errorValidacion = true
                             }
                         }
@@ -1459,7 +1459,12 @@ class CaserService implements ICompanyService{
                 }
 
             if (errorValidacion) {
-                throw new Exception(listaErroresValidacion.toString())
+                StringBuilder errorMessage = new StringBuilder()
+
+                for (String message : listaErroresValidacion) {
+                    errorMessage.append(message).append(" ")
+                }
+                throw new Exception(errorMessage.toString())
             }
         }
         catch (Exception e) {
