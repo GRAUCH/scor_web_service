@@ -11,3 +11,9 @@ scorWebservices.iml
 target/
 logs/
 .settings
+/Development/
+/Integration/
+/Preproduction/
+/Production/
+/src/java/com/scor/global/
+/wsdl/

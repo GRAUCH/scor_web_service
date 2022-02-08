@@ -378,8 +378,8 @@ log4j = {
 
         }
 
-        preproduction_wildfly {
-            println "Carga configuración log4j 'preproduction_wildfly'"
+        integration {
+            println "Carga configuración log4j 'integration'"
             appenders {
                 layout:
                 pattern(conversionPattern: '%c{2} %m%n')
@@ -401,8 +401,31 @@ log4j = {
 
         }
 
-        production_wildfly {
-            println "Carga configuración log4j 'production_wildfly'"
+        preproduction {
+            println "Carga configuración log4j 'preproduction'"
+            appenders {
+                layout:
+                pattern(conversionPattern: '%c{2} %m%n')
+                appender new DailyRollingFileAppender(
+                        name: 'infoAppender',
+                        datePattern: "'.'yyyy-MM-dd",
+                        threshold: org.apache.log4j.Level.INFO,
+                        fileName: '/var/log/wildfly/appLogs/webservicessoap/scorWebserviceInfo.log',  //storage path of log file
+                        layout: pattern(conversionPattern: '%d [%t] %-5p %c{2} %x - %m%n')
+                )
+                appender new DailyRollingFileAppender(
+                        name: 'errorAppender',
+                        datePattern: "'.'yyyy-MM-dd",
+                        threshold: org.apache.log4j.Level.ERROR,
+                        fileName: '/var/log/wildfly/appLogs/webservicessoap/scorWebserviceError.log',  //storage path of log file
+                        layout: pattern(conversionPattern: '%d [%t] %-5p %c{2} %x - %m%n')
+                )
+            }
+
+        }
+
+        production {
+            println "Carga configuración log4j 'production'"
             appenders {
                 layout:
                 pattern(conversionPattern: '%c{2} %m%n')
