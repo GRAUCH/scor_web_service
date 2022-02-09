@@ -410,14 +410,16 @@ class CaserService implements ICompanyService{
 
         Node policyInformationNode = policyInformationNodeList.item(0)
 
-        if (policyInformationNode.getNodeType() == Node.ELEMENT_NODE) {
+        if (policyInformationNode != null) {
 
-            Element policyInformationElement = (Element) policyInformationNode
+            if (policyInformationNode.getNodeType() == Node.ELEMENT_NODE) {
 
-            if (nList.getLength() > 1 && policyInformationElement.getElementsByTagName("productCode").item(0).getTextContent() == "Infantil")
-                esCaserInfantil = true
+                Element policyInformationElement = (Element) policyInformationNode
+
+                if (nList.getLength() > 1 && policyInformationElement.getElementsByTagName("productCode")?.item(0).getTextContent() == "Infantil")
+                    esCaserInfantil = true
+            }
         }
-
         return esCaserInfantil
     }
 
@@ -597,7 +599,7 @@ class CaserService implements ICompanyService{
         if (esCaserInfantil(req)) {
             datosEmail = rellenoDatosEmailInfantil(req)
         } else {
-            datosEmail = rellenoDatosEmail()
+            datosEmail = rellenoDatosEmail(req)
         }
 
         def textEmail = compongoText(datosEmail)
