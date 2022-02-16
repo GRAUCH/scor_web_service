@@ -98,8 +98,7 @@ class MethislabService implements ICompanyService{
         byte[] compressedData = commonZipService.obtenerZip(expedientePoliza.getNodoAlfresco())
 
         expediente.setZip(compressedData)
-
-        //As data received was encoded in base64 twice, should be decode twice times
+        
         byte[] ba = Base64.getDecoder().decode(compressedData)
         ba = Base64.getDecoder().decode(ba)
 
