@@ -260,22 +260,16 @@ public class GestionReconocimientoMedicoInfantilRequest {
         protected String name;
         @XmlElement(required = true)
         protected String surname;
-        @XmlElement(required = true)
+        @XmlElement(required = true, nillable = true)
         protected GenderType gender;
-        @XmlElement(required = true)
         protected MaritalStatusType maritalStatus;
         @XmlElement(required = true)
         @XmlSchemaType(name = "dateTime")
         protected XMLGregorianCalendar birthDate;
-        @XmlElement(required = true)
         protected String address;
-        @XmlElement(required = true)
         protected String city;
-        @XmlElement(required = true)
         protected String province;
-        @XmlElement(required = true)
         protected String country;
-        @XmlElement(required = true)
         protected String postalCode;
         protected String email;
         @XmlElement(required = true)
