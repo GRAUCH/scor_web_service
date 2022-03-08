@@ -2,6 +2,8 @@ package com.ws.servicios.impl
 
 import com.scor.global.ExceptionUtils
 import com.scor.global.WSException
+import com.scor.srpfileinbound.DATOS
+import com.scor.srpfileinbound.REGISTRODATOS
 import com.scor.srpfileinbound.RootElement
 import com.scortelemed.Company
 import com.scortelemed.Conf
@@ -198,13 +200,44 @@ class ExpedienteService implements IExpedienteService {
 
             if (companyService?.esCaserInfantil(req)){
 
+                List<RootElement> payloadList = new ArrayList<>()
+
+                String dniTutor = ""
+
+                REGISTRODATOS registroDatos
+
+                for (int i = 0; i < companyService.obtenerNumeroCandidatos(req); i++) {
+                    logginService.putInfoMessage("Procesando candidato " + (i+1) + " de " + companyService.obtenerNumeroCandidatos(req))
+
+                    payloadList.add(crearExpedienteCaserInfantil(req, i))
+
+                    registroDatos = (REGISTRODATOS)((DATOS)payloadList.get(i).getCABECERAOrDATOSOrPIE().get(1)).getRegistro()
+
+                    if (registroDatos.getObservaciones().contains("Tutor")){
+                        dniTutor = registroDatos.getDni()
+                    }
+                }
+
+                int j = 0
+
+                for (RootElement rootElementIesimo : payloadList) {
+
+                    registroDatos = (REGISTRODATOS)((DATOS)rootElementIesimo.getCABECERAOrDATOSOrPIE().get(1)).getRegistro()
+
+                    if (registroDatos.getDni().isEmpty()) {
+                        registroDatos.setDni("X" + dniTutor + "-" + j)
+                    }
+
+                    j++
+                }
+
                     // NECESITAMOS RELENTIZAR EL ENVÍO DE PETICIONES SOAP AL FRONTAL, YA QUE SI LLEGAN DEMASIADO RÁPIDO SE REPITEN LOS CÓDIGOS ST,
                     // POR LO QUE USAREMOS UN DELAY DE 30 SEGUNDOS (TIEMPO QUE TARDA BPEL EN CREAR UN EXPEDIENTE EN CRM ES DE 25 SEGUNDOS),
                     // EN EL CASO DEL ÚLTIMO EXPEDIENTE, SÓLO ESPERAMOS 5 SEGUNDOS
 
                     for (int i = 0; i < companyService.obtenerNumeroCandidatos(req); i++) {
                         logginService.putInfoMessage("Creando expediente " + (i+1) + " de " + companyService.obtenerNumeroCandidatos(req))
-                        realizarPeticionSOAP(req, comp, crearExpedienteCaserInfantil(req, i))
+                        realizarPeticionSOAP(req, comp, payloadList.get(i))
 
                         if (i == companyService.obtenerNumeroCandidatos(req) - 1) {
                             Thread.currentThread().sleep(5000)

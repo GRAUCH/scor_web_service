@@ -254,7 +254,6 @@ public class GestionReconocimientoMedicoInfantilRequest {
 
         @XmlElement(required = true)
         protected Boolean tutor;
-        @XmlElement(required = true)
         protected String identificationCode;
         @XmlElement(required = true)
         protected String name;
