@@ -84,6 +84,8 @@ environments {
 
         zipPath = "/datos/scorWebservices/MethisLab"
 
+        caserInfantilProductCode = "3698"
+
         cxf {
             client {
                 soapClientAlptis {
@@ -122,6 +124,8 @@ environments {
         grails.logging.jul.usebridge = true
 
         zipPath = "/datos/scorWebservices/MethisLab"
+
+        caserInfantilProductCode = "3698"
 
         cxf {
             client {
@@ -162,6 +166,8 @@ environments {
 
         zipPath = "/datos/scorWebservices/MethisLab"
 
+        caserInfantilProductCode = "3698"
+
         cxf {
             client {
                 soapClientAlptis {
@@ -200,6 +206,8 @@ environments {
 
         zipPath = "/datos/scorWebservices/MethisLab"
 
+        caserInfantilProductCode = "3698"
+
         cxf {
             client {
                 soapClientAlptis {
@@ -237,6 +245,8 @@ environments {
         grails.logging.jul.usebridge = false
 
         zipPath = "/datos/scorWebservices/MethisLab"
+
+        caserInfantilProductCode = "XXYYZZ"
 
         cxf {
             client {
@@ -349,7 +359,6 @@ log4j = {
                         threshold: org.apache.log4j.Level.DEBUG,
                         fileName: '/var/log/wildfly/appLogs/webservicessoap/scorWebserviceDebug.log',  //storage path of log file
                         layout: pattern(conversionPattern: '%d [%t] %-5p %c{2} %x - %m%n')
-
                 )
             }
 

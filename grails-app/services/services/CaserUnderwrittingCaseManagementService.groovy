@@ -156,9 +156,7 @@ class CaserUnderwrittingCaseManagementService {
                     notes = "El caso se ha procesado correctamente"
                     status = StatusType.OK
 
-                    Collection<Validation> validationCollection = validationService.obtenerValidaciones(company.getCodigoSt(), company.getOu().toString(), gestionReconocimientoMedicoInfantil.getPolicyInformation().getProductCode())
-
-                    caserService.validarCoberturas(gestionReconocimientoMedicoInfantil, company)
+                    caserService.comprobarValidaciones(gestionReconocimientoMedicoInfantil, company)
 
                     logginService.putInfoMessage("Se procede el alta automatica de ${company.getNombre()} con numero de solicitud ${numeroSolicitud}")
 
