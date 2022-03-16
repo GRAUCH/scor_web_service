@@ -84,7 +84,7 @@ environments {
 
         zipPath = "/datos/scorWebservices/MethisLab"
 
-        caserInfantilProductCode = "3698"
+        caserInfantilProductCode = "3698,3699"
 
         cxf {
             client {
@@ -101,7 +101,7 @@ environments {
                     wsdl = "http://172.17.0.33:8888/orabpel/default/ComprimirDocumentos/ComprimirDocumentos?wsdl"
                     namespace = "com.scor.comprimirdocumentos"
                     clientInterface = "com.scor.comprimirdocumentos.ComprimirDocumentos"
-                    serviceEndpointAddress = "http://172.17.0.33:8888/orabpel/default/ComprimirDocumentos/ComprimirDocumentos"
+                    serviceEndpointAddress = "http://172.17.0.33:8888/orabpel/default/ComprimirDocumentos/ComprimirDocumentos/2.0"
                     connectionTimeout = 240000
                     enableDefaultLoggingInterceptors = false
                 }
@@ -125,7 +125,7 @@ environments {
 
         zipPath = "/datos/scorWebservices/MethisLab"
 
-        caserInfantilProductCode = "3698"
+        caserInfantilProductCode = "3698,3699"
 
         cxf {
             client {
@@ -142,7 +142,7 @@ environments {
                     wsdl = "http://172.17.0.33:8888/orabpel/default/ComprimirDocumentos/ComprimirDocumentos?wsdl"
                     namespace = "com.scor.comprimirdocumentos"
                     clientInterface = "com.scor.comprimirdocumentos.ComprimirDocumentos"
-                    serviceEndpointAddress = "http://172.17.0.33:8888/orabpel/default/ComprimirDocumentos/1.0"
+                    serviceEndpointAddress = "http://172.17.0.33:8888/orabpel/default/ComprimirDocumentos/2.0"
                     connectionTimeout = 99999
                     enableDefaultLoggingInterceptors = false
                 }
@@ -166,7 +166,7 @@ environments {
 
         zipPath = "/datos/scorWebservices/MethisLab"
 
-        caserInfantilProductCode = "3698"
+        caserInfantilProductCode = "3698,3699"
 
         cxf {
             client {
@@ -183,7 +183,7 @@ environments {
                     wsdl = "http://172.17.0.33:8888/orabpel/default/ComprimirDocumentos/ComprimirDocumentos?wsdl"
                     namespace = "com.scor.comprimirdocumentos"
                     clientInterface = "com.scor.comprimirdocumentos.ComprimirDocumentos"
-                    serviceEndpointAddress = "http://172.17.0.33:8888/orabpel/default/ComprimirDocumentos/1.0"
+                    serviceEndpointAddress = "http://172.17.0.33:8888/orabpel/default/ComprimirDocumentos/2.0"
                     connectionTimeout = 99999
                     enableDefaultLoggingInterceptors = false
                 }
@@ -206,7 +206,7 @@ environments {
 
         zipPath = "/datos/scorWebservices/MethisLab"
 
-        caserInfantilProductCode = "3698"
+        caserInfantilProductCode = "3698,3699"
 
         cxf {
             client {
@@ -223,7 +223,7 @@ environments {
                     wsdl = "http://172.17.0.33:8888/orabpel/default/ComprimirDocumentos/ComprimirDocumentos?wsdl"
                     namespace = "com.scor.comprimirdocumentos"
                     clientInterface = "com.scor.comprimirdocumentos.ComprimirDocumentos"
-                    serviceEndpointAddress = "http://172.17.0.33:8888/orabpel/default/ComprimirDocumentos/1.0"
+                    serviceEndpointAddress = "http://172.17.0.33:8888/orabpel/default/ComprimirDocumentos/2.0"
                     connectionTimeout = 99999
                     enableDefaultLoggingInterceptors = false
                 }

@@ -231,6 +231,7 @@ public class GestionReconocimientoMedicoInfantilRequest {
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
             "tutor",
+            "idInterviniente",
             "identificationCode",
             "name",
             "surname",
@@ -254,6 +255,8 @@ public class GestionReconocimientoMedicoInfantilRequest {
 
         @XmlElement(required = true)
         protected Boolean tutor;
+        @XmlElement(required = true)
+        protected String idInterviniente;
         protected String identificationCode;
         @XmlElement(required = true)
         protected String name;
@@ -285,6 +288,7 @@ public class GestionReconocimientoMedicoInfantilRequest {
         public String toString() {
             return "CandidateInformation{" +
                     "tutor=" + tutor +
+                    ", idInterviniente='" + idInterviniente + '\'' +
                     ", identificationCode='" + identificationCode + '\'' +
                     ", name='" + name + '\'' +
                     ", surname='" + surname + '\'' +
@@ -324,6 +328,26 @@ public class GestionReconocimientoMedicoInfantilRequest {
          */
         public void setTutor(Boolean value) {
             this.tutor = value;
+        }
+
+        /**
+         * Gets the value of the fiscalIdentificationNumber property.
+         *
+         * @return possible object is
+         * {@link String }
+         */
+        public String getIdInterviniente() {
+            return idInterviniente;
+        }
+
+        /**
+         * Sets the value of the fiscalIdentificationNumber property.
+         *
+         * @param value allowed object is
+         *              {@link String }
+         */
+        public void setIdInterviniente(String value) {
+            this.idInterviniente = value;
         }
 
         /**

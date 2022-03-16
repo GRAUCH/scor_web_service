@@ -194,18 +194,22 @@ class ExpedienteService implements IExpedienteService {
 
             CaserService companyService
 
+            List<RootElement> payloadList
+
             if (comp == TipoCompany.CASER) {
                 companyService = new CaserService()
             }
 
             if (companyService?.esCaserInfantil(req)) {
 
-                List<RootElement> payloadList = new ArrayList<>()
+                payloadList = new ArrayList<>()
+                Map<String, Boolean> candidateIdentificationCodesWithTutor = new HashMap<>()
+                List<String> candidateIdentificationCodes = companyService?.obtenerCandidateIdIntervinienteList(req, candidateIdentificationCodesWithTutor)
 
                 for (int i = 0; i < companyService.obtenerNumeroCandidatos(req); i++) {
                     logginService.putInfoMessage("Procesando candidato " + (i + 1) + " de " + companyService.obtenerNumeroCandidatos(req))
 
-                    payloadList.add(crearExpedienteCaserInfantil(req, i))
+                    payloadList.add(crearExpedienteCaserInfantil(req, candidateIdentificationCodes, candidateIdentificationCodesWithTutor, i))
                 }
 
                 // NECESITAMOS RELENTIZAR EL ENVÍO DE PETICIONES SOAP AL FRONTAL, YA QUE SI LLEGAN DEMASIADO RÁPIDO SE REPITEN LOS CÓDIGOS ST,
@@ -214,6 +218,13 @@ class ExpedienteService implements IExpedienteService {
 
                 for (int i = 0; i < companyService.obtenerNumeroCandidatos(req); i++) {
                     logginService.putInfoMessage("Creando expediente " + (i + 1) + " de " + companyService.obtenerNumeroCandidatos(req))
+
+                    for (payload in payloadList) {
+                        if (payload.getCABECERAOrDATOSOrPIE().size() != 3) {
+                            throw new Exception("La peticion a bpel está mal formada")
+                        }
+                    }
+
                     realizarPeticionSOAP(req, comp, payloadList.get(i))
 
                     if (i == companyService.obtenerNumeroCandidatos(req) - 1) {
@@ -269,14 +280,14 @@ class ExpedienteService implements IExpedienteService {
         return payload
     }
 
-    private def crearExpedienteCaserInfantil(Request req, int iteradorCandidatosIndex) {
+    private def crearExpedienteCaserInfantil(Request req, List<String> candidateIdentificationCodes, Map<String, Boolean> candidateIdentificationCodesWithTutor, int iteradorCandidatosIndex) {
         companyService = new CaserService()
         def listadoFinal = []
         RootElement payload = new RootElement()
         try {
             String codigoSt = companyService.getCodigoStManual(req)
             listadoFinal.add(buildCabecera(req, codigoSt))
-            listadoFinal.add(companyService.buildDatosCaserInfantil(req, codigoSt, iteradorCandidatosIndex))
+            listadoFinal.add(companyService.buildDatosCaserInfantil(req, codigoSt, candidateIdentificationCodes, candidateIdentificationCodesWithTutor, iteradorCandidatosIndex))
             listadoFinal.add(buildPie(null))
             payload.cabeceraOrDATOSOrPIE = listadoFinal
         } catch (Exception e) {
@@ -398,7 +409,7 @@ class ExpedienteService implements IExpedienteService {
 
             // Creamos la queryString con el parámetro :companyCodigoPais, :companyCodigoSt, :numSolicitud y :productoIdName
             // IMPORTANTE: HAY QUE REALIZAR EL CAST( XXX AS VARCHAR(5000)) PORQUE EN SQLSERVER SE PRODUCE UN ERROR DE DIALECT AL INTENTAR CREAR LA LISTA DE RESULTADOS
-            final String query = 'SELECT CAST(A.Scor_name as VARCHAR(5000)) as codigoExpedienteST, CAST(E.scor_codigoST as VARCHAR(5000)) as codigoCompanyiaST, CAST(A.scor_nsolicitud_compania as VARCHAR(5000)) as numSolicitud FROM Scor_expediente AS A, Contact AS C, Scor_codBusinessUnit AS D, Scor_clienteExtensionBase as E WHERE A.DeletionStateCode = \'0\' and (C.contactId = A.scor_candidatoid) and (A.owningbusinessunit = D.scor_unidaddenegocioid) and (C.scor_candidatosid = e.Scor_clienteID) and d.scor_codigopais=:companyCodigoPais and E.scor_codigoST=:companyCodigoSt and A.scor_nsolicitud_compania=:numSolicitud and A.scor_productoidName=:productoIdName order by a.Scor_name'
+            final String query = 'SELECT CAST(A.Scor_name as VARCHAR(5000)) as codigoExpedienteST, CAST(E.scor_codigoST as VARCHAR(5000)) as codigoCompanyiaST, CAST(A.scor_nsolicitud_compania as VARCHAR(5000)) as numSolicitud FROM Scor_expediente AS A, Contact AS C, Scor_codBusinessUnit AS D, Scor_clienteExtensionBase as E WHERE A.DeletionStateCode = \'0\' and (C.contactId = A.scor_candidatoid) and (A.owningbusinessunit = D.scor_unidaddenegocioid) and (C.scor_candidatosid = E.Scor_clienteID) and D.scor_codigopais=:companyCodigoPais and E.scor_codigoST=:companyCodigoSt and A.scor_nsolicitud_compania=:numSolicitud and A.scor_productoidName=:productoIdName order by a.Scor_name'
 
             // Creamos la query nativa SQL
             final sqlQuery = sessionCRMDynamics.createSQLQuery(query)

@@ -87,13 +87,13 @@ class CaserService implements ICompanyService {
         }
     }
 
-    def buildDatosCaserInfantil(Request req, String codigoSt, int iteradorCandidatos) {
+    def buildDatosCaserInfantil(Request req, String codigoSt, List<String> candidateIdentificationCodes, Map<String, Boolean> candidateIdentificationCodesWithTutor, int iteradorCandidatos) {
         try {
             DATOS dato = new DATOS()
             Company company = req.company
 
             dato.coberturas = rellenaCoberturasInfantil(req, iteradorCandidatos)
-            dato.registro = rellenaDatosInfantil(req, company, dato.coberturas, iteradorCandidatos)
+            dato.registro = rellenaDatosInfantil(req, company, candidateIdentificationCodes, candidateIdentificationCodesWithTutor, iteradorCandidatos)
             dato.pregunta = rellenaPreguntas(req, company.nombre)
             dato.servicio = rellenaServiciosInfantil(req, iteradorCandidatos)
 
@@ -104,17 +104,13 @@ class CaserService implements ICompanyService {
         }
     }
 
-    def rellenaDatosInfantil(Request req, Company company, List<DATOS.Coberturas> coberturas, int candidateIteratorIndex) {
+    def rellenaDatosInfantil(Request req, Company company, List<String> candidateIdentificationCodes, Map<String, Boolean> candidateIdentificationCodesWithTutor, int candidateIteratorIndex) {
 
         def formato = new SimpleDateFormat("yyyyMMdd")
         def apellido
         def telefono1
         def telefono2
         def telefonoMovil
-
-        Map<String, Boolean> candidateIdentificationCodes = obtenerIdentificationNumberCandidatos(req)
-        def dniTutor = obtenerDNITutor(candidateIdentificationCodes)
-
 
         REGISTRODATOS datosRegistro = new REGISTRODATOS()
 
@@ -203,16 +199,7 @@ class CaserService implements ICompanyService {
                  *
                  */
 
-                if (candidateInformationElement.getElementsByTagName("identificationCode").item(0) != null) {
-
-                    String candidateIdentificationCode = candidateInformationElement.getElementsByTagName("identificationCode").item(0).getTextContent()
-
-                    if (candidateIdentificationCode == null){
-                        datosRegistro.dni = "X" + dniTutor + "-" + candidateIteratorIndex
-                    } else {
-                        datosRegistro.dni = candidateInformationElement.getElementsByTagName("identificationCode").item(0).getTextContent()
-                    }
-                }
+                datosRegistro.dni = candidateIdentificationCodes.get(candidateIteratorIndex)
 
                 /**TUTOR
                  *
@@ -223,7 +210,7 @@ class CaserService implements ICompanyService {
                 if (candidateInformationElement.getElementsByTagName("tutor").item(0) != null && candidateInformationElement.getElementsByTagName("tutor").item(0).getTextContent().equals("true")) {
                     observacionesTutor = "Tutor de "
 
-                    for (Map.Entry<String, Boolean> candidateIterator : candidateIdentificationCodes) {
+                    for (candidateIterator in candidateIdentificationCodesWithTutor) {
                         if (!candidateIterator.getValue()) {
                             observacionesTutor += StringBuilder.newInstance().append(candidateIterator.getKey()).append(", ")
                         }
@@ -241,7 +228,7 @@ class CaserService implements ICompanyService {
                 } else {
                     if (ValorUtils.isValid(datosRegistro.observaciones)) {
                         observacionesTutor = "Tutelado por "
-                        for (Map.Entry<String, Boolean> candidateIterator : candidateIdentificationCodes) {
+                        for (candidateIterator in candidateIdentificationCodesWithTutor) {
                             if (candidateIterator.getValue()) {
                                 observacionesTutor += StringBuilder.newInstance().append(candidateIterator.getKey()).append(", ")
                             }
@@ -421,7 +408,7 @@ class CaserService implements ICompanyService {
         if (operation != null) {
 
             if (operation.getNodeName() == "GestionReconocimientoMedicoInfantilRequest")
-                    esCaserInfantil = true
+                esCaserInfantil = true
         }
 
         return esCaserInfantil
@@ -1051,10 +1038,12 @@ class CaserService implements ICompanyService {
         datos.campo20 = ""
     }
 
-    private Map<String, Boolean> obtenerIdentificationNumberCandidatos(Request request) {
+    public Map<String, Boolean> obtenerIdentificationNumberCandidatos(Request request) {
 
         Pattern dniPattern = ~/^\d{8}[A-Z]$/
         Pattern passportPattern = ~/^X\d{7}$/
+        String candidateIdentificationCode
+        String candidateIdInterviniente
 
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
         DocumentBuilder builder = factory.newDocumentBuilder()
@@ -1079,12 +1068,13 @@ class CaserService implements ICompanyService {
 
                 if (candidateInformationElement.getElementsByTagName("identificationCode").item(0) != null) {
 
-                    String candidateIdentificationCode = candidateInformationElement.getElementsByTagName("identificationCode").item(0)
+                    candidateIdentificationCode = candidateInformationElement.getElementsByTagName("identificationCode").item(0).getTextContent()
 
                     if (candidateIdentificationCode ==~ dniPattern || candidateIdentificationCode ==~ passportPattern) {
                         candidatesIdentificationNumber.put(candidateIdentificationCode, candidateInformationElement.getElementsByTagName("tutor").item(0).getTextContent().toBoolean())
                     } else {
-                        throw new Exception("El candidato contiene un identificationCode erroneo con valor ${candidateIdentificationCode}.")
+                        candidateIdInterviniente = candidateInformationElement.getElementsByTagName("idInterviniente").item(0).getTextContent()
+                        candidatesIdentificationNumber.put(candidateIdInterviniente, candidateInformationElement.getElementsByTagName("tutor").item(0).getTextContent().toBoolean())
                     }
                 }
             }
@@ -1093,13 +1083,61 @@ class CaserService implements ICompanyService {
         return candidatesIdentificationNumber
     }
 
+    private List<String> obtenerCandidateIdIntervinienteList(Request request, Map<String, Boolean> candidateIdentificationCodesWithTutor) {
+
+        Map<String, Boolean> candidateIdentificationCodes = obtenerIdentificationNumberCandidatos(request)
+        def dniTutor = obtenerDNITutor(candidateIdentificationCodes)
+
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
+        DocumentBuilder builder = factory.newDocumentBuilder()
+
+        InputSource is = new InputSource(new StringReader(request.request))
+        is.setEncoding("UTF-8")
+        Document doc = builder.parse(is)
+
+        doc.getDocumentElement().normalize()
+
+        NodeList candidateNodeList = doc.getElementsByTagName("CandidateInformation")
+
+        List<String> candidatesIdIntervinienteList = new ArrayList<>()
+        String candidateIdentificationCode
+        String candidateIdInterviniente
+        Boolean tutor
+
+        for (int candidateIndex = 0; candidateIndex < candidateNodeList.getLength(); candidateIndex++) {
+
+            Node candidateNode = candidateNodeList.item(candidateIndex)
+
+            if (candidateNode.getNodeType() == Node.ELEMENT_NODE) {
+
+                Element candidateInformationElement = (Element) candidateNode
+
+                candidateIdentificationCode = candidateInformationElement.getElementsByTagName("identificationCode").item(0).getTextContent()
+                candidateIdInterviniente = candidateInformationElement.getElementsByTagName("idInterviniente").item(0).getTextContent()
+                tutor = candidateInformationElement.getElementsByTagName("tutor").item(0).getTextContent().toBoolean()
+
+                if (candidateIdentificationCode == null || candidateIdentificationCode.isEmpty()) {
+                    if (dniTutor != null) {
+                        candidateIdentificationCode = "X" + dniTutor + "-" + candidateIndex
+                    } else {
+                        candidateIdentificationCode = "X" + candidateIdInterviniente
+                    }
+                }
+
+                candidatesIdIntervinienteList.add(candidateIdentificationCode)
+                candidateIdentificationCodesWithTutor.put(candidateIdentificationCode, tutor)
+            }
+        }
+
+        return candidatesIdIntervinienteList
+    }
 
     private String obtenerDNITutor(Map<String, Boolean> dniTutorMap) {
 
         String dniTutor = null
         Boolean encontrado = false
 
-        for (Map<String, Boolean> dniTutorMapElement : dniTutorMap) {
+        for (dniTutorMapElement in dniTutorMap) {
 
             if (dniTutorMapElement.getValue() == Boolean.TRUE && encontrado == Boolean.FALSE) {
 
@@ -1475,35 +1513,19 @@ class CaserService implements ICompanyService {
         String requestNumber = gestionReconocimientoMedicoInfantil.getPolicyInformation().getRequestNumber()
 
         String codigoProductoCompanyia = gestionReconocimientoMedicoInfantil.getPolicyInformation().getProductCode()
-        Boolean tieneTutor = false
+
+        List<String> caserInfantilProductCodesList = new ArrayList<>();
+        caserInfantilProductCodesList.addAll(Holders.grailsApplication.config.caserInfantilProductCode.split(","))
 
         Boolean errorValidacion = false
         List<String> listaErroresValidacion = new ArrayList<>()
 
+
         try {
 
             // Comprobacion de que el codigo del producto es el infantil configurado en Config.groovy
-            if (codigoProductoCompanyia != null && codigoProductoCompanyia != Holders.grailsApplication.config.caserInfantilProductCode) {
+            if (codigoProductoCompanyia != null && !caserInfantilProductCodesList.contains(codigoProductoCompanyia)) {
                 listaErroresValidacion.add("El producto " + codigoProductoCompanyia + " no se corresponde con codigo del producto infantil. Revise el fichero de configuracion.")
-                errorValidacion = true
-            }
-
-            // Comprobacion de que existe mas de un candidato en la peticion
-            if (!(gestionReconocimientoMedicoInfantil.getCandidateInformation().size() > 1)) {
-                listaErroresValidacion.add("La peticion no tiene mas de un candidato.")
-                errorValidacion = true
-            }
-
-            // Comprobacion de que existe un tutor en la peticion
-            for (GestionReconocimientoMedicoInfantilRequest.CandidateInformation candidate : gestionReconocimientoMedicoInfantil.getCandidateInformation()) {
-
-                if (candidate.getTutor() == Boolean.TRUE) {
-                    tieneTutor = true
-                }
-            }
-
-            if (tieneTutor == Boolean.FALSE) {
-                listaErroresValidacion.add("La peticion no tiene informado ningun tutor.")
                 errorValidacion = true
             }
 
