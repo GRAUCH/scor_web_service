@@ -246,7 +246,7 @@ environments {
 
         zipPath = "/datos/scorWebservices/MethisLab"
 
-        caserInfantilProductCode = "XXYYZZ"
+        caserInfantilProductCode = "6142,6143"
 
         cxf {
             client {
