@@ -9,27 +9,19 @@ import java.util.List;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "gestionReconocimientoMedicoInfantilRequest", propOrder = {
         "policyInformation",
-        "candidateInformation",
-        "serviceInformation",
-        "benefitsType"
+        "candidateInformation"
 })
 public class GestionReconocimientoMedicoInfantilRequest {
     @XmlElement(name = "PolicyInformation", required = true)
     protected PolicyInformation policyInformation;
     @XmlElement(name = "CandidateInformation", required = true)
     protected List<GestionReconocimientoMedicoInfantilRequest.CandidateInformation> candidateInformation;
-    @XmlElement(name = "ServiceInformation", nillable = true)
-    protected List<GestionReconocimientoMedicoInfantilRequest.ServiceInformation> serviceInformation;
-    @XmlElement(name = "BenefitsType", required = true)
-    protected List<GestionReconocimientoMedicoInfantilRequest.BenefitsType> benefitsType;
 
     @Override
     public String toString() {
         return "GestionReconocimientoMedicoInfantilRequest{" +
                 "policyInformation=" + policyInformation +
                 ", candidateInformation=" + candidateInformation +
-                ", serviceInformation=" + serviceInformation +
-                ", benefitsType=" + benefitsType +
                 '}';
     }
 
@@ -75,61 +67,6 @@ public class GestionReconocimientoMedicoInfantilRequest {
     public void setCandidateInformation(List<GestionReconocimientoMedicoInfantilRequest.CandidateInformation> value) {
         this.candidateInformation = value;
     }
-
-    /**
-     * Gets the value of the serviceInformation property.
-     *
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the serviceInformation property.
-     *
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getServiceInformation().add(newItem);
-     * </pre>
-     *
-     *
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link GestionReconocimientoMedicoInfantilRequest.ServiceInformation }
-     */
-    public List<GestionReconocimientoMedicoInfantilRequest.ServiceInformation> getServiceInformation() {
-        if (serviceInformation == null) {
-            serviceInformation = new ArrayList<>();
-        }
-        return this.serviceInformation;
-    }
-
-    /**
-     * Gets the value of the benefitsType property.
-     *
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the benefitsType property.
-     *
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getBenefitsType().add(newItem);
-     * </pre>
-     *
-     *
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link GestionReconocimientoMedicoInfantilRequest.BenefitsType }
-     */
-    public List<GestionReconocimientoMedicoInfantilRequest.BenefitsType> getBenefitsType() {
-        if (benefitsType == null) {
-            benefitsType = new ArrayList<>();
-        }
-        return this.benefitsType;
-    }
-
 
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
@@ -294,6 +231,7 @@ public class GestionReconocimientoMedicoInfantilRequest {
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
             "tutor",
+            "idInterviniente",
             "identificationCode",
             "name",
             "surname",
@@ -310,35 +248,30 @@ public class GestionReconocimientoMedicoInfantilRequest {
             "phoneNumber1",
             "phoneNumber2",
             "agent",
+            "serviceInformation",
+            "benefitsType"
     })
-
-
     public static class CandidateInformation {
 
         @XmlElement(required = true)
         protected Boolean tutor;
         @XmlElement(required = true)
+        protected String idInterviniente;
         protected String identificationCode;
         @XmlElement(required = true)
         protected String name;
         @XmlElement(required = true)
         protected String surname;
-        @XmlElement(required = true)
+        @XmlElement(required = true, nillable = true)
         protected GenderType gender;
-        @XmlElement(required = true)
         protected MaritalStatusType maritalStatus;
         @XmlElement(required = true)
         @XmlSchemaType(name = "dateTime")
         protected XMLGregorianCalendar birthDate;
-        @XmlElement(required = true)
         protected String address;
-        @XmlElement(required = true)
         protected String city;
-        @XmlElement(required = true)
         protected String province;
-        @XmlElement(required = true)
         protected String country;
-        @XmlElement(required = true)
         protected String postalCode;
         protected String email;
         @XmlElement(required = true)
@@ -346,11 +279,16 @@ public class GestionReconocimientoMedicoInfantilRequest {
         protected String phoneNumber1;
         protected String phoneNumber2;
         protected String agent;
+        @XmlElement(name = "ServiceInformation", nillable = true)
+        protected List<GestionReconocimientoMedicoInfantilRequest.ServiceInformation> serviceInformation;
+        @XmlElement(name = "BenefitsType", required = true)
+        protected List<GestionReconocimientoMedicoInfantilRequest.BenefitsType> benefitsType;
 
         @Override
         public String toString() {
             return "CandidateInformation{" +
                     "tutor=" + tutor +
+                    ", idInterviniente='" + idInterviniente + '\'' +
                     ", identificationCode='" + identificationCode + '\'' +
                     ", name='" + name + '\'' +
                     ", surname='" + surname + '\'' +
@@ -367,6 +305,8 @@ public class GestionReconocimientoMedicoInfantilRequest {
                     ", phoneNumber1='" + phoneNumber1 + '\'' +
                     ", phoneNumber2='" + phoneNumber2 + '\'' +
                     ", agent='" + agent + '\'' +
+                    ", serviceInformation=" + serviceInformation +
+                    ", benefitsType=" + benefitsType +
                     '}';
         }
 
@@ -388,6 +328,26 @@ public class GestionReconocimientoMedicoInfantilRequest {
          */
         public void setTutor(Boolean value) {
             this.tutor = value;
+        }
+
+        /**
+         * Gets the value of the fiscalIdentificationNumber property.
+         *
+         * @return possible object is
+         * {@link String }
+         */
+        public String getIdInterviniente() {
+            return idInterviniente;
+        }
+
+        /**
+         * Sets the value of the fiscalIdentificationNumber property.
+         *
+         * @param value allowed object is
+         *              {@link String }
+         */
+        public void setIdInterviniente(String value) {
+            this.idInterviniente = value;
         }
 
         /**
@@ -708,6 +668,80 @@ public class GestionReconocimientoMedicoInfantilRequest {
          */
         public void setAgent(String value) {
             this.agent = value;
+        }
+
+        /**
+         * Gets the value of the serviceInformation property.
+         *
+         * <p>
+         * This accessor method returns a reference to the live list,
+         * not a snapshot. Therefore any modification you make to the
+         * returned list will be present inside the JAXB object.
+         * This is why there is not a <CODE>set</CODE> method for the serviceInformation property.
+         *
+         * <p>
+         * For example, to add a new item, do as follows:
+         * <pre>
+         *    getServiceInformation().add(newItem);
+         * </pre>
+         *
+         *
+         * <p>
+         * Objects of the following type(s) are allowed in the list
+         * {@link GestionReconocimientoMedicoInfantilRequest.ServiceInformation }
+         */
+        public List<GestionReconocimientoMedicoInfantilRequest.ServiceInformation> getServiceInformation() {
+            if (serviceInformation == null) {
+                serviceInformation = new ArrayList<>();
+            }
+            return this.serviceInformation;
+        }
+
+        /**
+         * Sets the value of the ServiceInformation property.
+         *
+         * @param value allowed object is
+         *              {@link GestionReconocimientoMedicoInfantilRequest.ServiceInformation }
+         */
+        public void setCandidateInformation(List<GestionReconocimientoMedicoInfantilRequest.ServiceInformation> value) {
+            this.serviceInformation = value;
+        }
+
+        /**
+         * Gets the value of the benefitsType property.
+         *
+         * <p>
+         * This accessor method returns a reference to the live list,
+         * not a snapshot. Therefore any modification you make to the
+         * returned list will be present inside the JAXB object.
+         * This is why there is not a <CODE>set</CODE> method for the benefitsType property.
+         *
+         * <p>
+         * For example, to add a new item, do as follows:
+         * <pre>
+         *    getBenefitsType().add(newItem);
+         * </pre>
+         *
+         *
+         * <p>
+         * Objects of the following type(s) are allowed in the list
+         * {@link GestionReconocimientoMedicoInfantilRequest.BenefitsType }
+         */
+        public List<GestionReconocimientoMedicoInfantilRequest.BenefitsType> getBenefitsType() {
+            if (benefitsType == null) {
+                benefitsType = new ArrayList<>();
+            }
+            return this.benefitsType;
+        }
+
+        /**
+         * Sets the value of the BenefitsType property.
+         *
+         * @param value allowed object is
+         *              {@link GestionReconocimientoMedicoInfantilRequest.BenefitsType }
+         */
+        public void setBenefitsType(List<GestionReconocimientoMedicoInfantilRequest.BenefitsType> value) {
+            this.benefitsType = value;
         }
 
     }

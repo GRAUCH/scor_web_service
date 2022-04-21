@@ -157,7 +157,7 @@ class AmaService implements ICompanyService{
 			candidateInformation.setPhoneNumber1(util.devolverTelefono1(expedientePoliza.getCandidato()))
 			candidateInformation.setPhoneNumber2(util.devolverTelefono2(expedientePoliza.getCandidato()))
 			candidateInformation.setPhoneNumber2(util.devolverTelefono2(expedientePoliza.getCandidato()))
-			candidateInformation.setProductCode(expedientePoliza.getProducto().getCodigoProductoCompanyia())
+			candidateInformation.setProductCode(expedientePoliza.getProducto().getCodigoProductoCompanya())
 			candidateInformation.setBirthDate(myFormat.format(fromUser.parse(expedientePoliza.getCandidato().getFechaNacimiento())))
 
 			expediente.setCandidateInformation(candidateInformation)
@@ -372,7 +372,7 @@ class AmaService implements ICompanyService{
 		expediente.setNumeroCertificado(util.devolverDatos(expedientePoliza.getNumCertificado()))
 		expediente.setFechaAltaPoliza(util.fromStringToXmlCalendar(expedientePoliza.getFechaApertura()))
 		expediente.setFechaSolicitudPoliza(util.fromStringToXmlCalendar(expedientePoliza.getFechaSolicitud()))
-		expediente.setProducto(util.devolverDatos(expedientePoliza.getProducto().getCodigoProductoCompanyia()))
+		expediente.setProducto(util.devolverDatos(expedientePoliza.getProducto().getCodigoProductoCompanya()))
 
 		/**ASOCIAMOS INTERVINIENTES EN EL EXPEDIENTE
 		 *

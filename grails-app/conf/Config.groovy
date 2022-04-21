@@ -78,9 +78,13 @@ grails.hibernate.pass.readonly = false
 grails.hibernate.osiv.readonly = false
 
 environments {
-    test {
+    local {
         grails.logging.jul.usebridge = true
-        println "Carga configuración entorno 'test'"
+        println "Carga configuración entorno 'local'"
+
+        zipPath = "/datos/scorWebservices/MethisLab"
+
+        caserInfantilProductCode = "3698,3699"
 
         cxf {
             client {
@@ -97,7 +101,7 @@ environments {
                     wsdl = "http://172.17.0.33:8888/orabpel/default/ComprimirDocumentos/ComprimirDocumentos?wsdl"
                     namespace = "com.scor.comprimirdocumentos"
                     clientInterface = "com.scor.comprimirdocumentos.ComprimirDocumentos"
-                    serviceEndpointAddress = "http://172.17.0.33:8888/orabpel/default/ComprimirDocumentos/ComprimirDocumentos"
+                    serviceEndpointAddress = "http://172.17.0.33:8888/orabpel/default/ComprimirDocumentos/ComprimirDocumentos/2.0"
                     connectionTimeout = 240000
                     enableDefaultLoggingInterceptors = false
                 }
@@ -119,6 +123,10 @@ environments {
 
         grails.logging.jul.usebridge = true
 
+        zipPath = "/datos/scorWebservices/MethisLab"
+
+        caserInfantilProductCode = "3698,3699"
+
         cxf {
             client {
                 soapClientAlptis {
@@ -134,17 +142,15 @@ environments {
                     wsdl = "http://172.17.0.33:8888/orabpel/default/ComprimirDocumentos/ComprimirDocumentos?wsdl"
                     namespace = "com.scor.comprimirdocumentos"
                     clientInterface = "com.scor.comprimirdocumentos.ComprimirDocumentos"
-                    serviceEndpointAddress = "http://172.17.0.33:8888/orabpel/default/ComprimirDocumentos/1.0"
+                    serviceEndpointAddress = "http://172.17.0.33:8888/orabpel/default/ComprimirDocumentos/2.0"
                     connectionTimeout = 99999
                     enableDefaultLoggingInterceptors = false
                 }
 
                 soapClientCrearOrabpel {
-//					wsdl="wsdl/crear.wsdl"
                     wsdl = "http://172.17.0.33:8888/orabpel/default/CreacionExpedienteAsyncSRP/4.0?wsdl"
                     namespace = "com.scor.creacionexpedienteasyncsrp"
                     clientInterface = "com.scor.creacionexpedienteasyncsrp.CreacionExpedienteAsyncSRP"
-                    //serviceEndpointAddress="wsdl/crear.wsdl"
                     serviceEndpointAddress = "http://172.17.0.33:8888/orabpel/default/CreacionExpedienteAsyncSRP/4.0?wsdl"
                     connectionTimeout = 99999
                     enableDefaultLoggingInterceptors = false
@@ -153,10 +159,15 @@ environments {
         }
     }
 
-    preproduction_wildfly {
-        println "Carga configuración entorno 'preproduction_wildfly'"
+    integration {
+        println "Carga configuración entorno 'integration'"
+
         grails.logging.jul.usebridge = true
 
+        zipPath = "/datos/scorWebservices/MethisLab"
+
+        caserInfantilProductCode = "3698,3699"
+
         cxf {
             client {
                 soapClientAlptis {
@@ -172,17 +183,15 @@ environments {
                     wsdl = "http://172.17.0.33:8888/orabpel/default/ComprimirDocumentos/ComprimirDocumentos?wsdl"
                     namespace = "com.scor.comprimirdocumentos"
                     clientInterface = "com.scor.comprimirdocumentos.ComprimirDocumentos"
-                    serviceEndpointAddress = "http://172.17.0.33:8888/orabpel/default/ComprimirDocumentos/1.0"
+                    serviceEndpointAddress = "http://172.17.0.33:8888/orabpel/default/ComprimirDocumentos/2.0"
                     connectionTimeout = 99999
                     enableDefaultLoggingInterceptors = false
                 }
 
                 soapClientCrearOrabpel {
-//					wsdl="wsdl/crear.wsdl"
                     wsdl = "http://172.17.0.33:8888/orabpel/default/CreacionExpedienteAsyncSRP/4.0?wsdl"
                     namespace = "com.scor.creacionexpedienteasyncsrp"
                     clientInterface = "com.scor.creacionexpedienteasyncsrp.CreacionExpedienteAsyncSRP"
-                    //serviceEndpointAddress="wsdl/crear.wsdl"
                     serviceEndpointAddress = "http://172.17.0.33:8888/orabpel/default/CreacionExpedienteAsyncSRP/4.0?wsdl"
                     connectionTimeout = 99999
                     enableDefaultLoggingInterceptors = false
@@ -191,9 +200,54 @@ environments {
         }
     }
 
-    production_wildfly{
-        println "Carga configuración entorno 'production_wildfly'"
+    preproduction {
+        println "Carga configuración entorno 'preproduction'"
+        grails.logging.jul.usebridge = true
+
+        zipPath = "/datos/scorWebservices/MethisLab"
+
+        caserInfantilProductCode = "3698,3699"
+
+        cxf {
+            client {
+                soapClientAlptis {
+                    wsdl = "http://172.17.0.33:8003/FrontalServiciosCRM/FrontalService?wsdl"
+                    namespace = "servicios"
+                    clientInterface = "servicios.Frontal"
+                    serviceEndpointAddress = "http://172.17.0.33:8003/FrontalServiciosCRM/FrontalService?wsdl"
+                    connectionTimeout = 99999
+                    enableDefaultLoggingInterceptors = false
+                }
+
+                soapClientComprimidoAlptis {
+                    wsdl = "http://172.17.0.33:8888/orabpel/default/ComprimirDocumentos/ComprimirDocumentos?wsdl"
+                    namespace = "com.scor.comprimirdocumentos"
+                    clientInterface = "com.scor.comprimirdocumentos.ComprimirDocumentos"
+                    serviceEndpointAddress = "http://172.17.0.33:8888/orabpel/default/ComprimirDocumentos/2.0"
+                    connectionTimeout = 99999
+                    enableDefaultLoggingInterceptors = false
+                }
+
+                soapClientCrearOrabpel {
+                    wsdl = "http://172.17.0.33:8888/orabpel/default/CreacionExpedienteAsyncSRP/4.0?wsdl"
+                    namespace = "com.scor.creacionexpedienteasyncsrp"
+                    clientInterface = "com.scor.creacionexpedienteasyncsrp.CreacionExpedienteAsyncSRP"
+                    serviceEndpointAddress = "http://172.17.0.33:8888/orabpel/default/CreacionExpedienteAsyncSRP/4.0?wsdl"
+                    connectionTimeout = 99999
+                    enableDefaultLoggingInterceptors = false
+                }
+            }
+        }
+    }
+
+    production{
+        println "Carga configuración entorno 'production'"
         grails.logging.jul.usebridge = false
+
+        zipPath = "/datos/scorWebservices/MethisLab"
+
+        caserInfantilProductCode = "6142,6143"
+
         cxf {
             client {
                 soapClientAlptis {
@@ -280,8 +334,8 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
 
 log4j = {
     environments {
-        test {
-            println "Carga configuración log4j 'test'"
+        local {
+            println "Carga configuración log4j 'local'"
             appenders {
                 layout:
                 pattern(conversionPattern: '%c{2} %m%n')
@@ -289,23 +343,22 @@ log4j = {
                         name: 'infoAppender',
                         datePattern: "'.'yyyy-MM-dd",
                         threshold: org.apache.log4j.Level.INFO,
-                        fileName: './logs/scorWebserviceInfo.log',  //storage path of log file
+                        fileName: '/var/log/wildfly/appLogs/webservicessoap/scorWebserviceInfo.log',  //storage path of log file
                         layout: pattern(conversionPattern: '%d [%t] %-5p %c{2} %x - %m%n')
                 )
                 appender new DailyRollingFileAppender(
                         name: 'errorAppender',
                         datePattern: "'.'yyyy-MM-dd",
                         threshold: org.apache.log4j.Level.ERROR,
-                        fileName: './logs/scorWebserviceError.log',  //storage path of log file
+                        fileName: '/var/log/wildfly/appLogs/webservicessoap/scorWebserviceError.log',  //storage path of log file
                         layout: pattern(conversionPattern: '%d [%t] %-5p %c{2} %x - %m%n')
                 )
                 appender new DailyRollingFileAppender(
                         name: 'debugAppender',
                         datePattern: "'.'yyyy-MM-dd",
                         threshold: org.apache.log4j.Level.DEBUG,
-                        fileName: './logs/scorWebserviceDebug.log',  //storage path of log file
+                        fileName: '/var/log/wildfly/appLogs/webservicessoap/scorWebserviceDebug.log',  //storage path of log file
                         layout: pattern(conversionPattern: '%d [%t] %-5p %c{2} %x - %m%n')
-
                 )
             }
 
@@ -320,24 +373,22 @@ log4j = {
                         name: 'infoAppender',
                         datePattern: "'.'yyyy-MM-dd",
                         threshold: org.apache.log4j.Level.INFO,
-                        fileName: 'C:\\temp\\scorWebserviceInfo.log',  //storage path of log file
+                        fileName: '/var/log/wildfly/appLogs/webservicessoap/scorWebserviceInfo.log',  //storage path of log file
                         layout: pattern(conversionPattern: '%d [%t] %-5p %c{2} %x - %m%n')
                 )
                 appender new DailyRollingFileAppender(
                         name: 'errorAppender',
                         datePattern: "'.'yyyy-MM-dd",
                         threshold: org.apache.log4j.Level.ERROR,
-                        fileName: 'C:\\temp\\scorWebserviceError.log',  //storage path of log file
+                        fileName: '/var/log/wildfly/appLogs/webservicessoap/scorWebserviceError.log',  //storage path of log file
                         layout: pattern(conversionPattern: '%d [%t] %-5p %c{2} %x - %m%n')
                 )
             }
 
         }
 
-
-
-        preproduction_wildfly {
-            println "Carga configuración log4j 'preproduction_wildfly'"
+        integration {
+            println "Carga configuración log4j 'integration'"
             appenders {
                 layout:
                 pattern(conversionPattern: '%c{2} %m%n')
@@ -345,22 +396,45 @@ log4j = {
                         name: 'infoAppender',
                         datePattern: "'.'yyyy-MM-dd",
                         threshold: org.apache.log4j.Level.INFO,
-                        fileName: '/datos/apps/logs/webservicessoap/scorWebserviceInfo.log',  //storage path of log file
+                        fileName: '/var/log/wildfly/appLogs/webservicessoap/scorWebserviceInfo.log',  //storage path of log file
                         layout: pattern(conversionPattern: '%d [%t] %-5p %c{2} %x - %m%n')
                 )
                 appender new DailyRollingFileAppender(
                         name: 'errorAppender',
                         datePattern: "'.'yyyy-MM-dd",
                         threshold: org.apache.log4j.Level.ERROR,
-                        fileName: '/datos/apps/logs/webservicessoap/scorWebserviceError.log',  //storage path of log file
+                        fileName: '/var/log/wildfly/appLogs/webservicessoap/scorWebserviceError.log',  //storage path of log file
                         layout: pattern(conversionPattern: '%d [%t] %-5p %c{2} %x - %m%n')
                 )
             }
 
         }
 
-        production_wildfly {
-            println "Carga configuración log4j 'production_wildfly'"
+        preproduction {
+            println "Carga configuración log4j 'preproduction'"
+            appenders {
+                layout:
+                pattern(conversionPattern: '%c{2} %m%n')
+                appender new DailyRollingFileAppender(
+                        name: 'infoAppender',
+                        datePattern: "'.'yyyy-MM-dd",
+                        threshold: org.apache.log4j.Level.INFO,
+                        fileName: '/var/log/wildfly/appLogs/webservicessoap/scorWebserviceInfo.log',  //storage path of log file
+                        layout: pattern(conversionPattern: '%d [%t] %-5p %c{2} %x - %m%n')
+                )
+                appender new DailyRollingFileAppender(
+                        name: 'errorAppender',
+                        datePattern: "'.'yyyy-MM-dd",
+                        threshold: org.apache.log4j.Level.ERROR,
+                        fileName: '/var/log/wildfly/appLogs/webservicessoap/scorWebserviceError.log',  //storage path of log file
+                        layout: pattern(conversionPattern: '%d [%t] %-5p %c{2} %x - %m%n')
+                )
+            }
+
+        }
+
+        production {
+            println "Carga configuración log4j 'production'"
             appenders {
                 layout:
                 pattern(conversionPattern: '%c{2} %m%n')

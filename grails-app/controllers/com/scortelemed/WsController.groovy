@@ -470,6 +470,7 @@ class WsController {
             logginService.putInfoMessage(sbInfo?.toString())
             RegistrarEventoSCOR entradaDetalle = new RegistrarEventoSCOR()
             String stringRequest = null
+            int erroneos = 0
             expedientes.each { expediente ->
                 entradaDetalle = transformacion.obtenerDetalle(expediente)
                 if (entradaDetalle != null) {
@@ -491,6 +492,7 @@ class WsController {
                         /**Metemos en errores
                          *
                          */
+                        erroneos++
                         Error error = new Error()
                         error.setFecha(new Date())
                         error.setCia(company.id?.toString())
@@ -506,7 +508,7 @@ class WsController {
             }
 
             logginService.putInfoMessage("proceso envio de informacion para " + company.nombre + " terminado.")
-            logginService.putInfoMessage("** Se enviaron :" + expedientes.size() + " **")
+            logginService.putInfoMessage("** Se han procesado :" + expedientes.size() + " **" + "Correctamente/Erroneos:" + expedientes.size()-erroneos + "/" + erroneos)
             sbInfo.append("\n")
             sbInfo.append("* se procesaron cantidad : ${expedientes.size()} *")
             flash.message = sbInfo?.toString()
@@ -918,7 +920,7 @@ class WsController {
         RespuestaCRM respuestaCRM = expedienteService.consultaExpedienteCodigoST(codigost, unidad)
        if(respuestaCRM?.getListaExpedientes()?.size() > 0) {
            Expediente expediente = respuestaCRM?.getListaExpedientes()?.get(0)
-           def zip = commonZipService.obtenerZipFile(expediente)
+           def zip = commonZipService.obtenerZipFile(expediente.nodoAlfresco)
 
            String contentDisposition = 'attachment'
            String mimeType2 = 'APPLICATION/OCTET-STREAM'
@@ -1000,5 +1002,9 @@ class WsController {
                 break
         }
         return literal
+    }
+
+    boolean notNullNotEmpty(String entrada) {
+        return (entrada && !entrada.trim().isEmpty())
     }
 }

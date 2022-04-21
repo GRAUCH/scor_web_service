@@ -174,12 +174,13 @@ class MethislabCFUnderwrittingCaseManagementService {
 					expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt,null,1,fechaIni,fechaFin,company.ou))
 					expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt,null,2,fechaIni,fechaFin,company.ou))
 
-					requestService.insertarEnvio(company, methislabCFUnderwrittingCasesResults.dateStart.toString().substring(0,10) + "-" + methislabCFUnderwrittingCasesResults.dateEnd.toString().substring(0,10), requestXML.toString())
 
+
+					String idIdentificador = new Date().format( 'dd-mm-yyyy HH:mm:ss' )
 					if(expedientes){
-
+						requestService.insertarEnvio(company, "SOLICITUD: " + idIdentificador , requestXML.toString())
 						expedientes.each { expedientePoliza ->
-
+							requestService.insertarEnvio(company, "EXPEDIENTE: " + idIdentificador, "ST:" + expedientePoliza.getCodigoST() + "#CIA:" + expedientePoliza.getNumSolicitud())
 							resultado.getExpediente().add(methislabCFService.rellenaDatosSalidaConsulta(expedientePoliza, methislabCFUnderwrittingCasesResults.dateStart, logginService))
 						}
 
@@ -193,7 +194,7 @@ class MethislabCFUnderwrittingCaseManagementService {
 						messages = "Nessun risultato per le date indicate"
 						status = StatusType.OK
 						code = 6
-
+						requestService.insertarEnvio(company, "SOLICITUD: " + idIdentificador , "No hay resultados para " + company.nombre)
 						logginService.putInfoEndpoint("ResultadoReconocimientoMedico","No hay resultados para " + company.nombre)
 					}
 				} else {

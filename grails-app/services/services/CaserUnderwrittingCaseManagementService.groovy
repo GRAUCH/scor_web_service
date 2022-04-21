@@ -156,9 +156,7 @@ class CaserUnderwrittingCaseManagementService {
                     notes = "El caso se ha procesado correctamente"
                     status = StatusType.OK
 
-                    Collection<Validation> validationCollection = validationService.obtenerValidaciones(company.getCodigoSt(), company.getOu().toString(), gestionReconocimientoMedicoInfantil.getPolicyInformation().getProductCode())
-
-                    caserService.validarCoberturas(gestionReconocimientoMedicoInfantil, company)
+                    caserService.comprobarValidaciones(gestionReconocimientoMedicoInfantil, company)
 
                     logginService.putInfoMessage("Se procede el alta automatica de ${company.getNombre()} con numero de solicitud ${numeroSolicitud}")
 
@@ -430,7 +428,7 @@ class CaserUnderwrittingCaseManagementService {
             Operacion operacion = estadisticasService.obtenerObjetoOperacion(opername)
 
             if (operacion && operacion.activo) {
-
+                String idIdentificador = new Date().format( 'dd-mm-yyyy HH:mm:ss' )
                 if (consultaExpediente && consultaExpediente.codExpediente) {
 
                     requestXML = caserService.marshall(consultaExpediente)
@@ -440,7 +438,7 @@ class CaserUnderwrittingCaseManagementService {
 
                     respuestaCRM = expedienteService.consultaExpedienteNumSolicitud(consultaExpediente.codExpediente, company.ou, company.codigoSt)
 
-                    requestService.insertarEnvio(company, consultaExpediente.codExpediente, requestXML.toString())
+                    requestService.insertarEnvio(company, "SOLICITUD: " + idIdentificador, requestXML.toString())
 
                     if (respuestaCRM != null && respuestaCRM.getListaExpedientes() != null) {
 
@@ -453,6 +451,7 @@ class CaserUnderwrittingCaseManagementService {
                              */
 
                             if (expediente.getCandidato().getCompanya().getCodigoST().equals(company.getCodigoSt())) {
+                                requestService.insertarEnvio(company, "EXPEDIENTE: " + idIdentificador, "ST:" + expedientePoliza.getCodigoST() + "#CIA:" + expedientePoliza.getNumSolicitud())
                                 resultado.getExpedienteConsulta().add(caserService.rellenaDatosSalidaConsulta(expediente, util.fromDateToXmlCalendar(new Date()), logginService))
                             }
                         }
@@ -469,7 +468,7 @@ class CaserUnderwrittingCaseManagementService {
                         resultado.expedienteConsulta = null
                         notes = "No hay resultados para el expediente indicado"
                         status = StatusType.OK
-
+                        requestService.insertarEnvio(company, "SOLICITUD: " + idIdentificador , "No hay resultados para " + company.nombre)
                         logginService.putInfoEndpoint("ConsultaExpediente", "No hay resultados para " + company.nombre)
                     }
                 } else {
