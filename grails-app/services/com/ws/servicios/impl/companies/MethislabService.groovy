@@ -102,9 +102,14 @@ class MethislabService implements ICompanyService{
         byte[] compressedData = commonZipService.obtenerZip(expedientePoliza.getNodoAlfresco())
 
         expediente.setZip(compressedData)
+        
+        byte[] ba = Base64.getDecoder().decode(compressedData)
+        ba = Base64.getDecoder().decode(ba)
 
-        //TODO Completar: ver que hacemos si el zip viene vacio, no la usamos hasta que sepamos que hacer
-        boolean haveData = saveZipFile(expedientePoliza, compressedData)
+        LocalDate localDate = LocalDate.now();//For reference
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        String dateString = localDate.format(formatter);
+        String fileName = "${Conf.findByName('methislab.path').value}/${expedientePoliza.getNumSolicitud}_${expedientePoliza.getNumSolicitud}_${dateString}.zip"
 
 
         expediente.setNotes(util.devolverDatos(expedientePoliza.getTarificacion().getObservaciones()))
