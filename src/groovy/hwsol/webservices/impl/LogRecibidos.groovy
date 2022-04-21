@@ -25,6 +25,8 @@ class LogRecibidos implements LogService{
 
     LogRecibidos(){}
 
+    def logginService
+
     List elementos
     Parser parser = new Parser()
 
@@ -93,7 +95,7 @@ class LogRecibidos implements LogService{
     private List<Recibido> findRecibidos(desde, hasta, Company company, Map sortParams) {
         StringBuilder hqlQueryBuilder = new StringBuilder(' ')
         hqlQueryBuilder << 'FROM Recibido AS recibido  '
-        Map namedParams = [idCia: company.id]
+        Map namedParams = [idCia: company.id.toString()]
         hqlQueryBuilder << 'WHERE cia = :idCia '
         hqlQueryBuilder << 'AND '
         hqlQueryBuilder << "fecha BETWEEN  :iniDate "
@@ -103,6 +105,12 @@ class LogRecibidos implements LogService{
         namedParams["iniDate"] = desde
         hqlQueryBuilder << "ORDER BY fecha DESC"
         System.out.println("idCia ID  -->>" + company.id)
-        Recibido.executeQuery(hqlQueryBuilder.toString(), namedParams, sortParams)
+
+        try {
+            Recibido.executeQuery(hqlQueryBuilder.toString(), namedParams, sortParams)
+        } catch (Exception e) {
+            logginService.putErrorMessage(this.class.getName() + + ".findRecibidos: Error:" + e.getCause().getMessage())
+            throw new Exception(e.getMessage(), e)
+        }
     }
 }

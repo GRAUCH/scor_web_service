@@ -2,6 +2,8 @@ package com.ws.servicios.impl
 
 import com.scor.global.ExceptionUtils
 import com.scor.global.WSException
+import com.scor.srpfileinbound.DATOS
+import com.scor.srpfileinbound.REGISTRODATOS
 import com.scor.srpfileinbound.RootElement
 import com.scortelemed.Company
 import com.scortelemed.Conf
@@ -53,12 +55,19 @@ class ExpedienteService implements IExpedienteService {
         try {
             def ctx = grailsApplication.mainContext
             def bean = ctx.getBean("soapClientAlptis")
-            bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY,Conf.findByName("frontal.wsdl")?.value)
-            def salida=grailsApplication.mainContext.soapClientAlptis.consultaExpediente(obtenerUsuarioFrontal(pais),filtro)
+            bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("frontal.wsdl")?.value)
+            def salida = grailsApplication.mainContext.soapClientAlptis.consultaExpediente(obtenerUsuarioFrontal(pais), filtro)
             return salida
         } catch (Exception e) {
-            logginService.putError("consultaExpediente","No se ha podido consultar el expediente " + e)
-            correoUtil.envioEmailErrores("consultaExpediente", "No se ha podido consultar el expediente ", e)
+            String error = "No se ha podido consultar el expediente"
+            Filtro actual = filtro
+            while (actual != null) {
+                error += " con " + actual.getClave() + " = " + actual.getValor()
+                actual = actual.getFiltroRelacionado()
+            }
+            correoUtil.envioEmailErrores("consultaExpediente", error, e)
+            error += ": Causa " + e
+            logginService.putError("consultaExpediente", error)
             return null
         }
     }
@@ -134,7 +143,7 @@ class ExpedienteService implements IExpedienteService {
             return salida.listaExpedientes
         } catch (Exception e) {
             logginService.putError("obtenerInformeExpedientesSiniestros", "No se ha podido obtener el informe de expediente " + e)
-            correoUtil.envioEmailErrores("obtenerInformeExpedientesSiniestros", "No se ha podido obtener el informe de expediente ->   Error msg: "  + e.getMessage()+"    Causa : " + e.getCause())
+            correoUtil.envioEmailErrores("obtenerInformeExpedientesSiniestros", "No se ha podido obtener el informe de expediente ->   Error msg: " + e.getMessage() + "    Causa : " + e.getCause())
             return null
         }
     }
@@ -143,11 +152,11 @@ class ExpedienteService implements IExpedienteService {
         try {
             def ctx = grailsApplication.mainContext
             def bean = ctx.getBean("soapClientAlptis")
-            bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY,Conf.findByName("frontal.wsdl")?.value)
-            def salida=grailsApplication.mainContext.soapClientAlptis.informeExpedientesPorFiltro(obtenerUsuarioFrontal(pais),filtro)
+            bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("frontal.wsdl")?.value)
+            def salida = grailsApplication.mainContext.soapClientAlptis.informeExpedientesPorFiltro(obtenerUsuarioFrontal(pais), filtro)
             return salida.listaExpedientesInforme
         } catch (Exception e) {
-            logginService.putError("informeExpedientePorFiltro de ama","No se ha podido obtener el informe de expediente : " + e)
+            logginService.putError("informeExpedientePorFiltro de ama", "No se ha podido obtener el informe de expediente : " + e)
             return null
         }
     }
@@ -168,7 +177,7 @@ class ExpedienteService implements IExpedienteService {
             return salida
         } catch (Exception e) {
             logginService.putError("modificaExpediente", "No se ha podido ejecutar la operacion de modificacion : " + e)
-            correoUtil.envioEmailErrores("modificaExpediente", "No se ha podido ejecutar la operacion de modificacion ->   Error msg: "  + e.getMessage()+"    Causa : " + e.getCause())
+            correoUtil.envioEmailErrores("modificaExpediente", "No se ha podido ejecutar la operacion de modificacion ->   Error msg: " + e.getMessage() + "    Causa : " + e.getCause())
             return null
         }
     }
@@ -185,28 +194,47 @@ class ExpedienteService implements IExpedienteService {
 
             CaserService companyService
 
+            List<RootElement> payloadList
+
             if (comp == TipoCompany.CASER) {
                 companyService = new CaserService()
             }
 
-            if (companyService?.esCaserInfantil(req)){
+            if (companyService?.esCaserInfantil(req)) {
 
-                    // NECESITAMOS RELENTIZAR EL ENVÍO DE PETICIONES SOAP AL FRONTAL, YA QUE SI LLEGAN DEMASIADO RÁPIDO SE REPITEN LOS CÓDIGOS ST,
-                    // POR LO QUE USAREMOS UN DELAY DE 30 SEGUNDOS (TIEMPO QUE TARDA BPEL EN CREAR UN EXPEDIENTE EN CRM ES DE 25 SEGUNDOS),
-                    // EN EL CASO DEL ÚLTIMO EXPEDIENTE, SÓLO ESPERAMOS 5 SEGUNDOS
+                payloadList = new ArrayList<>()
+                Map<String, Boolean> candidateIdentificationCodesWithTutor = new HashMap<>()
+                List<String> candidateIdentificationCodes = companyService?.obtenerCandidateIdIntervinienteList(req, candidateIdentificationCodesWithTutor)
 
-                    for (int i = 0; i < companyService.obtenerNumeroCandidatos(req); i++) {
-                        logginService.putInfoMessage("Creando expediente " + (i+1) + " de " + companyService.obtenerNumeroCandidatos(req))
-                        realizarPeticionSOAP(req, comp, crearExpedienteCaserInfantil(req, i))
+                for (int i = 0; i < companyService.obtenerNumeroCandidatos(req); i++) {
+                    logginService.putInfoMessage("Procesando candidato " + (i + 1) + " de " + companyService.obtenerNumeroCandidatos(req))
 
-                        if (i == companyService.obtenerNumeroCandidatos(req) - 1) {
-                            Thread.currentThread().sleep(5000)
-                        } else {
-                            Thread.currentThread().sleep(25000)
+                    payloadList.add(crearExpedienteCaserInfantil(req, candidateIdentificationCodes, candidateIdentificationCodesWithTutor, i))
+                }
+
+                // NECESITAMOS RELENTIZAR EL ENVÍO DE PETICIONES SOAP AL FRONTAL, YA QUE SI LLEGAN DEMASIADO RÁPIDO SE REPITEN LOS CÓDIGOS ST,
+                // POR LO QUE USAREMOS UN DELAY DE 30 SEGUNDOS (TIEMPO QUE TARDA BPEL EN CREAR UN EXPEDIENTE EN CRM ES DE 25 SEGUNDOS),
+                // EN EL CASO DEL ÚLTIMO EXPEDIENTE, SÓLO ESPERAMOS 5 SEGUNDOS
+
+                for (int i = 0; i < companyService.obtenerNumeroCandidatos(req); i++) {
+                    logginService.putInfoMessage("Creando expediente " + (i + 1) + " de " + companyService.obtenerNumeroCandidatos(req))
+
+                    for (payload in payloadList) {
+                        if (payload.getCABECERAOrDATOSOrPIE().size() != 3) {
+                            throw new Exception("La peticion a bpel está mal formada")
                         }
                     }
 
-                    return true
+                    realizarPeticionSOAP(req, comp, payloadList.get(i))
+
+                    if (i == companyService.obtenerNumeroCandidatos(req) - 1) {
+                        Thread.currentThread().sleep(5000)
+                    } else {
+                        Thread.currentThread().sleep(30000)
+                    }
+                }
+
+                return true
 
             } else {
                 return realizarPeticionSOAP(req, comp, crearExpedienteBPM(req, comp))
@@ -246,24 +274,24 @@ class ExpedienteService implements IExpedienteService {
             listadoFinal.add(buildPie(null))
             payload.cabeceraOrDATOSOrPIE = listadoFinal
         } catch (Exception e) {
-           logginService.putError("crearExpedienteBPM","Error en el metodo crearExpedienteBPM: " + e)
+            logginService.putError("crearExpedienteBPM", "Error en el metodo crearExpedienteBPM: " + e)
             //TODO: EXCEPTION: SE CAPTURA PERO NO SE PROPAGA
         }
         return payload
     }
 
-    private def crearExpedienteCaserInfantil(Request req, int iteradorCandidatosIndex) {
+    private def crearExpedienteCaserInfantil(Request req, List<String> candidateIdentificationCodes, Map<String, Boolean> candidateIdentificationCodesWithTutor, int iteradorCandidatosIndex) {
         companyService = new CaserService()
         def listadoFinal = []
         RootElement payload = new RootElement()
         try {
             String codigoSt = companyService.getCodigoStManual(req)
             listadoFinal.add(buildCabecera(req, codigoSt))
-            listadoFinal.add(companyService.buildDatosCaserInfantil(req, codigoSt, iteradorCandidatosIndex))
+            listadoFinal.add(companyService.buildDatosCaserInfantil(req, codigoSt, candidateIdentificationCodes, candidateIdentificationCodesWithTutor, iteradorCandidatosIndex))
             listadoFinal.add(buildPie(null))
             payload.cabeceraOrDATOSOrPIE = listadoFinal
         } catch (Exception e) {
-            logginService.putError("crearExpedienteCaserInfantil","Error en el metodo crearExpedienteCaserInfantil: " + e)
+            logginService.putError("crearExpedienteCaserInfantil", "Error en el metodo crearExpedienteCaserInfantil: " + e)
             throw new Exception(e)
         }
         return payload
@@ -272,7 +300,7 @@ class ExpedienteService implements IExpedienteService {
     private def buildCabecera(Request req, String codigoSt) {
         def formato = new SimpleDateFormat("yyyyMMdd")
         RootElement.CABECERA cabecera = new RootElement.CABECERA()
-        if(codigoSt) {
+        if (codigoSt) {
             cabecera.setCodigoCia(codigoSt)
         } else {
             cabecera.setCodigoCia(req.company.codigoSt)
@@ -300,7 +328,7 @@ class ExpedienteService implements IExpedienteService {
     Usuario obtenerUsuarioFrontal(UnidadOrganizativa unidadOrganizativa) {
         def usuario = new Usuario()
 
-        switch(unidadOrganizativa) {
+        switch (unidadOrganizativa) {
             case UnidadOrganizativa.ES:
                 if (Environment.current.name.equals("production_wildfly")) {
                     usuario.clave = "7Q%NN!v5"
@@ -369,12 +397,19 @@ class ExpedienteService implements IExpedienteService {
         final List<ExpedienteCRMDynamicsDTO> expedientes
 
         try {
+
             // Cogemos la sesión de Hibernate para el datasource del CRMDynamics
-            final sessionCRMDynamics = sessionFactory_CRMDynamics.currentSession
+            def ctx = grailsApplication.mainContext
+            System.out.println(ctx.toString())
+            def sessionFactory = ctx.sessionFactory_CRMDynamics
+            def sessionCRMDynamics = sessionFactory.currentSession
+
+            // Cogemos la sesión de Hibernate para el datasource del CRMDynamics
+            //final sessionCRMDynamics = sessionFactory_CRMDynamics.currentSession
 
             // Creamos la queryString con el parámetro :companyCodigoPais, :companyCodigoSt, :numSolicitud y :productoIdName
             // IMPORTANTE: HAY QUE REALIZAR EL CAST( XXX AS VARCHAR(5000)) PORQUE EN SQLSERVER SE PRODUCE UN ERROR DE DIALECT AL INTENTAR CREAR LA LISTA DE RESULTADOS
-            final String query = 'SELECT CAST(A.Scor_name as VARCHAR(5000)) as codigoExpedienteST, CAST(E.scor_codigoST as VARCHAR(5000)) as codigoCompanyiaST, CAST(A.scor_nsolicitud_compania as VARCHAR(5000)) as numSolicitud FROM Scor_expediente AS A, Contact AS C, Scor_codBusinessUnit AS D, Scor_clienteExtensionBase as E WHERE A.DeletionStateCode = \'0\' and (C.contactId = A.scor_candidatoid) and (A.owningbusinessunit = D.scor_unidaddenegocioid) and (C.scor_candidatosid = e.Scor_clienteID) and d.scor_codigopais=:companyCodigoPais and E.scor_codigoST=:companyCodigoSt and A.scor_nsolicitud_compania=:numSolicitud and A.scor_productoidName=:productoIdName order by a.Scor_name'
+            final String query = 'SELECT CAST(A.Scor_name as VARCHAR(5000)) as codigoExpedienteST, CAST(E.scor_codigoST as VARCHAR(5000)) as codigoCompanyiaST, CAST(A.scor_nsolicitud_compania as VARCHAR(5000)) as numSolicitud FROM Scor_expediente AS A, Contact AS C, Scor_codBusinessUnit AS D, Scor_clienteExtensionBase as E WHERE A.DeletionStateCode = \'0\' and (C.contactId = A.scor_candidatoid) and (A.owningbusinessunit = D.scor_unidaddenegocioid) and (C.scor_candidatosid = E.Scor_clienteID) and D.scor_codigopais=:companyCodigoPais and E.scor_codigoST=:companyCodigoSt and A.scor_nsolicitud_compania=:numSolicitud and A.scor_productoidName=:productoIdName order by a.Scor_name'
 
             // Creamos la query nativa SQL
             final sqlQuery = sessionCRMDynamics.createSQLQuery(query)
@@ -436,7 +471,12 @@ class ExpedienteService implements IExpedienteService {
 
         try {
             // Cogemos la sesión de Hibernate para el datasource del CRMDynamics
-            final sessionCRMDynamics = sessionFactory_CRMDynamics.currentSession
+            def ctx = grailsApplication.mainContext
+            System.out.println(ctx.toString())
+            def sessionFactory = ctx.sessionFactory_CRMDynamics
+            def sessionCRMDynamics = sessionFactory.currentSession
+
+            //final sessionCRMDynamics = sessionFactory_CRMDynamics.currentSession
 
             // Creamos la queryString con el parámetro :companyCodigoSt, :fechaIni, :fechaFin y :companyCodigoPais
             // IMPORTANTE: HAY QUE REALIZAR EL CAST( XXX AS VARCHAR(5000)) PORQUE EN SQLSERVER SE PRODUCE UN ERROR DE DIALECT AL INTENTAR CREAR LA LISTA DE RESULTADOS
@@ -503,7 +543,13 @@ class ExpedienteService implements IExpedienteService {
 
         try {
             // Cogemos la sesión de Hibernate para el datasource del CRMDynamics
-            final sessionCRMDynamics = sessionFactory_CRMDynamics.currentSession
+            def ctx = grailsApplication.mainContext
+            System.out.println(ctx.toString())
+            def sessionFactory = ctx.sessionFactory_CRMDynamics
+            def sessionCRMDynamics = sessionFactory.currentSession
+
+            // Cogemos la sesión de Hibernate para el datasource del CRMDynamics
+            //final sessionCRMDynamics = sessionFactory_CRMDynamics.currentSession
 
             // Creamos la queryString con el parámetro :companyCodigoSt, :numSolicitud y :companyCodigoPais
             // IMPORTANTE: HAY QUE REALIZAR EL CAST( XXX AS VARCHAR(5000)) PORQUE EN SQLSERVER SE PRODUCE UN ERROR DE DIALECT AL INTENTAR CREAR LA LISTA DE RESULTADOS
@@ -568,7 +614,13 @@ class ExpedienteService implements IExpedienteService {
 
         try {
             // Cogemos la sesión de Hibernate para el datasource del CRMDynamics
-            final sessionCRMDynamics = sessionFactory_CRMDynamics.currentSession
+            def ctx = grailsApplication.mainContext
+            System.out.println(ctx.toString())
+            def sessionFactory = ctx.sessionFactory_CRMDynamics
+            def sessionCRMDynamics = sessionFactory.currentSession
+
+            // Cogemos la sesión de Hibernate para el datasource del CRMDynamics
+            //final sessionCRMDynamics = sessionFactory_CRMDynamics.currentSession
 
             // Creamos la queryString con el parámetro :codigoExpedienteST
             // IMPORTANTE: HAY QUE REALIZAR EL CAST( XXX AS VARCHAR(5000)) PORQUE EN SQLSERVER SE PRODUCE UN ERROR DE DIALECT AL INTENTAR CREAR LA LISTA DE RESULTADOS
@@ -633,7 +685,13 @@ class ExpedienteService implements IExpedienteService {
 
         try {
             // Cogemos la sesión de Hibernate para el datasource del CRMDynamics
-            final sessionCRMDynamics = sessionFactory_CRMDynamics.currentSession
+            def ctx = grailsApplication.mainContext
+            System.out.println(ctx.toString())
+            def sessionFactory = ctx.sessionFactory_CRMDynamics
+            def sessionCRMDynamics = sessionFactory.currentSession
+
+            // Cogemos la sesión de Hibernate para el datasource del CRMDynamics
+            //final sessionCRMDynamics = sessionFactory_CRMDynamics.currentSession		
 
             // Creamos la queryString con el parámetro :codigoExpedienteST
             // IMPORTANTE: HAY QUE REALIZAR EL CAST( XXX AS VARCHAR(5000)) PORQUE EN SQLSERVER SE PRODUCE UN ERROR DE DIALECT AL INTENTAR CREAR LA LISTA DE RESULTADOS
@@ -692,7 +750,13 @@ class ExpedienteService implements IExpedienteService {
 
         try {
             // Cogemos la sesión de Hibernate para el datasource del CRMDynamics
-            final sessionCRMDynamics = sessionFactory_CRMDynamics.currentSession
+            def ctx = grailsApplication.mainContext
+            System.out.println(ctx.toString())
+            def sessionFactory = ctx.sessionFactory_CRMDynamics
+            def sessionCRMDynamics = sessionFactory.currentSession
+
+            // Cogemos la sesión de Hibernate para el datasource del CRMDynamics
+            //final sessionCRMDynamics = sessionFactory_CRMDynamics.currentSession
 
             // Creamos la queryString con el parámetro :codigoExpedienteST
             // IMPORTANTE: HAY QUE REALIZAR EL CAST( XXX AS VARCHAR(5000)) PORQUE EN SQLSERVER SE PRODUCE UN ERROR DE DIALECT AL INTENTAR CREAR LA LISTA DE RESULTADOS
@@ -726,7 +790,7 @@ class ExpedienteService implements IExpedienteService {
 
             String opername = "ExpedienteService BusquedaCrm"
             String logExpediente = getLogExpediente(policyNumber, requestNumber, certificateNumber, company.codigoSt)
-            logginService.putInfoMessage(opername+" - Buscando en CRM solicitud de "+logExpediente)
+            logginService.putInfoMessage(opername + " - Buscando en CRM solicitud de " + logExpediente)
             RespuestaCRM respuestaCrm
             int limite = 1
             boolean encontrado = false
@@ -735,19 +799,19 @@ class ExpedienteService implements IExpedienteService {
             Thread.currentThread().sleep(25000)
 
             try {
-                while( !encontrado && limite < 20) {
+                while (!encontrado && limite < 20) {
                     Thread.currentThread().sleep(5000)
                     respuestaCrm = consultaExpediente(company.ou, filtro)
                     if (respuestaCrm != null && respuestaCrm.getListaExpedientes() != null && respuestaCrm.getListaExpedientes().size() > 0) {
-                        for (Expediente exp: respuestaCrm.getListaExpedientes()) {
-                            logginService.putInfoMessage(opername+" - Expediente encontrado: " + exp.getCodigoST() + " para " + company.nombre)
+                        for (Expediente exp : respuestaCrm.getListaExpedientes()) {
+                            logginService.putInfoMessage(opername + " - Expediente encontrado: " + exp.getCodigoST() + " para " + company.nombre)
 
                             String fechaCreacion = format.format(new Date())
                             if (exp.getCandidato() != null && exp.getCandidato().getCompanya() != null && exp.getCandidato().getCompanya().getCodigoST().equals(company.codigoSt) &&
-                                    fechaCreacion != null && fechaCreacion.equals(exp.getFechaApertura())){
+                                    fechaCreacion != null && fechaCreacion.equals(exp.getFechaApertura())) {
                                 /**Alta procesada correctamente*/
                                 encontrado = true
-                                logginService.putInfoMessage(opername+" - Nueva alta automatica de "+logExpediente+" procesada correctamente. Verificado tras "+limite+" intentos")
+                                logginService.putInfoMessage(opername + " - Nueva alta automatica de " + logExpediente + " procesada correctamente. Verificado tras " + limite + " intentos")
                             }
                         }
                     }
@@ -756,26 +820,26 @@ class ExpedienteService implements IExpedienteService {
 
                 /**Alta procesada pero no se ha encontrado en CRM.*/
                 if (limite == 10) {
-                    logginService.putInfoMessage(opername+" - Nueva alta de "+logExpediente+" se ha procesado pero no se ha dado de alta en CRM")
-                    correoUtil.envioEmailErrores(opername,"Nueva alta de "+logExpediente+" se ha procesado pero no se ha dado de alta en CRM",null)
-                    requestService.insertarError(company.id, requestNumber, requestBBDD.request, TipoOperacion.ALTA, "Peticion procesada para solicitud: "+logExpediente+". Error: No encontrada en CRM")
+                    logginService.putInfoMessage(opername + " - Nueva alta de " + logExpediente + " se ha procesado pero no se ha dado de alta en CRM")
+                    correoUtil.envioEmailErrores(opername, "Nueva alta de " + logExpediente + " se ha procesado pero no se ha dado de alta en CRM", null)
+                    requestService.insertarError(company.id, requestNumber, requestBBDD.request, TipoOperacion.ALTA, "Peticion procesada para solicitud: " + logExpediente + ". Error: No encontrada en CRM")
                 }
             } catch (Exception e) {
-                logginService.putInfoMessage(opername+" - Nueva alta de "+logExpediente+". Error: " + e.getMessage())
-                correoUtil.envioEmailErrores(opername,"Nueva alta de "+logExpediente,e)
+                logginService.putInfoMessage(opername + " - Nueva alta de " + logExpediente + ". Error: " + e.getMessage())
+                correoUtil.envioEmailErrores(opername, "Nueva alta de " + logExpediente, e)
             }
         }
     }
 
     private String getLogExpediente(String numPoliza, String numSolicitud, String numCertificado, String codigoStCompany) {
         String logExpediente = codigoStCompany
-        if(numPoliza) {
+        if (numPoliza) {
             logExpediente = logExpediente.concat(" con numPoliza: " + numPoliza)
         }
-        if(numSolicitud) {
+        if (numSolicitud) {
             logExpediente = logExpediente.concat(" con numSolicitud: " + numSolicitud)
         }
-        if(numCertificado) {
+        if (numCertificado) {
             logExpediente = logExpediente.concat(" con numCertificado: " + numCertificado)
         }
         return logExpediente
@@ -783,16 +847,16 @@ class ExpedienteService implements IExpedienteService {
 
     private Filtro getFiltradoCRM(String numPoliza, String numSolicitud, String numCertificado, String codigoStCompany) {
         Filtro filtro = new Filtro()
-        if(numPoliza) {
+        if (numPoliza) {
             filtro.setClave(ClaveFiltro.NUM_POLIZA)
             filtro.setValor(numPoliza)
-        } else if(codigoStCompany && numSolicitud) {
+        } else if (codigoStCompany && numSolicitud) {
             filtro.setClave(ClaveFiltro.CLIENTE)
             filtro.setValor(codigoStCompany)
             Filtro filtroRelacionado = new Filtro()
             filtroRelacionado.setClave(ClaveFiltro.NUM_SOLICITUD)
             filtroRelacionado.setValor(numSolicitud)
-            if(numCertificado) {
+            if (numCertificado) {
                 Filtro filtroRelacionado2 = new Filtro()
                 filtroRelacionado2.setClave(ClaveFiltro.NUM_CERTIFICADO)
                 filtroRelacionado2.setValor(numCertificado)
