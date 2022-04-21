@@ -156,13 +156,9 @@ class AmaService implements ICompanyService{
 			candidateInformation.setMobileNumber(util.devolverTelefonoMovil(expedientePoliza.getCandidato()))
 			candidateInformation.setPhoneNumber1(util.devolverTelefono1(expedientePoliza.getCandidato()))
 			candidateInformation.setPhoneNumber2(util.devolverTelefono2(expedientePoliza.getCandidato()))
-<<<<<<< Updated upstream
-			candidateInformation.setPhoneNumber2(util.devolverTelefono2(expedientePoliza.getCandidato()))
-			candidateInformation.setProductCode(expedientePoliza.getProducto().getCodigoProductoCompanya())
-=======
 			//candidateInformation.setPhoneNumber2(util.devolverTelefono2(expedientePoliza.getCandidato()))
 			candidateInformation.setProductCode(expedientePoliza.getProducto().getCodigoProductoCompanyia())
->>>>>>> Stashed changes
+
 			candidateInformation.setBirthDate(myFormat.format(fromUser.parse(expedientePoliza.getCandidato().getFechaNacimiento())))
 
 			expediente.setCandidateInformation(candidateInformation)
