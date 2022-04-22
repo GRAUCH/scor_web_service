@@ -55,8 +55,8 @@ class ValidationService implements IValidationService {
             }
         }
         catch (Exception e) {
-            logginService.putError(this.class.getName() + ".validarCoberturas", "Error en la validacion de coberturas para la compañia " + company.getNombre() + " y producto " + codigoProductoCompanyia + ": " + ExceptionUtils.composeMessage(null, e))
-            correoUtil.envioEmailErrores(this.class.getName() + ".validarCoberturas", "Error en la validacion de coberturas para la compañia " + company.getNombre() + " y producto " + codigoProductoCompanyia + ": ", e)
+            logginService.putError(this.class.getName() + ".validarCoberturas", "Error en la validacion de coberturas para la companyia " + companyia.getNombre() + " y producto " + codigoProductoCompanyia + ": " + ExceptionUtils.composeMessage(null, e))
+            correoUtil.envioEmailErrores(this.class.getName() + ".validarCoberturas", "Error en la validacion de coberturas para la companyia " + companyia.getNombre() + " y producto " + codigoProductoCompanyia + ": ", e)
             throw new Exception(e.getMessage(), e)
         }
 
