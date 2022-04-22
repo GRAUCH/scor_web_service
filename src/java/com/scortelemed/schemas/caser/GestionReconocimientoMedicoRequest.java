@@ -416,7 +416,7 @@ public class GestionReconocimientoMedicoRequest {
         protected String email;
         @XmlElement(required = true, nillable = true)
         protected GenderType gender;
-        protected CivilStateType civilState;
+        protected MaritalStatusType civilState;
         @XmlElement(required = true)
         protected String mobileNumber;
         protected String phoneNumber1;
@@ -676,10 +676,10 @@ public class GestionReconocimientoMedicoRequest {
          * 
          * @return
          *     possible object is
-         *     {@link CivilStateType }
+         *     {@link MaritalStatusType }
          *     
          */
-        public CivilStateType getCivilState() {
+        public MaritalStatusType getCivilState() {
             return civilState;
         }
 
@@ -688,10 +688,10 @@ public class GestionReconocimientoMedicoRequest {
          * 
          * @param value
          *     allowed object is
-         *     {@link CivilStateType }
+         *     {@link MaritalStatusType }
          *     
          */
-        public void setCivilState(CivilStateType value) {
+        public void setCivilState(MaritalStatusType value) {
             this.civilState = value;
         }
 

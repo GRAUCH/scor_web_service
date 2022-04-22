@@ -156,8 +156,9 @@ class AmaService implements ICompanyService{
 			candidateInformation.setMobileNumber(util.devolverTelefonoMovil(expedientePoliza.getCandidato()))
 			candidateInformation.setPhoneNumber1(util.devolverTelefono1(expedientePoliza.getCandidato()))
 			candidateInformation.setPhoneNumber2(util.devolverTelefono2(expedientePoliza.getCandidato()))
-			candidateInformation.setPhoneNumber2(util.devolverTelefono2(expedientePoliza.getCandidato()))
-			candidateInformation.setProductCode(expedientePoliza.getProducto().getCodigoProductoCompanya())
+			//candidateInformation.setPhoneNumber2(util.devolverTelefono2(expedientePoliza.getCandidato()))
+			candidateInformation.setProductCode(expedientePoliza.getProducto().getCodigoProductoCompanyia())
+
 			candidateInformation.setBirthDate(myFormat.format(fromUser.parse(expedientePoliza.getCandidato().getFechaNacimiento())))
 
 			expediente.setCandidateInformation(candidateInformation)
@@ -702,7 +703,10 @@ class AmaService implements ICompanyService{
 						datos.telefono2 = eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent()
 					}
 
-					if (eElement.getElementsByTagName("mobileNumber").item(0) != null && eElement.getElementsByTagName("mobileNumber").item(0).getTextContent() != null && !eElement.getElementsByTagName("mobileNumber").item(0).getTextContent().toString().equals(0) && eElement.getElementsByTagName("phoneNumber2").item(0) != null && !eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent().toString().equals("0")) {
+					if (eElement.getElementsByTagName("mobileNumber").item(0) != null && eElement.getElementsByTagName("mobileNumber").item(0).getTextContent() != null && !eElement.getElementsByTagName("mobileNumber").item(0).getTextContent().toString().equals(0)) {
+						//21/04/22
+						//Eliminamos esta condición porque se estaban perdiendo datos si no llegaba el tag phoneNumber2 
+						//&& eElement.getElementsByTagName("phoneNumber2").item(0) != null && !eElement.getElementsByTagName("phoneNumber2").item(0).getTextContent().toString().equals("0")) {
 						datos.telefono3 = eElement.getElementsByTagName("mobileNumber").item(0).getTextContent()
 					}
 

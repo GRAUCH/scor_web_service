@@ -6,7 +6,6 @@ import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
-import javax.jws.soap.SOAPBinding.ParameterStyle;
 import javax.xml.bind.annotation.XmlSeeAlso;
 
 /**
@@ -53,4 +52,22 @@ public interface CaserUnderwrittingCaseManagementService {
         @WebParam(partName = "ResultadoReconocimientoMedicoRequest", name = "ResultadoReconocimientoMedicoRequest", targetNamespace = "http://www.scortelemed.com/schemas/caser")
         ResultadoReconocimientoMedicoRequest resultadoReconocimientoMedicoRequest
     );
+
+    @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
+    @WebResult(name = "GestionReconocimientoMedicoInfantilResponse", targetNamespace = "http://www.scortelemed.com/schemas/caser", partName = "GestionReconocimientoMedicoInfantilResponse")
+    @WebMethod
+    public GestionReconocimientoMedicoInfantilResponse gestionReconocimientoMedicoInfantil(
+            @WebParam(partName = "GestionReconocimientoMedicoInfantilRequest", name = "GestionReconocimientoMedicoInfantilRequest", targetNamespace = "http://www.scortelemed.com/schemas/caser")
+                    GestionReconocimientoMedicoInfantilRequest gestionReconocimientoMedicoInfantilRequest
+    );
+
+    //TODO: EMPAQUETDOR DE ZIP DE ZIPS
+    /*
+    @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
+    @WebResult(name = "ResultadoReconocimientoMedicoInfantilResponse", targetNamespace = "http://www.scortelemed.com/schemas/caser", partName = "ResultadoReconocimientoMedicoResponse")
+    @WebMethod
+    public ResultadoReconocimientoMedicoInfantilResponse resultadoReconocimientoMedicoInfantil(
+            @WebParam(partName = "ResultadoReconocimientoMedicoInfantilRequest", name = "ResultadoReconocimientoMedicoInfantilRequest", targetNamespace = "http://www.scortelemed.com/schemas/caser")
+                    ResultadoReconocimientoMedicoInfantilRequest resultadoReconocimientoMedicoInfantilRequest
+    );*/
 }

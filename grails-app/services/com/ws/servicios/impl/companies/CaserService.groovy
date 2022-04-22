@@ -1,19 +1,23 @@
 package com.ws.servicios.impl.companies
 
 import com.scor.global.ExceptionUtils
+import com.scor.global.ValorUtils
 import com.scor.global.WSException
 import com.scor.srpfileinbound.DATOS
 import com.scor.srpfileinbound.REGISTRODATOS
 import com.scortelemed.Company
 import com.scortelemed.Request
-import com.scortelemed.TipoCompany
+import com.scortelemed.Validation
 import com.scortelemed.schemas.caser.*
 import com.scortelemed.schemas.caser.ConsultaExpedienteResponse.ExpedienteConsulta
 import com.scortelemed.schemas.caser.ResultadoReconocimientoMedicoResponse.Expediente
+import com.sun.codemodel.JOp
+import com.velogica.model.dto.CandidatoCRMDynamicsDTO
+import com.velogica.model.dto.CoberturasCRMDynamicsDTO
+import com.velogica.model.dto.ExpedienteCRMDynamicsDTO
 import com.ws.enumeration.UnidadOrganizativa
 import com.ws.servicios.ICompanyService
-import com.ws.servicios.IComprimidoService
-import com.ws.servicios.ServiceFactory
+import com.ws.servicios.impl.ValidationService
 import grails.util.Holders
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
@@ -22,13 +26,18 @@ import org.w3c.dom.Element
 import org.w3c.dom.Node
 import org.w3c.dom.NodeList
 import org.xml.sax.InputSource
+import org.xml.sax.SAXException
 import servicios.RespuestaCRM
 
+import javax.xml.datatype.XMLGregorianCalendar
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
+import javax.xml.parsers.ParserConfigurationException
+import java.lang.reflect.UndeclaredThrowableException
 import java.text.SimpleDateFormat
+import java.util.regex.Pattern
 
-class CaserService implements ICompanyService{
+class CaserService implements ICompanyService {
 
     TransformacionUtil util = new TransformacionUtil()
     def commonZipService
@@ -36,6 +45,7 @@ class CaserService implements ICompanyService{
     def requestService = Holders.getGrailsApplication().mainContext.getBean("requestService")
     def expedienteService = Holders.getGrailsApplication().mainContext.getBean("expedienteService")
     def tarificadorService = Holders.getGrailsApplication().mainContext.getBean("tarificadorService")
+    def validationService = Holders.getGrailsApplication().mainContext.getBean("validationService")
     CorreoUtil correoUtil = new CorreoUtil()
 
 
@@ -47,6 +57,8 @@ class CaserService implements ICompanyService{
                 result = requestService.marshall(nameSpace, objeto, ResultadoReconocimientoMedicoRequest.class)
             } else if (objeto instanceof GestionReconocimientoMedicoRequest) {
                 result = requestService.marshall(nameSpace, objeto, GestionReconocimientoMedicoRequest.class)
+            } else if (objeto instanceof GestionReconocimientoMedicoInfantilRequest) {
+                result = requestService.marshall(nameSpace, objeto, GestionReconocimientoMedicoInfantilRequest.class)
             } else if (objeto instanceof ConsultaExpedienteRequest) {
                 result = requestService.marshall(nameSpace, objeto, ConsultaExpedienteRequest.class)
             } else if (objeto instanceof ConsolidacionPolizaRequest) {
@@ -62,42 +74,389 @@ class CaserService implements ICompanyService{
         try {
             DATOS dato = new DATOS()
             Company company = req.company
+
             dato.coberturas = rellenaCoberturas(req)
             dato.registro = rellenaDatos(req, company, dato.coberturas)
             dato.pregunta = rellenaPreguntas(req, company.nombre)
             dato.servicio = rellenaServicios(req)
+
             return dato
         } catch (Exception e) {
-            logginService.putError("buildDatos",e.toString())
+            logginService.putError("buildDatos", e.toString())
+            //TODO: EXCEPTION: SE CAPTURA PERO NO SE PROPAGA
         }
     }
 
+    def buildDatosCaserInfantil(Request req, String codigoSt, List<String> candidateIdentificationCodes, Map<String, Boolean> candidateIdentificationCodesWithTutor, int iteradorCandidatos) {
+        try {
+            DATOS dato = new DATOS()
+            Company company = req.company
+
+            dato.coberturas = rellenaCoberturasInfantil(req, iteradorCandidatos)
+            dato.registro = rellenaDatosInfantil(req, company, candidateIdentificationCodes, candidateIdentificationCodesWithTutor, iteradorCandidatos)
+            dato.pregunta = rellenaPreguntas(req, company.nombre)
+            dato.servicio = rellenaServiciosInfantil(req, iteradorCandidatos)
+
+            return dato
+        } catch (Exception e) {
+            logginService.putError("buildDatos", e.toString())
+            //TODO: EXCEPTION: SE CAPTURA PERO NO SE PROPAGA
+        }
+    }
+
+    def rellenaDatosInfantil(Request req, Company company, List<String> candidateIdentificationCodes, Map<String, Boolean> candidateIdentificationCodesWithTutor, int candidateIteratorIndex) {
+
+        def formato = new SimpleDateFormat("yyyyMMdd")
+        def apellido
+        def telefono1
+        def telefono2
+        def telefonoMovil
+
+        REGISTRODATOS datosRegistro = new REGISTRODATOS()
+
+        try {
+
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
+            DocumentBuilder builder = factory.newDocumentBuilder()
+
+            InputSource is = new InputSource(new StringReader(req.request))
+            is.setEncoding("UTF-8")
+            Document doc = builder.parse(is)
+
+            doc.getDocumentElement().normalize()
+
+            NodeList policyInformationList = doc.getElementsByTagName("PolicyInformation")
+
+            for (int temp = 0; temp < policyInformationList.getLength(); temp++) {
+
+                Node policyInformationNode = policyInformationList.item(temp)
+
+                if (policyInformationNode.getNodeType() == Node.ELEMENT_NODE) {
+
+                    Element policyInformationElement = (Element) policyInformationNode
+
+                    /**POLIZA
+                     *
+                     */
+
+                    if (policyInformationElement.getElementsByTagName("policyNumber").item(0) != null) {
+                        datosRegistro.numPoliza = policyInformationElement.getElementsByTagName("policyNumber").item(0).getTextContent()
+                    }
+
+                    /**CERTIFICADO
+                     *
+                     */
+
+                    if (policyInformationElement.getElementsByTagName("certificateNumber").item(0) != null) {
+                        datosRegistro.numCertificado = policyInformationElement.getElementsByTagName("certificateNumber").item(0).getTextContent()
+                    }
+
+                    /**CÓDIGO DE PRODUCTO
+                     *
+                     */
+
+                    if (policyInformationElement.getElementsByTagName("productCode").item(0) != null) {
+                        datosRegistro.codigoProducto = policyInformationElement.getElementsByTagName("productCode").item(0).getTextContent()
+                    }
+
+                    /**NUMERO DE REFERENCIA
+                     *
+                     */
+
+                    if (policyInformationElement.getElementsByTagName("requestNumber").item(0) != null) {
+                        datosRegistro.numSolicitud = policyInformationElement.getElementsByTagName("requestNumber").item(0).getTextContent()
+                    }
+
+                    /**FECHA DE SOLICITUD
+                     *
+                     */
+
+                    if (policyInformationElement.getElementsByTagName("requestDate").item(0) != null) {
+                        datosRegistro.fechaEnvio = formato.format(util.fromStringToXmlCalendar(policyInformationElement.getElementsByTagName("requestDate").item(0).getTextContent()).toGregorianCalendar().getTime())
+                    }
+
+                    /**OBSERVACIONES
+                     *
+                     */
+
+                    if (policyInformationElement.getElementsByTagName("comments").item(0) != null) {
+                        datosRegistro.observaciones = policyInformationElement.getElementsByTagName("comments").item(0).getTextContent()
+                    }
+
+
+                }
+            }
+
+            NodeList candidateNodeList = doc.getElementsByTagName("CandidateInformation")
+
+            Node candidateNode = candidateNodeList.item(candidateIteratorIndex)
+
+            if (candidateNode.getNodeType() == Node.ELEMENT_NODE) {
+
+                Element candidateInformationElement = (Element) candidateNode
+
+                /**DNI CANDIDATO
+                 *
+                 */
+
+                datosRegistro.dni = candidateIdentificationCodes.get(candidateIteratorIndex)
+
+                /**TUTOR
+                 *
+                 */
+
+                String observacionesTutor
+
+                if (candidateInformationElement.getElementsByTagName("tutor").item(0) != null && candidateInformationElement.getElementsByTagName("tutor").item(0).getTextContent().equals("true")) {
+                    observacionesTutor = "Tutor de "
+
+                    for (candidateIterator in candidateIdentificationCodesWithTutor) {
+                        if (!candidateIterator.getValue()) {
+                            observacionesTutor += StringBuilder.newInstance().append(candidateIterator.getKey()).append(", ")
+                        }
+                    }
+
+                    // Quitamos la última coma y la sustituimos por un punto
+                    observacionesTutor = StringBuilder.newInstance().append(observacionesTutor.substring(0, observacionesTutor.size() - 2)).append(".").toString()
+
+                    if (ValorUtils.isValid(datosRegistro.observaciones)) {
+                        datosRegistro.observaciones += StringBuilder.newInstance().append(". ").append(observacionesTutor).toString()
+                    } else {
+                        datosRegistro.observaciones += observacionesTutor
+                    }
+
+                } else {
+                    if (ValorUtils.isValid(datosRegistro.observaciones)) {
+                        observacionesTutor = "Tutelado por "
+                        for (candidateIterator in candidateIdentificationCodesWithTutor) {
+                            if (candidateIterator.getValue()) {
+                                observacionesTutor += StringBuilder.newInstance().append(candidateIterator.getKey()).append(", ")
+                            }
+                        }
+
+                        // Quitamos la última coma y la sustituimos por un punto
+                        observacionesTutor = StringBuilder.newInstance().append(observacionesTutor.substring(0, observacionesTutor.size() - 2)).append(".").toString()
+
+                        datosRegistro.observaciones += StringBuilder.newInstance().append(".").append(observacionesTutor).toString()
+                    } else {
+                        datosRegistro.observaciones += observacionesTutor
+                    }
+                }
+
+                /**NOMBRE DE CANDIDATO
+                 *
+                 */
+
+                if (candidateInformationElement.getElementsByTagName("name").item(0) != null) {
+                    datosRegistro.nombreCliente = candidateInformationElement.getElementsByTagName("name").item(0).getTextContent()
+                }
+
+                /**APELLIDO CANDIDATO
+                 *
+                 */
+
+                if (candidateInformationElement.getElementsByTagName("surname").item(0) != null) {
+                    apellido = candidateInformationElement.getElementsByTagName("surname").item(0).getTextContent()
+                }
+
+                datosRegistro.apellidosCliente = apellido
+
+                /**SEXO CANDIDATO
+                 *
+                 */
+
+                if (candidateInformationElement.getElementsByTagName("gender").item(0) != null) {
+                    datosRegistro.sexo = candidateInformationElement.getElementsByTagName("gender").item(0).getTextContent() == "M" ? "M" : "V"
+                } else {
+                    datosRegistro.sexo = "M"
+                }
+
+                /**ESTADO CIVIL
+                 *
+                 */
+
+                if (candidateInformationElement.getElementsByTagName("maritalStatus").item(0) != null) {
+                    datosRegistro.estadoCivil = candidateInformationElement.getElementsByTagName("maritalStatus").item(0).getTextContent()
+                }
+
+                /**FECHA DE NACIMIENTO
+                 *
+                 */
+
+                if (candidateInformationElement.getElementsByTagName("birthDate").item(0) != null && !candidateInformationElement.getElementsByTagName("birthDate").item(0).getTextContent().isEmpty()) {
+                    datosRegistro.fechaNacimiento = formato.format(util.fromStringToXmlCalendar(candidateInformationElement.getElementsByTagName("birthDate").item(0).getTextContent()).toGregorianCalendar().getTime())
+                } else {
+                    datosRegistro.fechaNacimiento = formato.format(util.fromStringToXmlCalendar("2017-01-01T00:00:00").toGregorianCalendar().getTime())
+                }
+
+                /**DIRECCION CLIENTE
+                 *
+                 */
+
+                if (candidateInformationElement.getElementsByTagName("address").item(0) != null) {
+                    datosRegistro.direccionCliente = candidateInformationElement.getElementsByTagName("address").item(0).getTextContent()
+                } else {
+                    datosRegistro.direccionCliente = "."
+                }
+
+                /**POBLACION
+                 *
+                 */
+
+                if (candidateInformationElement.getElementsByTagName("city").item(0) != null) {
+                    datosRegistro.poblacion = candidateInformationElement.getElementsByTagName("city").item(0).getTextContent()
+                } else {
+                    datosRegistro.poblacion = "."
+                }
+
+                /**PROVINCIA
+                 *
+                 */
+
+                if (candidateInformationElement.getElementsByTagName("province").item(0) != null) {
+                    datosRegistro.provincia = candidateInformationElement.getElementsByTagName("province").item(0).getTextContent()
+                } else {
+                    datosRegistro.provincia = "."
+                }
+
+                /**PAÍS
+                 *
+                 */
+
+                if (candidateInformationElement.getElementsByTagName("country").item(0) != null) {
+                    datosRegistro.pais = candidateInformationElement.getElementsByTagName("country").item(0).getTextContent()
+                } else {
+                    datosRegistro.pais = "."
+                }
+
+                /**CODIGO POSTAL CLIENTE
+                 *
+                 */
+
+                if (candidateInformationElement.getElementsByTagName("postalCode").item(0) != null) {
+                    datosRegistro.codigoPostal = candidateInformationElement.getElementsByTagName("postalCode").item(0).getTextContent()
+                } else {
+                    datosRegistro.codigoPostal = "."
+                }
+
+                /**EMAIL
+                 *
+                 */
+
+                if (candidateInformationElement.getElementsByTagName("email").item(0) != null) {
+                    datosRegistro.email = candidateInformationElement.getElementsByTagName("email").item(0).getTextContent()
+                }
+
+                /**TELEFONOS
+                 *
+                 */
+
+                if (candidateInformationElement.getElementsByTagName("mobileNumber").item(0) != null && candidateInformationElement.getElementsByTagName("mobileNumber").item(0).getTextContent() != null && !candidateInformationElement.getElementsByTagName("mobileNumber").item(0).getTextContent().isEmpty()) {
+                    telefonoMovil = candidateInformationElement.getElementsByTagName("mobileNumber").item(0).getTextContent()
+                    datosRegistro.telefono1 = telefonoMovil
+                }
+
+                if (candidateInformationElement.getElementsByTagName("phoneNumber1").item(0) != null && candidateInformationElement.getElementsByTagName("phoneNumber1").item(0).getTextContent() != null && !candidateInformationElement.getElementsByTagName("phoneNumber1").item(0).getTextContent().isEmpty()) {
+                    telefono1 = candidateInformationElement.getElementsByTagName("phoneNumber1").item(0).getTextContent()
+                    datosRegistro.telefono2 = telefono1
+                }
+
+                if (candidateInformationElement.getElementsByTagName("phoneNumber2").item(0) != null && candidateInformationElement.getElementsByTagName("phoneNumber2").item(0).getTextContent() != null && !candidateInformationElement.getElementsByTagName("phoneNumber2").item(0).getTextContent().isEmpty()) {
+                    telefono2 = candidateInformationElement.getElementsByTagName("phoneNumber2").item(0).getTextContent()
+                    datosRegistro.telefono3 = telefono2
+                }
+
+                /**CODIGO DE AGENTE
+                 *
+                 */
+
+                if (candidateInformationElement.getElementsByTagName("agent").item(0) != null) {
+                    datosRegistro.codigoAgencia = candidateInformationElement.getElementsByTagName("agent").item(0).getTextContent()
+                }
+
+                /**CODIGO CIA
+                 *
+                 */
+
+                datosRegistro.codigoCia = company.codigoSt
+
+            }
+
+            // AÑADIMOS EN EL CAMPO7 EL NÚMERO DE CANDIDATOS DE LA PÓLIZA PARA QUE APAREZCA EN EL CRM COMO subPolicyNumber (NÚMERO DE SUBPÓLIZA)
+            Integer subPolicyNumber = candidateNodeList.getLength()
+
+            setCamposGenericosInfantil(datosRegistro, subPolicyNumber.toString())
+
+            return datosRegistro
+        } catch (Exception e) {
+            throw new WSException(this.getClass(), "rellenaDatosInfantil", ExceptionUtils.composeMessage(null, e))
+        }
+    }
+
+    Boolean esCaserInfantil(Request req) {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
+        DocumentBuilder builder = factory.newDocumentBuilder()
+        Boolean esCaserInfantil = false
+        InputSource is = new InputSource(new StringReader(req.request))
+        is.setEncoding("UTF-8")
+        Document doc = builder.parse(is)
+
+        doc.getDocumentElement().normalize()
+
+        Node operation = doc.getElementsByTagName("GestionReconocimientoMedicoInfantilRequest").item(0)
+
+        if (operation != null) {
+
+            if (operation.getNodeName() == "GestionReconocimientoMedicoInfantilRequest")
+                esCaserInfantil = true
+        }
+
+        return esCaserInfantil
+    }
+
+    Integer obtenerNumeroCandidatos(Request req) throws ParserConfigurationException, IOException, SAXException {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
+        DocumentBuilder builder = factory.newDocumentBuilder()
+        InputSource is = new InputSource(new StringReader(req.getRequest()))
+        is.setEncoding("UTF-8")
+        Document doc = builder.parse(is)
+
+        doc.getDocumentElement().normalize()
+
+        NodeList nList = doc.getElementsByTagName("CandidateInformation")
+
+        return nList.getLength()
+    }
 
     def getCodigoStManual(Request req) {
         return null
     }
 
-    def rellenaDatosSalida(expedientePoliza, requestDate) {
+    def rellenaDatosSalida(String codigoExpedienteST, XMLGregorianCalendar requestDate) {
 
         Expediente expediente = new Expediente()
 
+        // obtenemos los datos del expediente
+        ExpedienteCRMDynamicsDTO datosExpediente = expedienteService.obtenerDatosExpedienteCRMDynamics(codigoExpedienteST)
+
         expediente.setRequestDate(requestDate)
-        expediente.setRequestNumber(util.devolverDatos(expedientePoliza.getNumSolicitud()))
-        expediente.setRequestState(util.devolverStateType(expedientePoliza.getCodigoEstado()))
-        expediente.setProductCode(util.devolverDatos(expedientePoliza.getProducto().getCodigoProductoCompanya()))
-        expediente.setPolicyNumber(util.devolverDatos(expedientePoliza.getNumPoliza()))
-        expediente.setCertificateNumber(util.devolverDatos(expedientePoliza.getNumCertificado()))
+        expediente.setRequestNumber(util.devolverDatos(datosExpediente.getNumSolicitud()))
+        expediente.setRequestState(util.devolverTipoEstadoCRM(datosExpediente.getCodigoEstadoExpediente()))
+        expediente.setProductCode(util.devolverDatos(datosExpediente.getCodigoProductoCompanyia()))
+        expediente.setPolicyNumber(util.devolverDatos(datosExpediente.getNumPoliza()))
+        expediente.setCertificateNumber(util.devolverDatos(datosExpediente.getNumCertificado()))
 
+        // obtenemos los datos del candidato del expediente
+        CandidatoCRMDynamicsDTO datosCandidatoExpediente = expedienteService.obtenerDatosCandidatoExpedienteCRMDynamics(codigoExpedienteST)
 
-        if (expedientePoliza.getCandidato() != null) {
-            expediente.setFiscalIdentificationNumber(expedientePoliza.getCandidato().getNumeroDocumento())
-            expediente.setMobilePhone(util.devolverTelefonoMovil(expedientePoliza.getCandidato()))
-            expediente.setPhoneNumber1(util.devolverTelefono1(expedientePoliza.getCandidato()))
-            expediente.setPhoneNumber2(util.devolverTelefono2(expedientePoliza.getCandidato()))
-            expediente.setDomicilio(expedientePoliza?.getCandidato()?.getDireccion())
-            expediente.setCodPostal(expedientePoliza?.getCandidato()?.getCodigoPostal())
-            expediente.setLocalidad(expedientePoliza?.getCandidato()?.getLocalidad())
-            expediente.setProvincia(expedientePoliza?.getCandidato()?.getProvincia())
+        if (datosCandidatoExpediente != null) {
+            expediente.setFiscalIdentificationNumber(datosCandidatoExpediente.getNumeroDocumento())
+            // Asignamos los teléfonos por orden de prioridad y tipo
+            util.asignarTelefonos(expediente, datosCandidatoExpediente)
+            expediente.setDomicilio(datosCandidatoExpediente.getDireccion())
+            expediente.setCodPostal(datosCandidatoExpediente.getCodPostal())
+            expediente.setLocalidad(datosCandidatoExpediente.getLocalidad())
+            expediente.setProvincia(datosCandidatoExpediente.getProvincia())
         } else {
             expediente.setFiscalIdentificationNumber("")
             expediente.setMobilePhone("")
@@ -109,15 +468,20 @@ class CaserService implements ICompanyService{
             expediente.setProvincia("")
         }
 
-        byte[] compressedData = commonZipService.obtenerZip(expedientePoliza.getNodoAlfresco())
+        byte[] compressedData = commonZipService.obtenerZip(datosExpediente.getNodoAlfresco())
 
         expediente.setZip(compressedData)
 
-        expediente.setNotes(util.devolverDatos(expedientePoliza.getTarificacion().getObservaciones()))
+        // obtenemos las observaciones de la tarificación de un expediente
 
-        if (expedientePoliza.getCoberturasExpediente() != null && expedientePoliza.getCoberturasExpediente().size() > 0) {
+        expediente.setNotes(util.devolverDatos(datosExpediente.getObservacionesTarificacion()))
 
-            expedientePoliza.getCoberturasExpediente().each { coberturasPoliza ->
+        // obtenemos las coberturas del expediente
+        List<CoberturasCRMDynamicsDTO> datosCoberturasExpediente = expedienteService.obtenerCoberturasExpedienteCRMDynamics(codigoExpedienteST)
+
+        if (datosCoberturasExpediente != null && datosCoberturasExpediente.size() > 0) {
+
+            datosCoberturasExpediente.each { coberturasPoliza ->
 
                 BenefitsType benefitsType = new BenefitsType()
 
@@ -128,7 +492,7 @@ class CaserService implements ICompanyService{
                 BenefictResultType benefictResultType = new BenefictResultType()
 
                 benefictResultType.setDescResult(util.devolverDatos(coberturasPoliza.getResultadoCobertura()))
-                benefictResultType.setResultCode(util.devolverDatos(coberturasPoliza.getCodResultadoCobertura()))
+                benefictResultType.setResultCode(util.devolverDatos(coberturasPoliza.getCodigoResultadoCobertura()))
 
                 benefictResultType.setPremiumLoading(util.devolverDatos(coberturasPoliza.getValoracionPrima()))
                 benefictResultType.setCapitalLoading(util.devolverDatos(coberturasPoliza.getValoracionCapital()))
@@ -136,10 +500,6 @@ class CaserService implements ICompanyService{
                 benefictResultType.setDescCapitalLoading("")
 
                 benefictResultType.exclusions = util.fromStringLoList(coberturasPoliza.getExclusiones())
-                benefictResultType.temporalLoading = util.fromStringLoList(coberturasPoliza.getValoracionTemporal())
-                benefictResultType.medicalReports = util.fromStringLoList(coberturasPoliza.getInformesMedicos())
-                //benefictResultType.medicalTest = util.fromStringLoList(coberturasPoliza.getInformes)
-                benefictResultType.notes = util.fromStringLoList(coberturasPoliza.getNotas())
 
                 benefitsType.setBenefictResult(benefictResultType)
 
@@ -225,14 +585,21 @@ class CaserService implements ICompanyService{
 
     def envioEmail(req) {
 
-        def datosEmail = rellenoDatosEmail(req)
+        def datosEmail
+
+        if (esCaserInfantil(req)) {
+            datosEmail = rellenoDatosEmailInfantil(req)
+        } else {
+            datosEmail = rellenoDatosEmail(req)
+        }
+
         def textEmail = compongoText(datosEmail)
 
         logginService.putInfo('Envio email modificacion Caser', textEmail)
         correoUtil.envioEmail('Caser MODIFICACION DE CASO', textEmail, 0)
     }
 
-    String compongoText(datosEmail){
+    String compongoText(datosEmail) {
         StringBuilder sb = new StringBuilder()
         sb.append("El Dossier del cliente ${datosEmail.get('nombre')}, ${datosEmail.get('apellido')} con DNI  ${datosEmail.get('dni')}")
         sb.append("\n")
@@ -245,6 +612,7 @@ class CaserService implements ICompanyService{
         sb.append("La modificacion es la siguiente :  ${datosEmail.get('comments')}")
         return sb.toString()
     }
+
     def rellenoDatosEmail(req) {
 
         def datosEmail = [:]
@@ -293,6 +661,53 @@ class CaserService implements ICompanyService{
 
     }
 
+    def rellenoDatosEmailInfantil(req) {
+
+        def datosEmail = [:]
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
+        DocumentBuilder builder = factory.newDocumentBuilder()
+
+        InputSource is = new InputSource(new StringReader(req.request))
+        is.setEncoding("UTF-8")
+        Document doc = builder.parse(is)
+
+        doc.getDocumentElement().normalize()
+
+        NodeList nList = doc.getElementsByTagName("PolicyInformation")
+        def requestNumber, policyNumber, certificateNumber, comments
+        Node nNode = nList.item(0)
+        if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+            Element eElement = (Element) nNode
+            requestNumber = eElement.getElementsByTagName("requestNumber").item(0).getTextContent()
+            policyNumber = eElement.getElementsByTagName("policyNumber").item(0).getTextContent()
+            certificateNumber = eElement.getElementsByTagName("certificateNumber").item(0).getTextContent()
+            comments = eElement.getElementsByTagName("comments").item(0).getTextContent()
+        }
+
+        datosEmail.put('requestNumber', requestNumber)
+        datosEmail.put('policyNumber', policyNumber)
+        datosEmail.put('certificateNumber', certificateNumber)
+        datosEmail.put('comments', comments)
+
+        nList = doc.getElementsByTagName("CandidateInformation")
+        def nombre, apellido, dni
+        for (int numCandidato = 0; numCandidato < nList.getLength(); numCandidato++) {
+            nNode = nList.item(numCandidato)
+            if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+                Element eElement = (Element) nNode
+                nombre = eElement.getElementsByTagName("name").item(0).getTextContent()
+                apellido = eElement.getElementsByTagName("surname").item(0).getTextContent()
+                dni = eElement.getElementsByTagName("identificationCode").item(0).getTextContent()
+
+                datosEmail.put('Candidato ' + numCandidato + ': nombre = ', nombre)
+                datosEmail.put('Candidato ' + numCandidato + ': apellido = ', apellido)
+                datosEmail.put('Candidato ' + numCandidato + ': dni = ', dni)
+            }
+        }
+
+        return datosEmail
+    }
+
     def rellenaDatos(req, company, coberturas) {
 
         def formato = new SimpleDateFormat("yyyyMMdd")
@@ -329,8 +744,6 @@ class CaserService implements ICompanyService{
                     /**NUMERO DE PRODUCTO
                      *
                      */
-
-
 
                     List<DATOS.Coberturas> coberturasList = coberturas
                     for (int i = 0; i < coberturasList.size(); i++) {
@@ -536,7 +949,7 @@ class CaserService implements ICompanyService{
                         datosRegistro.numCertificado = eElement.getElementsByTagName("certificateNumber").item(0).getTextContent()
                     }
 
-                    /**CERTIFICADO
+                    /**OBSERVACIONES
                      *
                      */
 
@@ -595,7 +1008,6 @@ class CaserService implements ICompanyService{
         }
     }
 
-
     private void setCamposGenericos(REGISTRODATOS datos, String productCia) {
 
         datos.lugarNacimiento = ""
@@ -612,6 +1024,147 @@ class CaserService implements ICompanyService{
         datos.campo6 = productCia
         datos.campo7 = ""
         datos.campo8 = productCia
+        datos.campo9 = ""
+        datos.campo10 = ""
+        datos.campo11 = ""
+        datos.campo12 = ""
+        datos.campo13 = ""
+        datos.campo14 = ""
+        datos.campo15 = ""
+        datos.campo16 = ""
+        datos.campo17 = ""
+        datos.campo18 = ""
+        datos.campo19 = ""
+        datos.campo20 = ""
+    }
+
+    public Map<String, Boolean> obtenerIdentificationNumberCandidatos(Request request) {
+
+        Pattern dniPattern = ~/^\d{8}[A-Z]$/
+        Pattern passportPattern = ~/^X\d{7}$/
+        String candidateIdentificationCode
+        String candidateIdInterviniente
+
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
+        DocumentBuilder builder = factory.newDocumentBuilder()
+
+        InputSource is = new InputSource(new StringReader(request.request))
+        is.setEncoding("UTF-8")
+        Document doc = builder.parse(is)
+
+        doc.getDocumentElement().normalize()
+
+        NodeList candidateNodeList = doc.getElementsByTagName("CandidateInformation")
+
+        Map<String, Boolean> candidatesIdentificationNumber = new HashMap<>()
+
+        for (int candidateIndex = 0; candidateIndex < candidateNodeList.getLength(); candidateIndex++) {
+
+            Node candidateNode = candidateNodeList.item(candidateIndex)
+
+            if (candidateNode.getNodeType() == Node.ELEMENT_NODE) {
+
+                Element candidateInformationElement = (Element) candidateNode
+
+                if (candidateInformationElement.getElementsByTagName("identificationCode").item(0) != null) {
+
+                    candidateIdentificationCode = candidateInformationElement.getElementsByTagName("identificationCode").item(0).getTextContent()
+
+                    if (candidateIdentificationCode ==~ dniPattern || candidateIdentificationCode ==~ passportPattern) {
+                        candidatesIdentificationNumber.put(candidateIdentificationCode, candidateInformationElement.getElementsByTagName("tutor").item(0).getTextContent().toBoolean())
+                    } else {
+                        candidateIdInterviniente = candidateInformationElement.getElementsByTagName("idInterviniente").item(0).getTextContent()
+                        candidatesIdentificationNumber.put(candidateIdInterviniente, candidateInformationElement.getElementsByTagName("tutor").item(0).getTextContent().toBoolean())
+                    }
+                }
+            }
+        }
+
+        return candidatesIdentificationNumber
+    }
+
+    private List<String> obtenerCandidateIdIntervinienteList(Request request, Map<String, Boolean> candidateIdentificationCodesWithTutor) {
+
+        Map<String, Boolean> candidateIdentificationCodes = obtenerIdentificationNumberCandidatos(request)
+        def dniTutor = obtenerDNITutor(candidateIdentificationCodes)
+
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
+        DocumentBuilder builder = factory.newDocumentBuilder()
+
+        InputSource is = new InputSource(new StringReader(request.request))
+        is.setEncoding("UTF-8")
+        Document doc = builder.parse(is)
+
+        doc.getDocumentElement().normalize()
+
+        NodeList candidateNodeList = doc.getElementsByTagName("CandidateInformation")
+
+        List<String> candidatesIdIntervinienteList = new ArrayList<>()
+        String candidateIdentificationCode
+        String candidateIdInterviniente
+        Boolean tutor
+
+        for (int candidateIndex = 0; candidateIndex < candidateNodeList.getLength(); candidateIndex++) {
+
+            Node candidateNode = candidateNodeList.item(candidateIndex)
+
+            if (candidateNode.getNodeType() == Node.ELEMENT_NODE) {
+
+                Element candidateInformationElement = (Element) candidateNode
+
+                candidateIdentificationCode = candidateInformationElement.getElementsByTagName("identificationCode").item(0).getTextContent()
+                candidateIdInterviniente = candidateInformationElement.getElementsByTagName("idInterviniente").item(0).getTextContent()
+                tutor = candidateInformationElement.getElementsByTagName("tutor").item(0).getTextContent().toBoolean()
+
+                if (candidateIdentificationCode == null || candidateIdentificationCode.isEmpty()) {
+                    if (dniTutor != null) {
+                        candidateIdentificationCode = "X" + dniTutor + "-" + candidateIndex
+                    } else {
+                        candidateIdentificationCode = "X" + candidateIdInterviniente
+                    }
+                }
+
+                candidatesIdIntervinienteList.add(candidateIdentificationCode)
+                candidateIdentificationCodesWithTutor.put(candidateIdentificationCode, tutor)
+            }
+        }
+
+        return candidatesIdIntervinienteList
+    }
+
+    private String obtenerDNITutor(Map<String, Boolean> dniTutorMap) {
+
+        String dniTutor = null
+        Boolean encontrado = false
+
+        for (dniTutorMapElement in dniTutorMap) {
+
+            if (dniTutorMapElement.getValue() == Boolean.TRUE && encontrado == Boolean.FALSE) {
+
+                dniTutor = dniTutorMapElement.getKey()
+                encontrado = Boolean.TRUE
+            }
+        }
+
+        return dniTutor
+    }
+
+    private void setCamposGenericosInfantil(REGISTRODATOS datos, String subPolicyNumber) {
+
+        datos.lugarNacimiento = ""
+        datos.pais = "ES"
+        datos.emailAgente = ""
+        datos.tipoCliente = "N"
+        datos.franjaHoraria = ""
+        datos.codigoCuestionario = ""
+        datos.campo1 = "es"
+        datos.campo2 = ""
+        datos.campo3 = "ES"
+        datos.campo4 = ""
+        datos.campo5 = ""
+        datos.campo6 = ""
+        datos.campo7 = subPolicyNumber
+        datos.campo8 = ""
         datos.campo9 = ""
         datos.campo10 = ""
         datos.campo11 = ""
@@ -827,6 +1380,280 @@ class CaserService implements ICompanyService{
         }
     }
 
+    private def rellenaCoberturasInfantil(Request req, int candidateIteratorIndex) {
+
+        def listadoCoberturas = []
+        def capital
+        String codigoProducto
+
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
+            DocumentBuilder builder = factory.newDocumentBuilder()
+
+            InputSource is = new InputSource(new StringReader(req.request))
+            is.setEncoding("UTF-8")
+            Document doc = builder.parse(is)
+
+            doc.getDocumentElement().normalize()
+
+            /**Primero tenemos que saber que producto nos llega para actuar en consecuencia
+             *
+             */
+
+            NodeList nListP = doc.getElementsByTagName("PolicyInformation")
+
+            for (int tempP = 0; tempP < nListP.getLength(); tempP++) {
+
+                Node nNode = nListP.item(tempP)
+
+                if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+
+                    Element eElement = (Element) nNode
+
+                    /**NUMERO DE PRODUCTO
+                     *
+                     */
+
+                    if (eElement.getElementsByTagName("productCode").item(0) != null) {
+                        if (eElement.getElementsByTagName("productCode").item(0).getTextContent().toString().equals("1190")) {
+                            codigoProducto = "SRP"
+                        } else {
+                            codigoProducto = eElement.getElementsByTagName("productCode").item(0).getTextContent().toString()
+                        }
+                    }
+                }
+            }
+
+            /**Calculamos las coberturas en base al producto y candidato
+             *
+             */
+
+            NodeList candidateNodeList = doc.getElementsByTagName("CandidateInformation")
+
+            Node candidateNode = candidateNodeList.item(candidateIteratorIndex)
+
+            if (candidateNode.getNodeType() == Node.ELEMENT_NODE) {
+
+                Element candidateElement = (Element) candidateNode
+
+                NodeList nList = candidateElement.getElementsByTagName("BenefitsType")
+
+                for (int temp = 0; temp < nList.getLength(); temp++) {
+
+                    Node nNode = nList.item(temp)
+
+                    if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+
+                        Element eElement = (Element) nNode
+
+                        DATOS.Coberturas cobertura = new DATOS.Coberturas()
+
+                        /**COBERTURAS QUE NOS LLEGAN
+                         *
+                         */
+                        cobertura.filler = ""
+                        cobertura.codigoCobertura = eElement.getElementsByTagName("benefictCode").item(0).getTextContent().toUpperCase()
+                        cobertura.capital = Float.parseFloat(eElement.getElementsByTagName("benefictCapital").item(0).getTextContent())
+
+                        listadoCoberturas.add(cobertura)
+
+                        capital = Float.parseFloat(eElement.getElementsByTagName("benefictCapital").item(0).getTextContent())
+                    }
+                }
+
+                if (codigoProducto.equals("SRP")) {
+
+                    DATOS.Coberturas cobertura_1 = new DATOS.Coberturas()
+
+                    cobertura_1.filler = ""
+                    cobertura_1.codigoCobertura = "COB2"
+                    cobertura_1.nombreCobertura = "ACCIDENTE"
+                    cobertura_1.capital = capital
+
+                    listadoCoberturas.add(cobertura_1)
+
+                    DATOS.Coberturas cobertura_2 = new DATOS.Coberturas()
+
+                    cobertura_2.filler = ""
+                    cobertura_2.codigoCobertura = "COB4"
+                    cobertura_2.nombreCobertura = "INVALIDEZ"
+                    cobertura_2.capital = capital
+
+                    listadoCoberturas.add(cobertura_2)
+                }
+            }
+
+            return listadoCoberturas
+
+        } catch (Exception e) {
+            throw new WSException(this.getClass(), "rellenaCoberturasInfantil", ExceptionUtils.composeMessage(null, e))
+        }
+    }
+
+    def comprobarValidaciones(GestionReconocimientoMedicoInfantilRequest gestionReconocimientoMedicoInfantil, Company company) {
+
+        String codigoProductoCompanyia
+
+        try {
+            codigoProductoCompanyia = gestionReconocimientoMedicoInfantil.getPolicyInformation().getProductCode()
+
+            validarParametrosEntrada(gestionReconocimientoMedicoInfantil)
+            validarCoberturas(gestionReconocimientoMedicoInfantil, company)
+        }
+        catch (Exception e) {
+            logginService.putError(this.class.getName() + ".comprobarValidaciones", "Error en las validaciones la compañia " + company.getNombre() + " y producto " + codigoProductoCompanyia + ": " + ExceptionUtils.composeMessage(null, e))
+            correoUtil.envioEmailErrores(this.class.getName() + ".comprobarValidaciones", "Error en las validaciones de la compañia " + company.getNombre() + " y producto " + codigoProductoCompanyia + ": ", e)
+            throw new Exception(e.getMessage(), e)
+        }
+    }
+
+    def validarParametrosEntrada(GestionReconocimientoMedicoInfantilRequest gestionReconocimientoMedicoInfantil) {
+
+        String policyNumber = gestionReconocimientoMedicoInfantil.getPolicyInformation().getPolicyNumber()
+        String requestNumber = gestionReconocimientoMedicoInfantil.getPolicyInformation().getRequestNumber()
+
+        String codigoProductoCompanyia = gestionReconocimientoMedicoInfantil.getPolicyInformation().getProductCode()
+
+        List<String> caserInfantilProductCodesList = new ArrayList<>();
+        caserInfantilProductCodesList.addAll(Holders.grailsApplication.config.caserInfantilProductCode.split(","))
+
+        Boolean errorValidacion = false
+        List<String> listaErroresValidacion = new ArrayList<>()
+
+
+        try {
+
+            // Comprobacion de que el codigo del producto es el infantil configurado en Config.groovy
+            if (codigoProductoCompanyia != null && !caserInfantilProductCodesList.contains(codigoProductoCompanyia)) {
+                listaErroresValidacion.add("El producto " + codigoProductoCompanyia + " no se corresponde con codigo del producto infantil. Revise el fichero de configuracion.")
+                errorValidacion = true
+            }
+
+            // Si hay errores de validacion, se compone una excepcion con todos los parametros que fallan
+            if (errorValidacion) {
+                StringBuilder errorMessage = new StringBuilder()
+
+                for (String message : listaErroresValidacion) {
+                    errorMessage.append(message).append(" ")
+                }
+                throw new Exception(errorMessage.toString())
+            }
+        }
+        catch (Exception e) {
+            logginService.putError(this.class.getName() + ".validarParametrosEntrada", "Error en la validacion de parametros de entrada para la peticion " + requestNumber + " de la poliza " + policyNumber + ": " + ExceptionUtils.composeMessage(null, e))
+            correoUtil.envioEmailErrores(this.class.getName() + ".validarParametrosEntrada", "Error en la validacion de parametros de entrada para la peticion " + requestNumber + " de la poliza " + policyNumber + ": ", e)
+            throw new Exception(e.getMessage(), e)
+        }
+    }
+
+    def validarCoberturas(GestionReconocimientoMedicoInfantilRequest gestionReconocimientoMedicoInfantil, Company company) {
+
+        String codigoCompanyiaST
+        String unidadOrganizativaCompanyia
+        String codigoProductoCompanyia
+
+        try {
+            codigoCompanyiaST = company.getCodigoSt()
+            unidadOrganizativaCompanyia = company.getOu().toString()
+            codigoProductoCompanyia = gestionReconocimientoMedicoInfantil.getPolicyInformation().getProductCode()
+
+            boolean errorValidacion = false
+            List<String> listaErroresValidacion = new ArrayList<>()
+
+            for (GestionReconocimientoMedicoInfantilRequest.CandidateInformation candidate : gestionReconocimientoMedicoInfantil.getCandidateInformation()) {
+                List<GestionReconocimientoMedicoInfantilRequest.BenefitsType> benefitsTypeList = candidate.getBenefitsType()
+
+                Collection<Validation> validationCollection = validationService.obtenerValidaciones(codigoCompanyiaST, unidadOrganizativaCompanyia, codigoProductoCompanyia)
+
+                Set<String> benefitsValidationCodes = validationService.obtenerBenefitCodes(validationCollection)
+
+                if (ValorUtils.isValid(benefitsValidationCodes)) {
+
+                    for (GestionReconocimientoMedicoInfantilRequest.BenefitsType benefitTypeIterator : benefitsTypeList) {
+                        // Si no está definido el código de la cobertura, lanzamos una excepción
+                        if (!benefitsValidationCodes.contains(benefitTypeIterator.getBenefictCode().toUpperCase())) {
+                            listaErroresValidacion.add("Las coberturas de la petición no se corresponden con las definidas para el dominio de la compañia " + company.getNombre() + " para el producto " + codigoProductoCompanyia + ": " + benefitsValidationCodes.toString() + " para el candidato " + candidate.identificationCode + ". Revise la base de datos o corrija la petición.")
+                            errorValidacion = true
+                        }
+                    }
+
+                } else {
+                    listaErroresValidacion.add("No hay coberturas definidas para este dominio. Revise la base de datos.")
+                    errorValidacion = true
+                }
+            }
+
+            if (errorValidacion) {
+                StringBuilder errorMessage = new StringBuilder()
+
+                for (String message : listaErroresValidacion) {
+                    errorMessage.append(message).append(" ")
+                }
+                throw new Exception(errorMessage.toString())
+            }
+        }
+        catch (Exception e) {
+            logginService.putError(this.class.getName() + ".validarCoberturas", "Error en la validacion de coberturas para la compañia " + company.getNombre() + " y producto " + codigoProductoCompanyia + ": " + ExceptionUtils.composeMessage(null, e))
+            correoUtil.envioEmailErrores(this.class.getName() + ".validarCoberturas", "Error en la validacion de coberturas para la compañia " + company.getNombre() + " y producto " + codigoProductoCompanyia + ": ", e)
+            throw new Exception(e.getMessage(), e)
+        }
+    }
+
+    private def rellenaServiciosInfantil(req, int candidateIteratorIndex) {
+
+        def listadoServicios = []
+
+        try {
+
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance()
+            DocumentBuilder builder = factory.newDocumentBuilder()
+
+            InputSource is = new InputSource(new StringReader(req.request))
+            is.setEncoding("UTF-8")
+            Document doc = builder.parse(is)
+            doc.getDocumentElement().normalize()
+
+            NodeList candidateNodeList = doc.getElementsByTagName("CandidateInformation")
+
+            Node candidateNode = candidateNodeList.item(candidateIteratorIndex)
+
+            if (candidateNode.getNodeType() == Node.ELEMENT_NODE) {
+
+                Element candidateElement = (Element) candidateNode
+
+                NodeList nList = candidateElement.getElementsByTagName("ServiceInformation")
+
+                for (int temp = 0; temp < nList.getLength(); temp++) {
+
+                    Node nNode = nList.item(temp)
+
+                    if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+
+                        Element eElement = (Element) nNode
+
+                        if (eElement.getElementsByTagName("serviceCode").item(0) != null) {
+
+                            DATOS.Servicio servicio = new DATOS.Servicio()
+
+                            servicio.codigoServicio = eElement.getElementsByTagName("serviceCode").item(0).getTextContent()
+                            servicio.tipoServicios = eElement.getElementsByTagName("serviceType").item(0).getTextContent()
+                            if (eElement.getElementsByTagName("serviceDescription").item(0) != null) {
+                                servicio.descripcionServicio = eElement.getElementsByTagName("serviceDescription").item(0).getTextContent()
+                            }
+
+                            servicio.filler = ""
+                            listadoServicios.add(servicio)
+                        }
+                    }
+                }
+            }
+            return listadoServicios
+        } catch (Exception e) {
+            throw new WSException(this.getClass(), "rellenaDatosInfantil", ExceptionUtils.composeMessage(null, e))
+        }
+    }
+
+
     List<servicios.Expediente> existeExpediente(String numeroSolicitud, String nombreCia, String companyCodigoSt, UnidadOrganizativa unidadOrganizativa) {
 
         logginService.putInfoMessage("Buscando si existe expediente con numero de solicitud " + numeroSolicitud + " para " + nombreCia)
@@ -861,4 +1688,5 @@ class CaserService implements ICompanyService{
 
         return expedientes
     }
+
 }

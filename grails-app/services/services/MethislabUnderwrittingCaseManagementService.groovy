@@ -1,6 +1,7 @@
 package services
 
 import com.scortelemed.Company
+import com.scortelemed.Conf
 import com.scortelemed.Operacion
 import com.scortelemed.Request
 import com.scortelemed.TipoCompany
@@ -25,6 +26,8 @@ import javax.jws.WebResult
 import javax.jws.WebService
 import javax.jws.soap.SOAPBinding
 import java.text.SimpleDateFormat
+import java.util.zip.ZipOutputStream
+
 
 @WebService(targetNamespace = "http://www.scortelemed.com/schemas/methislab")
 @SchemaValidation
@@ -160,7 +163,7 @@ class MethislabUnderwrittingCaseManagementService {
 		Company company = Company.findByNombre(TipoCompany.METHIS_LAB.getNombre())
 
 		def timedelay = System.currentTimeMillis()
-		logginService.putInfoEndpoint("Endpoint-" + opername + "Tiempo inicial: ", timedelay)
+		logginService.putInfoEndpoint("Endpoint-" + opername + "Tiempo inicial: ", timedelay.toString())
 		try{
 			Operacion operacion = estadisticasService.obtenerObjetoOperacion(opername)
 			logginService.putInfoMessage("Realizando proceso envio de informacion para " + company.nombre + " con fecha " + methislabUnderwrittingCasesResults.dateStart.toString() + "-" + methislabUnderwrittingCasesResults.dateEnd.toString())
@@ -169,7 +172,7 @@ class MethislabUnderwrittingCaseManagementService {
 				if (methislabUnderwrittingCasesResults && methislabUnderwrittingCasesResults.dateStart && methislabUnderwrittingCasesResults.dateEnd){
 
 					requestXML=methislabService.marshall(methislabUnderwrittingCasesResults)
-					requestBBDD = requestService.crear(opername,requestXML)
+					requestBBDD = requestService.crear(opername,requestXML) //TODO revisar
 
 					Date date = methislabUnderwrittingCasesResults.dateStart.toGregorianCalendar().getTime()
 					SimpleDateFormat sdfr = new SimpleDateFormat("yyyyMMdd HH:mm:ss")
@@ -180,11 +183,13 @@ class MethislabUnderwrittingCaseManagementService {
 					expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt,null,1,fechaIni,fechaFin,company.ou))
 					expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt,null,2,fechaIni,fechaFin,company.ou))
 
-					requestService.insertarEnvio(company, methislabUnderwrittingCasesResults.dateStart.toString().substring(0,10) + "-" + methislabUnderwrittingCasesResults.dateEnd.toString().substring(0,10), requestXML.toString())
-
+					String idIdentificador = new Date().format( 'dd-mm-yyyy HH:mm:ss' )
 					if(expedientes){
-						expedientes.each { expedientePoliza ->
-							resultado.getExpediente().add(methislabService.rellenaDatosSalidaConsulta(expedientePoliza, methislabUnderwrittingCasesResults.dateStart))
+						requestService.insertarEnvio(company, "SOLICITUD: " + idIdentificador, requestXML.toString())
+
+						for(int i=0; i< expedientes.size();i++) {
+							resultado.getExpediente().add(methislabService.rellenaDatosSalidaConsulta(expedientes.get(i), methislabUnderwrittingCasesResults.dateStart))
+							requestService.insertarEnvio(company, "EXPEDIENTE: " + idIdentificador , "ST:" + expedientes.get(i).getCodigoST()+ "#CIA:" + expedientes.get(i).getNumSolicitud())
 						}
 						messages = "Risultati restituiti"
 						status = StatusType.OK
@@ -192,6 +197,7 @@ class MethislabUnderwrittingCaseManagementService {
 						logginService.putInfoEndpoint("ResultadoReconocimientoMedico","Peticion realizada correctamente para " + company.nombre + " con fecha: " + methislabUnderwrittingCasesResults.dateStart.toString() + "-" + methislabUnderwrittingCasesResults.dateEnd.toString())
 					}else{
 
+						requestService.insertarEnvio(company, "SOLICITUD: " + idIdentificador , "No hay resultados para " + company.nombre)
 						messages = "Nessun risultato per le date indicate"
 						status = StatusType.OK
 						code = 6
@@ -240,7 +246,7 @@ class MethislabUnderwrittingCaseManagementService {
 		resultado.setCode(code)
 		logginService.putInfoEndpoint(opername,"Estoy devolviendo resultado ${resultado}")
 		def timeFinal = System.currentTimeMillis() - timedelay
-		logginService.putInfoEndpoint("Endpoint-"+opername +"Tiempo tiempo TOTAL: ", timeFinal)
+		logginService.putInfoEndpoint("Endpoint-"+opername +"Tiempo tiempo TOTAL: ", timeFinal.toString())
 		return resultado
 	}
 }

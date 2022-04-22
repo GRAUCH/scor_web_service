@@ -5,9 +5,15 @@ scorWebservices-grailsPlugins.iml
 scorWebservices.iml
 
 .idea/
-.idea/misc.xml
-.idea/workspace.xml
 
 .slcache/
 
 target/
+logs/
+.settings
+/Development/
+/Integration/
+/Preproduction/
+/Production/
+/src/java/com/scor/global/
+/wsdl/
