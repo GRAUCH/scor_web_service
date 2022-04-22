@@ -32,25 +32,25 @@ class ValidationService implements IValidationService {
             companyia = Company.findByCodigoStAndOu(codigoCompanyiaST, unidadOrganizativaCompanyia)
 
             if (companyia == null) {
-                String errorMessage = "Error al buscando compania " + codigoCompanyiaST + " " + unidadOrganizativaCompanyia;
+                String errorMessage = "Error al buscar compania " + codigoCompanyiaST + " " + unidadOrganizativaCompanyia;
                 throw new Exception(errorMessage.toString())
             }
 
             product = Product.findByCode(codigoProductoCompanyia)
             if (product == null) {
-                String errorMessage = "Error al buscando producto " + codigoProductoCompanyia;
+                String errorMessage = "Error al buscar producto " + codigoProductoCompanyia;
                 throw new Exception(errorMessage.toString())
             }
 
             domain = Domain.findByCompanyAndProduct(companyia, product)
             if (domain == null) {
-                String errorMessage = "Error al buscando dominio para compania " + companyia + " y producto " + product;
+                String errorMessage = "Error al buscar dominio para compania " + companyia + " y producto " + product;
                 throw new Exception(errorMessage.toString())
             }
 
             validationCollection = Validation.findAllByDomainId(domain.getId().toString())
             if (validationCollection == null || validationCollection.size() == 0) {
-                String errorMessage = "Error al buscando validaciones para el dominio de la compañia " + codigoCompanyiaST + " " + unidadOrganizativaCompanyia;
+                String errorMessage = "Error al buscar validaciones para el dominio de la compañia " + codigoCompanyiaST + " " + unidadOrganizativaCompanyia;
                 throw new Exception(errorMessage.toString())
             }
         }
