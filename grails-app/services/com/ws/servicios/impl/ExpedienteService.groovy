@@ -429,7 +429,7 @@ class ExpedienteService implements IExpedienteService {
                 setString("numSolicitud", numSolicitud)
 
                 // seteamos el parámetro 'productoIdName' de la query con el parámetro de entrada del método 'productoIdName'
-                setString("productoIdName", productoIdName)
+                setString("productoIdName", 'Infantil-' + productoIdName)
 
                 // Ejecutamos la query y obtenemos los resultados
                 list()
