@@ -792,8 +792,9 @@ class CbpitaService implements ICompanyService{
         if (expedientePoliza.getCandidato() != null) {
             expediente.setFiscalIdentificationNumber(expedientePoliza.getCandidato().getNumeroDocumento())
             expediente.setMobilePhone(util.devolverTelefonoMovil(expedientePoliza.getCandidato()))
-            expediente.setPhoneNumber1(util.devolverTelefono1(expedientePoliza.getCandidato()))
-            expediente.setPhoneNumber2(util.devolverTelefono2(expedientePoliza.getCandidato()))
+            // Dado que en el frontal el telefono 1 siempre tiene que ser un movil, el telefono 1 pasa a ser mobilePhone y el resto de telefonos seran, si vienen vacios, el telefono movil.
+            expediente.setPhoneNumber1(util.devolverTelefono1(expedientePoliza.getCandidato()) == "" ? expediente.getMobilePhone() : util.devolverTelefono1(expedientePoliza.getCandidato()))
+            expediente.setPhoneNumber2(util.devolverTelefono2(expedientePoliza.getCandidato()) == "" ? expediente.getMobilePhone() : util.devolverTelefono2(expedientePoliza.getCandidato()))
         } else {
             expediente.setFiscalIdentificationNumber("")
             expediente.setMobilePhone("")
