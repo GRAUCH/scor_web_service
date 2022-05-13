@@ -76,7 +76,7 @@ class WsController {
                 sbInfo.append(" con fecha inicio ").append(fechaIni).append("-").append(" con fecha fin ").append(fechaFin)
                 expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt, null, 1, fechaIni, fechaFin, company.ou))
             }
-            if (Environment.current.name?.equals("production_wildfly")) {
+            if (Environment.current.name?.equals("production")) {
                 logginService.putInfoMessage("WS PRD")
                 soap = soapAlptisRecetteWSPRO
             } else {
@@ -274,7 +274,7 @@ class WsController {
 
                             for (i in expediente?.getServicios()) {
 
-                                if (Environment.current.name?.equals("production_wildfly")) {
+                                if (Environment.current.name?.equals("production")) {
                                     if (i?.getCodigoStFacturacion()?.toString()?.equals("002245")) {
                                         tlabr = "1"
                                     } else if (i?.getCodigoStFacturacion()?.toString()?.equals("000991")) {
@@ -452,8 +452,8 @@ class WsController {
 
             XSDProcessExecutionServiceLocator locator = new XSDProcessExecutionServiceLocator()
 
-            if (Environment.current.name?.equals("production_wildfly")) {
-                sbInfo.append("** Clave  de caser  entorno -> production_wildfly **")
+            if (Environment.current.name?.equals("production")) {
+                sbInfo.append("** Clave  de caser  entorno -> production **")
                 username = "caser"
                 password = "a2aa10aPvQ8D5i6VDNwtXU5F7acSeKGre9PLL6iQEFLbbGfRgZdoHRzdygau"
                 locator.setXSDProcessExecutionPortEndpointAddress("https://iwssgo.caser.es/sgowschannel/XSDProcessExecution?WSDL")
@@ -572,7 +572,7 @@ class WsController {
             }
 
             logginService.putInfoMessage(sbInfo?.toString())
-            if (Environment.current.name?.equals("production_wildfly")) {
+            if (Environment.current.name?.equals("production")) {
                 logginService.putInfoMessage(" ** end point de PRD**")
                 def usuario = "aplCORWS"
                 def password = "Wh1t3p&&\$"

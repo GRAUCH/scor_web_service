@@ -365,7 +365,7 @@ class FrancesasService implements ICompanyService{
 			}
 		}
 
-		if (Environment.current.name.equals("production_wildfly")) {
+		if (Environment.current.name.equals("production")) {
 			if (nombre.equals("alptis")) {
 				servicio.codigoServicio = "000314"
 			} else if (nombre.equals("afiesca")){

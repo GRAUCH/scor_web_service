@@ -180,7 +180,7 @@ class AmaUnderwrittingCaseManagementService	 {
 					date = resultadoSiniestro.dateEnd.toGregorianCalendar().getTime()
 					String fechaFin = sdfr.format(date)
 
-					if (Environment.current.name.equals("production_wildfly")) {
+					if (Environment.current.name.equals("production")) {
 						expedientes.addAll(expedienteService.obtenerInformeExpedientesSiniestros("1060",null,null,fechaIni,fechaFin,company.ou))
 					} else {
 						expedientes.addAll(expedienteService.obtenerInformeExpedientesSiniestros("1061",null,null,fechaIni,fechaFin,company.ou))
