@@ -267,7 +267,7 @@ class GestionReconocimientosMedicosService {
             logginService.putInfoEndpoint("Endpoint-" + opername, "Paso por el finally")
         }
         def timeFinal = System.currentTimeMillis() - timedelay
-        logginService.putInfoEndpoint("Endpoint-" + opername + "Tiempo tiempo TOTAL: ", timeFinal)
+        logginService.putInfoEndpoint("Endpoint-" + opername, "Tiempo TOTAL: " + timeFinal.toString())
         return result
     }
 
