@@ -104,7 +104,13 @@ class MethislabService implements ICompanyService{
         expediente.setZip(compressedData)
         
         byte[] ba = Base64.getDecoder().decode(compressedData)
-        ba = Base64.getDecoder().decode(ba)
+        //Comentamos esta linea debido a un error en producción el día 13/05/2022
+        //ba = Base64.getDecoder().decode(ba)
+        //fin fix issue
+        
+        //Añadimos la llamada a grabar el fichero de Methislab el 17/05/2022 ya que no se había añadido
+        saveZipFile(expedientePoliza, compressedData
+        //fin fix 
 
         LocalDate localDate = LocalDate.now();//For reference
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
