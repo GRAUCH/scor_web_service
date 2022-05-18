@@ -189,7 +189,9 @@ class MethislabUnderwrittingCaseManagementService {
 
 						for(int i=0; i< expedientes.size();i++) {
 							resultado.getExpediente().add(methislabService.rellenaDatosSalidaConsulta(expedientes.get(i), methislabUnderwrittingCasesResults.dateStart))
+					
 							requestService.insertarEnvio(company, "EXPEDIENTE: " + idIdentificador , "ST:" + expedientes.get(i).getCodigoST()+ "#CIA:" + expedientes.get(i).getNumSolicitud())
+					
 						}
 						messages = "Risultati restituiti"
 						status = StatusType.OK
