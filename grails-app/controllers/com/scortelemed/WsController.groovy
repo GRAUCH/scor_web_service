@@ -12,6 +12,7 @@ import com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.Medic
 import com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.Product
 import com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.SaveDossierResultsResponseE
 import com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.TemporalLoading
+import com.scor.util.IntIncrement
 import com.scortelemed.schemas.caser.XSDProcessExecutionPort
 import com.scortelemed.schemas.caser.XSDProcessExecutionServiceLocator
 import com.ws.alptis.sp.beans.AlptisUnderwrittingCaseResultsRequest
@@ -434,20 +435,27 @@ class WsController {
         TransformacionUtil transformacion = new TransformacionUtil()
         def company = Company.findByNombre('caser')
         try {
+			logginService.putInfoMessage("WsController - Caser - Before 1st try")
             StringBuilder sbInfo = new StringBuilder(" * Realizando proceso envio de informacion para " + company.nombre + " *")
             sbInfo.append("\n")
             if (params.myGroup != null && params.myGroup == 'codigoST' && params.codigoST) {
+				logginService.putInfoMessage("WsController - Caser - Retrieve data with codigoST")
                 sbInfo.append(" al expediente con codigo ST ${params.codigoST}")
                 expedientes.addAll(expedienteService.informeExpedienteCodigoST(params.codigoST, company.ou))
                 sbInfo.append(" * se encontraron :  ${expedientes.size()}  expedientes con el codigo ST *")
+				logginService.putInfoMessage("WsController - Caser - End retrieve data with codigoST")
             } else {
+				logginService.putInfoMessage("WsController - Caser - Retrieve data with dates")
                 fechaIni = LogUtil.paramsToDateIni(params)
                 fechaFin = LogUtil.paramsToDateFin(params)
                 sbInfo.append(" con fecha inicio ").append(fechaIni).append("-").append(" con fecha fin ").append(fechaFin)
                 sbInfo.append("** compania " + company.codigoSt + " **")
                 expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt, null, 0, fechaIni, fechaFin, company.ou))
+				logginService.putInfoMessage("WsController - Caser - End Retrieve data with dates step 1")
                 expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt, null, 1, fechaIni, fechaFin, company.ou))
+				logginService.putInfoMessage("WsController - Caser - End Retrieve data with dates step 2")
                 expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt, null, 2, fechaIni, fechaFin, company.ou))
+				logginService.putInfoMessage("WsController - Caser - End Retrieve data with dates")
             }
 
             XSDProcessExecutionServiceLocator locator = new XSDProcessExecutionServiceLocator()
@@ -463,21 +471,28 @@ class WsController {
                 password = "abdbc632c0dd1807407c6ceee46e0ab48c0bc12c"
                 locator.setXSDProcessExecutionPortEndpointAddress("https://iwssgotest.caser.es/sgowschannel/XSDProcessExecution?WSDL")
             }
-
-
+			
             XSDProcessExecutionPort port = locator?.getXSDProcessExecutionPort()
             StringHolder salida = new StringHolder()
             logginService.putInfoMessage(sbInfo?.toString())
             RegistrarEventoSCOR entradaDetalle = new RegistrarEventoSCOR()
             String stringRequest = null
-            int erroneos = 0
+            //int erroneos = 0
+			IntIncrement erroneos = new IntIncrement()
+			logginService.putInfoMessage("WsController - Caser - For each expediente")
             expedientes.each { expediente ->
                 entradaDetalle = transformacion.obtenerDetalle(expediente)
+				logginService.putInfoMessage("WsController - Caser - After obtenerDetalle")
                 if (entradaDetalle != null) {
                     stringRequest = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?><service_RegistrarEventoSCOR><inputMap type='map'><username type='String'><_value_>" + username + "</_value_></username><password type='String'><_value_>" + password + "</_value_></password><idExpediente type='Integer'><_value_>" + entradaDetalle?.getIdExpediente() + "</_value_></idExpediente><codigoEvento type='String'><_value_>" + entradaDetalle?.getCodigoEvento() + "</_value_></codigoEvento><detalle type='String'><_value_>" + entradaDetalle?.getDetalle() + "</_value_></detalle><fecha type='Date'><_value_>" + entradaDetalle?.getFechaCierre() + "</_value_></fecha></inputMap></service_RegistrarEventoSCOR>"
                     Thread.sleep(6000)
+					logginService.putInfoMessage("WsController - Caser - Before 2nd try")
+					logginService.putInfoMessage("WsController - Caser - body" + stringRequest)
                     try {
+						logginService.putInfoMessage("WsController - Caser - before do procees")
                         port.doProcessExecution(stringRequest, salida)
+						logginService.putInfoMessage("WsController - Caser - after do procees")
+						Thread.sleep(6000)
                         Envio envio = new Envio()
                         envio.setFecha(new Date())
                         envio.setCia(company.id?.toString())
@@ -492,7 +507,9 @@ class WsController {
                         /**Metemos en errores
                          *
                          */
-                        erroneos++
+                        //erroneos++
+						logginService.putInfoMessage("WsController - Caser - inside catch")
+						erroneos.inc()
                         Error error = new Error()
                         error.setFecha(new Date())
                         error.setCia(company.id?.toString())
@@ -503,17 +520,18 @@ class WsController {
                         error.save(flush: true)
                         logginService.putErrorMessage("Error: " + opername + ". No se ha podido mandar el caso a Caser. Detalles:" + ex?.getMessage())
                     }
-
+					logginService.putInfoMessage("WsController - Caser - after try")
                 }
             }
-
+			logginService.putInfoMessage("WsController - Caser - End For each expediente")
             logginService.putInfoMessage("proceso envio de informacion para " + company.nombre + " terminado.")
-            logginService.putInfoMessage("** Se han procesado :" + expedientes.size() + " **" + "Correctamente/Erroneos:" + expedientes.size()-erroneos + "/" + erroneos)
+            logginService.putInfoMessage("** Se han procesado :" + expedientes.size() + " **" + "Correctamente/Erroneos:" + expedientes.size()-erroneos.getValue() + "/" + erroneos.getValue())
             sbInfo.append("\n")
             sbInfo.append("* se procesaron cantidad : ${expedientes.size()} *")
             flash.message = sbInfo?.toString()
             return redirect(controller: 'dashboard', action: 'index',params: [idCia: ''])
         } catch (Exception ex) {
+			logginService.putInfoMessage("WsController - Caser - Catch 1st try")
             logginService.putErrorMessage("Error: " + opername + ". " + ex?.getMessage() + ". Detalles:" + ex?.getMessage())
             Error error = new Error()
             error.setFecha(new Date())
