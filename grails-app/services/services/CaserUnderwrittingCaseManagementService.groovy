@@ -444,18 +444,22 @@ class CaserUnderwrittingCaseManagementService {
 
                     if (respuestaCRM != null && respuestaCRM.getListaExpedientes() != null) {
 						logginService.putInfoMessage("CaserUnderwrittingCaseManagementService -Caser - Procesamos la lista de expedientes de la respuesta CRM ")
+						logginService.putInfoMessage("CaserUnderwrittingCaseManagementService - Caser - Numero de  items a procear " + respuestaCRM.getListaExpedientes().size())
                         for (int i = 0; i < respuestaCRM.getListaExpedientes().size(); i++) {
 							logginService.putInfoMessage("CaserUnderwrittingCaseManagementService - Caser - Procesamos item " + i)
-                            Expediente expediente = respuestaCRM.getListaExpedientes().get(i)
-
+							//cambiamos expediente por expediente poliza
+                            Expediente expedientePoliza = respuestaCRM.getListaExpedientes().get(i)
+							logginService.putInfoMessage("CaserUnderwrittingCaseManagementService - Caser - Procesamos item " + i + " - Step 1")
                             /**PARA EVITAR CONSULTAR DATOS DE OTRAS COMPA�IAS
                              *
                              */
 
-                            if (expediente.getCandidato().getCompanya().getCodigoST().equals(company.getCodigoSt())) {
+                            if (expedientePoliza.getCandidato().getCompanya().getCodigoST().equals(company.getCodigoSt())) {
+								logginService.putInfoMessage("CaserUnderwrittingCaseManagementService - Caser - Procesamos item " + i + " - Step 2")
                                 requestService.insertarEnvio(company, "EXPEDIENTE: " + idIdentificador, "ST:" + expedientePoliza.getCodigoST() + "#CIA:" + expedientePoliza.getNumSolicitud())
-                                resultado.getExpedienteConsulta().add(caserService.rellenaDatosSalidaConsulta(expediente, util.fromDateToXmlCalendar(new Date()), logginService))
+                                resultado.getExpedienteConsulta().add(caserService.rellenaDatosSalidaConsulta(expedientePoliza, util.fromDateToXmlCalendar(new Date()), logginService))
                             }
+							logginService.putInfoMessage("CaserUnderwrittingCaseManagementService - Caser - Procesamos item " + i + " - Step 3")
                         }
                     }
 
