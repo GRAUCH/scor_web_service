@@ -185,6 +185,7 @@ class MethislabService implements ICompanyService{
                         "se guardo en la ruta ${fileName}")
             }catch(Exception e){
                 logginService.putError("Los ficheros del expedinte ${expedientePoliza.getNumSolicitud()} " + "no se han grabado",e)
+				haveData = false
             }
         }else{
 
