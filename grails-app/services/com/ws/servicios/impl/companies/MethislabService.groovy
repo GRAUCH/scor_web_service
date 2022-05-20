@@ -184,12 +184,12 @@ class MethislabService implements ICompanyService{
                 logginService.putInfoMessage("Los ficheros del expedinte ${expedientePoliza.getNumSolicitud()} " +
                         "se guardo en la ruta ${fileName}")
             }catch(Exception e){
-                logginService.putError("Los ficheros del expedinte ${expedientePoliza.getNumSolicitud()} " + "no se han grabado",e)
+                logginService.putErrorMessage("Los ficheros del expedinte ${expedientePoliza.getNumSolicitud()} " + "no se han grabado",e)
 				haveData = false
             }
         }else{
 
-            logginService.putInfo("Los ficheros del expedinte ${expedientePoliza.getNumSolicitud()} " + "vienen vacios")
+            logginService.putInfoMessage("Los ficheros del expedinte ${expedientePoliza.getNumSolicitud()} " + "vienen vacios")
             haveData = false
         }
 
