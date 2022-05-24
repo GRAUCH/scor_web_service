@@ -420,40 +420,46 @@ class CaserUnderwrittingCaseManagementService {
         CorreoUtil correoUtil = new CorreoUtil()
 
         Company company = Company.findByNombre(TipoCompany.CASER.getNombre())
-
+		logginService.putInfoMessage("CaserUnderwrittingCaseManagementService - Caser - 1st try")
         logginService.putInfoMessage("Realizando peticion de informacion de servicio ConsultaExpediente para la cia " + company.nombre)
 
         try {
 
             Operacion operacion = estadisticasService.obtenerObjetoOperacion(opername)
-
+			logginService.putInfoMessage("CaserUnderwrittingCaseManagementService - Caser - Get operation")
             if (operacion && operacion.activo) {
                 String idIdentificador = new Date().format( 'dd-mm-yyyy HH:mm:ss' )
                 if (consultaExpediente && consultaExpediente.codExpediente) {
 
+					logginService.putInfoMessage("CaserUnderwrittingCaseManagementService - Caser - Before marshal")
                     requestXML = caserService.marshall(consultaExpediente)
+					logginService.putInfoMessage("CaserUnderwrittingCaseManagementService - Caser - End  marshal + before Crear")
                     requestBBDD = requestService.crear(opername, requestXML)
-
+					logginService.putInfoMessage("CaserUnderwrittingCaseManagementService - Caser - End  Crear")
                     logginService.putInfoEndpoint("ConsultaExpediente", "Realizando peticion para " + company.nombre + " con numero de expiente: " + consultaExpediente.codExpediente)
-
+					logginService.putInfoMessage("CaserUnderwrittingCaseManagementService - Caser - Consulta expediente por num solicitud")
                     respuestaCRM = expedienteService.consultaExpedienteNumSolicitud(consultaExpediente.codExpediente, company.ou, company.codigoSt)
-
+					logginService.putInfoMessage("CaserUnderwrittingCaseManagementService - Caser - End consulta expediente por num solicitud")
                     requestService.insertarEnvio(company, "SOLICITUD: " + idIdentificador, requestXML.toString())
 
                     if (respuestaCRM != null && respuestaCRM.getListaExpedientes() != null) {
-
+						logginService.putInfoMessage("CaserUnderwrittingCaseManagementService -Caser - Procesamos la lista de expedientes de la respuesta CRM ")
+						logginService.putInfoMessage("CaserUnderwrittingCaseManagementService - Caser - Numero de  items a procear " + respuestaCRM.getListaExpedientes().size())
                         for (int i = 0; i < respuestaCRM.getListaExpedientes().size(); i++) {
-
-                            Expediente expediente = respuestaCRM.getListaExpedientes().get(i)
-
+							logginService.putInfoMessage("CaserUnderwrittingCaseManagementService - Caser - Procesamos item " + i)
+							//cambiamos expediente por expediente poliza
+                            Expediente expedientePoliza = respuestaCRM.getListaExpedientes().get(i)
+							logginService.putInfoMessage("CaserUnderwrittingCaseManagementService - Caser - Procesamos item " + i + " - Step 1")
                             /**PARA EVITAR CONSULTAR DATOS DE OTRAS COMPA�IAS
                              *
                              */
 
-                            if (expediente.getCandidato().getCompanya().getCodigoST().equals(company.getCodigoSt())) {
+                            if (expedientePoliza.getCandidato().getCompanya().getCodigoST().equals(company.getCodigoSt())) {
+								logginService.putInfoMessage("CaserUnderwrittingCaseManagementService - Caser - Procesamos item " + i + " - Step 2")
                                 requestService.insertarEnvio(company, "EXPEDIENTE: " + idIdentificador, "ST:" + expedientePoliza.getCodigoST() + "#CIA:" + expedientePoliza.getNumSolicitud())
-                                resultado.getExpedienteConsulta().add(caserService.rellenaDatosSalidaConsulta(expediente, util.fromDateToXmlCalendar(new Date()), logginService))
+                                resultado.getExpedienteConsulta().add(caserService.rellenaDatosSalidaConsulta(expedientePoliza, util.fromDateToXmlCalendar(new Date()), logginService))
                             }
+							logginService.putInfoMessage("CaserUnderwrittingCaseManagementService - Caser - Procesamos item " + i + " - Step 3")
                         }
                     }
 
@@ -487,7 +493,7 @@ class CaserUnderwrittingCaseManagementService {
                 correoUtil.envioEmail("ConsultaExpediente", "Peticion de " + company.nombre + " con numero de expiente: " + consultaExpediente.codExpediente + ". Esta operacion para " + company.nombre + " esta desactivada temporalmente", 0)
             }
         } catch (Exception e) {
-
+			logginService.putInfoMessage("CaserUnderwrittingCaseManagementService - Caser - Catch 1st try")
             logginService.putErrorEndpoint("ConsultaExpediente", "Peticion realizada para " + company.nombre + " con con numero de expiente: " + consultaExpediente.codExpediente + ". Error: " + e.getMessage())
             correoUtil.envioEmailErrores("ConsultaExpediente", "Peticion realizada para " + company.nombre + " con numero de expiente: " + consultaExpediente.codExpediente, e)
 
@@ -505,7 +511,7 @@ class CaserUnderwrittingCaseManagementService {
         resultado.setNotes(notes)
         resultado.setDate(util.fromDateToXmlCalendar(new Date()))
         resultado.setStatus(status)
-
+		logginService.putInfoMessage("CaserUnderwrittingCaseManagementService - Caser - Leave")
         return resultado
     }
 
