@@ -104,18 +104,24 @@ class MethislabService implements ICompanyService{
         expediente.setZip(compressedData)
         
         byte[] ba = Base64.getDecoder().decode(compressedData)
-        ba = Base64.getDecoder().decode(ba)
+        //Comentamos esta linea debido a un error en producción el día 13/05/2022
+        //ba = Base64.getDecoder().decode(ba)
+        //fin fix issue
+        
+        //AÃ±adimos la llamada a grabar el fichero de Methislab el 17/05/2022 ya que no se había añadido
+        saveZipFile(expedientePoliza, compressedData)
+        //fin fix 
 
         LocalDate localDate = LocalDate.now();//For reference
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         String dateString = localDate.format(formatter);
-        String fileName = "${Conf.findByName('methislab.path').value}/${expedientePoliza.getNumSolicitud}_${expedientePoliza.getNumSolicitud}_${dateString}.zip"
+        //String fileName = "${Conf.findByName('methislab.path').value}/${expedientePoliza.getNumSolicitud}_${expedientePoliza.getNumSolicitud}_${dateString}.zip"
 
 
         expediente.setNotes(util.devolverDatos(expedientePoliza.getTarificacion().getObservaciones()))
 
         if (expedientePoliza.getCoberturasExpediente() != null && expedientePoliza.getCoberturasExpediente().size() > 0) {
-
+		
             expedientePoliza.getCoberturasExpediente().each { coberturasPoliza ->
 
                 BenefitsType benefitsType = new BenefitsType()
@@ -123,6 +129,7 @@ class MethislabService implements ICompanyService{
                 benefitsType.setBenefictName(devolverNombreCobertura(coberturasPoliza.getCodigoCobertura()))
                 benefitsType.setBenefictCode(util.devolverDatos(coberturasPoliza.getCodigoCobertura()))
                 benefitsType.setBenefictCapital(util.devolverDatos(coberturasPoliza.getCapitalCobertura()))
+		
 
                 BenefictResultType benefictResultType = new BenefictResultType()
 
@@ -134,18 +141,20 @@ class MethislabService implements ICompanyService{
                 benefictResultType.setDescPremiumLoading("")
                 benefictResultType.setDescCapitalLoading("")
 
+
                 benefictResultType.exclusions = util.fromStringLoList(coberturasPoliza.getExclusiones())
                 benefictResultType.temporalLoading = util.fromStringLoList(coberturasPoliza.getValoracionTemporal())
                 benefictResultType.medicalReports = util.fromStringLoList(coberturasPoliza.getInformesMedicos())
                 //benefictResultType.medicalTest = util.fromStringLoList(coberturasPoliza.getInformes)
                 benefictResultType.notes = util.fromStringLoList(coberturasPoliza.getNotas())
-
+			
                 benefitsType.setBenefictResult(benefictResultType)
-
+		
                 expediente.getBenefitsList().add(benefitsType)
+	
             }
         }
-
+	
         return expediente
     }
 
@@ -175,11 +184,12 @@ class MethislabService implements ICompanyService{
                 logginService.putInfoMessage("Los ficheros del expedinte ${expedientePoliza.getNumSolicitud()} " +
                         "se guardo en la ruta ${fileName}")
             }catch(Exception e){
-                logginService.putError("Los ficheros del expedinte ${expedientePoliza.getNumSolicitud()} " + "no se han grabado",e)
+                logginService.putErrorMessage("Los ficheros del expedinte ${expedientePoliza.getNumSolicitud()} " + "no se han grabado",e)
+				haveData = false
             }
         }else{
 
-            logginService.putInfo("Los ficheros del expedinte ${expedientePoliza.getNumSolicitud()} " + "vienen vacios")
+            logginService.putInfoMessage("Los ficheros del expedinte ${expedientePoliza.getNumSolicitud()} " + "vienen vacios")
             haveData = false
         }
 

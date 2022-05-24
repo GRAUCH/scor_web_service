@@ -225,7 +225,7 @@ class TarificadorService {
         def i = 0
         def soap = soapAlptisRecetteWS
 
-        if (Environment.current.name.equals("production_wildfly")) {
+        if (Environment.current.name.equals("production")) {
             soap = soapAlptisRecetteWSPRO
         }
 
@@ -253,7 +253,7 @@ class TarificadorService {
         def usuario = new UsuarioGorm()
 
         if (unidadOrganizativa.equals("FR")) {
-            if (Environment.current.name.equals("production_wildfly")) {
+            if (Environment.current.name.equals("production")) {
                 usuario.clave = "5#6GAkXP456"
                 usuario.dominio = "SCOR-TELEMED"
                 usuario.unidadOrganizativa = "FR"
@@ -267,7 +267,7 @@ class TarificadorService {
         }
 
         if (unidadOrganizativa.equals("ES")) {
-            if (Environment.current.name.equals("production_wildfly")) {
+            if (Environment.current.name.equals("production")) {
                 usuario.clave = "7Q%NN!v5"
                 usuario.dominio = "SCOR-TELEMED"
                 usuario.unidadOrganizativa = "ES"
@@ -281,7 +281,7 @@ class TarificadorService {
         }
 
         if (unidadOrganizativa.equals("IT")) {
-            if (Environment.current.name.equals("production_wildfly")) {
+            if (Environment.current.name.equals("production")) {
                 usuario.clave = "sc5t4!QAZ123"
                 usuario.dominio = "SCOR-TELEMED"
                 usuario.unidadOrganizativa = "IT"

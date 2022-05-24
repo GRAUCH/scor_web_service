@@ -330,7 +330,7 @@ class ExpedienteService implements IExpedienteService {
 
         switch (unidadOrganizativa) {
             case UnidadOrganizativa.ES:
-                if (Environment.current.name.equals("production_wildfly")) {
+                if (Environment.current.name.equals("production")) {
                     usuario.clave = "7Q%NN!v5"
                     usuario.dominio = "SCOR-TELEMED"
                     usuario.unidadOrganizativa = "ES"
@@ -343,7 +343,7 @@ class ExpedienteService implements IExpedienteService {
                 }
                 break
             case UnidadOrganizativa.IT:
-                if (Environment.current.name.equals("production_wildfly")) {
+                if (Environment.current.name.equals("production")) {
                     usuario.clave = "sc5t4!QAZ123"
                     usuario.dominio = "SCOR-TELEMED"
                     usuario.unidadOrganizativa = "IT"
@@ -356,7 +356,7 @@ class ExpedienteService implements IExpedienteService {
                 }
                 break
             case UnidadOrganizativa.FR:
-                if (Environment.current.name.equals("production_wildfly")) {
+                if (Environment.current.name.equals("production")) {
                     usuario.clave = "5#6GAkXP456"
                     usuario.dominio = "SCOR-TELEMED"
                     usuario.unidadOrganizativa = "FR"

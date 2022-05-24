@@ -158,7 +158,7 @@ class GestionReconocimientosMedicosService {
         TramitacionReconocimientoMedicoResponse result = new TramitacionReconocimientoMedicoResponse()
         def timedelay = System.currentTimeMillis()
         logginService.putInfoEndpoint("Endpoint-" + opername, "Peticion para fecha: " + tramitacionReconocimientoMedicoRequest.fecha)
-        logginService.putInfoEndpoint("Endpoint-" + opername + "Tiempo inicial: ", timedelay)
+        logginService.putInfoEndpoint("Endpoint-" + opername, "Tiempo inicial: " + timedelay.toString())
         Company company = Company.findByNombre(TipoCompany.LAGUN_ARO.getNombre())
 
         try {
@@ -267,7 +267,7 @@ class GestionReconocimientosMedicosService {
             logginService.putInfoEndpoint("Endpoint-" + opername, "Paso por el finally")
         }
         def timeFinal = System.currentTimeMillis() - timedelay
-        logginService.putInfoEndpoint("Endpoint-" + opername + "Tiempo tiempo TOTAL: ", timeFinal)
+        logginService.putInfoEndpoint("Endpoint-" + opername, "Tiempo TOTAL: " + timeFinal.toString())
         return result
     }
 

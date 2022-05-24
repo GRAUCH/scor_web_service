@@ -753,7 +753,7 @@ class CaserService implements ICompanyService {
                             datosRegistro.codigoProducto = "SRP"
                             break
                         } else if (coberturasList.get(i).getCodigoCobertura().equalsIgnoreCase('Cob1') || coberturasList.get(i).getCodigoCobertura().equalsIgnoreCase('Cob01')) {
-                            if (grails.util.Environment.current.name == "production_wildfly") {
+                            if (grails.util.Environment.current.name == "production") {
                                 logginService.putInfo("rellenaDatos", "Vino  ${coberturasList.get(i).getCodigoCobertura()} ** pongo producto 5441")
                                 datosRegistro.codigoProducto = "5441" //REAL
                             } else {

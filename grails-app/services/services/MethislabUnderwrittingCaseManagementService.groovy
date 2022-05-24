@@ -163,33 +163,44 @@ class MethislabUnderwrittingCaseManagementService {
 		Company company = Company.findByNombre(TipoCompany.METHIS_LAB.getNombre())
 
 		def timedelay = System.currentTimeMillis()
-		logginService.putInfoEndpoint("Endpoint-" + opername + "Tiempo inicial: ", timedelay.toString())
+		def cadena = "Methislab Test - Endpoint - " + opername + " - Tiempo inicial: " + timedelay.toString() + "<>"
+		logginService.putInfoMessage("Methislab Test - Endpoint - " + opername + " - Tiempo inicial: " + timedelay.toString() + "<>")
 		try{
+			logginService.putInfoMessage("Methislab - Before obtenerObjetoOperacion")
 			Operacion operacion = estadisticasService.obtenerObjetoOperacion(opername)
+			logginService.putInfoMessage("Methislab - After obtenerObjetoOperacion")
 			logginService.putInfoMessage("Realizando proceso envio de informacion para " + company.nombre + " con fecha " + methislabUnderwrittingCasesResults.dateStart.toString() + "-" + methislabUnderwrittingCasesResults.dateEnd.toString())
 			if(operacion && operacion.activo ) {
 
 				if (methislabUnderwrittingCasesResults && methislabUnderwrittingCasesResults.dateStart && methislabUnderwrittingCasesResults.dateEnd){
 
+					logginService.putInfoMessage("Methislab - Before marshall")
 					requestXML=methislabService.marshall(methislabUnderwrittingCasesResults)
+					logginService.putInfoMessage("Methislab - After marshall before crear")
 					requestBBDD = requestService.crear(opername,requestXML) //TODO revisar
+					logginService.putInfoMessage("Methislab - After crear")
 
 					Date date = methislabUnderwrittingCasesResults.dateStart.toGregorianCalendar().getTime()
 					SimpleDateFormat sdfr = new SimpleDateFormat("yyyyMMdd HH:mm:ss")
 					String fechaIni = sdfr.format(date)
 					date = methislabUnderwrittingCasesResults.dateEnd.toGregorianCalendar().getTime()
 					String fechaFin = sdfr.format(date)
-
+					logginService.putInfoMessage("Methislab - Before obtenerInformeExpediente")
 					expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt,null,1,fechaIni,fechaFin,company.ou))
+					logginService.putInfoMessage("Methislab - into obtenerInformeExpediente")
 					expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt,null,2,fechaIni,fechaFin,company.ou))
+					logginService.putInfoMessage("Methislab - After obtenerInformeExpediente")
 
 					String idIdentificador = new Date().format( 'dd-mm-yyyy HH:mm:ss' )
 					if(expedientes){
 						requestService.insertarEnvio(company, "SOLICITUD: " + idIdentificador, requestXML.toString())
-
+						logginService.putInfoMessage("Methislab - Procees expedientes - Items: " + expedientes.size())
 						for(int i=0; i< expedientes.size();i++) {
+							logginService.putInfoMessage("Methislab - Procees expedientes - Init Item: " + i)
 							resultado.getExpediente().add(methislabService.rellenaDatosSalidaConsulta(expedientes.get(i), methislabUnderwrittingCasesResults.dateStart))
+							logginService.putInfoMessage("Methislab - Procees expedientes - Middle Item: " + i)
 							requestService.insertarEnvio(company, "EXPEDIENTE: " + idIdentificador , "ST:" + expedientes.get(i).getCodigoST()+ "#CIA:" + expedientes.get(i).getNumSolicitud())
+							logginService.putInfoMessage("Methislab - Procees expedientes - End Item: " + i)
 						}
 						messages = "Risultati restituiti"
 						status = StatusType.OK
@@ -222,7 +233,7 @@ class MethislabUnderwrittingCaseManagementService {
 				correoUtil.envioEmail("ResultadoReconocimientoMedico","Peticion de " + company.nombre + " con fecha: " + methislabUnderwrittingCasesResults.dateStart.toString() + "-" + methislabUnderwrittingCasesResults.dateEnd.toString() + " Esta operacion para " + company.nombre + " esta desactivada temporalmente", 0)
 			}
 		}catch (Exception e){
-
+			logginService.putInfoMessage("Methislab - Catch")
 
 			messages = "Error: " + e.getMessage()
 			status = StatusType.ERROR
@@ -244,6 +255,7 @@ class MethislabUnderwrittingCaseManagementService {
 		resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 		resultado.setStatus(status)
 		resultado.setCode(code)
+		logginService.putInfoMessage("Methislab - Procees expedientes - leave")
 		logginService.putInfoEndpoint(opername,"Estoy devolviendo resultado ${resultado}")
 		def timeFinal = System.currentTimeMillis() - timedelay
 		logginService.putInfoEndpoint("Endpoint-"+opername +"Tiempo tiempo TOTAL: ", timeFinal.toString())

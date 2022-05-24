@@ -45,7 +45,7 @@ class CorreoUtil {
 
                 InternetAddress[] addressTo = null;
 
-                if (!Environment.current.name.equals("production_wildfly")) {
+                if (!Environment.current.name.equals("production")) {
                     subject = "Webservices Test PREPRO: " + operacion;
                  }
 
@@ -103,7 +103,7 @@ class CorreoUtil {
 
                 InternetAddress[] addressTo = null
 
-                if (!Environment.current.name.equals("production_wildfly")) {
+                if (!Environment.current.name.equals("production")) {
                     subject = "Webservices Test PREPRO: " + operacion
                 }
 
@@ -142,7 +142,7 @@ class CorreoUtil {
 
             String subject = "Webservices: " + operacion
 
-            if (!Environment.current.name.equals("production_wildfly")) {
+            if (!Environment.current.name.equals("production")) {
                 subject = "Webservices Test PREPRO: " + operacion
             }
 

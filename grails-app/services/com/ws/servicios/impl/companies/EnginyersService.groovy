@@ -61,7 +61,7 @@ class EnginyersService implements ICompanyService{
     def getCodigoStManual(Request req) {
         String codigoSt
         //TODO ESTO TIENE SENTIDO?
-        if (Environment.current.name.equals("production_wildfly")) {
+        if (Environment.current.name.equals("production")) {
             codigoSt = "1071"
         } else {
             codigoSt = "1072"
