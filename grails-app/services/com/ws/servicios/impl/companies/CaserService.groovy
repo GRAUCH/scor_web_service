@@ -205,10 +205,9 @@ class CaserService implements ICompanyService {
                  *
                  */
 
-                String observacionesTutor
+                String observacionesTutor = ""
 
                 if (candidateInformationElement.getElementsByTagName("tutor").item(0) != null && candidateInformationElement.getElementsByTagName("tutor").item(0).getTextContent().equals("true")) {
-                    observacionesTutor = "Tutor de "
 
                     for (candidateIterator in candidateIdentificationCodesWithTutor) {
                         if (!candidateIterator.getValue()) {
@@ -216,8 +215,13 @@ class CaserService implements ICompanyService {
                         }
                     }
 
-                    // Quitamos la última coma y la sustituimos por un punto
-                    observacionesTutor = StringBuilder.newInstance().append(observacionesTutor.substring(0, observacionesTutor.size() - 2)).append(".").toString()
+                    if (observacionesTutor.size() != 0) {
+                        observacionesTutor = "Tutor de " + observacionesTutor
+
+                        // Quitamos la última coma y la sustituimos por un punto
+                        observacionesTutor = StringBuilder.newInstance().append(observacionesTutor.substring(0, observacionesTutor.size() - 2)).append(".").toString()
+                    }
+
 
                     if (ValorUtils.isValid(datosRegistro.observaciones)) {
                         datosRegistro.observaciones += StringBuilder.newInstance().append(". ").append(observacionesTutor).toString()
@@ -227,17 +231,23 @@ class CaserService implements ICompanyService {
 
                 } else {
                     if (ValorUtils.isValid(datosRegistro.observaciones)) {
-                        observacionesTutor = "Tutelado por "
+
                         for (candidateIterator in candidateIdentificationCodesWithTutor) {
                             if (candidateIterator.getValue()) {
                                 observacionesTutor += StringBuilder.newInstance().append(candidateIterator.getKey()).append(", ")
                             }
                         }
 
-                        // Quitamos la última coma y la sustituimos por un punto
-                        observacionesTutor = StringBuilder.newInstance().append(observacionesTutor.substring(0, observacionesTutor.size() - 2)).append(".").toString()
+                        if (observacionesTutor.size() != 0) {
+                            observacionesTutor = "Tutelado por " + observacionesTutor
 
-                        datosRegistro.observaciones += StringBuilder.newInstance().append(".").append(observacionesTutor).toString()
+                            // Quitamos la última coma y la sustituimos por un punto
+                            observacionesTutor = StringBuilder.newInstance().append(observacionesTutor.substring(0, observacionesTutor.size() - 2)).append(".").toString()
+
+                            datosRegistro.observaciones += StringBuilder.newInstance().append(".").append(observacionesTutor).toString()
+                        }
+
+
                     } else {
                         datosRegistro.observaciones += observacionesTutor
                     }
