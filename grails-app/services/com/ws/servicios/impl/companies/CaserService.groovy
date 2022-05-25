@@ -1117,11 +1117,11 @@ class CaserService implements ICompanyService {
                 tutor = candidateInformationElement.getElementsByTagName("tutor").item(0).getTextContent().toBoolean()
 
                 if (candidateIdentificationCode == null || candidateIdentificationCode.isEmpty()) {
-                    if (dniTutor != null) {
-                        candidateIdentificationCode = "X" + dniTutor + "-" + candidateIndex
-                    } else {
-                        candidateIdentificationCode = "X" + candidateIdInterviniente
-                    }
+//                    if (dniTutor != null) {
+//                        candidateIdentificationCode = "X" + dniTutor + "-" + candidateIndex
+//                    } else {
+                        candidateIdentificationCode = "X-" + candidateIdInterviniente
+//                    }
                 }
 
                 candidatesIdIntervinienteList.add(candidateIdentificationCode)
