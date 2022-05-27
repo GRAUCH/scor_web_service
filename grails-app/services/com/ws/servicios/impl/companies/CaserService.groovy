@@ -707,7 +707,11 @@ class CaserService implements ICompanyService {
                 Element eElement = (Element) nNode
                 nombre = eElement.getElementsByTagName("name").item(0).getTextContent()
                 apellido = eElement.getElementsByTagName("surname").item(0).getTextContent()
-                dni = eElement.getElementsByTagName("identificationCode").item(0).getTextContent()
+				if (eElement.getElementsByTagName("identificationCode") != null) {
+					dni = eElement.getElementsByTagName("identificationCode").item(0).getTextContent()
+				} else {
+					dni ="";
+				}
 
                 datosEmail.put('Candidato ' + numCandidato + ': nombre = ', nombre)
                 datosEmail.put('Candidato ' + numCandidato + ': apellido = ', apellido)
@@ -1076,7 +1080,7 @@ class CaserService implements ICompanyService {
 
                 Element candidateInformationElement = (Element) candidateNode
 
-                if (candidateInformationElement.getElementsByTagName("identificationCode").item(0) != null) {
+                if (candidateInformationElement.getElementsByTagName("identificationCode") != null && candidateInformationElement.getElementsByTagName("identificationCode").item(0) != null) {
 
                     candidateIdentificationCode = candidateInformationElement.getElementsByTagName("identificationCode").item(0).getTextContent()
 
@@ -1121,9 +1125,14 @@ class CaserService implements ICompanyService {
             if (candidateNode.getNodeType() == Node.ELEMENT_NODE) {
 
                 Element candidateInformationElement = (Element) candidateNode
-
-                candidateIdentificationCode = candidateInformationElement.getElementsByTagName("identificationCode").item(0).getTextContent()
-                candidateIdInterviniente = candidateInformationElement.getElementsByTagName("idInterviniente").item(0).getTextContent()
+				
+				
+				candidateIdInterviniente = candidateInformationElement.getElementsByTagName("idInterviniente").item(0).getTextContent()
+				if ( candidateInformationElement.getElementsByTagName("identificationCode") != null) {
+					candidateIdentificationCode = candidateInformationElement.getElementsByTagName("identificationCode").item(0).getTextContent()
+				} else {
+					candidateIdentificationCode = null
+				}                 
                 tutor = candidateInformationElement.getElementsByTagName("tutor").item(0).getTextContent().toBoolean()
 
                 if (candidateIdentificationCode == null || candidateIdentificationCode.isEmpty()) {
