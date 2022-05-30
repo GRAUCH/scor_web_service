@@ -1080,7 +1080,7 @@ class CaserService implements ICompanyService {
 
                 Element candidateInformationElement = (Element) candidateNode
 
-                if (candidateInformationElement.getElementsByTagName("identificationCode") != null && candidateInformationElement.getElementsByTagName("identificationCode").item(0) != null) {
+                if (candidateInformationElement.getElementsByTagName("identificationCode").item(0) != null) {
 
                     candidateIdentificationCode = candidateInformationElement.getElementsByTagName("identificationCode").item(0).getTextContent()
 
@@ -1128,7 +1128,7 @@ class CaserService implements ICompanyService {
 				
 				
 				candidateIdInterviniente = candidateInformationElement.getElementsByTagName("idInterviniente").item(0).getTextContent()
-				if ( candidateInformationElement.getElementsByTagName("identificationCode") != null) {
+				if ( candidateInformationElement.getElementsByTagName("identificationCode").item(0) != null) {
 					candidateIdentificationCode = candidateInformationElement.getElementsByTagName("identificationCode").item(0).getTextContent()
 				} else {
 					candidateIdentificationCode = null
