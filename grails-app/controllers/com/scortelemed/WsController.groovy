@@ -469,7 +469,8 @@ class WsController {
                 sbInfo.append("** Clave  de caser  entorno -> preproduction **")
                 username = "caser"
                 password = "abdbc632c0dd1807407c6ceee46e0ab48c0bc12c"
-                locator.setXSDProcessExecutionPortEndpointAddress("https://iwssgotest.caser.es/sgowschannel/XSDProcessExecution?WSDL")
+                //remove ?WSDL due a problem with the invocation in PRE ENV
+                locator.setXSDProcessExecutionPortEndpointAddress("https://iwssgotest.caser.es/sgowschannel/XSDProcessExecution")
             }
 			
             XSDProcessExecutionPort port = locator?.getXSDProcessExecutionPort()
