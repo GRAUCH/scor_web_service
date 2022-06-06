@@ -36,6 +36,20 @@ import wslite.soap.SOAPResponse
 
 import javax.xml.rpc.holders.StringHolder
 import java.text.SimpleDateFormat
+import java.nio.charset.StandardCharsets;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 @Secured('permitAll')
@@ -427,6 +441,7 @@ class WsController {
         def coberturas = []
         def password
         def username
+		def urlSoap
         List<RespuestaCRMInforme> expedientesInforme = new ArrayList<RespuestaCRMInforme>()
 
         //EJEMPLO DE URL:
@@ -465,16 +480,19 @@ class WsController {
                 username = "caser"
                 password = "a2aa10aPvQ8D5i6VDNwtXU5F7acSeKGre9PLL6iQEFLbbGfRgZdoHRzdygau"
                 locator.setXSDProcessExecutionPortEndpointAddress("https://iwssgo.caser.es/sgowschannel/XSDProcessExecution?WSDL")
+				urlSoap = "https://iwssgo.caser.es/sgowschannel/XSDProcessExecution"
             } else {
                 sbInfo.append("** Clave  de caser  entorno -> preproduction **")
                 username = "caser"
                 password = "abdbc632c0dd1807407c6ceee46e0ab48c0bc12c"
-                //remove ?WSDL due a problem with the invocation in PRE ENV
+                //remove ?WusernameSDL due a problem with the invocation in PRE ENV
                 locator.setXSDProcessExecutionPortEndpointAddress("https://iwssgotest.caser.es/sgowschannel/XSDProcessExecution")
+				urlSoap ="https://iwssgotest.caser.es/sgowschannel/XSDProcessExecution"
             }
 			
             XSDProcessExecutionPort port = locator?.getXSDProcessExecutionPort()
-            StringHolder salida = new StringHolder()
+            //StringHolder salida = new StringHolder()
+			def salida = ""
             logginService.putInfoMessage(sbInfo?.toString())
             RegistrarEventoSCOR entradaDetalle = new RegistrarEventoSCOR()
             String stringRequest = null
@@ -488,20 +506,25 @@ class WsController {
                     stringRequest = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?><service_RegistrarEventoSCOR><inputMap type='map'><username type='String'><_value_>" + username + "</_value_></username><password type='String'><_value_>" + password + "</_value_></password><idExpediente type='Integer'><_value_>" + entradaDetalle?.getIdExpediente() + "</_value_></idExpediente><codigoEvento type='String'><_value_>" + entradaDetalle?.getCodigoEvento() + "</_value_></codigoEvento><detalle type='String'><_value_>" + entradaDetalle?.getDetalle() + "</_value_></detalle><fecha type='Date'><_value_>" + entradaDetalle?.getFechaCierre() + "</_value_></fecha></inputMap></service_RegistrarEventoSCOR>"
                     Thread.sleep(6000)
 					logginService.putInfoMessage("WsController - Caser - Before 2nd try")
-					logginService.putInfoMessage("WsController - Caser - body" + stringRequest)
+					logginService.putInfoMessage("WsController - Caser - body - " + stringRequest)
                     try {
 						logginService.putInfoMessage("WsController - Caser - before do procees")
-                        port.doProcessExecution(stringRequest, salida)
-						logginService.putInfoMessage("WsController - Caser - after do procees")
+						if (Environment.current.name?.equals("production")) {
+							port.doProcessExecution(stringRequest, salida) 
+						} else {
+							salida = soapCaser(urlSoap, username,  password, stringRequest)
+						}
+						logginService.putInfoMessage("WsController - Caser - after do procees - " + salida)
 						Thread.sleep(6000)
                         Envio envio = new Envio()
                         envio.setFecha(new Date())
                         envio.setCia(company.id?.toString())
                         envio.setIdentificador(entradaDetalle?.getIdExpediente())
                         envio.setInfo(stringRequest)
-                        envio.save(flush: true)
+						logginService.putInfoMessage("WsController - Caser - after do procees - almacenamiento en BBDD: " + envio.getFecha() + "," + envio.getCia() + "," + envio.getIdentificador() + "," + envio.getInfo())
+						envio.save(flush: true)
                         logginService.putInfoMessage("Informacion de salida envio de cambios en expedientes " + entradaDetalle?.getIdExpediente())
-                        logginService.putInfoMessage("Informacion recibida de cambios en expedientes " + entradaDetalle?.getIdExpediente() + ":" + salida.value.trim())
+                        logginService.putInfoMessage("Informacion recibida de cambios en expedientes " + entradaDetalle?.getIdExpediente() + ":" + salida.trim())
                         logginService.putInfoMessage("Informacion expedientes " + entradaDetalle?.getIdExpediente() + " enviado a " + company.nombre + " correctamente")
 
                     } catch (Exception ex) {
@@ -1026,4 +1049,77 @@ class WsController {
     boolean notNullNotEmpty(String entrada) {
         return (entrada && !entrada.trim().isEmpty())
     }
+	
+	String soapCaser(String soapURL, String user, String password, String body) throws Exception, MalformedURLException,
+		IOException {
+		def valret = ""
+
+		logginService.putInfoMessage("WsController - Caser - init soapCaser")
+		URL url = new URL(soapURL)
+
+		HttpURLConnection con = (HttpURLConnection) url.openConnection()
+
+		def soapXml = generateHeader() + body + generateFooter()
+		
+		con.setRequestMethod("POST")
+		con.setRequestProperty("Content-Type", "text/xml; charset=utf-8")
+		con.setRequestProperty("Accept", "text/xml")
+		con.setRequestProperty("SOAPAction", "")
+		con.setRequestProperty("Content-Length", String.valueOf(soapXml.toString().getBytes("utf-8").length))
+		con.setDoOutput(true)
+		con.setDoInput(true)
+
+		
+		try {
+			logginService.putInfoMessage("WsController - Caser - init soapCaser - try")
+			logginService.putInfoMessage("WsController - Caser - init soapCaser - datos llamada================================================")
+			logginService.putInfoMessage("WsController - Caser - init soapCaser - datos llamada - RequestMethod =  POST")// + con.getRequestMethod())
+			logginService.putInfoMessage("WsController - Caser - init soapCaser - datos llamada - Content-Type =  text/xml; charset=utf-8") // + con.getContentType())
+			logginService.putInfoMessage("WsController - Caser - init soapCaser - datos llamada - SOAPAction =  " )
+			logginService.putInfoMessage("WsController - Caser - init soapCaser - datos llamada - Content-length =  "  + String.valueOf(soapXml.toString().getBytes("utf-8").length)) //con.getContentLength())
+			logginService.putInfoMessage("WsController - Caser - init soapCaser - datos llamada - URL =  " + soapURL)
+			logginService.putInfoMessage("WsController - Caser - init soapCaser - datos llamada - Body =  " + soapXml)
+			logginService.putInfoMessage("WsController - Caser - init soapCaser - end datos llamada===========================================")
+			
+			logginService.putInfoMessage("WsController - Caser - init soapCaser - antes de ejecutar la llamada")
+			OutputStream os = null
+			os = con.getOutputStream()
+			logginService.putInfoMessage("WsController - Caser - init soapCaser - despues  de ejecutar la llamada pero antes de cargar la salida")
+			byte[] input = soapXml.toString().getBytes("utf-8")
+			os.write(input, 0, input.length)
+			logginService.putInfoMessage("WsController - Caser - init soapCaser - despues  de cargar la salida")
+			int code = con.getResponseCode()
+			logginService.putInfoMessage("WsController - Caser - init soapCaser - con.getResponseCode: " + code)
+			
+			if (code == 200) {
+				BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), "utf-8"))
+				def response = ""
+				def responseLine = ""
+				while ((responseLine = br.readLine()) != null) {
+					response = response + responseLine.trim()
+				}
+				valret = response
+
+			} else {
+				logginService.putInfoMessage("WsController - Caser - init soapCaser - salimos por el else")
+				throw new  Exception("The code returned by the service is: " + code);
+			}
+		} catch (Exception e2) {
+			logginService.putErrorMessage("Error: soapCaser. No se ha podido mandar el caso a Caser. Detalles:" + e2?.getMessage())
+			throw new  Exception(e2?.getMessage());
+		}
+		
+		logginService.putInfoMessage("WsController - Caser - end soapCaser")
+
+		return valret
+	
+	}
+	String generateHeader( ) {
+		return "<soapenv:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:urn=\"urn:XSDProcessExecution\"><soapenv:Header/><soapenv:Body><urn:doProcessExecution soapenv:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\"><input xsi:type=\"xsd:string\"><![CDATA["
+		
+	}
+	
+	String generateFooter() {
+		return "]]></input></urn:doProcessExecution></soapenv:Body></soapenv:Envelope>"	
+	}
 }
