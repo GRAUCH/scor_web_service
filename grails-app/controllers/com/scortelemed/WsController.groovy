@@ -15,15 +15,18 @@ import com.amaseguros.amascortelemed_ws.webservices.DossierDataStoreWSStub.Tempo
 import com.scor.util.IntIncrement
 import com.scortelemed.schemas.caser.XSDProcessExecutionPort
 import com.scortelemed.schemas.caser.XSDProcessExecutionServiceLocator
+import com.velogica.model.dto.ExpedienteCRMDynamicsDTO
 import com.ws.alptis.sp.beans.AlptisUnderwrittingCaseResultsRequest
 import com.ws.cajamar.beans.Cobertura
 import com.ws.enumeration.UnidadOrganizativa
 import com.ws.servicios.IComprimidoService
 import com.ws.servicios.ServiceFactory
 import com.ws.servicios.impl.companies.AmaService
+import com.ws.servicios.impl.companies.CaserService
 import com.ws.servicios.impl.comprimidos.CommonZipService
 import grails.plugin.springsecurity.annotation.Secured
 import grails.util.Environment
+import grails.util.Holders
 import hwsol.entities.parser.RegistrarEventoSCOR
 import hwsol.utilities.LogUtil
 import hwsol.webservices.CorreoUtil
@@ -445,6 +448,7 @@ class WsController {
         List<RespuestaCRMInforme> expedientesInforme = new ArrayList<RespuestaCRMInforme>()
 		
 		List<RegistrarEventoSCOR> expedientesEnviar = new ArrayList<RegistrarEventoSCOR>()
+        List<Expediente> expedientesCaserInfantil = new ArrayList<Expediente>()
 
         //EJEMPLO DE URL:
         //http://localhost:8080/scorWebservices/ws/caseresultCaser?ini=20170519 00:00:00&fin=20170519 23:59:59
@@ -493,24 +497,33 @@ class WsController {
             }
 			
             XSDProcessExecutionPort port = locator?.getXSDProcessExecutionPort()
-            //StringHolder salida = new StringHolder()
-			def salida = ""
+            def salida = ""
             logginService.putInfoMessage(sbInfo?.toString())
 			
 			//Chequear si los expediente son de caser infantil y ver si tienen hermanos
 			expedientes.each { expediente ->
-				expediente.
-				entradaDetalle = transformacion.obtenerDetalle(expediente)
-				
+                if (Holders.grailsApplication.config.caserInfantilProductCode.contains(expediente.getCodigoProductoCIA())) {
+                    //Caser infantil
+                    expedientesCaserInfantil.add(expediente)
+                } else {
+                    //Resto productos
+                    expedientesEnviar.add(transformacion.obtenerDetalle(expediente))
+                }
+            }
+            if (expedientesCaserInfantil != null && expedientesCaserInfantil.size() > 0) {
+                checkCaserInfantil(expedientesCaserInfantil, company).each { expediente ->
+                    expedientesEnviar.add(transformacion.obtenerDetalle(expediente))
+                }
+
             }
 			//Fin chequear
-            RegistrarEventoSCOR entradaDetalle = new RegistrarEventoSCOR()
+            //RegistrarEventoSCOR entradaDetalle = new RegistrarEventoSCOR()
             String stringRequest = null
             //int erroneos = 0
 			IntIncrement erroneos = new IntIncrement()
 			logginService.putInfoMessage("WsController - Caser - For each expediente")
-            expedientes.each { expediente ->
-                entradaDetalle = transformacion.obtenerDetalle(expediente)
+            expedientesEnviar.each { entradaDetalle ->
+                //entradaDetalle = transformacion.obtenerDetalle(expediente)
 				logginService.putInfoMessage("WsController - Caser - After obtenerDetalle")
                 if (entradaDetalle != null) {
                     stringRequest = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?><service_RegistrarEventoSCOR><inputMap type='map'><username type='String'><_value_>" + username + "</_value_></username><password type='String'><_value_>" + password + "</_value_></password><idExpediente type='Integer'><_value_>" + entradaDetalle?.getIdExpediente() + "</_value_></idExpediente><codigoEvento type='String'><_value_>" + entradaDetalle?.getCodigoEvento() + "</_value_></codigoEvento><detalle type='String'><_value_>" + entradaDetalle?.getDetalle() + "</_value_></detalle><fecha type='Date'><_value_>" + entradaDetalle?.getFechaCierre() + "</_value_></fecha></inputMap></service_RegistrarEventoSCOR>"
@@ -1132,4 +1145,60 @@ class WsController {
 	String generateFooter() {
 		return "]]></input></urn:doProcessExecution></soapenv:Body></soapenv:Envelope>"	
 	}
+
+    List <servicios.Expediente> checkCaserInfantil(List <servicios.Expediente> expedientesParaClasificar, Company company) {
+        List<servicios.Expediente> expedientesFinales = new ArrayList<servicios.Expediente>()
+
+        // Contiene los expedientes agrupados por número de solicitud, de este modo, por cada número de solicitud se obtienen todos los expedientes relacionados.
+        Map<String, List<ExpedienteCRMDynamicsDTO>> mapaExpedientesAgrupados = new HashMap<>()
+
+        if (expedientesParaClasificar) {
+
+            expedientesParaClasificar.each { expedienteClasificar ->
+
+                List<ExpedienteCRMDynamicsDTO> expedientesInfantilesHermanos
+                List<ExpedienteCRMDynamicsDTO> listaExpedientes
+
+                // si el expediente tiene número de subpóliza, indica que forma parte de una póliza infantil y hay que buscar los expedientes hermanos.
+                if (expedienteClasificar.getNumSubPoliza()) {
+                    expedientesInfantilesHermanos = expedienteService.obtenerExpedientesPorNumeroSolicitudYCompanyaCRMDynamics(company.getNombre(), company.getOu().getKey(), company.getCodigoSt(), expedienteClasificar.getNumSolicitud())
+
+                    // Si el expediente tiene hermanos y coinciden con los definidos en el número de subpóliza, lo añadimos al mapa de agrupados por
+                    // número de solicitud, ya que forman parte de la misma póliza infantil y han de evaluarse.
+                    if (expedienteClasificar.getNumSubPoliza().toInteger() == expedientesInfantilesHermanos.size()) {
+                        mapaExpedientesAgrupados.put(expedienteClasificar.getNumSolicitud(), expedientesInfantilesHermanos)
+                    }
+                } else {
+                    listaExpedientes = new ArrayList<>()
+                    listaExpedientes.add(expedienteClasificar)
+                    mapaExpedientesAgrupados.put(expedienteClasificar.getNumSolicitud(), listaExpedientes)
+                }
+            }
+        }
+
+        // Recorremos el mapa comprobando que todos los expedientes agrupados por número de póliza están en estado 1 o 2,
+        // si es así, pasan a la lista de expedientes finales.
+        if (mapaExpedientesAgrupados) {
+
+            int contadorExpedientesFinalizados = 1
+
+            mapaExpedientesAgrupados.each { elementoMapa ->
+
+                contadorExpedientesFinalizados = 0
+
+                for (expediente in elementoMapa.value) {
+                    if (expediente.getCodigoEstadoExpediente() == "10"){
+                        contadorExpedientesFinalizados++
+                    }
+                }
+
+                // Si todos los expedientes de un número de póliza están finalizados, pasan a la lista de expedientesFinales
+                if (contadorExpedientesFinalizados == elementoMapa.getValue().size()) {
+                    expedientesFinales.addAll(elementoMapa.getValue().get(0))
+                }
+            }
+        }
+
+        return expedientesFinales
+    }
 }
