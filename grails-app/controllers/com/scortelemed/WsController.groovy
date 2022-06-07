@@ -456,21 +456,18 @@ class WsController {
         TransformacionUtil transformacion = new TransformacionUtil()
         def company = Company.findByNombre('caser')
         try {
+			logginService.putInfoMessage(" * Realizando proceso envio de informacion para " + company.nombre + " *")
 			logginService.putInfoMessage("WsController - Caser - Before 1st try")
-            StringBuilder sbInfo = new StringBuilder(" * Realizando proceso envio de informacion para " + company.nombre + " *")
-            sbInfo.append("\n")
             if (params.myGroup != null && params.myGroup == 'codigoST' && params.codigoST) {
-				logginService.putInfoMessage("WsController - Caser - Retrieve data with codigoST")
-                sbInfo.append(" al expediente con codigo ST ${params.codigoST}")
-                expedientes.addAll(expedienteService.informeExpedienteCodigoST(params.codigoST, company.ou))
-                sbInfo.append(" * se encontraron :  ${expedientes.size()}  expedientes con el codigo ST *")
+				logginService.putInfoMessage("WsController - Caser - Retrieve data with codigoST ST " + params.codigoST)
+                expedientes.addAll(expedienteService.informeExpedienteCodigoST(params.codigoST, company.ou))                
+				logginService.putInfoMessage(" * se encontraron :  " + expedientes.size() + " expedientes con el codigo ST *")
 				logginService.putInfoMessage("WsController - Caser - End retrieve data with codigoST")
             } else {
-				logginService.putInfoMessage("WsController - Caser - Retrieve data with dates")
+				
                 fechaIni = LogUtil.paramsToDateIni(params)
                 fechaFin = LogUtil.paramsToDateFin(params)
-                sbInfo.append(" con fecha inicio ").append(fechaIni).append("-").append(" con fecha fin ").append(fechaFin)
-                sbInfo.append("** compania " + company.codigoSt + " **")
+                logginService.putInfoMessage("WsController - Caser - Retrieve data with dates from "  + fechaIni + " to " + fechaFin + " for company " + company.codigoSt + " *")
                 expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt, null, 0, fechaIni, fechaFin, company.ou))
 				logginService.putInfoMessage("WsController - Caser - End Retrieve data with dates step 1")
                 expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt, null, 1, fechaIni, fechaFin, company.ou))
@@ -482,13 +479,13 @@ class WsController {
             XSDProcessExecutionServiceLocator locator = new XSDProcessExecutionServiceLocator()
 
             if (Environment.current.name?.equals("production")) {
-                sbInfo.append("** Clave  de caser  entorno -> production **")
+                logginService.putInfoMessage("** Clave  de caser  entorno -> production **")
                 username = "caser"
                 password = "a2aa10aPvQ8D5i6VDNwtXU5F7acSeKGre9PLL6iQEFLbbGfRgZdoHRzdygau"
                 locator.setXSDProcessExecutionPortEndpointAddress("https://iwssgo.caser.es/sgowschannel/XSDProcessExecution?WSDL")
 				urlSoap = "https://iwssgo.caser.es/sgowschannel/XSDProcessExecution"
             } else {
-                sbInfo.append("** Clave  de caser  entorno -> preproduction **")
+                logginService.putInfoMessage("** Clave  de caser  entorno -> preproduction **")
                 username = "caser"
                 password = "abdbc632c0dd1807407c6ceee46e0ab48c0bc12c"
                 //remove ?WusernameSDL due a problem with the invocation in PRE ENV
@@ -498,10 +495,11 @@ class WsController {
 			
             XSDProcessExecutionPort port = locator?.getXSDProcessExecutionPort()
             def salida = ""
-            logginService.putInfoMessage(sbInfo?.toString())
-			
+            			
 			//Chequear si los expediente son de caser infantil y ver si tienen hermanos
+			logginService.putInfoMessage("WsController - Caser - Check caser infantil files vs regular ones")
 			expedientes.each { expediente ->
+				logginService.putInfoMessage("WsController - Caser - Check caser infantil files vs regular ones" + expediente.toString())
                 if (Holders.grailsApplication.config.caserInfantilProductCode.contains(expediente.getCodigoProductoCIA())) {
                     //Caser infantil
                     expedientesCaserInfantil.add(expediente)
@@ -510,10 +508,14 @@ class WsController {
                     expedientesEnviar.add(transformacion.obtenerDetalle(expediente))
                 }
             }
+			logginService.putInfoMessage("WsController - Caser - End check caser infantil files vs regular ones")			
+			logginService.putInfoMessage("WsController - Caser - Files to process: Caser Infantil - " + expedientesCaserInfantil.size() + " Regular ones: " +  expedientesEnviar.size())
             if (expedientesCaserInfantil != null && expedientesCaserInfantil.size() > 0) {
+				logginService.putInfoMessage("WsController - Caser - Transform caser infantil data")
                 checkCaserInfantil(expedientesCaserInfantil, company).each { expediente ->
                     expedientesEnviar.add(transformacion.obtenerDetalle(expediente))
                 }
+				logginService.putInfoMessage("WsController - Caser - End Transform caser infantil data")
 
             }
 			//Fin chequear
@@ -1146,14 +1148,16 @@ class WsController {
 		return "]]></input></urn:doProcessExecution></soapenv:Body></soapenv:Envelope>"	
 	}
 
-    List <servicios.Expediente> checkCaserInfantil(List <servicios.Expediente> expedientesParaClasificar, Company company) {
-        List<servicios.Expediente> expedientesFinales = new ArrayList<servicios.Expediente>()
+    List <Expediente> checkCaserInfantil(List <Expediente> expedientesParaClasificar, Company company) {
+        List<Expediente> expedientesFinales = new ArrayList<Expediente>()
 
         // Contiene los expedientes agrupados por número de solicitud, de este modo, por cada número de solicitud se obtienen todos los expedientes relacionados.
         Map<String, List<ExpedienteCRMDynamicsDTO>> mapaExpedientesAgrupados = new HashMap<>()
+		logginService.putInfoMessage("WsController - Caser - checkCaserInfantil ini")
+        
+		if (expedientesParaClasificar) {
 
-        if (expedientesParaClasificar) {
-
+			logginService.putInfoMessage("WsController - Caser - checkCaserInfantil - expedientesParaClasificar ini")
             expedientesParaClasificar.each { expedienteClasificar ->
 
                 List<ExpedienteCRMDynamicsDTO> expedientesInfantilesHermanos
@@ -1174,12 +1178,13 @@ class WsController {
                     mapaExpedientesAgrupados.put(expedienteClasificar.getNumSolicitud(), listaExpedientes)
                 }
             }
+			logginService.putInfoMessage("WsController - Caser - checkCaserInfantil - expedientesParaClasificar end")
         }
 
         // Recorremos el mapa comprobando que todos los expedientes agrupados por número de póliza están en estado 1 o 2,
         // si es así, pasan a la lista de expedientes finales.
         if (mapaExpedientesAgrupados) {
-
+			logginService.putInfoMessage("WsController - Caser - checkCaserInfantil - mapaExpedientesAgrupados ini")
             int contadorExpedientesFinalizados = 1
 
             mapaExpedientesAgrupados.each { elementoMapa ->
@@ -1197,7 +1202,10 @@ class WsController {
                     expedientesFinales.addAll(elementoMapa.getValue().get(0))
                 }
             }
+			logginService.putInfoMessage("WsController - Caser - checkCaserInfantil - mapaExpedientesAgrupados end")
         }
+		
+		logginService.putInfoMessage("WsController - Caser - checkCaserInfantil end")
 
         return expedientesFinales
     }
