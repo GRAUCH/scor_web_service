@@ -448,7 +448,7 @@ class WsController {
         List<RespuestaCRMInforme> expedientesInforme = new ArrayList<RespuestaCRMInforme>()
 		
 		List<RegistrarEventoSCOR> expedientesEnviar = new ArrayList<RegistrarEventoSCOR>()
-        List<Expediente> expedientesCaserInfantil = new ArrayList<Expediente>()
+        List<ExpedienteInforme> expedientesCaserInfantil = new ArrayList<ExpedienteInforme>()
 
         //EJEMPLO DE URL:
         //http://localhost:8080/scorWebservices/ws/caseresultCaser?ini=20170519 00:00:00&fin=20170519 23:59:59
@@ -498,9 +498,9 @@ class WsController {
             			
 			//Chequear si los expediente son de caser infantil y ver si tienen hermanos
 			logginService.putInfoMessage("WsController - Caser - Check caser infantil files vs regular ones")
-			expedientes.each { expediente ->
+			expedientes.each { ExpedienteInforme expediente ->
 				logginService.putInfoMessage("WsController - Caser - Check caser infantil files vs regular ones" + expediente.toString())
-                if (Holders.grailsApplication.config.caserInfantilProductCode.contains(expediente.getCodigoProductoCIA())) {
+                if (Holders.grailsApplication.config.caserInfantilProductCode.contains(expediente.getProducto().getCodigoProductoCompanya())) {
                     //Caser infantil
                     expedientesCaserInfantil.add(expediente)
                 } else {
@@ -512,7 +512,7 @@ class WsController {
 			logginService.putInfoMessage("WsController - Caser - Files to process: Caser Infantil - " + expedientesCaserInfantil.size() + " Regular ones: " +  expedientesEnviar.size())
             if (expedientesCaserInfantil != null && expedientesCaserInfantil.size() > 0) {
 				logginService.putInfoMessage("WsController - Caser - Transform caser infantil data")
-                checkCaserInfantil(expedientesCaserInfantil, company).each { expediente ->
+                checkCaserInfantil(expedientesCaserInfantil, company).each { ExpedienteCRMDynamicsDTO expediente ->
                     expedientesEnviar.add(transformacion.obtenerDetalle(expediente))
                 }
 				logginService.putInfoMessage("WsController - Caser - End Transform caser infantil data")
@@ -575,9 +575,8 @@ class WsController {
 			logginService.putInfoMessage("WsController - Caser - End For each expediente")
             logginService.putInfoMessage("proceso envio de informacion para " + company.nombre + " terminado.")
             logginService.putInfoMessage("** Se han procesado :" + expedientes.size() + " **" + "Correctamente/Erroneos:" + expedientes.size()-erroneos.getValue() + "/" + erroneos.getValue())
-            sbInfo.append("\n")
-            sbInfo.append("* se procesaron cantidad : ${expedientes.size()} *")
-            flash.message = sbInfo?.toString()
+            logginService.putInfoMessage("* se procesaron cantidad : " + expedientes.size() + " *")
+            flash.message = "Procesado correctamente"
             return redirect(controller: 'dashboard', action: 'index',params: [idCia: ''])
         } catch (Exception ex) {
 			logginService.putInfoMessage("WsController - Caser - Catch 1st try")
@@ -1148,8 +1147,8 @@ class WsController {
 		return "]]></input></urn:doProcessExecution></soapenv:Body></soapenv:Envelope>"	
 	}
 
-    List <Expediente> checkCaserInfantil(List <Expediente> expedientesParaClasificar, Company company) {
-        List<Expediente> expedientesFinales = new ArrayList<Expediente>()
+    List <ExpedienteCRMDynamicsDTO> checkCaserInfantil(List <ExpedienteInforme> expedientesParaClasificar, Company company) {
+        List<ExpedienteCRMDynamicsDTO> expedientesFinales = new ArrayList<Expediente>()
 
         // Contiene los expedientes agrupados por número de solicitud, de este modo, por cada número de solicitud se obtienen todos los expedientes relacionados.
         Map<String, List<ExpedienteCRMDynamicsDTO>> mapaExpedientesAgrupados = new HashMap<>()
@@ -1158,7 +1157,7 @@ class WsController {
 		if (expedientesParaClasificar) {
 
 			logginService.putInfoMessage("WsController - Caser - checkCaserInfantil - expedientesParaClasificar ini")
-            expedientesParaClasificar.each { expedienteClasificar ->
+            expedientesParaClasificar.each { ExpedienteInforme expedienteClasificar ->
 
                 List<ExpedienteCRMDynamicsDTO> expedientesInfantilesHermanos
                 List<ExpedienteCRMDynamicsDTO> listaExpedientes
