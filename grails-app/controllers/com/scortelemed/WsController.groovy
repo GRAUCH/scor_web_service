@@ -443,6 +443,8 @@ class WsController {
         def username
 		def urlSoap
         List<RespuestaCRMInforme> expedientesInforme = new ArrayList<RespuestaCRMInforme>()
+		
+		List<RegistrarEventoSCOR> expedientesEnviar = new ArrayList<RegistrarEventoSCOR>()
 
         //EJEMPLO DE URL:
         //http://localhost:8080/scorWebservices/ws/caseresultCaser?ini=20170519 00:00:00&fin=20170519 23:59:59
@@ -494,6 +496,14 @@ class WsController {
             //StringHolder salida = new StringHolder()
 			def salida = ""
             logginService.putInfoMessage(sbInfo?.toString())
+			
+			//Chequear si los expediente son de caser infantil y ver si tienen hermanos
+			expedientes.each { expediente ->
+				expediente.
+				entradaDetalle = transformacion.obtenerDetalle(expediente)
+				
+            }
+			//Fin chequear
             RegistrarEventoSCOR entradaDetalle = new RegistrarEventoSCOR()
             String stringRequest = null
             //int erroneos = 0
