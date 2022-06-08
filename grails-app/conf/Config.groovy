@@ -84,7 +84,7 @@ environments {
 
         zipPath = "/datos/scorWebservices/MethisLab"
 
-        caserInfantilProductCode = "3698,3699"
+        caserInfantilProductCode = "3698,3697"
 
         cxf {
             client {
@@ -125,7 +125,7 @@ environments {
 
         zipPath = "/datos/scorWebservices/MethisLab"
 
-        caserInfantilProductCode = "3698,3699"
+        caserInfantilProductCode = "3698,3697"
 
         cxf {
             client {
@@ -166,7 +166,7 @@ environments {
 
         zipPath = "/datos/scorWebservices/MethisLab"
 
-        caserInfantilProductCode = "3698,3699"
+        caserInfantilProductCode = "3698,3697"
 
         cxf {
             client {
@@ -206,7 +206,7 @@ environments {
 
         zipPath = "/datos/scorWebservices/MethisLab"
 
-        caserInfantilProductCode = "3698,3699"
+        caserInfantilProductCode = "3698,3697"
 
         cxf {
             client {
