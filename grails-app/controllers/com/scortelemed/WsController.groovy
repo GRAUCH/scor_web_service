@@ -482,7 +482,7 @@ class WsController {
                 logginService.putInfoMessage("** Clave  de caser  entorno -> production **")
                 username = "caser"
                 password = "a2aa10aPvQ8D5i6VDNwtXU5F7acSeKGre9PLL6iQEFLbbGfRgZdoHRzdygau"
-                locator.setXSDProcessExecutionPortEndpointAddress("https://iwssgo.caser.es/sgowschannel/XSDProcessExecution?WSDL")
+                locator.setXSDProcessExecutionPortEndpointAddress("https://iwssgo.caser.es/sgowschannel/XSDProcessExecution")
 				urlSoap = "https://iwssgo.caser.es/sgowschannel/XSDProcessExecution"
             } else {
                 logginService.putInfoMessage("** Clave  de caser  entorno -> preproduction **")
