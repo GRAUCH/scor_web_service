@@ -534,11 +534,11 @@ class WsController {
 					logginService.putInfoMessage("WsController - Caser - body - " + stringRequest)
                     try {
 						logginService.putInfoMessage("WsController - Caser - before do procees")
-						if (Environment.current.name?.equals("production")) {
-							port.doProcessExecution(stringRequest, salida) 
-						} else {
+						//if (Environment.current.name?.equals("production")) {
+						//	port.doProcessExecution(stringRequest, salida) 
+						//} else {
 							salida = soapCaser(urlSoap, username,  password, stringRequest)
-						}
+						//}
 						logginService.putInfoMessage("WsController - Caser - after do procees - " + salida)
 						Thread.sleep(6000)
                         Envio envio = new Envio()
