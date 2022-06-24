@@ -52,11 +52,16 @@ public class ExpedienteCRMDynamicsDTO {
      */
     String nodoAlfresco;
 
+    /**
+     * la fecha de apertura del expediente
+     */
+    String fechaApertura;
+
     public ExpedienteCRMDynamicsDTO() {
 
     }
 
-    public ExpedienteCRMDynamicsDTO(String codigoExpedienteST, String numSolicitud, String codigoEstadoExpediente, String codigoProductoCompanyia, String numPoliza, String numCertificado, String observacionesTarificacion, String nodoAlfresco) {
+    public ExpedienteCRMDynamicsDTO(String codigoExpedienteST, String numSolicitud, String codigoEstadoExpediente, String codigoProductoCompanyia, String numPoliza, String numCertificado, String observacionesTarificacion, String nodoAlfresco, String fechaApertura) {
         this.codigoExpedienteST = codigoExpedienteST;
         this.numSolicitud = numSolicitud;
         this.numPoliza = numPoliza;
@@ -65,9 +70,10 @@ public class ExpedienteCRMDynamicsDTO {
         this.numCertificado = numCertificado;
         this.observacionesTarificacion = observacionesTarificacion;
         this.nodoAlfresco = nodoAlfresco;
+        this.fechaApertura = fechaApertura;
     }
 
-    public ExpedienteCRMDynamicsDTO(String codigoExpedienteST, String codigoCompanyiaST, String numSolicitud, String numPoliza, String numSubPoliza, String codigoProductoCompanyia, String codigoEstadoExpediente, String numCertificado, String observacionesTarificacion, String nodoAlfresco) {
+    public ExpedienteCRMDynamicsDTO(String codigoExpedienteST, String codigoCompanyiaST, String numSolicitud, String numPoliza, String numSubPoliza, String codigoProductoCompanyia, String codigoEstadoExpediente, String numCertificado, String observacionesTarificacion, String nodoAlfresco, String fechaApertura) {
         this.codigoExpedienteST = codigoExpedienteST;
         this.codigoCompanyiaST = codigoCompanyiaST;
         this.numSolicitud = numSolicitud;
@@ -78,6 +84,7 @@ public class ExpedienteCRMDynamicsDTO {
         this.numCertificado = numCertificado;
         this.observacionesTarificacion = observacionesTarificacion;
         this.nodoAlfresco = nodoAlfresco;
+        this.fechaApertura = fechaApertura;
     }
 
     public ExpedienteCRMDynamicsDTO(ExpedienteCRMDynamicsDTO expedienteCRMDynamicsDTO) {
@@ -91,6 +98,7 @@ public class ExpedienteCRMDynamicsDTO {
         this.numCertificado = expedienteCRMDynamicsDTO.getNumCertificado();
         this.observacionesTarificacion = expedienteCRMDynamicsDTO.getObservacionesTarificacion();
         this.nodoAlfresco = expedienteCRMDynamicsDTO.getNodoAlfresco();
+        this.fechaApertura = expedienteCRMDynamicsDTO.getFechaApertura();
     }
 
     public String getCodigoExpedienteST() {
@@ -171,5 +179,13 @@ public class ExpedienteCRMDynamicsDTO {
 
     public void setNodoAlfresco(String nodoAlfresco) {
         this.nodoAlfresco = nodoAlfresco;
+    }
+
+    public String getFechaApertura() {
+        return fechaApertura;
+    }
+
+    public void setFechaApertura(String fechaApertura) {
+        this.fechaApertura = fechaApertura;
     }
 }
