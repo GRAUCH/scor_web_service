@@ -7,6 +7,7 @@ import com.scortelemed.Recibido
 import com.scortelemed.schemas.caser.BenefictNameType
 import com.scortelemed.schemas.caser.RequestStateType
 import com.velogica.model.dto.CandidatoCRMDynamicsDTO
+import com.velogica.model.dto.ExpedienteCRMDynamicsDTO
 import com.ws.cajamar.beans.Cobertura
 import com.ws.cajamar.beans.ElementoEntrada
 import com.ws.cajamar.beans.ElementoSalida
@@ -1396,6 +1397,7 @@ class TransformacionUtil {
     def obtenerDetalle(entidad) {
 
         DateFormat formatter = new SimpleDateFormat("yyyy/MM/dd")
+        DateFormat formatterFechaSolicitud = new SimpleDateFormat("MMM dd yyyy hh:mma") // May 25 2022 10:00PM
         DateFormat formatterSalida = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss")
 
         RegistrarEventoSCOR entradaDetalle = new RegistrarEventoSCOR()
@@ -1493,6 +1495,20 @@ class TransformacionUtil {
                     entradaDetalle.setFechaCierre(formatterSalida.format(date))
                     entradaDetalle.setCodigoEvento(obtenerValorEstadoExpediente(entidad.getCodigoEstado().toString()))
                     entradaDetalle.setDetalle("INFORMES_COMPLEMENTARIOS")
+                    return entradaDetalle
+                default:
+                    return null
+            }
+
+        } else if (entidad instanceof ExpedienteCRMDynamicsDTO) {
+
+            switch (entidad.getCodigoEstadoExpediente()) {
+                case "10":
+                    Date date = formatterFechaSolicitud.parse(entidad.getFechaApertura())
+                    entradaDetalle.setIdExpediente(entidad.getNumSolicitud())
+                    entradaDetalle.setFechaCierre(formatterSalida.format(date))
+                    entradaDetalle.setCodigoEvento(entidad.getCodigoEstadoExpediente())
+                    entradaDetalle.setDetalle("CERRADO")
                     return entradaDetalle
                 default:
                     return null
