@@ -1505,16 +1505,16 @@ class TransformacionUtil {
             switch (entidad.getCodigoEstadoExpediente()) {
                 case "10":
                     //Formateamos la fecha
-                    Date date;
+                    Date date
                     try {
                         date = formatterFechaSolicitud.parse(entidad.getFechaApertura())
                     } catch (Exception e) {
-                       Locale loc = new Locale("en", "US");
-        	            formatterFechaSolicitud = new SimpleDateFormat("MMM dd yyyy hh:mma",loc); // May 25 2022 10:00PM
+                       Locale loc = new Locale("en", "US")
+        	            formatterFechaSolicitud = new SimpleDateFormat("MMM dd yyyy hh:mma",loc) // May 25 2022 10:00PM
         	            try {
-        		            date = formatterFechaSolicitud.parse(entidad.getFechaApertura());
+        		            date = formatterFechaSolicitud.parse(entidad.getFechaApertura())
         	            } catch (Exception e1) {
-        		            System.out.println(e1);
+        		            System.out.println(e1)
         	            }
                     }
                     entradaDetalle.setIdExpediente(entidad.getNumSolicitud())                
