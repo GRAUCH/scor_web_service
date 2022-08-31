@@ -1504,9 +1504,21 @@ class TransformacionUtil {
 
             switch (entidad.getCodigoEstadoExpediente()) {
                 case "10":
-                    Date date = formatterFechaSolicitud.parse(entidad.getFechaApertura())
-                    entradaDetalle.setIdExpediente(entidad.getNumSolicitud())
-                    entradaDetalle.setFechaCierre(formatterSalida.format(date))
+                    //Formateamos la fecha
+                    Date date;
+                    try {
+                        date = formatterFechaSolicitud.parse(entidad.getFechaApertura())
+                    } catch (Exception e) {
+                       Locale loc = new Locale("en", "US");
+        	            formatterFechaSolicitud = new SimpleDateFormat("MMM dd yyyy hh:mma",loc); // May 25 2022 10:00PM
+        	            try {
+        		            date = formatterFechaSolicitud.parse(entidad.getFechaApertura());
+        	            } catch (Exception e1) {
+        		            System.out.println(e1);
+        	            }
+                    }
+                    entradaDetalle.setIdExpediente(entidad.getNumSolicitud())                
+                    entradaDetalle.setFechaCierre(formatterSalida.format(date))                
                     entradaDetalle.setCodigoEvento(entidad.getCodigoEstadoExpediente())
                     entradaDetalle.setDetalle("CERRADO")
                     return entradaDetalle
