@@ -460,7 +460,7 @@ class WsController {
 			logginService.putInfoMessage("WsController - Caser - Before 1st try")
             if (params.myGroup != null && params.myGroup == 'codigoST' && params.codigoST) {
 				logginService.putInfoMessage("WsController - Caser - Retrieve data with codigoST ST " + params.codigoST)
-                expedientes.addAll(expedienteService.informeExpedienteCodigoST(params.codigoST, company.ou))                
+                expedientes.addAll(expedienteService.informeExpedienteCodigoSTv2(params.codigoST, company.ou))                
 				logginService.putInfoMessage(" * se encontraron :  " + expedientes.size() + " expedientes con el codigo ST *")
 				logginService.putInfoMessage("WsController - Caser - End retrieve data with codigoST")
             } else {
