@@ -123,6 +123,29 @@ class ExpedienteService implements IExpedienteService {
         }
     }
 
+    def informeExpedienteCodigoSTv2(String codigoST, UnidadOrganizativa pais) {
+        logginService.putInfoMessage("WsController - Caser - start informeExpedienteCodigoSTv2")
+        Filtro filtro = new Filtro()
+        filtro.setClave(ClaveFiltro.EXPEDIENTE)
+        filtro.setValor(codigoST)
+        try {
+            def ctx = grailsApplication.mainContext
+            def bean = ctx.getBean("soapClientAlptis")
+            bean.getRequestContext().put(javax.xml.ws.BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("frontal.wsdl")?.value)
+            def salida = grailsApplication.mainContext.soapClientAlptis.informeExpedientesPorFiltro(obtenerUsuarioFrontal(pais), filtro)
+            logginService.putInfoMessage("WsController - Caser - informeExpedienteCodigoSTv2 =============")
+            logginService.putInfoMessage("WsController - Caser - informeExpedienteCodigoSTv2 " + salida)
+            logginService.putInfoMessage("WsController - Caser - informeExpedienteCodigoSTv2 " + salida.listaExpedientesInforme)
+            logginService.putInfoMessage("WsController - Caser - informeExpedienteCodigoSTv2 =============")
+            logginService.putInfoMessage("WsController - Caser - end informeExpedienteCodigoSTv2")
+            return salida.listaExpedientesInforme
+        } catch (Exception e) {
+            logginService.putError("informeExpedientePorFiltro de caser", "No se ha podido obtener el informe de expediente : " + e)
+            return null
+        }  
+        
+    }
+
     /**
      * Obtener Expedientes de Siniestro en formato Informe (Más reducido)
      *
