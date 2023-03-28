@@ -245,7 +245,7 @@ class WsController {
             }
 
             def client = new SOAPClient('https://www.generali.es/evi_vidaEmissioServWeb/services/TeleSeleccionHandlerService?Company=M')
-            client.authorization = new HTTPBasicAuthorization("vevisct", "21yb51gs")
+            client.authorization = new HTTPBasicAuthorization("vevisct", "21yb51gS")
             Calendar cal = Calendar?.getInstance()
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd")
             Date fechaSalida = sdf.parse("2016/07/26")
