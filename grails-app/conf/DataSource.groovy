@@ -2,7 +2,7 @@ dataSource {
     pooled = true
     driverClassName = "org.postgresql.Driver"
     dialect = "org.hibernate.dialect.PostgreSQLDialect"
-    jndiName = "java:jboss/datasources/MySqlscorwsDS"
+    jndiName = "java:jboss/datasources/scorwsDS"
 }
 
 dataSource_CRMDynamics {
