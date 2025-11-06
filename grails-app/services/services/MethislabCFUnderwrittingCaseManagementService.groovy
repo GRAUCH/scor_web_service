@@ -85,12 +85,15 @@ class MethislabCFUnderwrittingCaseManagementService {
 						message = "Il caso e stato elaborato correttamente"
 						status = StatusType.OK
 						code = 0
+						def dni = MethislabCFUnderwrittingCaseManagementRequest.candidateInformation.fiscalIdentificationNumber
+						String dniPart = dni.length() > 13 ? dni.substring(0, 13) : dni.padRight(13, '0')
+						def numSolicitud = MethislabCFUnderwrittingCaseManagementRequest.candidateInformation.requestNumber+dniPart
 
 						/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado
 						 *
 						 */
 						logginService.putInfoMessage("Buscando en CRM solicitud de " + company.nombre + " con numero de solicitud: " + MethislabCFUnderwrittingCaseManagementRequest.candidateInformation.requestNumber)
-						expedienteService.busquedaCrm(requestBBDD, company, MethislabCFUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, MethislabCFUnderwrittingCaseManagementRequest.candidateInformation.certificateNumber, null)
+						expedienteService.busquedaCrm(requestBBDD, company, numSolicitud, MethislabCFUnderwrittingCaseManagementRequest.candidateInformation.certificateNumber, null)
 
 					} else {
 						String error =  util.detalleError(wsErrors)

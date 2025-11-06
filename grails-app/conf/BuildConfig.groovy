@@ -5,7 +5,7 @@ grails.project.test.reports.dir = "target/test-reports"
 grails.project.work.dir = "target/work"
 grails.project.target.level = 1.8
 grails.project.source.level = 1.8
-grails.project.war.file = "target/webservicessoap.war"
+grails.project.war.file = "target/webservicessoap_produccion.war"
 
 
 grails.project.fork = [
