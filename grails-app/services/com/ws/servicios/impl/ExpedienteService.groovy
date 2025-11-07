@@ -282,6 +282,7 @@ class ExpedienteService implements IExpedienteService {
         def ctx = grailsApplication.mainContext
         def bean = ctx.getBean("soapClientCrearOrabpel")
         bean.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("orabpelCreacion.wsdl")?.value)
+        logginService.putInfoMessage("Se procede a llamar a BPEL para la creacion del expediente con este payload:" + payload)
         def salida = grailsApplication.mainContext.soapClientCrearOrabpel.initiate(payload)
         return true
     }

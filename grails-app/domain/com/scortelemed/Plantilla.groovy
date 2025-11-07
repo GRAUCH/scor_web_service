@@ -10,7 +10,7 @@ class Plantilla {
 	static hasMany = [avisos: Aviso]
 
 	static mapping = {
-		body sqlType: 'longText'
+		body type: 'text'
 	}
 		
     static constraints = {

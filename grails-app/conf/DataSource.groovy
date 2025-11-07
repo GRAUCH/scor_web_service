@@ -23,19 +23,22 @@ hibernate {
 environments {
 
     local {
-        println "Configurando datasource LOCAL MySQL"
+        println "Configurando datasource LOCAL PostgreSQL"
         dataSource {
             pooled = true
-            driverClassName = "com.mysql.cj.jdbc.Driver"
-            username = "root"
-            password = "root"
+            driverClassName = "org.postgresql.Driver"
+            dialect = org.hibernate.dialect.PostgreSQLDialect
+            username = "postgres"
+            password = "postgres"
             dbCreate = "update"  // 'create', 'create-drop', 'update'
-            url = "jdbc:mysql://localhost:3306/scorws_prepro?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true"
+            url = "jdbc:postgresql://localhost:5432/scorws_prepro_local"
             jndiName = "" // <-- forzamos que no use JNDI
             properties {
                 removeAbandonedTimeout = 60
                 testWhileIdle = true
                 timeBetweenEvictionRunsMillis = 300000
+                validationQuery = "SELECT 1"
+                validationQueryTimeout = 3
             }
         }
 

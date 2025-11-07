@@ -1,0 +1,21 @@
+INSERT INTO company (id, version, codigo_st, ip_control, nombre, user_crm, org_name, pass_crm, host, domain, generation_automatic, ou) VALUES
+(1, 0, '0001', false, 'CompanyUno', 'test', 'test', 'test', 'test', 'test', false, 'ES'),
+(2, 0, '0002', false, 'CompanyDos', 'test', 'test', 'test', 'test', 'test', false, 'ES'),
+(3, 2, '1004', false, 'lagunaro', 'test', 'test', 'test', 'test', 'test', true, 'ES'),
+(4, 0, '0000', false, 'Scor', 'test', 'test', 'test', 'test', 'test', false, 'ES'),
+(5, 7, '1019', false, 'alptis', 'test', 'test', 'test', 'test', 'test', true, 'FR'),
+(6, 4, '1048', false, 'afiesca', 'test', 'test', 'test', 'test', 'test', true, 'FR'),
+(7, 5, '1053', false, 'lifesquare', 'hwsol', 'test', 'P@ssword', 'test', 'test', true, 'FR'),
+(8, 1, '1035', false, 'cajamar', 'cajamar', 'cajamar', 'cajamar', 'cajamar', 'cajamar', true, 'ES'),
+(9, 3, '1059', false, 'ama', 'ama', 'ama', 'ama', 'ama', 'ama', true, 'ES'),
+(10, 2, '1040', false, 'psn', 'psn', 'psn', 'psn', 'psn', 'psn', true, 'ES'),
+(11, 2, '1062', false, 'caser', 'caser', 'caser', 'caser', 'caser', 'caser', true, 'ES'),
+(12, 1, '1060', false, 'netinsurance', 'netinsurance', 'netinsurance', 'netinsurance', 'netinsurance', 'netinsurance', true, 'IT'),
+(13, 0, '1111', false, 'simplefr', 'simplefr', 'simplefr', 'simplefr', 'simplefr', 'simplefr', true, 'FR'),
+(14, 0, '2222', false, 'societeGenerale', 'societeGenerale', 'societeGenerale', 'societeGenerale', 'societeGenerale', 'societeGenerale', true, 'FR'),
+(15, 3, '1068', false, 'methislab', 'methislab', 'methislab', 'methislab', 'methislab', 'methislab', true, 'IT'),
+(16, 1, '1071', false, 'cbp-italia', 'cbp-italia', 'cbp-italia', 'cbp-italia', 'cbp-italia', 'cbp-italia', true, 'IT'),
+(17, 6, '1072', true, 'enginyers', 'enginyers', 'enginyers', 'enginyers', 'enginyers', 'enginyersenginyers', true, 'ES'),
+(18, 0, '1090', true, 'methislabCF', 'methislabcf', 'test', 'methislabcf', 'methislabcf', 'methislabcf', true, 'IT'),
+(19, 0, '1064', false, 'amaVida', 'ama', 'ama', 'ama', 'ama', 'ama', true, 'ES');
+COMMIT;
