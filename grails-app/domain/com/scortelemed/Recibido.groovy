@@ -16,5 +16,8 @@ class Recibido {
 		info(nullable:false)
 		operacion(nullable:false)
 	}
-	
+
+	static mapping = {
+		info type: 'text'
+	}
 }

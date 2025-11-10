@@ -74,9 +74,9 @@ class CajamarUnderwrittingCaseManagementService {
 		Request requestBBDD
 
 		def company = Company.findByNombre(TipoCompany.CAJAMAR.getNombre())
+		def numeroSolicitud = cajamarUnderwrittingCaseManagementRequest.regScor.numref
 
-
-		logginService.putInfoEndpoint("Endpoint-"+opername,"Peticion de Cajamar para solicitud: " + cajamarUnderwrittingCaseManagementRequest.regScor.numref)
+		logginService.putInfoEndpoint("Endpoint-"+opername,"Peticion de Cajamar para solicitud: " +numeroSolicitud)
 
 		try {
 
@@ -86,15 +86,17 @@ class CajamarUnderwrittingCaseManagementService {
 
 				if (company.generationAutomatic && cajamarUnderwrittingCaseManagementRequest.getRegScor().getYtipo().toString().equals("1")) {
 
+					logginService.putInfoMessage("Se procede el alta automatica de " + company.nombre + " con numero de solicitud " + cajamarUnderwrittingCaseManagementRequest.regScor.numref)
 					requestXML=cajamarService.marshall(cajamarUnderwrittingCaseManagementRequest)
+					logginService.putInfoMessage("Se procede al crear la request")
 					requestBBDD = requestService.crear(opername,requestXML)
-
-					expedienteService.crearExpediente(requestBBDD, TipoCompany.CAJAMAR)
+					logginService.putInfoMessage("Se procede al crear el expediente")
+					expedienteService.crearExpediente(requestBBDD, TipoCompany.CAJAMAR, numeroSolicitud)
 					resultado.setComments("El caso se ha procesado correctamente")
 					resultado.setStatus(StatusType.OK)
 					resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 
-					logginService.putInfoMessage("Se procede el alta automatica de " + company.nombre + " con numero de solicitud " + cajamarUnderwrittingCaseManagementRequest.regScor.numref)
+					logginService.putInfoMessage("Se procede a insertar la request recibida")
 					requestService.insertarRecibido(company, cajamarUnderwrittingCaseManagementRequest.regScor.numref, requestBBDD.request, TipoOperacion.ALTA)
 
 					/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado*/

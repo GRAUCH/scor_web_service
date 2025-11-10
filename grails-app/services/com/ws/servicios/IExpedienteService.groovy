@@ -17,7 +17,7 @@ interface IExpedienteService {
     def obtenerInformeExpedientesSiniestros(String companya, String producto, Integer estado, String fechaIni, String fechaFin, UnidadOrganizativa pais)
     List<Expediente> informeExpedienteCodigoST(String codigoST, UnidadOrganizativa pais)
     def modificaExpediente(UnidadOrganizativa pais, Expediente expediente, def servicioScorList, def paqueteScorList)
-    boolean crearExpediente(Request req, TipoCompany comp)
+    boolean crearExpediente(Request req, TipoCompany comp, String numSolicitud)
     def busquedaCrm(Request requestBBDD, Company company, String requestNumber, String certificateNumber, String policyNumber)
     Usuario obtenerUsuarioFrontal(UnidadOrganizativa unidadOrganizativa)
 

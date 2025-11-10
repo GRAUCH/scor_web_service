@@ -7,6 +7,10 @@ class Estadistica {
 	Operacion operacion
 	
 	Request request
+
+	static mapping = {
+		value type: 'text'
+	}
 	
 	static constraints = {
 		clave(blank:false)

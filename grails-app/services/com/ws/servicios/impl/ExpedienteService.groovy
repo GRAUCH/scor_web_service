@@ -31,6 +31,8 @@ import servicios.Filtro
 import servicios.RespuestaCRM
 import servicios.Usuario
 
+import javax.xml.bind.JAXBContext
+import javax.xml.bind.Marshaller
 import javax.xml.namespace.QName
 import javax.xml.ws.soap.SOAPFaultException
 
@@ -212,7 +214,7 @@ class ExpedienteService implements IExpedienteService {
      * @param TipoCompany comp
      * @return
      */
-    boolean crearExpediente(Request req, TipoCompany comp) {
+    boolean crearExpediente(Request req, TipoCompany comp, String numSolicitud) {
         try {
 
             CaserService companyService
@@ -248,7 +250,7 @@ class ExpedienteService implements IExpedienteService {
                         }
                     }
 
-                    realizarPeticionSOAP(req, comp, payloadList.get(i))
+                    realizarPeticionSOAP(req, comp, payloadList.get(i), numSolicitud)
 
                     if (i == companyService.obtenerNumeroCandidatos(req) - 1) {
                         Thread.currentThread().sleep(5000)
@@ -260,7 +262,9 @@ class ExpedienteService implements IExpedienteService {
                 return true
 
             } else {
-                return realizarPeticionSOAP(req, comp, crearExpedienteBPM(req, comp))
+                logginService.putInfoMessage("Se procede a la llamada a BPEL para crear el expediente")
+                return realizarPeticionSOAP(req, comp, crearExpedienteBPM(req, comp), numSolicitud)
+                logginService.putInfoMessage("Fin llamada a BPEL para crear el expediente")
             }
 
         } catch (Exception e) {
@@ -277,12 +281,45 @@ class ExpedienteService implements IExpedienteService {
      * @return true SE DEVUELVE SIEMPRE TRUE PORQUE EL SERVICIO SOAP NO DEVUELVE ESTADO DE LA LLAMADA REALIZADA
      *              SE COMPRUEBA POSTERIORMENTE SI EL EXPEDIENTE EXISTE EN CRM PARA VALIDAR QUE SE HA PERSISTIDO CORRECTAMENTE
      */
-    private boolean realizarPeticionSOAP(Request req, TipoCompany comp, RootElement payload) {
+    private boolean realizarPeticionSOAP(Request req, TipoCompany comp, RootElement payload, String numSolicitud) {
         //SOBREESCRIBIMOS LA URL A LA QUE TIENE QUE LLAMAR EL WSDL
         def ctx = grailsApplication.mainContext
         def bean = ctx.getBean("soapClientCrearOrabpel")
         bean.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, Conf.findByName("orabpelCreacion.wsdl")?.value)
-        logginService.putInfoMessage("Se procede a llamar a BPEL para la creacion del expediente con este payload:" + payload)
+        // Convertimos el payload a XML legible
+        def payloadXml = ""
+        try {
+            JAXBContext context = JAXBContext.newInstance(payload.getClass())
+            StringWriter sw = new StringWriter()
+            Marshaller marshaller = context.createMarshaller()
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true)
+            marshaller.marshal(payload, sw)
+            payloadXml = sw.toString()
+        } catch (Exception e) {
+            payloadXml = "Error al serializar payload: ${e.message}"
+        }
+        if (Environment.current.name?.equals("local")) {
+            logginService.putInfoMessage("Payload enviado a BPEL:\n${payloadXml}")
+        }
+         else {
+            logginService.putInfoMessage("Payload enviado a BPEL")
+        }
+        //Construimos el nombre del fichero
+        def sdf = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss")
+        def fecha = sdf.format(new Date())
+        def nombreArchivo = "${comp.nombre}_${numSolicitud}_${fecha}.txt"
+        nombreArchivo = nombreArchivo.replaceAll("[^a-zA-Z0-9_.-]", "_")
+
+        // Definimos la ruta donde guardar ---
+        def carpeta = new File("./payloads") // Puedes cambiarla, ej: "C:/logs/payloads"
+        if (!carpeta.exists()) carpeta.mkdirs()
+
+        def archivo = new File(carpeta, nombreArchivo)
+        // Guardamos el XML en el fichero ---
+        archivo.withWriter("UTF-8") { writer ->
+            writer.write(payloadXml)
+        }
+        logginService.putInfoMessage("fichero generado: " + nombreArchivo)
         def salida = grailsApplication.mainContext.soapClientCrearOrabpel.initiate(payload)
         return true
     }

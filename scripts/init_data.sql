@@ -19,3 +19,132 @@ INSERT INTO company (id, version, codigo_st, ip_control, nombre, user_crm, org_n
 (18, 0, '1090', true, 'methislabCF', 'methislabcf', 'test', 'methislabcf', 'methislabcf', 'methislabcf', true, 'IT'),
 (19, 0, '1064', false, 'amaVida', 'ama', 'ama', 'ama', 'ama', 'ama', true, 'ES');
 COMMIT;
+INSERT INTO webservice (id, version,activo,clave,descripcion,pass_externo,usuario_externo) VALUES
+(1,2,true,'GestionReconocimientosMedicos','Webservice de lagunaro: GestionReconocimientosMedicos','pass','user'),
+(2,4,true,'AlptisUnderwrittingCaseManagement','AlptisUnderwrittingCaseManagement','',''),
+(3,1,true,'AlptisUnderwrittingCasesResults','AlptisUnderwrittingCasesResults','alptis','alptis'),
+(4,1,true,'AlptisUnderwrittingTestResults','AlptisUnderwrittingTestResults','alptis','alptis'),
+(5,1,true,'AlptisUnderwrittingTestManagement','AlptisUnderwrittingTestManagement','alptis','alptis'),
+(6,5,true,'AfiEscaUnderwrittingCaseManagement','AfiEscaUnderwrittingCaseManagement','afiesca','afiesca'),
+(7,5,true,'AfiEscaUnderwrittingCasesResults','AfiEscaUnderwrittingCasesResults','afiesca','afiesca'),
+(8,0,true,'LifesquareUnderwrittingCaseManagement','LifesquareUnderwrittingCaseManagement','lifesquare','lifesquare'),
+(9,0,true,'LifesquareUnderwrittingCasesResultsRequest','LifesquareUnderwrittingCasesResultsRequest','admin','admin'),
+(10,0,true,'CajamarUnderwrittingCaseManagementRequest','CajamarUnderwrittingCaseManagementRequest','cajamar','cajamar'),
+(11,1,true,'AmaUnderwrittingCaseManagement','AmaUnderwrittingCaseManagement','ama','ama7854'),
+(12,3,true,'PsnUnderwrittingCaseManagement','PsnUnderwrittingCaseManagement','psn','psn7854'),
+(13,5,true,'CaserUnderwrittingCaseManagement','CaserUnderwrittingCaseManagement','caser','caser7854'),
+(14,0,true,'NetinsuranceUnderwrittingCaseManagement','NetinsuranceUnderwrittingCaseManagement','NetinsuranceUnderwrittingCaseManagement','NetinsuranceUnderwrittingCaseManagement'),
+(15,0,false,'SimplefrUnderwrittingCaseManagement','SimplefrUnderwrittingCaseManagement','simplefr','simplefr'),
+(16,1,false,'SocieteGeneraleUnderwrittingCaseManagement','SocieteGeneraleUnderwrittingCaseManagement','societe','societe'),
+(17,0,true,'MethislabUnderwrittingCaseManagement','MethislabUnderwrittingCaseManagement','MethislabUnderwrittingCaseManagement','MethislabUnderwrittingCaseManagement'),
+(18,2,true,'CbpitaUnderwrittingCaseManagement','CbpitaUnderwrittingCaseManagement','CbpitaUnderwrittingCaseManagement','CbpitaUnderwrittingCaseManagement'),
+(19,0,true,'EnginyersUnderwrittingCaseManagement','EnginyersUnderwrittingCaseManagement','enginyers','enginyers7854'),
+(20,3,true,'MethislabCFUnderwrittingCaseManagement','MethislabCFUnderwrittingCaseManagement','MethislabCFUnderwrittingCaseManagement','MethislabCFUnderwrittingCaseManagement');
+COMMIT;
+INSERT INTO conf (id,version,description,name,value) VALUES
+                                                               (1,0,'Template para emails de aviso. OBLIGATORIO. ${body} corresponde al contenido de la plantilla','template_email','
+					<img width="170" height="100" alt="" src="http://www.scortelemed.com:9090/webservices/images/cabecera_logo.png">
+					<div class="clear"></div>
+					<div class="nav">
+					${body}
+					</div>
+					<div>
+						<div>&copy; 2010 &middot; SCOR Telemed </div>
+						<div>
+							Desarrollado por <a href="http://www.helloworldsolutions.com" target="_blank"><b>helloworld</b>solutions</a>
+						</div>
+					</div>
+				'),
+(2,1,'Email de administrador para envio de avisos. OBLIGATORIO','admin_email','gcaballero@remarkgroup.com'),
+(3,3,'descripcion','carpetaFicheros','/home/customer/hwsol/prepro/ficherolagunaro/'),
+(4,0,'descripcion','prefijoFicheros','-fileDump.generado.txt'),
+(5,1,'Carpeta del sistema donde se almacenara los Informes de Pruebas de Alptis. OBLIGATORIO.','alptisCarpetaInformesPruebas','/home/customer/hwsol/ficheroalptis'),
+(6,1,'Email donde se envian el informe de recepcion de Informes de Pruebas de Alptis. OBLIGATORIO.','alptisEmailInformes','d@hwsol.com'),
+(7,0,'URL to conection wsdl','frontal.wsdl','http://172.17.0.33:8003/FrontalServiciosCRM/FrontalService?wsdl'),
+(8,0,'URL to conection serviceEndpointAddress','frontal.serviceEndpointAddress','http://172.17.0.33:8003/FrontalServiciosCRM/FrontalService?wsdl'),
+(9,0,'Frontal Password','frontal.clave','P@ssword'),
+(10,0,'Frontal Domain','frontal.dominio','scor'),
+(11,0,'Frontal User','frontal.usuario','ccuenca'),
+(12,0,'URL to conection wsdl','orabpel.wsdl','http://172.17.0.33:8888/orabpel/default/ComprimirDocumentos/1.0?wsdl'),
+(13,0,'URL to conection serviceEndpointAddress','orabpel.serviceEndpointAddress','http://172.17.0.33:8888/orabpel/default/ComprimirDocumentos/1.0'),
+(14,0,'Orabpel Password','orabpel.clave','pR8x5hqD'),
+(15,0,'Orabpel User','orabpel.usuario','generico'),
+(16,0,'URL to conection wsdl','crm.wsdl','http://172.17.0.36/mscrmservices/2007/crmService.asmx'),
+(17,0,'CRM Password','crm.clave','xY;;#MID!c!572'),
+(18,0,'CRM User','crm.usuario','Administrador'),
+(19,0,'CRM Password','crm.clave.lagunaro','xY;;#MID!c!572'),
+(20,0,'CRM User','crm.usuario.lagunaro','Administrador'),
+(21,0,'CRM host','crm.host','172.17.0.36'),
+(22,0,'CRM domain','crm.domain','scor'),
+(23,0,'CRM orgName','crm.orgName','scortelemed'),
+(24,0,'URL to conection creacion expediente BPEL','orabpelCreacion.wsdl','http://172.17.0.33:8888/orabpel/default/CreacionExpedienteAsyncSRP/4.0?wsdl'),
+(25,0,'Descarga y generacion de fichero zip','rutaFicheroZip','/home/wildfly/ficheros/'),
+(26,0,'Usuario para descarga alfresco','usuarioZip','ccuenca'),
+(27,0,'Password para descarga alfresco','passwordZip','P@ssword');
+COMMIT;
+INSERT INTO operacion (id,version,activo,clave,descripcion,fecha_alta,fecha_modificacion,pass_externo,usuario_externo,webservice_id) VALUES
+(1,1,true,'GestionReconocimientoMedicoRequest','GestionReconocimientoMedicoRequest','2010-11-16 21:26:02+01','2014-07-15 15:57:57+02','pass','user',1),
+(2,0,true,'TramitacionReconocimientoMedicoRequest','TramitacionReconocimientoMedicoRequest','2010-11-16 21:27:53+01',NULL,'','',1),
+(3,0,true,'AlptisUnderwrittingCaseManagementRequest','AlptisUnderwrittingCaseManagementRequest','2011-10-19 19:41:54+02',NULL,'','',2),
+(4,0,true,'AlptisUnderwrittingCasesResultsRequest','AlptisUnderwrittingCasesResultsRequest','2012-07-13 19:59:14+02',NULL,'alptis','alptis',3),
+(5,0,true,'AlptisUnderwrittingTestResultsRequest','AlptisUnderwrittingTestResultsRequest','2012-09-26 17:02:32+02',NULL,'alptis','alptis',4),
+(6,0,true,'AlptisUnderwrittingTestManagementRequest','AlptisUnderwrittingTestManagementRequest','2012-09-26 22:02:34+02',NULL,'alptis','alptis',5),
+(7,0,true,'AfiEscaUnderwrittingCaseManagementRequest','AfiEscaUnderwrittingCaseManagementRequest','2014-04-24 21:08:40+02',NULL,'afiesca','afiesca',6),
+(8,0,true,'AfiEscaUnderwrittingCasesResultsRequest','AfiEscaUnderwrittingCasesResultsRequest','2014-04-24 21:09:04+02',NULL,'afiesca','afiesca',7),
+(9,2,true,'LifesquareUnderwrittingCaseManagementRequest','LifesquareUnderwrittingCaseManagementRequest','2015-11-20 12:40:23+01','2015-11-20 12:55:53+01','lifesquare','lifesquare',8),
+(10,0,true,'LifesquareUnderwrittingCasesResultsRequest','LifesquareUnderwrittingCasesResultsRequest','2015-11-30 12:07:28+01',NULL,'admin','admin',9),
+(11,1,true,'CajamarUnderwrittingCaseManagementRequest','CajamarUnderwrittingCaseManagementRequest','2016-04-12 19:25:06+02','2016-04-12 19:34:32+02','cajamar','cajamar',10),
+(12,4,true,'AmaResultadoReconocimientoMedicoRequest','AmaResultadoReconocimientoMedicoRequest','2017-02-10 15:14:38+01','2017-04-25 11:46:30+02','ama7854','ama',11),
+(13,0,true,'PsnResultadoReconocimientoMedicoRequest','PsnResultadoReconocimientoMedicoRequest','2018-05-10 14:57:19+02',NULL,'psn7854','psn',1),
+(14,3,true,'CaserResultadoReconocimientoMedicoResponse','CaserResultadoReconocimientoMedicoResponse','2017-04-21 16:21:18+02','2017-05-04 20:57:47+02','caser7854','caser',13),
+(15,3,true,'CaserResultadoReconocimientoMedicoRequest','CaserResultadoReconocimientoMedicoRequest','2017-04-21 16:21:51+02','2017-05-04 20:57:59+02','caser7854','caser',13),
+(16,1,true,'AmaResultadoReconocimientoMedicoResponse','AmaResultadoReconocimientoMedicoResponse','2017-04-28 15:02:17+02','2017-04-28 15:02:22+02','ama7854','ama',11),
+(17,1,true,'AmaResultadoSiniestroRequest','AmaResultadoSiniestroRequest','2017-05-16 13:07:58+02','2018-05-23 15:06:35+02','ama7854','ama',11),
+(18,1,true,'CaserConsultaExpedienteResponse','CaserConsultaExpedienteResponse','2017-05-24 11:31:25+02','2017-05-24 11:31:29+02','caser7854','caser',13),
+(19,1,true,'AmaConsolidacionPolizaResponse','AmaConsolidacionPolizaResponse','2017-09-18 09:42:28+02','2017-09-18 09:45:29+02','ama7854','ama',11),
+(20,1,true,'NetinsuranceUnderwrittingCaseManagementRequest','NetinsuranceUnderwrittingCaseManagementRequest','2017-10-09 15:00:42+02','2017-10-09 15:01:10+02','netinsurance','netinsurance',14),
+(21,1,true,'NetinsuranceUnderwrittingCaseManagementResponse','NetinsuranceUnderwrittingCaseManagementResponse','2017-10-09 15:01:48+02','2017-10-09 15:01:58+02','netinsurance','netinsurance',14),
+(22,0,false,'SimplefrUnderwrittingCaseManagementRequest','SimplefrUnderwrittingCaseManagementRequest','2017-11-08 11:45:46+01',NULL,'simplefr7854','simplefr',15),
+(23,0,false,'SimplefrUnderwrittingCaseManagementResponse','SimplefrUnderwrittingCaseManagementResponse','2017-11-08 11:46:17+01',NULL,'simplefr7854','simplefr',15),
+(24,0,false,'SocieteGeneraleUnderwrittingCaseManagementRequest','SocieteGeneraleUnderwrittingCaseManagementRequest','2017-12-20 14:02:31+01',NULL,'societe7854','societe',16),
+(25,0,false,'SocieteGeneraleUnderwrittingCaseManagementResponse','SocieteGeneraleUnderwrittingCaseManagementResponse','2017-12-20 14:04:04+01',NULL,'societe7854','societe',16),
+(26,1,true,'ResultadoReconocimientoMedicoResponse','ResultadoReconocimientoMedicoResponse','2018-03-22 13:36:57+01','2018-03-22 13:37:17+01','psn7854','psn',1),
+(27,1,true,'PsnResultadoReconocimientoMedicoRequest','PsnResultadoReconocimientoMedicoRequest','2018-05-10 14:57:58+02','2018-05-10 14:58:04+02','psn7854','psn',12),
+(28,1,true,'PsnResultadoReconocimientoMedicoResponse','PsnResultadoReconocimientoMedicoResponse','2018-05-10 14:58:31+02','2018-05-10 14:58:36+02','psn7854','psn',12),
+(29,0,true,'PsnConsolidacionPolizaResponse','PsnConsolidacionPolizaResponse','2018-07-19 12:56:50+02',NULL,'psn7854','psn',12),
+(30,0,true,'PsnConsultaExpediente','PsnConsultaExpediente','2018-07-19 12:57:14+02',NULL,'psn7854','psn',12),
+(31,1,false,'PsnConsultaDocumento','PsnConsultaDocumento','2018-07-19 12:57:39+02','2018-07-25 14:30:21+02','psn7854','psn',12),
+(32,1,true,'AmaConsultaExpediente','AmaConsultaExpediente','2018-07-25 14:20:21+02','2018-07-25 14:20:24+02','ama7854','ama',11),
+(33,0,true,'MethislabUnderwrittingCaseManagementRequest','MethislabUnderwrittingCaseManagementRequest','2018-08-10 15:29:32+02',NULL,'methislab','methislab',17),
+(34,0,true,'MethislabUnderwrittingCaseManagementResponse','MethislabUnderwrittingCaseManagementResponse','2018-08-10 15:29:57+02',NULL,'methislab','methislab',17),
+(35,2,true,'CbpitaUnderwrittingCaseManagementRequest','CbpitaUnderwrittingCaseManagementRequest','2018-08-10 15:30:37+02','2019-04-29 18:54:03+02','cbpita','cbpita',18),
+(36,2,true,'CbpitaUnderwrittingCaseManagementResponse','CbpitaUnderwrittingCaseManagementResponse','2018-08-10 15:31:07+02','2019-04-29 18:54:17+02','cbpita','cbpita',18),
+(37,0,true,'NetinsuranteGetDossier','NetinsuranteGetDossier','2018-09-17 19:14:00+02',NULL,'netinsurance','netinsurance',14),
+(38,0,true,'EnginyersResultadoReconocimientoMedicoRequest','EnginyersResultadoReconocimientoMedicoRequest','2019-02-22 14:10:10+01',NULL,'enginyers7854','enginyers',19),
+(39,1,true,'MethislabCFUnderwrittingCaseManagementRequest','MethislabCFUnderwrittingCaseManagementRequest','2019-12-03 18:56:24+01','2019-12-19 11:10:34+01','MethislabCFUnderwrittingCaseManagementRequest','MethislabCFUnderwrittingCaseManagementRequest',20),
+(40,1,true,'MethislabCFUnderwrittingCaseManagementResponse','MethislabCFUnderwrittingCaseManagementResponse','2019-12-03 18:57:45+01','2019-12-19 11:11:05+01','MethislabCFUnderwrittingCaseManagementResponse','MethislabCFUnderwrittingCaseManagementResponse',20),
+(41,3,true,'CaserResultadoReconocimientoMedicoInfantilRequest','CaserResultadoReconocimientoMedicoInfantilRequest','2021-12-15 10:24:28+01','2021-12-15 10:24:28+01','caser7854','caser',13),
+(42,3,false,'CaserResultadoReconocimientoMedicoInfantilRequest','CaserResultadoReconocimientoMedicoInfantilRequest','2022-04-22 13:54:02+02','2022-04-22 13:54:02+02','caser7854','caser',13);
+COMMIT;
+INSERT INTO person (id,version,company_id,description,email,email_show,enabled,passwd,user_real_name,username,account_expired,password_expired,account_locked) VALUES
+(1,4,1,'descripcion: Admin','info@helloworldsolutions.com',true,true,'20c542bf666f6dbf8860b971cd796898c10e5e21','Administrador','admin',false,true,false),
+(2,0,2,'descripcion: User','info@helloworldsolutions.com',true,true,'12dea96fec20593566ab75692c9949596833adc9','Usuario normal','user',false,false,false),
+(3,0,3,'Usuario generico de Lagunaro','gotinano@seguroslagunaro.com',true,true,'e31cad3ae1e21308cb4f18471ddfd41b4fe73030','Usuario webservices Lagunaro','lagunaro',false,false,false),
+(4,1,3,'descripcion: Admin','info@helloworldsolutions.com',true,true,'$2a$10$Z9ihWupUCS9rh33AejFJke.82A.4KiowAjh.Vn7R5OsRH9wJQOCEe','Administrador','hwsol',false,false,false),
+(5,4,5,'','',false,true,'401471b3c39087e0f3a8d8f6bd560ee6da498415','Alptis','alptis',false,false,false),
+(6,2,6,'','',false,true,'afiesca','afiesca','afiesca',false,false,false),
+(7,5,6,'','',false,true,'prueba','prueba','prueba',false,false,false),
+(8,0,6,'Lagunaro2','test@hwsol.com',true,true,'$2a$10$Z9ihWupUCS9rh33AejFJke.82A.4KiowAjh.Vn7R5OsRH9wJQOCEe','lagunaro2','afiesca2',false,false,false),
+(9,0,7,'lifesquare','lifesquare',false,true,'300f9dca4cd1e6d38cbdd43ee2ed97f7d860060f','lifesquare','lifesquare',false,false,false),
+(10,0,8,'cajamar','cajamar@scor.com',false,true,'abdbc632f0dd1807407c6ceee46e0ab48c0bc3fb','cajamar','cajamar',false,false,false),
+(11,2,9,'ama','ama@scor.com',false,true,'abdbc632f0dd1807407c6ceee46e0ab48c0bc3fc','ama','ama',false,false,false),
+(12,2,10,'psn','psns@scor.com',false,true,'abdbc632f0dd1807407c6ceee46e0ab48c0bc44c','psn','psn',false,false,false),
+(13,2,11,'caser','caser@scor.com',false,true,'abdbc632c0dd1807407c6ceee46e0ab48c0bc12c','caser','caser',false,false,false),
+(14,0,12,'netinsurance','netinsurance@scor.com',false,true,'abdbc632c0dd1807407c6cbvn46e0ab48c0bc12d','netinsurance','netinsurance',false,false,false),
+(15,0,13,'simplefr','simplefr@gmail.com',false,false,'bbbb71b3c39087e0f3a8d8f6yd560ee6da498433','simplefr','simplefr',false,false,false),
+(16,0,14,'societeGenerale','societeGenerale@scor.com',false,true,'bbbb71b3c39087bbf3a8bbf6yd560ee6da4984bb','societeGenerale','societeGenerale',false,false,false),
+(17,0,15,'methislab','methislab@scor.com',false,true,'hnjkl632c0dd1807407c6cbvn46e0ab48c0bc567','methislab','methislab',false,false,false),
+(18,0,16,'cbp-italia','cbp-italia@scor.com',false,true,'401471b3c39087qwe3a8d8f6bd560ee6da498415','cbp-italia','cbp-italia',false,false,false),
+(19,1,17,'enginyers','enginyers@scor.com',false,true,'abdbc632f0dd1807407c6ceee46e0ab48c0bc44c','enginyers','enginyers',false,false,false),
+(20,1,18,'methislabCF','methislab@scor.com',false,true,'$2a$10$XxdVtnvUK1Tw8GXpGwVeiueFx6x.SX3G0ShHVhqoVufRX4WR3yIoy','methislabCF','methislabCF',false,false,false);
+COMMIT;

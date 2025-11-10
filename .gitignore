@@ -19,7 +19,7 @@
 
 # Plugin cache
 /.plugin-cache/
-
+/payloads
 # =========================================
 # ☕ Java / Groovy build artifacts
 # =========================================

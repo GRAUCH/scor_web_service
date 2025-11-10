@@ -106,14 +106,13 @@ class RequestService implements IRequestService {
                         logginService.putErrorMessage("No se ha podido guardar los request: " + it)
                     }
                 } else {
+                    //AHORA MISMO ESTO NO HACE NADA ASI QUE SE COMENTA
+//					avisosService.enviarAvisos(salida.operacion, salida.claveProceso)
+                    def salida = estadisticasService.crear(result, operacion, requestXML.trim())
                     StringBuilder sbInfo = new StringBuilder("Se ha guardado la request correctamente para la operacion [");
                     sbInfo.append(message).append("] para la compania: ").append(compania.nombre);
                     logginService.putInfoMessage(sbInfo.toString())
                 }
-
-                def salida = estadisticasService.crear(result, operacion, requestXML.trim())
-                //AHORA MISMO ESTO NO HACE NADA ASI QUE SE COMENTA
-//					avisosService.enviarAvisos(salida.operacion, salida.claveProceso)
             } else {
                 throw new Exception("No se ha encontrado la cia o la operacion activa.")
             }
