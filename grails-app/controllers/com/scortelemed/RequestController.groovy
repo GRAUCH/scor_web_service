@@ -359,7 +359,7 @@ class RequestController {
 
 		Request requestBBDD = null
 		Request requestInstance = Request.get(params.id)
-
+		def numSolicitud = ""
 		if(Company.findByNombre(requestInstance.company).generationAutomatic) {
 			Company compania = Company.findByNombre(requestInstance.company)
 			session.companyST = compania.codigoSt
@@ -370,6 +370,8 @@ class RequestController {
 					AfiEscaUnderwrittingCaseManagementRequest afiEscaUnderwrittingCaseManagementRequest = requestService.unmarshall(requestInstance.getRequest(), AfiEscaUnderwrittingCaseManagementRequest.class)
 					if (afiEscaUnderwrittingCaseManagementRequest.getRequest_Data().getRecord().getNombre().equals("A")) {
 						requestBBDD = requestService.getBBDDRequest(requestInstance, "AfiEscaUnderwrittingCaseManagementRequest", null, AfiEscaUnderwrittingCaseManagementRequest.class)
+						numSolicitud = afiEscaUnderwrittingCaseManagementRequest.policy.policy_number
+
 					} else {
 						flash.error = "${message(code: 'default.invalid.type.operation.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
 					}
@@ -378,26 +380,34 @@ class RequestController {
 					AlptisUnderwrittingCaseManagementRequest alptisUnderwrittingCaseManagementRequest = requestService.unmarshall(requestInstance.getRequest(), AlptisUnderwrittingCaseManagementRequest.class)
 					if (alptisUnderwrittingCaseManagementRequest.getRequest_Data().getRecord().getNombre().equals("A")) {
 						requestBBDD = requestService.getBBDDRequest(requestInstance, "AlptisUnderwrittingCaseManagementRequest", null, AlptisUnderwrittingCaseManagementRequest.class)
+						numSolicitud = alptisUnderwrittingCaseManagementRequest.policy.BasicPolicyGroup.policy_number
 					} else {
 						flash.error = "${message(code: 'default.invalid.type.operation.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
 					}
 					break
 				case TipoCompany.AMA:
+					GestionReconocimientoMedicoRequestAma gestionReconocimientoMedicoRequestAma = requestService.unmarshall(requestInstance.getRequest(), GestionReconocimientoMedicoRequestAma.class)
 					requestBBDD = requestService.getBBDDRequest(requestInstance, "AmaResultadoReconocimientoMedicoRequest", "http://www.scortelemed.com/schemas/ama", GestionReconocimientoMedicoRequestAma.class)
+					numSolicitud = gestionReconocimientoMedicoRequestAma.candidateInformation.requestNumber
 					break
 				case TipoCompany.CASER:
+					GestionReconocimientoMedicoRequestCaser gestionReconocimientoMedicoRequestCaser = requestService.unmarshall(requestInstance.getRequest(), GestionReconocimientoMedicoRequestCaser.class)
 					requestBBDD = requestService.getBBDDRequest(requestInstance, "CaserResultadoReconocimientoMedicoRequest", "http://www.scortelemed.com/schemas/caser", GestionReconocimientoMedicoRequestCaser.class)
+					numSolicitud = gestionReconocimientoMedico.policyHolderInformation.requestNumber
 					break
 				case TipoCompany.CAJAMAR:
 					CajamarUnderwrittingCaseManagementRequest cajamarUnderwrittingCaseManagementRequest = requestService.unmarshall(requestInstance.getRequest(), CajamarUnderwrittingCaseManagementRequest.class)
 					if (cajamarUnderwrittingCaseManagementRequest.getRegScor().getYtipo().toString().equals("1")) {
 						requestBBDD = requestService.getBBDDRequest(requestInstance, "CajamarUnderwrittingCaseManagementRequest", "http://www.scortelemed.com/schemas/cajamar", CajamarUnderwrittingCaseManagementRequest.class)
+						numSolicitud = cajamarUnderwrittingCaseManagementRequest.regScor.numref
 					} else {
 						flash.error = "${message(code: 'default.invalid.type.operation.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
 					}
 					break
 				case TipoCompany.CBP_ITALIA:
+					CbpitaUnderwrittingCaseManagementRequest cbpitaUnderwrittingCaseManagementRequest = requestService.unmarshall(requestInstance.getRequest(), CbpitaUnderwrittingCaseManagementRequest.class)
 					requestBBDD = requestService.getBBDDRequest(requestInstance, "CbpitaUnderwrittingCaseManagementRequest", "http://www.scortelemed.com/schemas/cbpita", CbpitaUnderwrittingCaseManagementRequest.class)
+					numSolicitud = cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber
 					break
 				case TipoCompany.ENGINYERS:
 					requestBBDD = requestService.getBBDDRequest(requestInstance, "EnginyersResultadoReconocimientoMedicoRequest", "http://www.scortelemed.com/schemas/enginyers", AddExp.class)
@@ -406,21 +416,30 @@ class RequestController {
 					requestBBDD = requestService.getBBDDRequest(requestInstance, "GestionReconocimientoMedicoRequest", null, GestionReconocimientoMedicoRequestLagunaro.class)
 					break
 				case TipoCompany.METHIS_LAB:
+					MethislabUnderwrittingCaseManagementRequest methislabUnderwrittingCaseManagementRequest = requestService.unmarshall(requestInstance.getRequest(), MethislabUnderwrittingCaseManagementRequest.class)
 					requestBBDD = requestService.getBBDDRequest(requestInstance, "MethislabUnderwrittingCaseManagementRequest", "http://www.scortelemed.com/schemas/methislab", MethislabUnderwrittingCaseManagementRequest.class)
+					numSolicitud = methislabUnderwrittingCaseManagementRequest.candidateInformation.requestNumber
 					break
 				case TipoCompany.CF_LIFE:
+					MethislabCFUnderwrittingCaseManagementRequest methislabCFUnderwrittingCaseManagementRequest = requestService.unmarshall(requestInstance.getRequest(), MethislabCFUnderwrittingCaseManagementRequest.class)
 					requestBBDD = requestService.getBBDDRequest(requestInstance, "MethislabCFUnderwrittingCaseManagementRequest", "http://www.scortelemed.com/schemas/methislabCF", MethislabCFUnderwrittingCaseManagementRequest.class)
+					numSolicitud = methislabCFUnderwrittingCaseManagementRequest.candidateInformation.requestNumber
 					break
 				case TipoCompany.NET_INSURANCE:
+					NetinsuranteUnderwrittingCaseManagementRequest netinsuranteUnderwrittingCaseManagementRequest = requestService.unmarshall(requestInstance.getRequest(), NetinsuranteUnderwrittingCaseManagementRequest.class)
 					requestBBDD = requestService.getBBDDRequest(requestInstance, "NetinsuranceUnderwrittingCaseManagementRequest", "http://www.scortelemed.com/schemas/netinsurance", NetinsuranteUnderwrittingCaseManagementRequest.class)
+					numSolicitud = netinsuranteUnderwrittingCaseManagementRequest.candidateInformation.requestNumber
 					break
 				case TipoCompany.PSN:
+					GestionReconocimientoMedicoRequestPsn gestionReconocimientoMedicoRequestPsn = requestService.unmarshall(requestInstance.getRequest(), GestionReconocimientoMedicoRequestPsn.class)
 					requestBBDD = requestService.getBBDDRequest(requestInstance, "PsnResultadoReconocimientoMedicoRequest", "http://www.scortelemed.com/schemas/psn", GestionReconocimientoMedicoRequestPsn.class)
+					numSolicitud = gestionReconocimientoMedicoRequestPsn.candidateInformation.requestNumber
 					break
 				case TipoCompany.ZEN_UP:
 					LifesquareUnderwrittingCaseManagementRequest lifesquareUnderwrittingCaseManagementRequest = requestService.unmarshall(requestInstance.getRequest(), LifesquareUnderwrittingCaseManagementRequest.class)
 					if (lifesquareUnderwrittingCaseManagementRequest.getRequest_Data().getRecord().getNombre().equals("A")) {
 						requestBBDD = requestService.getBBDDRequest(requestInstance, "LifesquareUnderwrittingCaseManagementRequest", null, LifesquareUnderwrittingCaseManagementRequest.class)
+						numSolicitud = lifesquareUnderwrittingCaseManagementRequest.policy.policy_number.toString()
 					} else {
 						flash.error = "${message(code: 'default.invalid.type.operation.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
 					}
@@ -435,7 +454,7 @@ class RequestController {
 					break
 			}
 			if(requestBBDD != null) {
-				expedienteService.crearExpediente(requestBBDD, filtro)
+				expedienteService.crearExpediente(requestBBDD, filtro, numSolicitud)
 				flash.message = "${message(code: 'default.processed.message', args: [message(code: 'request.label', default: 'Request'), requestInstance.id])}"
 			}
 		} else {

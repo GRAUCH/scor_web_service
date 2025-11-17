@@ -307,18 +307,40 @@ class ExpedienteService implements IExpedienteService {
         //Construimos el nombre del fichero
         def sdf = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss")
         def fecha = sdf.format(new Date())
-        def nombreArchivo = "${comp.nombre}_${numSolicitud}_${fecha}.txt"
+        def nombreArchivo = "${comp.nombre}_${numSolicitud}_${fecha}.xml"
         nombreArchivo = nombreArchivo.replaceAll("[^a-zA-Z0-9_.-]", "_")
 
-        // Definimos la ruta donde guardar ---
-        def carpeta = new File("./payloads") // Puedes cambiarla, ej: "C:/logs/payloads"
-        if (!carpeta.exists()) carpeta.mkdirs()
+        def rutaPayloads = Conf.findByName("payloads")?.value
 
-        def archivo = new File(carpeta, nombreArchivo)
-        // Guardamos el XML en el fichero ---
-        archivo.withWriter("UTF-8") { writer ->
-            writer.write(payloadXml)
+        if (!rutaPayloads) {
+            log.error("El valor de configuración 'payloads' está vacío o es nulo.")
+            throw new IllegalStateException("No se puede determinar la ruta para guardar los payloads.")
         }
+
+        def carpeta = new File(rutaPayloads)
+
+        if (!carpeta.exists()) {
+            if (!carpeta.mkdirs()) {
+                log.error("No se pudo crear el directorio de payloads en: ${rutaPayloads}")
+                throw new IOException("No se pudo crear el directorio: ${rutaPayloads}")
+            }
+        }
+
+        if (!carpeta.canWrite()) {
+            log.error("No hay permisos de escritura en: ${rutaPayloads}")
+            throw new IOException("No hay permisos de escritura en: ${rutaPayloads}")
+        }
+
+        try {
+            def archivo = new File(carpeta, nombreArchivo)
+            archivo.withWriter("UTF-8") { writer ->
+                writer.write(payloadXml)
+            }
+        } catch (IOException e) {
+            log.error("Error al escribir el fichero ${archivo.absolutePath}: ${e.message}", e)
+            return false
+        }
+
         logginService.putInfoMessage("fichero generado: " + nombreArchivo)
         def salida = grailsApplication.mainContext.soapClientCrearOrabpel.initiate(payload)
         return true

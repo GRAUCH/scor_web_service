@@ -74,7 +74,7 @@ class SimplefrUnderwrittingCaseManagementService	 {
 				requestXML=simplefrService.marshall(simplefrUnderwrittingCaseManagement)
 				requestBBDD = requestService.crear(opername,requestXML)
 
-				expedienteService.crearExpediente(requestBBDD, TipoCompany.MALAKOFF_MEDERIC)
+				expedienteService.crearExpediente(requestBBDD, TipoCompany.MALAKOFF_MEDERIC, simplefrUnderwrittingCaseManagement.candidateInformation.requestNumber)
 				resultado.setMessage("The case has been successfully processed")
 				resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 				resultado.setStatus(StatusType.OK)

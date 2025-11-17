@@ -90,7 +90,7 @@ class CbpitaUnderwrittingCaseManagementService {
                             status = StatusType.OK
                             code = 0
 
-                            expedienteService.crearExpediente(requestBBDD, TipoCompany.CBP_ITALIA)
+                            expedienteService.crearExpediente(requestBBDD, TipoCompany.CBP_ITALIA, cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber)
 
                             logginService.putInfoMessage("Se procede el alta automatica de " + company.nombre + " con numero de solicitud " + cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber)
                             requestService.insertarRecibido(company, cbpitaUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, requestXML.toString(), TipoOperacion.ALTA)

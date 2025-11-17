@@ -74,9 +74,8 @@ class CajamarUnderwrittingCaseManagementService {
 		Request requestBBDD
 
 		def company = Company.findByNombre(TipoCompany.CAJAMAR.getNombre())
-		def numeroSolicitud = cajamarUnderwrittingCaseManagementRequest.regScor.numref
 
-		logginService.putInfoEndpoint("Endpoint-"+opername,"Peticion de Cajamar para solicitud: " +numeroSolicitud)
+		logginService.putInfoEndpoint("Endpoint-"+opername,"Peticion de Cajamar para solicitud: " +cajamarUnderwrittingCaseManagementRequest.regScor.numref)
 
 		try {
 
@@ -91,7 +90,7 @@ class CajamarUnderwrittingCaseManagementService {
 					logginService.putInfoMessage("Se procede al crear la request")
 					requestBBDD = requestService.crear(opername,requestXML)
 					logginService.putInfoMessage("Se procede al crear el expediente")
-					expedienteService.crearExpediente(requestBBDD, TipoCompany.CAJAMAR, numeroSolicitud)
+					expedienteService.crearExpediente(requestBBDD, TipoCompany.CAJAMAR, cajamarUnderwrittingCaseManagementRequest.regScor.numref)
 					resultado.setComments("El caso se ha procesado correctamente")
 					resultado.setStatus(StatusType.OK)
 					resultado.setDate(util.fromDateToXmlCalendar(new Date()))

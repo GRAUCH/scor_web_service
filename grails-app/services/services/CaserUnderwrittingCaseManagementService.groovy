@@ -78,7 +78,7 @@ class CaserUnderwrittingCaseManagementService {
                     if (expedientes != null)
                         logginService.putInfoMessage("Exisiten ${expedientes.size()}  con numero de solicitud " + gestionReconocimientoMedico.policyHolderInformation.requestNumber)
                     if (expedientes != null && expedientes.size() == 0) {
-                        expedienteService.crearExpediente(requestBBDD, TipoCompany.CASER)
+                        expedienteService.crearExpediente(requestBBDD, TipoCompany.CASER, gestionReconocimientoMedico.policyHolderInformation.requestNumber)
                         requestService.insertarRecibido(company, gestionReconocimientoMedico.policyHolderInformation.requestNumber, requestXML.toString(), TipoOperacion.ALTA)
                         /**Llamamos al metodo asincrono que busca en el crm el expediente recien creado*/
                         expedienteService.busquedaCrm(requestBBDD, company, gestionReconocimientoMedico.policyHolderInformation.requestNumber, gestionReconocimientoMedico.policyHolderInformation.certificateNumber, null)
@@ -170,7 +170,7 @@ class CaserUnderwrittingCaseManagementService {
 
                     if (expedientes != null && expedientes.size() == 0) {
 
-                        expedienteService.crearExpediente(requestBBDD, TipoCompany.CASER)
+                        expedienteService.crearExpediente(requestBBDD, TipoCompany.CASER, numeroSolicitud)
                         requestService.insertarRecibido(company, numeroSolicitud, requestXML.toString(), TipoOperacion.ALTA)
 
                         try {

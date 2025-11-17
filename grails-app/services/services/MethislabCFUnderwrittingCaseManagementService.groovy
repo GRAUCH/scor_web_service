@@ -77,7 +77,7 @@ class MethislabCFUnderwrittingCaseManagementService {
 
 						logginService.putInfoMessage("Se procede el alta automatica de " + company.nombre + " con numero de solicitud " + MethislabCFUnderwrittingCaseManagementRequest.candidateInformation.requestNumber)
 
-						expedienteService.crearExpediente(requestBBDD, TipoCompany.CF_LIFE)
+						expedienteService.crearExpediente(requestBBDD, TipoCompany.CF_LIFE, MethislabCFUnderwrittingCaseManagementRequest.candidateInformation.requestNumber)
 
 						requestService.insertarRecibido(company, MethislabCFUnderwrittingCaseManagementRequest.candidateInformation.requestNumber, requestXML.toString(), TipoOperacion.ALTA)
 

@@ -86,7 +86,7 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 					requestXML=netinsuranceService.marshall(netInsuranteUnderwrittingCaseManagement)
 					requestBBDD = requestService.crear(opername,requestXML)
 
-					expedienteService.crearExpediente(requestBBDD, TipoCompany.NET_INSURANCE)
+					expedienteService.crearExpediente(requestBBDD, TipoCompany.NET_INSURANCE, netInsuranteUnderwrittingCaseManagement.candidateInformation.requestNumber)
 
 					message = "Il caso � stato elaborato correttamente"
 					status = StatusType.OK

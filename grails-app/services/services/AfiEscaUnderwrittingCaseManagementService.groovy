@@ -67,7 +67,7 @@ class AfiEscaUnderwrittingCaseManagementService {
 
 
 				logginService.putInfoMessage("Se procede el alta automatica de Afiesca con numero de solicitud " + afiEscaUnderwrittingCaseManagementRequest.policy.policy_number)
-				expedienteService.crearExpediente(requestBBDD, TipoCompany.AFI_ESCA)
+				expedienteService.crearExpediente(requestBBDD, TipoCompany.AFI_ESCA, afiEscaUnderwrittingCaseManagementRequest.policy.policy_number)
 				requestService.insertarRecibido(company, afiEscaUnderwrittingCaseManagementRequest.policy.policy_number, requestBBDD.request, TipoOperacion.ALTA)
 
 				/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado*/

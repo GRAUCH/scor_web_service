@@ -355,8 +355,11 @@ class MethislabCFService implements ICompanyService{
                      */
 
                     if (eElement.getElementsByTagName("requestNumber").item(0) != null) {
-                        String dniPart = datosRegistro.dni.length() > 13 ? datosRegistro.dni.substring(0, 13) : datosRegistro.dni.padRight(13, '0')
-                        datosRegistro.numSolicitud = eElement.getElementsByTagName("requestNumber").item(0).getTextContent() + dniPart
+                        String numSolicitud = (eElement.getElementsByTagName("requestNumber").item(0).getTextContent() + datosRegistro.dni)
+                        if (numSolicitud.length() > 20) {
+                            numSolicitud = numSolicitud.substring(0, 20)
+                        }
+                        datosRegistro.numSolicitud = numSolicitud
                     }
 
                     /**CODIGO DE AGENTE

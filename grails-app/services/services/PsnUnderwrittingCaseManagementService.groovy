@@ -104,7 +104,7 @@ class PsnUnderwrittingCaseManagementService	 {
 						if (gestionReconocimientoMedico.getCandidateInformation().getOperation().toString().equals("A")) {
 
 
-							expedienteService.crearExpediente(requestBBDD, TipoCompany.PSN)
+							expedienteService.crearExpediente(requestBBDD, TipoCompany.PSN, gestionReconocimientoMedico.candidateInformation.requestNumber)
 
 							message = "El caso se ha procesado correctamente"
 							status = StatusType.OK

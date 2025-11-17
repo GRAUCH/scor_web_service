@@ -71,7 +71,7 @@ class AlptisUnderwrittingCaseManagementService {
 					if (company.generationAutomatic) {
 
 						logginService.putInfoMessage("Se procede el alta automatica de Alptis con numero de solicitud " + alptisUnderwrittingCaseManagementRequest.policy.BasicPolicyGroup.policy_number)
-						expedienteService.crearExpediente(requestBBDD, TipoCompany.ALPTIS)
+						expedienteService.crearExpediente(requestBBDD, TipoCompany.ALPTIS, alptisUnderwrittingCaseManagementRequest.policy.BasicPolicyGroup.policy_number)
 						requestService.insertarRecibido(company, alptisUnderwrittingCaseManagementRequest.policy.BasicPolicyGroup.policy_number, requestBBDD.request, TipoOperacion.ALTA)
 
 						/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado

@@ -76,7 +76,7 @@ class SocieteGeneraleUnderwrittingCaseManagementService	 {
 				requestXML=societeGeneraleService.marshall(societeGeneraleUnderwrittingCaseManagement)
 				requestBBDD = requestService.crear(opername,requestXML)
 
-				expedienteService.crearExpediente(requestBBDD, TipoCompany.SOCIETE_GENERALE)
+				expedienteService.crearExpediente(requestBBDD, TipoCompany.SOCIETE_GENERALE, societeGeneraleUnderwrittingCaseManagement.candidateInformation.requestNumber)
 				resultado.setMessage("The case has been successfully processed")
 				resultado.setDate(util.fromDateToXmlCalendar(new Date()))
 				resultado.setStatus(StatusType.OK)

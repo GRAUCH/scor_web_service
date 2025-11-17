@@ -80,7 +80,7 @@ class EnginyersUnderwrittingCaseManagementService {
 		
 							if (wsErrors != null && wsErrors.size() == 0) {
 
-								expedienteService.crearExpediente(requestBBDD, TipoCompany.ENGINYERS)
+								expedienteService.crearExpediente(requestBBDD, TipoCompany.ENGINYERS, addExp.d.getPolicyNumber())
 
 								expedient.setAddExpResultCode(0)
 								fault.setFaultCode("0")

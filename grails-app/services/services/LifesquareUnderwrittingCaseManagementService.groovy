@@ -75,7 +75,7 @@ class LifesquareUnderwrittingCaseManagementService {
 					if (company.generationAutomatic) {
 
 						logginService.putInfoMessage("Se procede el alta automatica de Lifesquare con numero de solicitud " + lifesquareUnderwrittingCaseManagementRequest.policy.policy_number)
-						expedienteService.crearExpediente(requestBBDD, TipoCompany.ZEN_UP)
+						expedienteService.crearExpediente(requestBBDD, TipoCompany.ZEN_UP, lifesquareUnderwrittingCaseManagementRequest.policy.policy_number)
 						requestService.insertarRecibido(company,lifesquareUnderwrittingCaseManagementRequest.policy.policy_number,requestBBDD.request, TipoOperacion.ALTA)
 
 						/**Llamamos al metodo asincrono que busca en el crm el expediente recien creado

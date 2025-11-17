@@ -80,7 +80,8 @@ INSERT INTO conf (id,version,description,name,value) VALUES
 (24,0,'URL to conection creacion expediente BPEL','orabpelCreacion.wsdl','http://172.17.0.33:8888/orabpel/default/CreacionExpedienteAsyncSRP/4.0?wsdl'),
 (25,0,'Descarga y generacion de fichero zip','rutaFicheroZip','/home/wildfly/ficheros/'),
 (26,0,'Usuario para descarga alfresco','usuarioZip','ccuenca'),
-(27,0,'Password para descarga alfresco','passwordZip','P@ssword');
+(27,0,'Password para descarga alfresco','passwordZip','P@ssword'),
+(28,0,'Payloads enviados a BPEL SRPFileInbound','payloads','/Users/esjhgb00/Desktop/newco telemed/proyectos/scorWebservices/payloads');
 COMMIT;
 INSERT INTO operacion (id,version,activo,clave,descripcion,fecha_alta,fecha_modificacion,pass_externo,usuario_externo,webservice_id) VALUES
 (1,1,true,'GestionReconocimientoMedicoRequest','GestionReconocimientoMedicoRequest','2010-11-16 21:26:02+01','2014-07-15 15:57:57+02','pass','user',1),

@@ -70,7 +70,7 @@ class AmaUnderwrittingCaseManagementService	 {
 
 							logginService.putInfoMessage("Se procede el alta automatica de " + company.nombre + " con numero de solicitud " + gestionReconocimientoMedico.candidateInformation.requestNumber)
 
-							expedienteService.crearExpediente(requestBBDD, TipoCompany.AMA)
+							expedienteService.crearExpediente(requestBBDD, TipoCompany.AMA, gestionReconocimientoMedico.candidateInformation.requestNumber)
 
 							requestService.insertarRecibido(company, gestionReconocimientoMedico.candidateInformation.requestNumber, requestXML.toString(), TipoOperacion.ALTA)
 

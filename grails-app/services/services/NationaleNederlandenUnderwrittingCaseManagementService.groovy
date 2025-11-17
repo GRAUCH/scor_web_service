@@ -80,7 +80,7 @@ class NationaleNederlandenUnderwrittingCaseManagementService {
 
 					if (wsErrors != null && wsErrors.size() == 0) {
 
-						expedienteService.crearExpediente(requestBBDD, TipoCompany.NATIONALE_NETHERLANDEN)
+						expedienteService.crearExpediente(requestBBDD, TipoCompany.NATIONALE_NETHERLANDEN, gestionReconocimientoMedico.candidateInformation.requestNumber)
 
 						message = "El caso se ha procesado correctamente"
 						status = StatusType.OK

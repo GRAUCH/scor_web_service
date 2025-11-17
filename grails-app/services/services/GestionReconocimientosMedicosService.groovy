@@ -78,7 +78,7 @@ class GestionReconocimientosMedicosService {
                     requestXML = requestService.marshall(gestionReconocimientoMedicoRequest, GestionReconocimientoMedicoRequest.class)
                     requestBBDD = requestService.crear(opername, requestXML)
 
-                    expedienteService.crearExpediente(requestBBDD, TipoCompany.LAGUN_ARO)
+                    expedienteService.crearExpediente(requestBBDD, TipoCompany.LAGUN_ARO, gestionReconocimientoMedicoRequest.poliza.cod_poliza)
                     requestService.insertarRecibido(company, gestionReconocimientoMedicoRequest.poliza.cod_poliza, requestBBDD.request, TipoOperacion.ALTA)
 
                     resultado.setMensaje("El caso se ha procesado correctamente")
