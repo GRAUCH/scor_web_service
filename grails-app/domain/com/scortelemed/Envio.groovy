@@ -7,6 +7,10 @@ class Envio {
     String identificador
     String info
 
+    static mapping = {
+        info type: 'text'
+    }
+
     static constraints = {
         fecha(nullable: false)
         cia(nullable: false)

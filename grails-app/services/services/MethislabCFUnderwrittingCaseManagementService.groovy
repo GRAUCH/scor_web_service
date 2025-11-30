@@ -6,9 +6,14 @@ import com.scortelemed.Request
 import com.scortelemed.TipoCompany
 import com.scortelemed.TipoOperacion
 import com.scortelemed.schemas.methislabCF.*
+import com.scortelemed.Conf
 import com.ws.servicios.*
 import com.ws.servicios.impl.RequestService
 import com.ws.servicios.impl.companies.MethislabCFService
+import com.ws.servicios.ServiceZohoService
+import com.zoho.services.Frontal;
+import com.zoho.services.RespuestaCRMInforme
+import com.zoho.services.Usuario
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
 import hwsol.webservices.WsError
@@ -18,8 +23,6 @@ import org.grails.cxf.utils.GrailsCxfEndpoint
 import org.grails.cxf.utils.GrailsCxfEndpointProperty
 
 import org.springframework.web.context.request.RequestContextHolder
-import servicios.RespuestaCRMInforme
-
 import javax.jws.WebParam
 import javax.jws.WebResult
 import javax.jws.WebService
@@ -38,7 +41,7 @@ class MethislabCFUnderwrittingCaseManagementService {
 	def estadisticasService
 	def requestService
 	def logginService
-	def tarificadorService
+	def serviceZohoService
 
 	@WebResult(name = "caseManagementResponse")
 	MethislabCFUnderwrittingCaseManagementResponse MethislabCFUnderwrittingCaseManagementResponse(@WebParam(partName = "CaseManagementRequest",name = "CaseManagementRequest")
@@ -168,23 +171,44 @@ class MethislabCFUnderwrittingCaseManagementService {
 					requestXML=methislabCFService.marshall(methislabCFUnderwrittingCasesResults)
 					requestBBDD=requestService.crear(opername,requestXML)
 
-					Date date = methislabCFUnderwrittingCasesResults.dateStart.toGregorianCalendar().getTime()
-					SimpleDateFormat sdfr = new SimpleDateFormat("yyyyMMdd HH:mm:ss")
-					String fechaIni = sdfr.format(date)
-					date = methislabCFUnderwrittingCasesResults.dateEnd.toGregorianCalendar().getTime()
-					String fechaFin = sdfr.format(date)
+					Date date = methislabCFUnderwrittingCasesResults.getDateStart().toGregorianCalendar().getTime();
+					Date dateEnd = methislabCFUnderwrittingCasesResults.getDateEnd().toGregorianCalendar().getTime();
 
-					expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt,null,1,fechaIni,fechaFin,company.ou))
-					expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt,null,2,fechaIni,fechaFin,company.ou))
+					// Creamos el formato base sin zona
+					SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
 
+					// Calculamos el timezone en horas
+					TimeZone tz = TimeZone.getDefault();
+					int offsetHours = tz.getRawOffset() / (1000 * 60 * 60); // convierte milisegundos a horas
 
+					// Añadimos el offset manualmente
+					String fechaIni = sdf.format(date) + String.format(":%02d", offsetHours);
+					String fechaFin = sdf.format(dateEnd) + String.format(":%02d", offsetHours);
 
+					Frontal frontal =  serviceZohoService.instanciarFrontalZoho(Conf.findByName("frontalZoho.wsdl")?.value)
+					Usuario usuario = serviceZohoService.obtenerUsuarioFrontal(company.ou);
+
+					logginService.putInfoMessage("Consultando zoho con fecha " + fechaIni + "-" + fechaFin)
+					RespuestaCRMInforme respuestaCRMInforme_one = frontal.informeExpedientes(usuario, company.codigoSt, null, 1, fechaIni, fechaFin);
+					logginService.putInfoMessage("Zoho ha devuelto "+ respuestaCRMInforme_one.listaExpedientesInforme.size() + " expedientes para el estado 1")
+					RespuestaCRMInforme respuestaCRMInforme_two = frontal.informeExpedientes(usuario, company.codigoSt, null, 2, fechaIni, fechaFin);
+					logginService.putInfoMessage("Zoho ha devuelto "+ respuestaCRMInforme_two.listaExpedientesInforme.size() + " expedientes para el estado 2")
+					logginService.putInfoMessage("Consultando zoho termiando")
+
+					if (respuestaCRMInforme_one?.listaExpedientesInforme) {
+						expedientes.addAll(respuestaCRMInforme_one.listaExpedientesInforme)
+					}
+
+					if (respuestaCRMInforme_two?.listaExpedientesInforme) {
+						expedientes.addAll(respuestaCRMInforme_two.listaExpedientesInforme)
+					}
 					String idIdentificador = new Date().format( 'dd-mm-yyyy HH:mm:ss' )
 					if(expedientes){
+						logginService.putInfoMessage("Se van a procesar " + expedientes.size() + " expedientes para " + company.nombre)
 						requestService.insertarEnvio(company, "SOLICITUD: " + idIdentificador , requestXML.toString())
 						expedientes.each { expedientePoliza ->
 							requestService.insertarEnvio(company, "EXPEDIENTE: " + idIdentificador, "ST:" + expedientePoliza.getCodigoST() + "#CIA:" + expedientePoliza.getNumSolicitud())
-							resultado.getExpediente().add(methislabCFService.rellenaDatosSalidaConsulta(expedientePoliza, methislabCFUnderwrittingCasesResults.dateStart, logginService))
+							resultado.getExpediente().add(methislabCFService.rellenaDatosSalidaConsulta(expedientePoliza, methislabCFUnderwrittingCasesResults.dateStart))
 						}
 
 						messages = "Risultati restituiti"
@@ -217,12 +241,11 @@ class MethislabCFUnderwrittingCaseManagementService {
 			}
 		}catch (Exception e){
 
-
 			messages = "Error: " + e.getMessage()
 			status = StatusType.ERROR
 			code = 2
 			logginService.putErrorEndpoint("ResultadoReconocimientoMedico","Peticion realizada para " + company.nombre + " con fecha: " + methislabCFUnderwrittingCasesResults.dateStart.toString() + "-" + methislabCFUnderwrittingCasesResults.dateEnd.toString() + ". Error: " + e.getMessage())
-			correoUtil.envioEmailErrores("ResultadoReconocimientoMedico","Peticion realizada para " + company.nombre + " con fecha: " + methislabCFUnderwrittingCasesResults.dateStart.toString() + "-" + methislabCFUnderwrittingCasesResults.dateEnd.toString(), e)
+			//TODO:correoUtil.envioEmailErrores("ResultadoReconocimientoMedico","Peticion realizada para " + company.nombre + " con fecha: " + methislabCFUnderwrittingCasesResults.dateStart.toString() + "-" + methislabCFUnderwrittingCasesResults.dateEnd.toString(), e)
 			requestService.insertarError(company, methislabCFUnderwrittingCasesResults.dateStart.toString().substring(0,10) + "-" + methislabCFUnderwrittingCasesResults.dateEnd.toString().substring(0,10), requestXML.toString(), TipoOperacion.CONSULTA, "Peticion no realizada para solicitud: " + methislabCFUnderwrittingCasesResults.dateStart.toString() + "-" + methislabCFUnderwrittingCasesResults.dateEnd.toString() + ". Error: " + e.getMessage())
 			
 		}finally{

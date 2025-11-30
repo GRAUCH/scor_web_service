@@ -74,7 +74,7 @@ class MethislabService implements ICompanyService{
         return null
     }
 
-    def rellenaDatosSalidaConsulta(expedientePoliza, requestDate) {
+    def rellenaDatosSalidaConsulta(Expediente expedientePoliza, requestDate) {
 
         Expediente expediente = new Expediente()
 
@@ -104,11 +104,11 @@ class MethislabService implements ICompanyService{
         expediente.setZip(compressedData)
         
         byte[] ba = Base64.getDecoder().decode(compressedData)
-        //Comentamos esta linea debido a un error en producción el día 13/05/2022
+        //Comentamos esta linea debido a un error en producciï¿½n el dï¿½a 13/05/2022
         //ba = Base64.getDecoder().decode(ba)
         //fin fix issue
         
-        //AÃ±adimos la llamada a grabar el fichero de Methislab el 17/05/2022 ya que no se había añadido
+        //AÃ±adimos la llamada a grabar el fichero de Methislab el 17/05/2022 ya que no se habï¿½a aï¿½adido
         saveZipFile(expedientePoliza, compressedData)
         //fin fix 
 

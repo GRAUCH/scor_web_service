@@ -6,14 +6,13 @@ import com.scor.srpfileinbound.DATOS
 import com.scor.srpfileinbound.REGISTRODATOS
 import com.scortelemed.Company
 import com.scortelemed.Request
-import com.scortelemed.TipoCompany
 import com.scortelemed.schemas.methislabCF.*
 import com.ws.servicios.ICompanyService
-import com.ws.servicios.IComprimidoService
-import com.ws.servicios.ServiceFactory
+import com.zoho.services.Expediente
 import grails.util.Holders
 import hwsol.webservices.TransformacionUtil
 import hwsol.webservices.WsError
+import org.apache.log4j.Logger
 import org.w3c.dom.Document
 import org.w3c.dom.Element
 import org.w3c.dom.Node
@@ -28,8 +27,10 @@ class MethislabCFService implements ICompanyService{
     TransformacionUtil util = new TransformacionUtil()
     def commonZipService
     def requestService = Holders.grailsApplication.mainContext.getBean("requestService")
-    def logginService = Holders.grailsApplication.mainContext.getBean("logginService")
-    def tarificadorService = Holders.grailsApplication.mainContext.getBean("tarificadorService")
+    def serviceZohoService
+
+    static final Logger log = Logger.getLogger(MethislabCFService)
+
 
     String marshall(def objeto) {
         String nameSpace = "http://www.scortelemed.com/schemas/methislabCF"
@@ -64,23 +65,25 @@ class MethislabCFService implements ICompanyService{
         return null
     }
 
-    def rellenaDatosSalidaConsulta(expedientePoliza, requestDate, logginService) {
+    def rellenaDatosSalidaConsulta(Expediente expedientePoliza, requestDate) {
+
+        log.info("Rellenando datos de salida de consulta MethislabCF")
 
         MethislabCFUnderwrittingCasesResultsResponse.Expediente expediente = new MethislabCFUnderwrittingCasesResultsResponse.Expediente()
 
         expediente.setRequestDate(requestDate)
-        expediente.setRequestNumber(util.devolverDatos(expedientePoliza.getNumSolicitud()))
+        expediente.setRequestNumber(serviceZohoService.devolverDatos(expedientePoliza.getNumSolicitud()))
         expediente.setRequestState(devolverStateType(expedientePoliza.getCodigoEstado()))
-        expediente.setProductCode(util.devolverDatos(expedientePoliza.getProducto().getCodigoProductoCompanya()))
-        expediente.setPolicyNumber(util.devolverDatos(expedientePoliza.getNumPoliza()))
-        expediente.setCertificateNumber(util.devolverDatos(expedientePoliza.getNumCertificado()))
+        expediente.setProductCode(serviceZohoService.devolverDatos(expedientePoliza.getProducto().getCodigoProductoCompanya()))
+        expediente.setPolicyNumber(serviceZohoService.devolverDatos(expedientePoliza.getNumPoliza()))
+        expediente.setCertificateNumber(serviceZohoService.devolverDatos(expedientePoliza.getNumCertificado()))
 
 
         if (expedientePoliza.getCandidato() != null) {
             expediente.setFiscalIdentificationNumber(expedientePoliza.getCandidato().getNumeroDocumento())
-            expediente.setMobilePhone(util.devolverTelefonoMovil(expedientePoliza.getCandidato()))
-            expediente.setPhoneNumber1(util.devolverTelefono1(expedientePoliza.getCandidato()))
-            expediente.setPhoneNumber2(util.devolverTelefono2(expedientePoliza.getCandidato()))
+            expediente.setMobilePhone(serviceZohoService.devolverTelefonoMovil(expedientePoliza.getCandidato()))
+            expediente.setPhoneNumber1(serviceZohoService.devolverTelefono1(expedientePoliza.getCandidato()))
+            expediente.setPhoneNumber2(serviceZohoService.devolverTelefono2(expedientePoliza.getCandidato()))
         } else {
             expediente.setFiscalIdentificationNumber("")
             expediente.setMobilePhone("")
@@ -92,7 +95,7 @@ class MethislabCFService implements ICompanyService{
 
         expediente.setZip(compressedData)
 
-        expediente.setNotes(util.devolverDatos(expedientePoliza.getTarificacion().getObservaciones()))
+        expediente.setNotes(serviceZohoService.devolverDatos(expedientePoliza.getTarificacion().getObservaciones()))
 
         if (expedientePoliza.getCoberturasExpediente() != null && expedientePoliza.getCoberturasExpediente().size() > 0) {
 
@@ -101,16 +104,16 @@ class MethislabCFService implements ICompanyService{
                 BenefitsType benefitsType = new BenefitsType()
 
                 benefitsType.setBenefictName(devolverNombreCobertura(coberturasPoliza.getCodigoCobertura()))
-                benefitsType.setBenefictCode(util.devolverDatos(coberturasPoliza.getCodigoCobertura()))
-                benefitsType.setBenefictCapital(util.devolverDatos(coberturasPoliza.getCapitalCobertura()))
+                benefitsType.setBenefictCode(serviceZohoService.devolverDatos(coberturasPoliza.getCodigoCobertura()))
+                benefitsType.setBenefictCapital(serviceZohoService.devolverDatos(coberturasPoliza.getCapitalCobertura()))
 
                 BenefictResultType benefictResultType = new BenefictResultType()
 
-                benefictResultType.setDescResult(util.devolverDatos(coberturasPoliza.getResultadoCobertura()))
-                benefictResultType.setResultCode(util.devolverDatos(coberturasPoliza.getCodResultadoCobertura()))
+                benefictResultType.setDescResult(serviceZohoService.devolverDatos(coberturasPoliza.getResultadoCobertura()))
+                benefictResultType.setResultCode(serviceZohoService.devolverDatos(coberturasPoliza.getCodResultadoCobertura()))
 
-                benefictResultType.setPremiumLoading(util.devolverDatos(coberturasPoliza.getValoracionPrima()))
-                benefictResultType.setCapitalLoading(util.devolverDatos(coberturasPoliza.getValoracionCapital()))
+                benefictResultType.setPremiumLoading(serviceZohoService.devolverDatos(coberturasPoliza.getValoracionPrima()))
+                benefictResultType.setCapitalLoading(serviceZohoService.devolverDatos(coberturasPoliza.getValoracionCapital()))
                 benefictResultType.setDescPremiumLoading("")
                 benefictResultType.setDescCapitalLoading("")
 
@@ -125,6 +128,8 @@ class MethislabCFService implements ICompanyService{
                 expediente.getBenefitsList().add(benefitsType)
             }
         }
+
+        log.info("Fin rellenando datos de salida de consulta MethislabCF")
 
         return expediente
     }

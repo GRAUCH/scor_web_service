@@ -5,7 +5,7 @@ DB_CONTAINER_NAME="postgres-local"
 DB_NAME="scorws_prepro_local"
 DB_USER="postgres"
 DB_PASS="postgres"
-INIT_SCRIPT_PATH="./scripts/init_data.sql"   # Ruta a tu script SQL
+INIT_SCRIPT_PATH="./scripts/init_data.sql"
 POSTGRES_IMAGE="postgres:16"
 
 # --- ARRANQUE DEL CONTENEDOR ---
@@ -31,7 +31,28 @@ until docker exec $DB_CONTAINER_NAME pg_isready -U $DB_USER > /dev/null 2>&1; do
 done
 echo "✅ PostgreSQL está listo."
 
-# --- CARGA DE DATOS INICIALES (si existe script) ---
+# --- VACIAR TODAS LAS TABLAS ---
+echo "🧹 Vaciando todas las tablas en la base de datos $DB_NAME..."
+
+docker exec -i $DB_CONTAINER_NAME psql -U $DB_USER -d $DB_NAME <<EOF
+DO \$\$
+DECLARE
+    stmt text;
+BEGIN
+    FOR stmt IN
+        SELECT 'TRUNCATE TABLE "' || tablename || '" RESTART IDENTITY CASCADE;'
+        FROM pg_tables
+        WHERE schemaname = 'public'
+    LOOP
+        EXECUTE stmt;
+    END LOOP;
+END
+\$\$;
+EOF
+
+echo "✅ Todas las tablas fueron vaciadas (sin eliminar estructura)."
+
+# --- CARGA DE DATOS INICIALES ---
 if [ -f "$INIT_SCRIPT_PATH" ]; then
   echo "📦 Cargando datos iniciales desde $INIT_SCRIPT_PATH..."
   cat "$INIT_SCRIPT_PATH" | docker exec -i $DB_CONTAINER_NAME psql -U $DB_USER -d $DB_NAME
@@ -40,5 +61,5 @@ else
   echo "⚠️ No se encontró el script SQL en $INIT_SCRIPT_PATH. Se omite carga de datos."
 fi
 
-# --- LEVANTA GRAILS EN ENTORNO LOCAL ---
+# --- LEVANTAR GRAILS ---
 grails run-app -Dgrails.env=local

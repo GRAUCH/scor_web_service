@@ -16,7 +16,7 @@ INSERT INTO company (id, version, codigo_st, ip_control, nombre, user_crm, org_n
 (15, 3, '1068', false, 'methislab', 'methislab', 'methislab', 'methislab', 'methislab', 'methislab', true, 'IT'),
 (16, 1, '1071', false, 'cbp-italia', 'cbp-italia', 'cbp-italia', 'cbp-italia', 'cbp-italia', 'cbp-italia', true, 'IT'),
 (17, 6, '1072', true, 'enginyers', 'enginyers', 'enginyers', 'enginyers', 'enginyers', 'enginyersenginyers', true, 'ES'),
-(18, 0, '1090', true, 'methislabCF', 'methislabcf', 'test', 'methislabcf', 'methislabcf', 'methislabcf', true, 'IT'),
+(18, 0, '1080', true, 'methislabCF', 'methislabcf', 'test', 'methislabcf', 'methislabcf', 'methislabcf', true, 'IT'),
 (19, 0, '1064', false, 'amaVida', 'ama', 'ama', 'ama', 'ama', 'ama', true, 'ES');
 COMMIT;
 INSERT INTO webservice (id, version,activo,clave,descripcion,pass_externo,usuario_externo) VALUES
@@ -81,7 +81,8 @@ INSERT INTO conf (id,version,description,name,value) VALUES
 (25,0,'Descarga y generacion de fichero zip','rutaFicheroZip','/home/wildfly/ficheros/'),
 (26,0,'Usuario para descarga alfresco','usuarioZip','ccuenca'),
 (27,0,'Password para descarga alfresco','passwordZip','P@ssword'),
-(28,0,'Payloads enviados a BPEL SRPFileInbound','payloads','/Users/esjhgb00/Desktop/newco telemed/proyectos/scorWebservices/payloads');
+(28,0,'Payloads enviados a BPEL SRPFileInbound','payloads','/Users/esjhgb00/Desktop/newco telemed/proyectos/scorWebservices/payloads'),
+(29,0,'Endpoint Zoho','frontalZoho.wsdl','https://ccars.es/newco/soap/index.php');
 COMMIT;
 INSERT INTO operacion (id,version,activo,clave,descripcion,fecha_alta,fecha_modificacion,pass_externo,usuario_externo,webservice_id) VALUES
 (1,1,true,'GestionReconocimientoMedicoRequest','GestionReconocimientoMedicoRequest','2010-11-16 21:26:02+01','2014-07-15 15:57:57+02','pass','user',1),

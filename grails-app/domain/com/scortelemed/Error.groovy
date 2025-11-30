@@ -9,6 +9,10 @@ class Error {
     String operacion
     String error
 
+    static mapping = {
+        info type: 'text'
+    }
+
     static constraints = {
         fecha(nullable: false)
         cia(nullable: false)
