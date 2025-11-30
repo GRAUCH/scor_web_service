@@ -14,6 +14,7 @@ import com.scortelemed.servicios.Frontal
 import com.scortelemed.servicios.FrontalServiceLocator
 import com.ws.enumeration.UnidadOrganizativa
 import com.ws.servicios.ICompanyService
+import com.zoho.services.ExpedienteInforme
 import grails.util.Holders
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
@@ -24,8 +25,8 @@ import org.w3c.dom.Node
 import org.w3c.dom.NodeList
 import org.xml.sax.InputSource
 import servicios.RespuestaCRM
-import servicios.TipoEstadoExpediente
-import servicios.TipoMotivoAnulacion
+import com.zoho.services.TipoEstadoExpediente
+import com.zoho.services.TipoMotivoAnulacion
 
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
@@ -39,6 +40,7 @@ class CbpitaService implements ICompanyService{
     def logginService = Holders.grailsApplication.mainContext.getBean("logginService")
     ZipUtils zipUtils = new ZipUtils()
     CorreoUtil correoUtil = new CorreoUtil()
+    def serviceZohoService
 
 
     String marshall(def objeto) {
@@ -771,12 +773,14 @@ class CbpitaService implements ICompanyService{
         }
     }
 
-    def rellenaDatosSalidaConsulta(servicios.ExpedienteInforme expedientePoliza, String codigoSt, def requestDate, String zipPath, String user, String password) {
+    def rellenaDatosSalidaConsulta(ExpedienteInforme expedientePoliza, String codigoSt, def requestDate, String zipPath, String user, String password) {
+
+        log.info("Rellenando datos de salida de consulta para expediente " + expedientePoliza.getCodigoST())
 
         CbpitaUnderwrittingCasesResultsResponse.Expediente expediente = new CbpitaUnderwrittingCasesResultsResponse.Expediente()
 
         expediente.setRequestDate(requestDate)
-        expediente.setRequestNumber(util.devolverDatos(expedientePoliza.getNumSolicitud()))
+        expediente.setRequestNumber(serviceZohoService.devolverDatos(expedientePoliza.getNumSolicitud()))
         expediente.setRequestState(devolverStateType(expedientePoliza.getCodigoEstado()))
 
         if (expedientePoliza.getCodigoEstado() == TipoEstadoExpediente.ANULADO && expedientePoliza.getMotivoAnulacion() != TipoMotivoAnulacion.ABIERTO_POR_ERROR) {
@@ -785,16 +789,15 @@ class CbpitaService implements ICompanyService{
             expediente.setCancellationReason("")
         }
 
-        expediente.setProductCode(util.devolverDatos(expedientePoliza.getProducto().getCodigoProductoCompanya()))
-        expediente.setPolicyNumber(util.devolverDatos(expedientePoliza.getNumPoliza()))
-        expediente.setCertificateNumber(util.devolverDatos(expedientePoliza.getNumCertificado()))
+        expediente.setProductCode(serviceZohoService.devolverDatos(expedientePoliza.getProducto().getCodigoProductoCompanya()))
+        expediente.setPolicyNumber(serviceZohoService.devolverDatos(expedientePoliza.getNumPoliza()))
+        expediente.setCertificateNumber(serviceZohoService.devolverDatos(expedientePoliza.getNumCertificado()))
 
         if (expedientePoliza.getCandidato() != null) {
             expediente.setFiscalIdentificationNumber(expedientePoliza.getCandidato().getNumeroDocumento())
-            expediente.setMobilePhone(util.devolverTelefonoMovil(expedientePoliza.getCandidato()))
-            // Dado que en el frontal el telefono 1 siempre tiene que ser un movil, el telefono 1 pasa a ser mobilePhone y el resto de telefonos seran, si vienen vacios, el telefono movil.
-            expediente.setPhoneNumber1(util.devolverTelefono1(expedientePoliza.getCandidato()) == "" ? expediente.getMobilePhone() : util.devolverTelefono1(expedientePoliza.getCandidato()))
-            expediente.setPhoneNumber2(util.devolverTelefono2(expedientePoliza.getCandidato()) == "" ? expediente.getMobilePhone() : util.devolverTelefono2(expedientePoliza.getCandidato()))
+            expediente.setMobilePhone(serviceZohoService.devolverTelefonoMovil(expedientePoliza.getCandidato()))
+            expediente.setPhoneNumber1(serviceZohoService.devolverTelefono1(expedientePoliza.getCandidato()))
+            expediente.setPhoneNumber2(serviceZohoService.devolverTelefono2(expedientePoliza.getCandidato()))
         } else {
             expediente.setFiscalIdentificationNumber("")
             expediente.setMobilePhone("")
@@ -809,7 +812,7 @@ class CbpitaService implements ICompanyService{
 
         if (expedientePoliza.getCodigoEstado() != TipoEstadoExpediente.ANULADO) {
             try {
-                byte[] compressedData = zipUtils.generarZips(expedientePoliza, codigoSt, dateString, zipPath, user, password)
+                byte[] compressedData = serviceZohoService.generarZips(expedientePoliza, codigoSt, dateString, zipPath, user, password)
                 expediente.setZip(compressedData)
             } catch (Exception e) {
                 logginService.putError("rellenaDatosSalidaConsulta", "Error:  " + e.getMessage())
@@ -823,7 +826,7 @@ class CbpitaService implements ICompanyService{
 
         logginService.putInfoMessage("Fin generacion de zip para expediente " + codigoSt)
 
-        expediente.setNotes(util.devolverDatos(expedientePoliza.getTarificacion().getObservaciones()))
+        expediente.setNotes(serviceZohoService.devolverDatos(expedientePoliza.getTarificacion().getObservaciones()))
 
         if (expedientePoliza.getCoberturasExpediente() != null && expedientePoliza.getCoberturasExpediente().size() > 0) {
 
@@ -834,16 +837,16 @@ class CbpitaService implements ICompanyService{
                     BenefitsType benefitsType = new BenefitsType()
 
                     benefitsType.setBenefictName(devolverNombreCobertura(coberturasPoliza.getCodigoCobertura()))
-                    benefitsType.setBenefictCode(util.devolverDatos(coberturasPoliza.getCodigoCobertura()))
-                    benefitsType.setBenefictCapital(util.devolverDatos(coberturasPoliza.getCapitalCobertura()))
+                    benefitsType.setBenefictCode(serviceZohoService.devolverDatos(coberturasPoliza.getCodigoCobertura()))
+                    benefitsType.setBenefictCapital(serviceZohoService.devolverDatos(coberturasPoliza.getCapitalCobertura()))
 
                     BenefictResultType benefictResultType = new BenefictResultType()
 
-                    benefictResultType.setDescResult(util.devolverDatos(coberturasPoliza.getResultadoCobertura()))
+                    benefictResultType.setDescResult(serviceZohoService.devolverDatos(coberturasPoliza.getResultadoCobertura()))
                     benefictResultType.setResultCode(util.codificarResultado(coberturasPoliza.getCodResultadoCobertura()))
 
-                    benefictResultType.setPremiumLoading(util.devolverDatos(coberturasPoliza.getValoracionPrima()))
-                    benefictResultType.setCapitalLoading(util.devolverDatos(coberturasPoliza.getValoracionCapital()))
+                    benefictResultType.setPremiumLoading(serviceZohoService.devolverDatos(coberturasPoliza.getValoracionPrima()))
+                    benefictResultType.setCapitalLoading(serviceZohoService.devolverDatos(coberturasPoliza.getValoracionCapital()))
                     benefictResultType.setDescPremiumLoading("")
                     benefictResultType.setDescCapitalLoading("")
 
@@ -858,6 +861,8 @@ class CbpitaService implements ICompanyService{
                     expediente.getBenefitsList().add(benefitsType)
             }
         }
+
+        log.info("Fin rellenando datos de salida de consulta para expediente " + expedientePoliza.getCodigoST())
 
         return expediente
     }

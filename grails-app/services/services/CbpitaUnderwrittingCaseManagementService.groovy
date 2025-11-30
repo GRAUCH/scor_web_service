@@ -12,6 +12,9 @@ import com.ws.servicios.*
 import com.ws.servicios.impl.ExpedienteService
 import com.ws.servicios.impl.RequestService
 import com.ws.servicios.impl.companies.CbpitaService
+import com.zoho.services.Frontal;
+import com.zoho.services.RespuestaCRMInforme
+import com.zoho.services.Usuario
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
 import hwsol.webservices.WsError
@@ -22,7 +25,6 @@ import org.grails.cxf.utils.GrailsCxfEndpointProperty
 
 import org.springframework.web.context.request.RequestContextHolder
 import servicios.Documentacion
-import servicios.RespuestaCRMInforme
 
 import javax.jws.WebParam
 import javax.jws.WebResult
@@ -42,7 +44,7 @@ class CbpitaUnderwrittingCaseManagementService {
     def estadisticasService
     def requestService
     def logginService
-    def tarificadorService
+    def serviceZohoService
 
     @WebResult(name = "caseManagementResponse")
     CbpitaUnderwrittingCaseManagementResponse cbpitaUnderwrittingCaseManagement(
@@ -238,25 +240,39 @@ class CbpitaUnderwrittingCaseManagementService {
                         requestXML = cbpitaService.marshall(cbpitaUnderwrittingCasesResultsRequest)
                         requestBBDD = requestService.crear(opername, requestXML)
 
-                        Calendar calendarIni = Calendar.getInstance()
-                        Date date = cbpitaUnderwrittingCasesResultsRequest.dateStart.toGregorianCalendar().getTime()
-                        calendarIni.setTime(date)
-                        calendarIni.add(Calendar.HOUR, -1)
-                        SimpleDateFormat sdfr = new SimpleDateFormat("yyyyMMdd HH:mm:ss")
-                        String fechaIni = sdfr.format(calendarIni.getTime())
+                        // Creamos el formato base sin zona
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
 
-                        Calendar calendarFin = Calendar.getInstance()
-                        date = cbpitaUnderwrittingCasesResultsRequest.dateEnd.toGregorianCalendar().getTime()
-                        calendarFin.setTime(date)
-                        calendarFin.add(Calendar.HOUR, -1)
-                        String fechaFin = sdfr.format(calendarFin.getTime())
+                        // Calculamos el timezone en horas
+                        TimeZone tz = TimeZone.getDefault();
+                        int offsetHours = tz.getRawOffset() / (1000 * 60 * 60); // convierte milisegundos a horas
 
-                        expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt, null, 1, fechaIni, fechaFin, company.getOu()))
-                        expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt, null, 2, fechaIni, fechaFin, company.getOu()))
+                        // Añadimos el offset manualmente
+                        String fechaIni = sdf.format(date) + String.format(":%02d", offsetHours);
+                        String fechaFin = sdf.format(dateEnd) + String.format(":%02d", offsetHours);
+
+                        Frontal frontal =  serviceZohoService.instanciarFrontalZoho(Conf.findByName("frontalZoho.wsdl")?.value)
+                        Usuario usuario = serviceZohoService.obtenerUsuarioFrontal(company.ou);
+
+                        logginService.putInfoMessage("Consultando zoho con fecha " + fechaIni + "-" + fechaFin)
+                        RespuestaCRMInforme respuestaCRMInforme_one = frontal.informeExpedientes(usuario, company.codigoSt, null, 1, fechaIni, fechaFin);
+                        logginService.putInfoMessage("Zoho ha devuelto "+ respuestaCRMInforme_one.listaExpedientesInforme.size() + " expedientes para el estado 1")
+                        RespuestaCRMInforme respuestaCRMInforme_two = frontal.informeExpedientes(usuario, company.codigoSt, null, 2, fechaIni, fechaFin);
+                        logginService.putInfoMessage("Zoho ha devuelto "+ respuestaCRMInforme_two.listaExpedientesInforme.size() + " expedientes para el estado 2")
+                        logginService.putInfoMessage("Consultando zoho termiando")
+
+                        if (respuestaCRMInforme_one?.listaExpedientesInforme) {
+                            expedientes.addAll(respuestaCRMInforme_one.listaExpedientesInforme)
+                        }
+
+                        if (respuestaCRMInforme_two?.listaExpedientesInforme) {
+                            expedientes.addAll(respuestaCRMInforme_two.listaExpedientesInforme)
+                        }
 
                         String idIdentificador = new Date().format( 'dd-mm-yyyy HH:mm:ss' )
 
                         if (expedientes) {
+                            logginService.putInfoMessage("Se van a procesar " + expedientes.size() + " expedientes para " + company.nombre)
                             requestService.insertarEnvio(company, "SOLICITUD: " + idIdentificador,requestXML.toString())
                             expedientes.each { expedientePoliza ->
 
@@ -265,7 +281,7 @@ class CbpitaUnderwrittingCaseManagementService {
                                     List<Documentacion> listaDocumentosAudio = new ArrayList<Documentacion>()
                                     audioEncontrado = false
 
-                                    listaDocumentosAudio = zipUtils.obtenerAudios(expedientePoliza, null)
+                                    listaDocumentosAudio = serviceZohoService.obtenerAudios(expedientePoliza)
 
                                     if (listaDocumentosAudio != null && listaDocumentosAudio.size() > 0) {
 

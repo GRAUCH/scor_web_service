@@ -67,7 +67,7 @@ class MethislabCFService implements ICompanyService{
 
     def rellenaDatosSalidaConsulta(Expediente expedientePoliza, requestDate) {
 
-        log.info("Rellenando datos de salida de consulta MethislabCF")
+        log.info("Rellenando datos de salida de consulta para expediente " + expedientePoliza.getCodigoST())
 
         MethislabCFUnderwrittingCasesResultsResponse.Expediente expediente = new MethislabCFUnderwrittingCasesResultsResponse.Expediente()
 
@@ -129,7 +129,7 @@ class MethislabCFService implements ICompanyService{
             }
         }
 
-        log.info("Fin rellenando datos de salida de consulta MethislabCF")
+        log.info("Fin rellenando datos de salida de consulta para expediente " + expedientePoliza.getCodigoST())
 
         return expediente
     }
