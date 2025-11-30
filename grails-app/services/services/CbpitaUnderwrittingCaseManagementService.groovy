@@ -240,6 +240,9 @@ class CbpitaUnderwrittingCaseManagementService {
                         requestXML = cbpitaService.marshall(cbpitaUnderwrittingCasesResultsRequest)
                         requestBBDD = requestService.crear(opername, requestXML)
 
+                        Date date = cbpitaUnderwrittingCasesResultsRequest.getDateStart().toGregorianCalendar().getTime();
+                        Date dateEnd = cbpitaUnderwrittingCasesResultsRequest.getDateEnd().toGregorianCalendar().getTime();
+
                         // Creamos el formato base sin zona
                         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
 

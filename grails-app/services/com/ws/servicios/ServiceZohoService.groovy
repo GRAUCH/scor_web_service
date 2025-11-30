@@ -5,6 +5,8 @@ import com.ws.enumeration.UnidadOrganizativa
 import com.zoho.services.Candidato
 import com.zoho.services.Documentacion
 import com.zoho.services.ExpedienteInforme
+import com.zoho.services.Filtro
+import com.zoho.services.ClaveFiltro
 import com.zoho.services.Frontal
 import com.zoho.services.FrontalService
 import com.zoho.services.Usuario
@@ -362,6 +364,18 @@ class ServiceZohoService {
         }
 
         return null;
+    }
+
+
+    def crearFiltro(String requestNumber, String codigoST) {
+        Filtro filtro = new Filtro()
+        filtro.setClave(ClaveFiltro.CLIENTE)
+        filtro.setValor(codigoST)
+        Filtro filtroRelacionado = new Filtro()
+        filtroRelacionado.setClave(ClaveFiltro.NUM_SOLICITUD)
+        filtroRelacionado.setValor(requestNumber)
+        filtro.setFiltroRelacionado(filtroRelacionado)
+        return filtro
     }
 
 }

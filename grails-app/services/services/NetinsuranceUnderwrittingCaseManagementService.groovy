@@ -1,8 +1,13 @@
 package services
 
+import com.scortelemed.Conf
 import com.scortelemed.Request
 import com.scortelemed.TipoCompany
 import com.scortelemed.TipoOperacion
+import com.zoho.services.Frontal
+import com.zoho.services.RespuestaCRM
+import com.zoho.services.RespuestaCRMInforme
+import com.zoho.services.Usuario
 import grails.util.Environment
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
@@ -22,8 +27,6 @@ import org.grails.cxf.utils.GrailsCxfEndpointProperty
 import org.springframework.web.context.request.RequestContextHolder
 import servicios.Expediente
 import servicios.Filtro
-import servicios.RespuestaCRM
-import servicios.RespuestaCRMInforme
 
 import com.scortelemed.Company
 import com.scortelemed.Operacion
@@ -52,7 +55,8 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 	def estadisticasService
 	def requestService
 	def logginService
-	def tarificadorService
+	def serviceZohoService
+
 
 	@WebResult(name = "CaseManagementResponse")
 	NetinsuranteUnderwrittingCaseManagementResponse netInsuranteUnderwrittingCaseManagement(
@@ -159,14 +163,37 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 					requestXML=netinsuranceService.marshall(netInsuranteUnderwrittingCasesResults)
 					requestBBDD=requestService.crear(opername,requestXML)
 
-					Date date = netInsuranteUnderwrittingCasesResults.dateStart.toGregorianCalendar().getTime()
-					SimpleDateFormat sdfr = new SimpleDateFormat("yyyyMMdd HH:mm:ss")
-					String fechaIni = sdfr.format(date)
-					date = netInsuranteUnderwrittingCasesResults.dateEnd.toGregorianCalendar().getTime()
-					String fechaFin = sdfr.format(date)
+					Date date = netInsuranteUnderwrittingCasesResults.getDateStart().toGregorianCalendar().getTime();
+					Date dateEnd = netInsuranteUnderwrittingCasesResults.getDateEnd().toGregorianCalendar().getTime();
 
-					expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt,null,1,fechaIni,fechaFin,company.ou))
-					expedientes.addAll(expedienteService.obtenerInformeExpedientes(company.codigoSt,null,2,fechaIni,fechaFin,company.ou))
+					// Creamos el formato base sin zona
+					SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
+
+					// Calculamos el timezone en horas
+					TimeZone tz = TimeZone.getDefault();
+					int offsetHours = tz.getRawOffset() / (1000 * 60 * 60); // convierte milisegundos a horas
+
+					// Añadimos el offset manualmente
+					String fechaIni = sdf.format(date) + String.format(":%02d", offsetHours);
+					String fechaFin = sdf.format(dateEnd) + String.format(":%02d", offsetHours);
+
+					Frontal frontal =  serviceZohoService.instanciarFrontalZoho(Conf.findByName("frontalZoho.wsdl")?.value)
+					Usuario usuario = serviceZohoService.obtenerUsuarioFrontal(company.ou);
+
+					logginService.putInfoMessage("Consultando zoho con fecha " + fechaIni + "-" + fechaFin)
+					RespuestaCRMInforme respuestaCRMInforme_one = frontal.informeExpedientes(usuario, company.codigoSt, null, 1, fechaIni, fechaFin);
+					logginService.putInfoMessage("Zoho ha devuelto "+ respuestaCRMInforme_one.listaExpedientesInforme.size() + " expedientes para el estado 1")
+					RespuestaCRMInforme respuestaCRMInforme_two = frontal.informeExpedientes(usuario, company.codigoSt, null, 2, fechaIni, fechaFin);
+					logginService.putInfoMessage("Zoho ha devuelto "+ respuestaCRMInforme_two.listaExpedientesInforme.size() + " expedientes para el estado 2")
+					logginService.putInfoMessage("Consultando zoho termiando")
+
+					if (respuestaCRMInforme_one?.listaExpedientesInforme) {
+						expedientes.addAll(respuestaCRMInforme_one.listaExpedientesInforme)
+					}
+
+					if (respuestaCRMInforme_two?.listaExpedientesInforme) {
+						expedientes.addAll(respuestaCRMInforme_two.listaExpedientesInforme)
+					}
 
 					requestService.insertarEnvio(company, netInsuranteUnderwrittingCasesResults.dateStart.toString().substring(0,10) + "-" + netInsuranteUnderwrittingCasesResults.dateEnd.toString().substring(0,10), requestXML.toString())
 
@@ -260,7 +287,16 @@ class NetinsuranceUnderwrittingCaseManagementService	 {
 					requestBBDD=requestService.crear(opername,requestXML)
 
 					logginService.putInfoEndpoint("ConsultaExpediente","Realizando peticion para " + company.nombre + " con numero de expiente: " + consultaExpediente.requestNumber)
-					respuestaCRM = expedienteService.consultaExpedienteNumSolicitud(consultaExpediente.requestNumber, company.ou, company.codigoSt)
+
+					Frontal frontal =  serviceZohoService.instanciarFrontalZoho(Conf.findByName("frontalZoho.wsdl")?.value)
+					Usuario usuario = serviceZohoService.obtenerUsuarioFrontal(company.ou);
+					com.zoho.services.Filtro filtro = serviceZohoService.crearFiltro(consultaExpediente.requestNumber, company.codigoSt);
+
+					logginService.putInfoMessage("Consultando zoho para expediente " + consultaExpediente.requestNumber)
+					respuestaCRM = frontal.consultaExpediente(usuario, filtro)
+					logginService.putInfoMessage("Zoho ha devuelto "+ (respuestaCRM.getListaExpedientes() != null ? respuestaCRM.getListaExpedientes().size() : 0) + " expedientes para el numero " + consultaExpediente.requestNumber)
+					logginService.putInfoMessage("Consultando zoho termiando")
+
 					requestService.insertarEnvio (company, consultaExpediente.requestNumber, requestXML.toString())
 					if(respuestaCRM != null && respuestaCRM.getListaExpedientes() != null){
 

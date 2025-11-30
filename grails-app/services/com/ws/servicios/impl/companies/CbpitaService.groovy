@@ -19,6 +19,7 @@ import grails.util.Holders
 import hwsol.webservices.CorreoUtil
 import hwsol.webservices.TransformacionUtil
 import hwsol.webservices.WsError
+import org.apache.log4j.Logger
 import org.w3c.dom.Document
 import org.w3c.dom.Element
 import org.w3c.dom.Node
@@ -38,10 +39,10 @@ class CbpitaService implements ICompanyService{
     def requestService = Holders.grailsApplication.mainContext.getBean("requestService")
     def expedienteService = Holders.grailsApplication.mainContext.getBean("expedienteService")
     def logginService = Holders.grailsApplication.mainContext.getBean("logginService")
-    ZipUtils zipUtils = new ZipUtils()
     CorreoUtil correoUtil = new CorreoUtil()
     def serviceZohoService
 
+    static final Logger log = Logger.getLogger(CbpitaService)
 
     String marshall(def objeto) {
         String nameSpace = "http://www.scortelemed.com/schemas/cbpita"
